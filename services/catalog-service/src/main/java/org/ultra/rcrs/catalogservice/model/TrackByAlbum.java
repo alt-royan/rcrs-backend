@@ -8,23 +8,30 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
+import org.ultra.rcrs.catalogservice.model.key.TrackByAlbumKey;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
-@Table("artists_by_id")
-public class ArtistById {
+@Table("tracks_by_album")
+public class TrackByAlbum {
 
     @PrimaryKey
-    @Column("artist_id")
-    private UUID artistId;
+    private TrackByAlbumKey key;
 
-    private String name;
+    @Column("track_id")
+    private UUID trackId;
 
-    private String bio;
+    private String title;
+
+    private Long duration;
+
+    @Column("artist_ids")
+    private Set<UUID> artistIds;
 
     @Column("image_url")
     private String imageUrl;

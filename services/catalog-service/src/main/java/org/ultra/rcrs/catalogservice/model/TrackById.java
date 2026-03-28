@@ -10,21 +10,25 @@ import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
 import java.time.Instant;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
-@Table("artists_by_id")
-public class ArtistById {
+@Table("tracks_by_id")
+public class TrackById {
 
     @PrimaryKey
-    @Column("artist_id")
-    private UUID artistId;
+    @Column("track_id")
+    private UUID trackId;
 
-    private String name;
+    private String title;
 
-    private String bio;
+    private Long duration;
+
+    @Column("artist_ids")
+    private Set<UUID> artistIds;
 
     @Column("image_url")
     private String imageUrl;
