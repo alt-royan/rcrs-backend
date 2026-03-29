@@ -13,6 +13,8 @@ import org.ultra.rcrs.enums.AlbumGroup;
 import org.ultra.rcrs.enums.AlbumType;
 
 import java.time.Instant;
+import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -31,8 +33,14 @@ public class AlbumByArtist {
     @Column("album_group")
     private AlbumGroup albumGroup;
 
+    @Column("artist_ids")
+    private Set<UUID> artistIds;
+
     @Column("image_url")
     private String imageUrl;
+
+    @Column("total_tracks")
+    private Integer totalTracks;
 
     @Column("created_at")
     @CreatedDate

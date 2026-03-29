@@ -39,6 +39,9 @@ public class AlbumById {
     @Column("image_url")
     private String imageUrl;
 
+    @Column("total_tracks")
+    private Integer totalTracks;
+
     @Column("created_at")
     @CreatedDate
     private Instant createdAt;

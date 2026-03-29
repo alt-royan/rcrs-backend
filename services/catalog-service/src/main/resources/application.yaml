@@ -1,3 +1,8 @@
 spring:
   application:
     name: catalog-service
+  cassandra:
+    keyspace-name: "rcrs"
+    contact-points: "localhost:9042"
+    local-datacenter: "my-datacenter-1"
+    schema-action: CREATE_IF_NOT_EXISTS

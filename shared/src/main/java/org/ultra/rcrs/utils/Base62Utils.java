@@ -46,4 +46,25 @@ public class Base62Utils {
 
         return new UUID(high, low);
     }
+
+    public static boolean isValid(String s) {
+        if (s == null || s.length() != 22) {
+            return false;
+        }
+
+        for (char c : s.toCharArray()) {
+
+            boolean isDigit = c >= '0' && c <= '9';
+
+            boolean isUpper = c >= 'A' && c <= 'Z';
+
+            boolean isLower = c >= 'a' && c <= 'z';
+
+            if (!(isDigit || isUpper || isLower)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
 }

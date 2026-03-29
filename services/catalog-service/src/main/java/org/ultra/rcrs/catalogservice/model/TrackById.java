@@ -25,7 +25,11 @@ public class TrackById {
 
     private String title;
 
-    private Long duration;
+    @Column("duration_ms")
+    private Long durationMs;
+
+    @Column("track_number")
+    private Integer trackNumber;
 
     @Column("artist_ids")
     private Set<UUID> artistIds;

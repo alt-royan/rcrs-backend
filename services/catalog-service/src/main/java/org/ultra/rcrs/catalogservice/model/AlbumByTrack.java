@@ -8,31 +8,44 @@ import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
-import org.ultra.rcrs.catalogservice.model.key.TrackByAlbumKey;
+import org.ultra.rcrs.catalogservice.model.key.AlbumByArtistKey;
+import org.ultra.rcrs.catalogservice.model.key.AlbumByTrackKey;
+import org.ultra.rcrs.enums.AlbumGroup;
+import org.ultra.rcrs.enums.AlbumType;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
-@Table("tracks_by_album")
-public class TrackByAlbum {
+@Table("albums_by_track")
+public class AlbumByTrack {
 
     @PrimaryKey
-    private TrackByAlbumKey key;
-
-    @Column("track_id")
-    private UUID trackId;
+    private AlbumByTrackKey key;
 
     private String title;
 
-    @Column("duration_ms")
-    private Long durationMs;
+    @Column("album_type")
+    private AlbumType albumType;
 
     @Column("artist_ids")
     private Set<UUID> artistIds;
+
+    @Column("album_group")
+    private AlbumGroup albumGroup;
+
+    @Column("release_date")
+    private LocalDate releaseDate;
+
+    @Column("image_url")
+    private String imageUrl;
+
+    @Column("total_tracks")
+    private Integer totalTracks;
 
     @Column("created_at")
     @CreatedDate

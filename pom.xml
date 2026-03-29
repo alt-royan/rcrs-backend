@@ -26,6 +26,7 @@
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
         <tika.version>3.2.3</tika.version>
         <imgscalr.version>4.2</imgscalr.version>
+        <spring-doc.version>3.0.2</spring-doc.version>
     </properties>
 
     <modules>
@@ -45,6 +46,12 @@
                 <groupId>org.ultra.rcrs</groupId>
                 <artifactId>shared-lib</artifactId>
                 <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+                <version>${spring-doc.version}</version>
+                <scope>compile</scope>
             </dependency>
 
             <dependency>

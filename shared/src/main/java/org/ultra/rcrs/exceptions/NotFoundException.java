@@ -12,4 +12,8 @@ public class NotFoundException extends RuntimeException {
     public NotFoundException(Class<?> entityClass, String param, Object paramValue) {
         super(String.format(messageTemplate, entityClass.getSimpleName(), param, paramValue.toString()));
     }
+
+    public NotFoundException(String message) {
+        super(message);
+    }
 }
