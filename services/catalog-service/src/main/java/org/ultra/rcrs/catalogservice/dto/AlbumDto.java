@@ -3,10 +3,10 @@ package org.ultra.rcrs.catalogservice.dto;
 import lombok.Data;
 import org.ultra.rcrs.catalogservice.dto.simplify.ArtistSimplifyDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.TrackSimplifyDto;
-import org.ultra.rcrs.catalogservice.model.AlbumById;
+import org.ultra.rcrs.catalogservice.model.Album;
 import org.ultra.rcrs.catalogservice.utils.S3Utils;
 import org.ultra.rcrs.enums.AlbumType;
-import org.ultra.rcrs.utils.Base62Utils;
+import org.ultra.rcrs.utils.Url62;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -30,8 +30,8 @@ public class AlbumDto {
 
     private Integer totalTracks;
 
-    public AlbumDto(AlbumById album, Collection<ArtistSimplifyDto> artists, Collection<TrackSimplifyDto> tracks) {
-        this.id = Base62Utils.encode(album.getAlbumId());
+    public AlbumDto(Album album, Collection<ArtistSimplifyDto> artists, Collection<TrackSimplifyDto> tracks) {
+        this.id = Url62.encode(album.getAlbumId());
         this.title = album.getTitle();
         this.albumType = album.getAlbumType();
         this.releaseDate = album.getReleaseDate();

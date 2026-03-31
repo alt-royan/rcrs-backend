@@ -1,7 +1,7 @@
 package org.ultra.rcrs.enums;
 
 public enum AlbumGroup {
-    ALBUM("album"), SINGLE("single"), EP("ep"), APPEARS_ON("appears_on");
+    MAINLINE("mainline"), APPEARS_ON("appears_on");
 
     private final String value;
 

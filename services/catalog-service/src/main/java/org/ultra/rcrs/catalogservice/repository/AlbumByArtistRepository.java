@@ -12,4 +12,15 @@ import java.util.UUID;
 public interface AlbumByArtistRepository extends ReactiveCassandraRepository<AlbumByArtist, AlbumByArtistKey> {
 
     Flux<AlbumByArtist> findByKeyArtistId(UUID artistId);
+
+ /*   private final CassandraTemplate cassandraTemplate;
+
+    @Override
+    @Nonnull
+    public <S extends Artist> Mono<S> insert(final @Nonnull S artist){
+        final CassandraBatchOperations batchOps = cassandraTemplate.batchOps();
+        batchOps.insert(artist);
+        batchOps.execute();
+        return movie;
+    }*/
 }

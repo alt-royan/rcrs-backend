@@ -1,13 +1,12 @@
 package org.ultra.rcrs.catalogservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.dto.TrackDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.AlbumSimplifyDto;
-import org.ultra.rcrs.catalogservice.model.TrackById;
+import org.ultra.rcrs.catalogservice.model.Track;
 import org.ultra.rcrs.catalogservice.repository.AlbumByTrackRepository;
-import org.ultra.rcrs.catalogservice.repository.TrackByIdRepository;
+import org.ultra.rcrs.catalogservice.repository.TrackRepository;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import reactor.core.publisher.Mono;
 
@@ -17,19 +16,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TrackReadService {
 
-    @Value
-    private final TrackByIdRepository trackByIdRepository;
+    private final TrackRepository trackRepository;
 
     private final AlbumByTrackRepository albumByTrackRepository;
 
     public final ArtistReadService artistReadService;
 
     public Mono<TrackDto> getTrack(UUID trackId) {
-        return trackByIdRepository.findById(trackId)
+        return trackRepository.findById(trackId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Track with id " + trackId + " was not found")))
                 .zipWith(this.collectAlbumForTrack(trackId))
                 .flatMap(tuple -> {
-                    TrackById track = tuple.getT1();
+                    Track track = tuple.getT1();
                     AlbumSimplifyDto album = tuple.getT2();
                     return artistReadService.collectArtists(track.getArtistIds())
                             .map(artists -> new TrackDto(track, artists, album));

@@ -1,5 +1,6 @@
 package org.ultra.rcrs.catalogservice.model;
 
+import jakarta.annotation.Nonnull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;

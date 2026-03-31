@@ -7,10 +7,10 @@ import org.ultra.rcrs.catalogservice.dto.ItemListDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.AlbumSimplifyDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.ArtistSimplifyDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.TrackSimplifyDto;
-import org.ultra.rcrs.catalogservice.model.AlbumById;
+import org.ultra.rcrs.catalogservice.model.Album;
 import org.ultra.rcrs.catalogservice.repository.AlbumByArtistRepository;
-import org.ultra.rcrs.catalogservice.repository.AlbumByIdRepository;
-import org.ultra.rcrs.catalogservice.repository.ArtistByIdRepository;
+import org.ultra.rcrs.catalogservice.repository.AlbumRepository;
+import org.ultra.rcrs.catalogservice.repository.ArtistRepository;
 import org.ultra.rcrs.catalogservice.repository.TrackByAlbumRepository;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import reactor.core.publisher.Flux;
@@ -22,22 +22,22 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class AlbumReadService {
-    private final AlbumByIdRepository albumByIdRepository;
+    private final AlbumRepository albumRepository;
 
     private final TrackByAlbumRepository trackByAlbumRepository;
 
-    private final ArtistByIdRepository artistByIdRepository;
+    private final ArtistRepository artistRepository;
 
     private final AlbumByArtistRepository albumByArtistRepository;
 
     private final ArtistReadService artistReadService;
 
     public Mono<AlbumDto> getAlbum(UUID albumId) {
-        return albumByIdRepository.findById(albumId)
+        return albumRepository.findById(albumId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Album with id " + albumId + " was not found")))
                 .zipWith(this.collectTracksForAlbum(albumId))
                 .flatMap(tuple -> {
-                    AlbumById album = tuple.getT1();
+                    Album album = tuple.getT1();
                     List<TrackSimplifyDto> tracks = tuple.getT2();
                     return artistReadService.collectArtists(album.getArtistIds())
                             .map(artists -> new AlbumDto(album, artists, tracks));
@@ -56,7 +56,7 @@ public class AlbumReadService {
 
     private Mono<List<TrackSimplifyDto>> collectTracksForAlbum(UUID albumId) {
         return trackByAlbumRepository.findByKeyAlbumId(albumId).flatMap(track -> Flux.fromIterable(track.getArtistIds())
-                .flatMap(artistByIdRepository::findById)
+                .flatMap(artistRepository::findById)
                 .map(ArtistSimplifyDto::new)
                 .collectList()
                 .map(artists -> new TrackSimplifyDto(track, artists))

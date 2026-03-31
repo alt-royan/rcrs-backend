@@ -11,3 +11,6 @@ spring:
     process-topic: "entity-process-topic"
 s3:
   url: http://localhost:9444
+logging:
+  level:
+    root: DEBUG

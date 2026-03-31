@@ -17,7 +17,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @Table("tracks_by_id")
-public class TrackById {
+public class Track {
 
     @PrimaryKey
     @Column("track_id")

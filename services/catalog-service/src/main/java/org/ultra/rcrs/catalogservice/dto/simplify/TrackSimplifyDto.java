@@ -3,7 +3,7 @@ package org.ultra.rcrs.catalogservice.dto.simplify;
 import lombok.Data;
 import org.ultra.rcrs.catalogservice.dto.ItemListDto;
 import org.ultra.rcrs.catalogservice.model.TrackByAlbum;
-import org.ultra.rcrs.utils.Base62Utils;
+import org.ultra.rcrs.utils.Url62;
 
 import java.util.List;
 
@@ -21,7 +21,7 @@ public class TrackSimplifyDto {
     private Long durationMs;
 
     public TrackSimplifyDto(TrackByAlbum track, List<ArtistSimplifyDto> artists) {
-        this.id = Base62Utils.encode(track.getTrackId());
+        this.id = Url62.encode(track.getTrackId());
         this.trackNumber = track.getKey().getTrackNumber();
         this.title = track.getTitle();
         this.durationMs = track.getDurationMs();

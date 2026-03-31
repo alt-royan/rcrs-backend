@@ -7,7 +7,7 @@ import org.ultra.rcrs.catalogservice.model.AlbumByArtist;
 import org.ultra.rcrs.catalogservice.model.AlbumByTrack;
 import org.ultra.rcrs.catalogservice.utils.S3Utils;
 import org.ultra.rcrs.enums.AlbumType;
-import org.ultra.rcrs.utils.Base62Utils;
+import org.ultra.rcrs.utils.Url62;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -30,7 +30,7 @@ public class AlbumSimplifyDto {
     private Integer totalTracks;
 
     public AlbumSimplifyDto(AlbumByTrack album, Collection<ArtistSimplifyDto> artists) {
-        this.id = Base62Utils.encode(album.getKey().getAlbumId());
+        this.id = Url62.encode(album.getKey().getAlbumId());
         this.title = album.getTitle();
         this.albumType = album.getAlbumType();
         this.releaseDate = album.getReleaseDate();
@@ -40,7 +40,7 @@ public class AlbumSimplifyDto {
     }
 
     public AlbumSimplifyDto(AlbumByArtist album, Collection<ArtistSimplifyDto> artists) {
-        this.id = Base62Utils.encode(album.getKey().getAlbumId());
+        this.id = Url62.encode(album.getKey().getAlbumId());
         this.title = album.getTitle();
         this.albumType = album.getAlbumType();
         this.releaseDate = album.getKey().getReleaseDate();
