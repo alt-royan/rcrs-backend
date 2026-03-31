@@ -6,3 +6,6 @@ spring:
     contact-points: "localhost:9042"
     local-datacenter: "my-datacenter-1"
     schema-action: CREATE_IF_NOT_EXISTS
+  kafka:
+    bootstrap-servers: localhost:9092
+    process-topic: "entity-process-topic"
