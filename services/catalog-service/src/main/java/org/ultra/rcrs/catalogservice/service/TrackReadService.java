@@ -17,7 +17,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TrackReadService {
 
-    @Value
     private final TrackByIdRepository trackByIdRepository;
 
     private final AlbumByTrackRepository albumByTrackRepository;
