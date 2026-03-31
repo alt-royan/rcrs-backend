@@ -36,8 +36,8 @@ public class AlbumByArtist {
     @Column("artist_ids")
     private Set<UUID> artistIds;
 
-    @Column("image_url")
-    private String imageUrl;
+    @Column("image_key")
+    private String imageKey;
 
     @Column("total_tracks")
     private Integer totalTracks;

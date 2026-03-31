@@ -5,6 +5,7 @@ import org.ultra.rcrs.catalogservice.dto.ImageDto;
 import org.ultra.rcrs.catalogservice.dto.ItemListDto;
 import org.ultra.rcrs.catalogservice.model.AlbumByArtist;
 import org.ultra.rcrs.catalogservice.model.AlbumByTrack;
+import org.ultra.rcrs.catalogservice.utils.S3Utils;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.utils.Base62Utils;
 
@@ -34,7 +35,7 @@ public class AlbumSimplifyDto {
         this.albumType = album.getAlbumType();
         this.releaseDate = album.getReleaseDate();
         this.totalTracks = album.getTotalTracks();
-        this.coverArt = new ImageDto(album.getImageUrl());
+        this.coverArt = new ImageDto(S3Utils.createResourceS3Url(album.getImageKey()));
         this.artists = new ItemListDto<>(artists);
     }
 
@@ -44,7 +45,7 @@ public class AlbumSimplifyDto {
         this.albumType = album.getAlbumType();
         this.releaseDate = album.getKey().getReleaseDate();
         this.totalTracks = album.getTotalTracks();
-        this.coverArt = new ImageDto(album.getImageUrl());
+        this.coverArt = new ImageDto(S3Utils.createResourceS3Url(album.getImageKey()));
         this.artists = new ItemListDto<>(artists);
     }
 

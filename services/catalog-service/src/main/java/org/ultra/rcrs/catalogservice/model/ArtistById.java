@@ -26,8 +26,8 @@ public class ArtistById {
 
     private String bio;
 
-    @Column("image_url")
-    private String imageUrl;
+    @Column("image_key")
+    private String imageKey;
 
     @Column("created_at")
     @CreatedDate

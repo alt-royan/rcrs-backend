@@ -41,8 +41,8 @@ public class AlbumByTrack {
     @Column("release_date")
     private LocalDate releaseDate;
 
-    @Column("image_url")
-    private String imageUrl;
+    @Column("image_key")
+    private String imageKey;
 
     @Column("total_tracks")
     private Integer totalTracks;

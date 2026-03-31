@@ -1,6 +1,7 @@
 package org.ultra.rcrs.catalogservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.dto.TrackDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.AlbumSimplifyDto;
@@ -16,6 +17,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class TrackReadService {
 
+    @Value
     private final TrackByIdRepository trackByIdRepository;
 
     private final AlbumByTrackRepository albumByTrackRepository;
