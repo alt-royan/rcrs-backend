@@ -38,6 +38,7 @@ public class TrackPersistRepositoryImpl implements TrackPersistRepository<Track>
 
         track.setTrackId(UUID.randomUUID());
         track.setDurationMs(0L);
+        track.setAvailable(true);
 
         return Mono.just(track).zipWith(processByAlbum(track)).zipWith(processByArtist(track))
                 .flatMap(tuple -> {

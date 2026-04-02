@@ -20,14 +20,18 @@ public class Artist {
     @Column("artist_id")
     private UUID artistId;
 
+    @Column("name")
     private String name;
 
+    @Column("bio")
     private String bio;
 
     @Column("image_key")
     private String imageKey;
 
-    public Artist(ArtistRegisterDto dto){
-
+    public Artist(ArtistRegisterDto dto) {
+        this.name = dto.getName();
+        this.bio = dto.getBio();
+        this.imageKey = dto.getImageExternalKey();
     }
 }

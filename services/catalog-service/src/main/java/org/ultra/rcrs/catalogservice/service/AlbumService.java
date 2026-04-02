@@ -36,9 +36,7 @@ public class AlbumService {
     public Mono<AlbumDto> getAlbum(UUID albumId) {
         return albumRepository.findById(albumId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Album with id " + albumId + " was not found")))
-                .flatMap(album -> trackService.getTracksForAlbum(album)
-                        .flatMap(tracks -> artistService.collectArtistsByRole(album.getArtists(), ArtistRole.MAIN_ARTIST)
-                                .map(artists -> new AlbumDto(album, artists, tracks))));
+                .flatMap(this::albumToDto);
     }
 
     public Mono<AlbumSimplifyDto> getAlbum(AlbumByArtist albumByArtist) {
@@ -73,8 +71,8 @@ public class AlbumService {
                 .map(ItemListDto::new);
     }
 
-    public Mono<Album> createAlbum(AlbumCreateDto dto) {
-        return albumRepository.save(new Album(dto));
+    public Mono<AlbumDto> createAlbum(AlbumCreateDto dto) {
+        return albumRepository.save(new Album(dto)).flatMap(this::albumToDto);
     }
 
     public Mono<Void> deleteAlbumCascadeById(UUID albumId) {
@@ -89,6 +87,12 @@ public class AlbumService {
         return Flux.fromIterable(artists)
                 .flatMap(artistWithRole -> albumByArtistRepository.deleteByKeyArtistIdAndArtistRoleAndAlbumId(artistWithRole.getArtistId(), artistWithRole.getArtistRole(), albumId))
                 .then();
+    }
+
+    private Mono<AlbumDto> albumToDto(Album album) {
+        return trackService.getTracksForAlbum(album)
+                .flatMap(tracks -> artistService.collectArtistsByRole(album.getArtists(), ArtistRole.MAIN_ARTIST)
+                        .map(artists -> new AlbumDto(album, artists, tracks)));
     }
 
 }

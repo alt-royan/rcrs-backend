@@ -2,8 +2,10 @@ package org.ultra.rcrs.catalogservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.catalogservice.dto.TrackDto;
+import org.ultra.rcrs.catalogservice.dto.request.TrackCreateDto;
 import org.ultra.rcrs.catalogservice.service.TrackService;
 import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Mono;
@@ -24,6 +26,12 @@ public class TrackController {
     @DeleteMapping("/{trackId}")
     public Mono<ResponseEntity<Void>> deleteTrack(@PathVariable("trackId") String trackId) {
         return trackService.deleteTrackById(Url62.decode(trackId))
+                .map(ResponseEntity::ok);
+    }
+
+    @PostMapping
+    public Mono<ResponseEntity<TrackDto>> createTrack(@RequestBody @Validated TrackCreateDto dto) {
+        return trackService.createTrack(dto)
                 .map(ResponseEntity::ok);
     }
 

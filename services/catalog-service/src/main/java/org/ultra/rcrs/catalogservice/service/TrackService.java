@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.dto.ItemListDto;
 import org.ultra.rcrs.catalogservice.dto.TrackDto;
+import org.ultra.rcrs.catalogservice.dto.request.TrackCreateDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.AlbumSimplifyDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.TrackSimplifyDto;
 import org.ultra.rcrs.catalogservice.model.album.Album;
 import org.ultra.rcrs.catalogservice.model.artist.ArtistWithRole;
+import org.ultra.rcrs.catalogservice.model.track.Track;
 import org.ultra.rcrs.catalogservice.model.track.TrackByAlbum;
 import org.ultra.rcrs.catalogservice.model.track.TrackByArtist;
 import org.ultra.rcrs.catalogservice.repository.AlbumRepository;
@@ -36,9 +38,11 @@ public class TrackService {
     public Mono<TrackDto> getTrack(UUID trackId) {
         return trackRepository.findById(trackId)
                 .switchIfEmpty(Mono.error(new NotFoundException("Track with id " + trackId + " was not found")))
-                .flatMap(track -> collectAlbumForTrack(track.getAlbumId())
-                        .zipWith(artistService.collectAllArtists(track.getArtists()))
-                        .map(tuple -> new TrackDto(track, tuple.getT2(), tuple.getT1())));
+                .flatMap(this::trackToDto);
+    }
+
+    public Mono<TrackDto> createTrack(TrackCreateDto dto) {
+        return trackRepository.save(new Track(dto)).flatMap(this::trackToDto);
     }
 
     public Mono<TrackSimplifyDto> getTrack(TrackByAlbum trackByAlbum) {
@@ -76,6 +80,13 @@ public class TrackService {
         return trackByAlbumRepository.findByKeyAlbumId(album.getAlbumId())
                 .flatMap(trackByAlbum -> deleteTrackById(trackByAlbum.getKey().getTrackId()))
                 .then();
+    }
+
+    private Mono<TrackDto> trackToDto(Track track) {
+        return collectAlbumForTrack(track.getAlbumId())
+                .flatMap(album -> artistService.collectAllArtists(track.getArtists())
+                        .map(artists -> new TrackDto(track, artists, album))
+                );
     }
 
     private Mono<Void> deleteTrackByAlbum(UUID albumId, UUID trackId) {

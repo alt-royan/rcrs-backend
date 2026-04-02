@@ -36,6 +36,7 @@ public class AlbumPersistRepositoryImpl implements AlbumPersistRepository<Album>
         album.setAlbumId(UUID.randomUUID());
         album.setTotalTracks(0);
         album.setTotalDurationMs(0L);
+        album.setAvailable(true);
 
         return Mono.just(album).zipWith(processByArtist(album))
                 .flatMap(tuple -> {

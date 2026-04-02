@@ -6,10 +6,9 @@ import lombok.Setter;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
+import org.ultra.rcrs.catalogservice.dto.request.TrackCreateDto;
 import org.ultra.rcrs.catalogservice.model.artist.ArtistWithRole;
-import org.ultra.rcrs.enums.ArtistRole;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -36,5 +35,19 @@ public class Track {
 
     @Column("track_number")
     private Integer trackNumber;
+
+    @Column("explicit")
+    private Boolean explicit;
+
+    @Column("available")
+    private Boolean available;
+
+    public Track(TrackCreateDto dto) {
+        this.title = dto.getTitle();
+        this.albumId = dto.getAlbumId();
+        this.artists = dto.getArtists();
+        this.trackNumber = dto.getTrackNumber();
+        this.explicit = dto.getExplicit();
+    }
 
 }

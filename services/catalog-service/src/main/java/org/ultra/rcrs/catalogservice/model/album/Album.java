@@ -45,8 +45,18 @@ public class Album {
     @Column("total_tracks")
     private Integer totalTracks;
 
-    public Album(AlbumCreateDto dto){
+    @Column("explicit")
+    private Boolean explicit;
 
+    @Column("available")
+    private Boolean available;
+
+    public Album(AlbumCreateDto dto) {
+        this.title = dto.getTitle();
+        this.albumType = dto.getAlbumType();
+        this.releaseDate = dto.getReleaseDate();
+        this.imageKey = dto.getImageKey();
+        this.artists = dto.getArtists();
+        this.explicit = dto.getExplicit();
     }
-
 }

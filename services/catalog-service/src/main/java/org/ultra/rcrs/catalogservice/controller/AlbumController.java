@@ -8,7 +8,6 @@ import org.ultra.rcrs.catalogservice.dto.AlbumDto;
 import org.ultra.rcrs.catalogservice.dto.ItemListDto;
 import org.ultra.rcrs.catalogservice.dto.request.AlbumCreateDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.TrackSimplifyDto;
-import org.ultra.rcrs.catalogservice.model.album.Album;
 import org.ultra.rcrs.catalogservice.service.AlbumService;
 import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Mono;
@@ -39,7 +38,7 @@ public class AlbumController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Album>> createAlbum(@RequestBody @Validated AlbumCreateDto dto) {
+    public Mono<ResponseEntity<AlbumDto>> createAlbum(@RequestBody @Validated AlbumCreateDto dto) {
         return albumService.createAlbum(dto)
                 .map(ResponseEntity::ok);
     }
