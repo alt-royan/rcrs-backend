@@ -3,7 +3,6 @@ package org.ultra.rcrs.catalogservice.dto.simplify;
 import lombok.Data;
 import org.ultra.rcrs.catalogservice.dto.ItemListDto;
 import org.ultra.rcrs.catalogservice.model.album.Album;
-import org.ultra.rcrs.catalogservice.model.album.AlbumByArtist;
 import org.ultra.rcrs.catalogservice.utils.S3Utils;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.utils.Url62;
@@ -33,16 +32,6 @@ public class AlbumSimplifyDto {
         this.title = album.getTitle();
         this.albumType = album.getAlbumType();
         this.releaseDate = album.getReleaseDate();
-        this.totalTracks = album.getTotalTracks();
-        this.coverUrl = S3Utils.createResourceS3Url(album.getImageKey());
-        this.artists = new ItemListDto<>(artists);
-    }
-
-    public AlbumSimplifyDto(AlbumByArtist album, Collection<ArtistSimplifyDto> artists) {
-        this.id = Url62.encode(album.getKey().getAlbumId());
-        this.title = album.getTitle();
-        this.albumType = album.getAlbumType();
-        this.releaseDate = album.getKey().getReleaseDate();
         this.totalTracks = album.getTotalTracks();
         this.coverUrl = S3Utils.createResourceS3Url(album.getImageKey());
         this.artists = new ItemListDto<>(artists);
