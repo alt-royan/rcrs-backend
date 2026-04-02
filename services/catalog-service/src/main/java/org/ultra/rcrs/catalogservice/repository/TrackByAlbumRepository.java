@@ -2,14 +2,14 @@ package org.ultra.rcrs.catalogservice.repository;
 
 import org.springframework.data.cassandra.repository.ReactiveCassandraRepository;
 import org.springframework.stereotype.Repository;
-import org.ultra.rcrs.catalogservice.model.TrackByAlbum;
-import org.ultra.rcrs.catalogservice.model.key.TrackByAlbumKey;
-import reactor.core.publisher.Flux;
+import org.ultra.rcrs.catalogservice.model.track.TrackByAlbum;
+import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface TrackByAlbumRepository extends ReactiveCassandraRepository<TrackByAlbum, TrackByAlbumKey> {
+public interface TrackByAlbumRepository extends ReactiveCassandraRepository<TrackByAlbum, TrackByAlbum.TrackByAlbumKey> {
 
-    Flux<TrackByAlbum> findByKeyAlbumId(UUID albumId);
+    Mono<List<TrackByAlbum>> findByKeyAlbumId(UUID albumId);
 }

@@ -1,16 +1,12 @@
-package org.ultra.rcrs.catalogservice.model;
+package org.ultra.rcrs.catalogservice.model.artist;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -29,13 +25,4 @@ public class Artist {
 
     @Column("image_key")
     private String imageKey;
-
-    @Column("created_at")
-    @CreatedDate
-    private Instant createdAt;
-
-    @Column("last_modified_at")
-    @LastModifiedDate
-    private Instant lastModifiedAt;
-
 }

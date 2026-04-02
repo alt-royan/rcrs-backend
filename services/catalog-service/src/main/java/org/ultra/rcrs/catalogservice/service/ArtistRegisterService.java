@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.dto.ArtistDto;
 import org.ultra.rcrs.catalogservice.dto.request.ArtistRegisterDto;
-import org.ultra.rcrs.catalogservice.model.Artist;
+import org.ultra.rcrs.catalogservice.model.artist.Artist;
 import org.ultra.rcrs.catalogservice.repository.ArtistRepository;
 import reactor.core.publisher.Mono;
 

@@ -7,7 +7,7 @@ import org.ultra.rcrs.catalogservice.dto.ItemListDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.AlbumSimplifyDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.ArtistSimplifyDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.TrackSimplifyDto;
-import org.ultra.rcrs.catalogservice.model.Album;
+import org.ultra.rcrs.catalogservice.model.album.Album;
 import org.ultra.rcrs.catalogservice.repository.AlbumByArtistRepository;
 import org.ultra.rcrs.catalogservice.repository.AlbumRepository;
 import org.ultra.rcrs.catalogservice.repository.ArtistRepository;

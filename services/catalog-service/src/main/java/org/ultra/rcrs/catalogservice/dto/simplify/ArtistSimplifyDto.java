@@ -1,8 +1,7 @@
 package org.ultra.rcrs.catalogservice.dto.simplify;
 
 import lombok.Data;
-import org.ultra.rcrs.catalogservice.dto.ImageDto;
-import org.ultra.rcrs.catalogservice.model.Artist;
+import org.ultra.rcrs.catalogservice.model.artist.Artist;
 import org.ultra.rcrs.catalogservice.utils.S3Utils;
 import org.ultra.rcrs.utils.Url62;
 
@@ -13,12 +12,12 @@ public class ArtistSimplifyDto {
 
     private String name;
 
-    private ImageDto avatarImage;
+    private String avatarUrl;
 
     public ArtistSimplifyDto(Artist artist) {
         this.id = Url62.encode(artist.getArtistId());
         this.name = artist.getName();
-        this.avatarImage = new ImageDto(S3Utils.createResourceS3Url(artist.getImageKey()));
+        this.avatarUrl = S3Utils.createResourceS3Url(artist.getImageKey());
     }
 
 }

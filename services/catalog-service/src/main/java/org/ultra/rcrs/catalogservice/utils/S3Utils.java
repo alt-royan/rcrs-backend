@@ -1,5 +1,6 @@
 package org.ultra.rcrs.catalogservice.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,10 @@ public class S3Utils {
         S3_URL = s3Url;
     }
 
-    public static String createResourceS3Url(String key){
+    public static String createResourceS3Url(String key) {
+        if (StringUtils.isEmpty(key)) {
+            return null;
+        }
         try {
             return new URIBuilder(S3_URL).setPath(key).build().toString();
         } catch (URISyntaxException e) {

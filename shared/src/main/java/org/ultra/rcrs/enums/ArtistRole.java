@@ -1,11 +1,11 @@
 package org.ultra.rcrs.enums;
 
-public enum AlbumGroup {
-    MAINLINE("mainline"), APPEARS_ON("appears_on");
+public enum ArtistRole {
+    MAIN_ARTIST("main_artist"), APPEARS_ON("appears_on");
 
     private final String value;
 
-    AlbumGroup(String value) {
+    ArtistRole(String value) {
         this.value = value;
     }
 

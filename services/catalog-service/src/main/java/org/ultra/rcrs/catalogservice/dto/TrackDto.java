@@ -3,7 +3,7 @@ package org.ultra.rcrs.catalogservice.dto;
 import lombok.Data;
 import org.ultra.rcrs.catalogservice.dto.simplify.AlbumSimplifyDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.ArtistSimplifyDto;
-import org.ultra.rcrs.catalogservice.model.Track;
+import org.ultra.rcrs.catalogservice.model.track.Track;
 import org.ultra.rcrs.utils.Url62;
 
 import java.util.List;
