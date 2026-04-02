@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
         log.debug(ex.getMessage(), ex);
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), "Object not found"));
+                .body(new ErrorResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage()));
     }
 
     @ExceptionHandler(produces = "application/json", exception = EncodeToBase62Exception.class)
