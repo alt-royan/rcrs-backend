@@ -14,6 +14,4 @@ public interface TrackByAlbumRepository extends ReactiveCassandraRepository<Trac
     Flux<TrackByAlbum> findByKeyAlbumId(UUID albumId);
 
     Mono<Void> deleteByKeyAlbumIdAndTrackId(UUID albumId, UUID trackId);
-
-    Mono<Void> deleteByKeyAlbumId(UUID albumId);
 }

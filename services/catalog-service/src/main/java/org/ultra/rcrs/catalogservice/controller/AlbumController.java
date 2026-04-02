@@ -18,18 +18,23 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/v1/albums")
 public class AlbumController {
 
-    private final AlbumService albumReadService;
     private final AlbumService albumService;
 
     @GetMapping("/{albumId}")
     public Mono<ResponseEntity<AlbumDto>> getAlbum(@PathVariable("albumId") String albumId) {
-        return albumReadService.getAlbum(Url62.decode(albumId))
+        return albumService.getAlbum(Url62.decode(albumId))
                 .map(ResponseEntity::ok);
     }
 
     @GetMapping("/{albumId}/tracks")
     public Mono<ResponseEntity<ItemListDto<TrackSimplifyDto>>> getTracksForAlbum(@PathVariable("albumId") String albumId) {
-        return albumReadService.getTracksForAlbum(Url62.decode(albumId))
+        return albumService.getTracksForAlbum(Url62.decode(albumId))
+                .map(ResponseEntity::ok);
+    }
+
+    @DeleteMapping("/{albumId}")
+    public Mono<ResponseEntity<Void>> deleteAlbum(@PathVariable("albumId") String albumId) {
+        return albumService.deleteAlbumCascadeById(Url62.decode(albumId))
                 .map(ResponseEntity::ok);
     }
 

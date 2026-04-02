@@ -6,6 +6,7 @@ import org.ultra.rcrs.catalogservice.dto.AlbumDto;
 import org.ultra.rcrs.catalogservice.dto.ItemListDto;
 import org.ultra.rcrs.catalogservice.dto.request.AlbumCreateDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.AlbumSimplifyDto;
+import org.ultra.rcrs.catalogservice.dto.simplify.TrackSimplifyDto;
 import org.ultra.rcrs.catalogservice.model.album.Album;
 import org.ultra.rcrs.catalogservice.model.album.AlbumByArtist;
 import org.ultra.rcrs.catalogservice.model.artist.ArtistWithRole;
@@ -42,8 +43,15 @@ public class AlbumService {
 
     public Mono<AlbumSimplifyDto> getAlbum(AlbumByArtist albumByArtist) {
         return albumRepository.findById(albumByArtist.getKey().getAlbumId())
+                .switchIfEmpty(Mono.error(new NotFoundException("Album with id " + albumByArtist.getKey().getAlbumId() + " was not found")))
                 .flatMap(album -> artistService.collectArtistsByRole(album.getArtists(), ArtistRole.MAIN_ARTIST)
                         .map(artists -> new AlbumSimplifyDto(album, artists)));
+    }
+
+    public Mono<ItemListDto<TrackSimplifyDto>> getTracksForAlbum(UUID albumId) {
+        return albumRepository.findById(albumId)
+                .switchIfEmpty(Mono.error(new NotFoundException("Album with id " + albumId + " was not found")))
+                .flatMap(trackService::getTracksForAlbum);
     }
 
 
@@ -71,6 +79,7 @@ public class AlbumService {
 
     public Mono<Void> deleteAlbumCascadeById(UUID albumId) {
         return albumRepository.findById(albumId)
+                .switchIfEmpty(Mono.error(new NotFoundException("Album with id " + albumId + " was not found")))
                 .flatMap(album -> trackService.deleteAllTracksFromAlbum(album)
                         .then(deleteAlbumByArtists(album.getArtists(), albumId))
                         .then(albumRepository.deleteById(albumId)));

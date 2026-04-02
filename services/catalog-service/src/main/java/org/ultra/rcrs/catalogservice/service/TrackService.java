@@ -43,12 +43,14 @@ public class TrackService {
 
     public Mono<TrackSimplifyDto> getTrack(TrackByAlbum trackByAlbum) {
         return trackRepository.findById(trackByAlbum.getKey().getTrackId())
+                .switchIfEmpty(Mono.error(new NotFoundException("Track with id " + trackByAlbum.getKey().getTrackId() + " was not found")))
                 .flatMap(track -> artistService.collectAllArtists(track.getArtists())
                         .map(artists -> new TrackSimplifyDto(track, artists)));
     }
 
     public Mono<TrackSimplifyDto> getTrack(TrackByArtist trackByArtist) {
         return trackRepository.findById(trackByArtist.getKey().getTrackId())
+                .switchIfEmpty(Mono.error(new NotFoundException("Track with id " + trackByArtist.getKey().getTrackId() + " was not found")))
                 .flatMap(track -> artistService.collectAllArtists(track.getArtists())
                         .map(artists -> new TrackSimplifyDto(track, artists)));
     }
@@ -62,6 +64,7 @@ public class TrackService {
 
     public Mono<Void> deleteTrackById(UUID trackId) {
         return trackRepository.findById(trackId)
+                .switchIfEmpty(Mono.error(new NotFoundException("Track with id " + trackId + " was not found")))
                 .flatMap(track ->
                         deleteTrackByAlbum(track.getAlbumId(), trackId)
                                 .then(deleteTrackByArtists(track.getArtists(), trackId))

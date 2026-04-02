@@ -38,7 +38,6 @@ public class ArtistController {
                 .map(ResponseEntity::ok);
     }
 
-
     @PostMapping
     public Mono<ResponseEntity<ArtistDto>> registerNewArtist(@RequestBody @Validated ArtistRegisterDto artistRegisterDto) {
         return artistRegisterService.registerNewArtist(artistRegisterDto)
