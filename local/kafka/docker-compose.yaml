@@ -4,6 +4,7 @@ services:
     image: confluentinc/cp-zookeeper:7.2.1
     hostname: zookeeper
     container_name: zookeeper
+    restart: unless-stopped
     ports:
       - "2181:2181"
     environment:
@@ -14,6 +15,7 @@ services:
     image: confluentinc/cp-kafka:7.2.1
     hostname: kafka
     container_name: kafka
+    restart: unless-stopped
     depends_on:
       - zookeeper
     ports:
@@ -27,6 +29,7 @@ services:
 
   kafka-ui:
     container_name: kafka-ui
+    restart: unless-stopped
     image: provectuslabs/kafka-ui:latest
     ports:
       - "9091:8080"

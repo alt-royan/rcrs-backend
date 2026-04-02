@@ -85,7 +85,7 @@ public class AlbumService {
 
     private Mono<Void> deleteAlbumByArtists(Collection<ArtistWithRole> artists, UUID albumId) {
         return Flux.fromIterable(artists)
-                .flatMap(artistWithRole -> albumByArtistRepository.deleteByKeyArtistIdAndArtistRoleAndAlbumId(artistWithRole.getArtistId(), artistWithRole.getArtistRole(), albumId))
+                .flatMap(artistWithRole -> albumByArtistRepository.deleteByKeyArtistIdAndKeyArtistRoleAndKeyAlbumId(artistWithRole.getArtistId(), artistWithRole.getArtistRole(), albumId))
                 .then();
     }
 

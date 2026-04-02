@@ -31,6 +31,7 @@ public class TrackPersistRepositoryImpl implements TrackPersistRepository<Track>
 
     @Override
     public @NonNull <S extends Track> Mono<S> save(@Nonnull S track) {
+        Assert.notNull(track.getArtists(), "Artists must not be null");
         Assert.notNull(track.getTitle(), "Title must not be null");
         Assert.notNull(track.getAlbumId(), "Album id must not be null");
         Assert.notNull(track.getTrackNumber(), "Track number must not be null");

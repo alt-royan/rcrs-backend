@@ -1,20 +1,22 @@
 package org.ultra.rcrs.catalogservice.model.track;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.Table;
+import org.springframework.data.cassandra.core.mapping.*;
 import org.ultra.rcrs.catalogservice.dto.request.TrackCreateDto;
 import org.ultra.rcrs.catalogservice.model.artist.ArtistWithRole;
 
 import java.util.Set;
 import java.util.UUID;
 
+import static org.springframework.data.cassandra.core.mapping.Embedded.OnEmpty.USE_NULL;
+
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
 @Table("tracks_by_id")
 public class Track {
 

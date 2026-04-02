@@ -13,18 +13,18 @@ import java.util.UUID;
 @Repository
 public interface AlbumByArtistRepository extends ReactiveCassandraRepository<AlbumByArtist, AlbumByArtist.AlbumByArtistKey> {
 
-    Mono<Void> deleteByKeyArtistIdAndArtistRoleAndAlbumId(UUID artistId, ArtistRole artistRole, UUID albumId);
+    Mono<Void> deleteByKeyArtistIdAndKeyArtistRoleAndKeyAlbumId(UUID artistId, ArtistRole artistRole, UUID albumId);
 
-    Flux<AlbumByArtist> findByKeyArtistIdAndArtistRole(UUID artistId, ArtistRole artistRole);
+    Flux<AlbumByArtist> findByKeyArtistIdAndKeyArtistRole(UUID artistId, ArtistRole artistRole);
 
     default Flux<AlbumByArtist> findByArtistId_Main(UUID artistId, AlbumsOrder order) {
-        return this.findByKeyArtistIdAndArtistRole(artistId, ArtistRole.MAIN_ARTIST)
+        return this.findByKeyArtistIdAndKeyArtistRole(artistId, ArtistRole.MAIN_ARTIST)
                 .collectList().map(list -> order == AlbumsOrder.ASC ? list.reversed() : list)
                 .flatMapMany(Flux::fromIterable);
     }
 
     default Flux<AlbumByArtist> findByArtistId_AppearsOn(UUID artistId, AlbumsOrder order) {
-        return this.findByKeyArtistIdAndArtistRole(artistId, ArtistRole.APPEARS_ON)
+        return this.findByKeyArtistIdAndKeyArtistRole(artistId, ArtistRole.APPEARS_ON)
                 .collectList().map(list -> order == AlbumsOrder.ASC ? list.reversed() : list)
                 .flatMapMany(Flux::fromIterable);
     }

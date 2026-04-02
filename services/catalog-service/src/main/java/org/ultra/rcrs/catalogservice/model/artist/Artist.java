@@ -1,5 +1,6 @@
 package org.ultra.rcrs.catalogservice.model.artist;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
 @Table("artists_by_id")
 public class Artist {
 

@@ -14,5 +14,5 @@ public interface TrackByArtistRepository extends ReactiveCassandraRepository<Tra
 
     Flux<TrackByArtist> findByKeyArtistId(UUID artistId);
 
-    Mono<Void> deleteByKeyArtistIdAndArtistRoleAndTrackId(UUID artistId, ArtistRole artistRole, UUID trackId);
+    Mono<Void> deleteByKeyArtistIdAndKeyArtistRoleAndKeyTrackId(UUID artistId, ArtistRole artistRole, UUID trackId);
 }

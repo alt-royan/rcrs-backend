@@ -27,6 +27,7 @@ public class AlbumPersistRepositoryImpl implements AlbumPersistRepository<Album>
 
     @Override
     public @NonNull <S extends Album> Mono<S> save(@Nonnull S album) {
+        Assert.notNull(album.getArtists(), "Artists must not be null");
         Assert.isTrue(album.getArtists().stream().anyMatch(ArtistWithRole::isMainArtist), "At least 1 main artist must be present on the album");
         Assert.notNull(album.getTitle(), "Title must not be null");
         Assert.notNull(album.getAlbumType(), "Album type must not be null");

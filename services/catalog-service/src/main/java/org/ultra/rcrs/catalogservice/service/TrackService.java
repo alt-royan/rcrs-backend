@@ -90,12 +90,12 @@ public class TrackService {
     }
 
     private Mono<Void> deleteTrackByAlbum(UUID albumId, UUID trackId) {
-        return trackByAlbumRepository.deleteByKeyAlbumIdAndTrackId(albumId, trackId);
+        return trackByAlbumRepository.deleteByKeyAlbumIdAndKeyTrackId(albumId, trackId);
     }
 
     private Mono<Void> deleteTrackByArtists(Collection<ArtistWithRole> artists, UUID trackId) {
         return Flux.fromIterable(artists)
-                .flatMap(artistWithRole -> trackByArtistRepository.deleteByKeyArtistIdAndArtistRoleAndTrackId(artistWithRole.getArtistId(), artistWithRole.getArtistRole(), trackId))
+                .flatMap(artistWithRole -> trackByArtistRepository.deleteByKeyArtistIdAndKeyArtistRoleAndKeyTrackId(artistWithRole.getArtistId(), artistWithRole.getArtistRole(), trackId))
                 .then();
     }
 

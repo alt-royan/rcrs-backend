@@ -1,11 +1,7 @@
 package org.ultra.rcrs.catalogservice.model.album;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.Table;
+import lombok.*;
+import org.springframework.data.cassandra.core.mapping.*;
 import org.ultra.rcrs.catalogservice.dto.request.AlbumCreateDto;
 import org.ultra.rcrs.catalogservice.model.artist.ArtistWithRole;
 import org.ultra.rcrs.enums.AlbumType;
@@ -14,9 +10,12 @@ import java.time.LocalDate;
 import java.util.Set;
 import java.util.UUID;
 
+import static org.springframework.data.cassandra.core.mapping.Embedded.OnEmpty.USE_NULL;
+
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
 @Table("albums_by_id")
 public class Album {
 
