@@ -30,7 +30,9 @@ public class AlbumDto {
 
     private Integer totalTracks;
 
-    public AlbumDto(Album album, Collection<ArtistSimplifyDto> artists, Collection<TrackSimplifyDto> tracks) {
+    private Long totalDurationMs;
+
+    public AlbumDto(Album album, Collection<ArtistSimplifyDto> artists, ItemListDto<TrackSimplifyDto> tracks) {
         this.id = Url62.encode(album.getAlbumId());
         this.title = album.getTitle();
         this.albumType = album.getAlbumType();
@@ -38,7 +40,8 @@ public class AlbumDto {
         this.totalTracks = album.getTotalTracks();
         this.coverUrl = S3Utils.createResourceS3Url(album.getImageKey());
         this.artists = new ItemListDto<>(artists);
-        this.tracks = new ItemListDto<>(tracks);
+        this.tracks = tracks;
+        this.totalDurationMs = album.getTotalDurationMs();
     }
 
 }

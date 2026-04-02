@@ -8,9 +8,9 @@ import org.ultra.rcrs.catalogservice.dto.ArtistDto;
 import org.ultra.rcrs.catalogservice.dto.ItemListDto;
 import org.ultra.rcrs.catalogservice.dto.request.ArtistRegisterDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.AlbumSimplifyDto;
-import org.ultra.rcrs.catalogservice.service.AlbumReadService;
-import org.ultra.rcrs.catalogservice.service.ArtistReadService;
-import org.ultra.rcrs.catalogservice.service.ArtistRegisterService;
+import org.ultra.rcrs.catalogservice.service.AlbumService;
+import org.ultra.rcrs.catalogservice.service.ArtistService;
+import org.ultra.rcrs.enums.AlbumsOrder;
 import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Mono;
 
@@ -19,21 +19,22 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/v1/artists")
 public class ArtistController {
 
-    private final ArtistReadService artistReadService;
+    private final ArtistService artistService;
 
-    private final AlbumReadService albumReadService;
+    private final AlbumService albumReadService;
 
-    private final ArtistRegisterService artistRegisterService;
+    private final ArtistService artistRegisterService;
 
     @GetMapping("/{artistId}")
     public Mono<ResponseEntity<ArtistDto>> getArtist(@PathVariable("artistId") String artistId) {
-        return artistReadService.getArtist(Url62.decode(artistId))
+        return artistService.getArtist(Url62.decode(artistId))
                 .map(ResponseEntity::ok);
     }
 
     @GetMapping("/{artistId}/albums")
-    public Mono<ResponseEntity<ItemListDto<AlbumSimplifyDto>>> getAlbumsForArtist(@PathVariable("artistId") String artistId) {
-        return albumReadService.getAlbumsForArtist(Url62.decode(artistId))
+    public Mono<ResponseEntity<ItemListDto<AlbumSimplifyDto>>> getAlbumsForArtist(@PathVariable("artistId") String artistId,
+                                                                                  @RequestParam(value = "order", required = false, defaultValue = "desc") AlbumsOrder order) {
+        return albumReadService.getAlbumsForArtist_Main(Url62.decode(artistId), order)
                 .map(ResponseEntity::ok);
     }
 

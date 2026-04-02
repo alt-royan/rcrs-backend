@@ -11,30 +11,17 @@ import org.ultra.rcrs.enums.ArtistRole;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
-@Table("albums_by_artist_desc")
+@Table("albums_by_artist")
 public class AlbumByArtist {
 
     @PrimaryKey
     private AlbumByArtistKey key;
-
-    private String title;
-
-    @Column("album_type")
-    private AlbumType albumType;
-
-    @Column("artists")
-    private Map<UUID, ArtistRole> artists;
-
-    @Column("image_key")
-    private String imageKey;
-
-    @Column("total_tracks")
-    private Integer totalTracks;
 
     @Getter
     @Setter
@@ -52,17 +39,9 @@ public class AlbumByArtist {
         @PrimaryKeyColumn(
                 name = "artist_role",
                 ordinal = 1,
-                type = PrimaryKeyType.PARTITIONED
+                type = PrimaryKeyType.CLUSTERED
         )
         private ArtistRole artistRole;
-
-        @PrimaryKeyColumn(
-                name = "release_date",
-                ordinal = 1,
-                type = PrimaryKeyType.CLUSTERED,
-                ordering = Ordering.DESCENDING
-        )
-        private LocalDate releaseDate;
 
         @PrimaryKeyColumn(
                 name = "album_id",

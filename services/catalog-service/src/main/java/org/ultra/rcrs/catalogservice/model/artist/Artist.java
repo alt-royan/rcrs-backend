@@ -6,6 +6,7 @@ import lombok.Setter;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
+import org.ultra.rcrs.catalogservice.dto.request.ArtistRegisterDto;
 
 import java.util.UUID;
 
@@ -25,4 +26,8 @@ public class Artist {
 
     @Column("image_key")
     private String imageKey;
+
+    public Artist(ArtistRegisterDto dto){
+
+    }
 }

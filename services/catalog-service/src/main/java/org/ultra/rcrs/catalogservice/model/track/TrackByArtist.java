@@ -4,40 +4,42 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
-import org.springframework.data.cassandra.core.mapping.*;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
+import org.springframework.data.cassandra.core.mapping.PrimaryKeyClass;
+import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.core.mapping.Table;
 import org.ultra.rcrs.enums.ArtistRole;
 
-import java.util.Map;
 import java.util.UUID;
 
 @Getter
 @Setter
 @Builder
-@Table("tracks_by_album")
-public class TrackByAlbum {
+@Table("tracks_by_artist")
+public class TrackByArtist {
 
     @PrimaryKey
-    private TrackByAlbumKey key;
+    private TrackByArtistKey key;
 
     @Getter
     @Setter
     @Builder
     @PrimaryKeyClass
-    public static class TrackByAlbumKey {
+    public static class TrackByArtistKey {
 
         @PrimaryKeyColumn(
-                name = "album_id",
+                name = "artist_id",
                 ordinal = 0,
                 type = PrimaryKeyType.PARTITIONED
         )
-        private UUID albumId;
+        private UUID artistId;
 
         @PrimaryKeyColumn(
-                name = "track_number",
+                name = "artist_role",
                 ordinal = 1,
                 type = PrimaryKeyType.CLUSTERED
         )
-        private Integer trackNumber;
+        private ArtistRole artistRole;
 
         @PrimaryKeyColumn(
                 name = "track_id",

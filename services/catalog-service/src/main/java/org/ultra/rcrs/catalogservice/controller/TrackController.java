@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ultra.rcrs.catalogservice.dto.TrackDto;
-import org.ultra.rcrs.catalogservice.service.TrackReadService;
+import org.ultra.rcrs.catalogservice.service.TrackService;
 import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Mono;
 
@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 @RequestMapping("/api/v1/tracks")
 public class TrackController {
 
-    private final TrackReadService trackReadService;
+    private final TrackService trackReadService;
 
     @GetMapping("/{trackId}")
     public Mono<ResponseEntity<TrackDto>> getTrack(@PathVariable("trackId") String trackId) {

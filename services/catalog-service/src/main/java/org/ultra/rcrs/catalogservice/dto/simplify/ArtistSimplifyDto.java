@@ -12,12 +12,9 @@ public class ArtistSimplifyDto {
 
     private String name;
 
-    private String avatarUrl;
-
     public ArtistSimplifyDto(Artist artist) {
         this.id = Url62.encode(artist.getArtistId());
         this.name = artist.getName();
-        this.avatarUrl = S3Utils.createResourceS3Url(artist.getImageKey());
     }
 
 }

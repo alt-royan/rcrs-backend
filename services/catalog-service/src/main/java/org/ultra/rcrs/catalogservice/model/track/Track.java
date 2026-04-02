@@ -6,9 +6,11 @@ import lombok.Setter;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
+import org.ultra.rcrs.catalogservice.model.artist.ArtistWithRole;
 import org.ultra.rcrs.enums.ArtistRole;
 
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -29,10 +31,10 @@ public class Track {
     @Column("album_id")
     private UUID albumId;
 
+    @Column("artists")
+    private Set<ArtistWithRole> artists;
+
     @Column("track_number")
     private Integer trackNumber;
-
-    @Column("artists")
-    private Map<UUID, ArtistRole> artists;
 
 }

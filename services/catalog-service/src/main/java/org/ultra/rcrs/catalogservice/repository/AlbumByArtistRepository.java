@@ -3,31 +3,30 @@ package org.ultra.rcrs.catalogservice.repository;
 import org.springframework.data.cassandra.repository.ReactiveCassandraRepository;
 import org.springframework.stereotype.Repository;
 import org.ultra.rcrs.catalogservice.model.album.AlbumByArtist;
+import org.ultra.rcrs.enums.AlbumsOrder;
 import org.ultra.rcrs.enums.ArtistRole;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.UUID;
 
 @Repository
 public interface AlbumByArtistRepository extends ReactiveCassandraRepository<AlbumByArtist, AlbumByArtist.AlbumByArtistKey> {
 
+    Mono<Void> deleteByKeyArtistIdAndArtistRoleAndAlbumId(UUID artistId, ArtistRole artistRole, UUID albumId);
+
     Flux<AlbumByArtist> findByKeyArtistIdAndArtistRole(UUID artistId, ArtistRole artistRole);
 
-    default Mono<List<AlbumByArtist>> findByArtistId_Main_Asc(UUID artistId) {
+    default Flux<AlbumByArtist> findByArtistId_Main(UUID artistId, AlbumsOrder order) {
         return this.findByKeyArtistIdAndArtistRole(artistId, ArtistRole.MAIN_ARTIST)
-                .collectList().map(List::reversed);
+                .collectList().map(list -> order == AlbumsOrder.ASC ? list.reversed() : list)
+                .flatMapMany(Flux::fromIterable);
     }
 
-    default Mono<List<AlbumByArtist>> findByArtistId_Main(UUID artistId) {
-        return this.findByKeyArtistIdAndArtistRole(artistId, ArtistRole.MAIN_ARTIST)
-                .collectList();
-    }
-
-    default Mono<List<AlbumByArtist>> findByArtistId_AppearsOn(UUID artistId) {
+    default Flux<AlbumByArtist> findByArtistId_AppearsOn(UUID artistId, AlbumsOrder order) {
         return this.findByKeyArtistIdAndArtistRole(artistId, ArtistRole.APPEARS_ON)
-                .collectList();
+                .collectList().map(list -> order == AlbumsOrder.ASC ? list.reversed() : list)
+                .flatMapMany(Flux::fromIterable);
     }
 
 }
