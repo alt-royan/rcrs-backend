@@ -4,12 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.dto.AlbumDto;
 import org.ultra.rcrs.catalogservice.dto.ItemListDto;
-import org.ultra.rcrs.catalogservice.dto.request.AlbumCreateDto;
+import org.ultra.rcrs.catalogservice.dto.request.AlbumCreateRequest;
 import org.ultra.rcrs.catalogservice.dto.simplify.AlbumSimplifyDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.TrackSimplifyDto;
 import org.ultra.rcrs.catalogservice.model.album.Album;
 import org.ultra.rcrs.catalogservice.model.album.AlbumByArtist;
-import org.ultra.rcrs.catalogservice.model.artist.ArtistWithRole;
 import org.ultra.rcrs.catalogservice.repository.AlbumByArtistRepository;
 import org.ultra.rcrs.catalogservice.repository.AlbumRepository;
 import org.ultra.rcrs.enums.AlbumsOrder;
@@ -71,7 +70,7 @@ public class AlbumService {
                 .map(ItemListDto::new);
     }
 
-    public Mono<AlbumDto> createAlbum(AlbumCreateDto dto) {
+    public Mono<AlbumDto> createAlbum(AlbumCreateRequest dto) {
         return albumRepository.save(new Album(dto)).flatMap(this::albumToDto);
     }
 

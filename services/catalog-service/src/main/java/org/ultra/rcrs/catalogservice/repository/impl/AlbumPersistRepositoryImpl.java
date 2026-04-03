@@ -8,7 +8,6 @@ import org.springframework.data.cassandra.core.ReactiveCassandraTemplate;
 import org.springframework.util.Assert;
 import org.ultra.rcrs.catalogservice.model.album.Album;
 import org.ultra.rcrs.catalogservice.model.album.AlbumByArtist;
-import org.ultra.rcrs.catalogservice.model.artist.ArtistWithRole;
 import org.ultra.rcrs.catalogservice.repository.AlbumPersistRepository;
 import org.ultra.rcrs.catalogservice.repository.ArtistRepository;
 import org.ultra.rcrs.exceptions.NotFoundException;

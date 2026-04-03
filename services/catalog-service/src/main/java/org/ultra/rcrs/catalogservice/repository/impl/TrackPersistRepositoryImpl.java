@@ -6,7 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.cassandra.core.ReactiveCassandraTemplate;
 import org.springframework.util.Assert;
-import org.ultra.rcrs.catalogservice.model.artist.ArtistWithRole;
 import org.ultra.rcrs.catalogservice.model.track.Track;
 import org.ultra.rcrs.catalogservice.model.track.TrackByAlbum;
 import org.ultra.rcrs.catalogservice.model.track.TrackByArtist;

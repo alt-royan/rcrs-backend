@@ -1,16 +1,17 @@
 package org.ultra.rcrs.catalogservice.model.album;
 
-import lombok.*;
-import org.springframework.data.cassandra.core.mapping.*;
-import org.ultra.rcrs.catalogservice.dto.request.AlbumCreateDto;
-import org.ultra.rcrs.catalogservice.model.artist.ArtistWithRole;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.cassandra.core.mapping.Column;
+import org.springframework.data.cassandra.core.mapping.PrimaryKey;
+import org.springframework.data.cassandra.core.mapping.Table;
+import org.ultra.rcrs.catalogservice.dto.request.AlbumCreateRequest;
 import org.ultra.rcrs.enums.AlbumType;
 
 import java.time.LocalDate;
-import java.util.Set;
 import java.util.UUID;
-
-import static org.springframework.data.cassandra.core.mapping.Embedded.OnEmpty.USE_NULL;
 
 @Getter
 @Setter
@@ -32,9 +33,6 @@ public class Album {
     @Column("album_type")
     private AlbumType albumType;
 
-    @Column("artists")
-    private Set<ArtistWithRole> artists;
-
     @Column("release_date")
     private LocalDate releaseDate;
 
@@ -50,12 +48,11 @@ public class Album {
     @Column("available")
     private Boolean available;
 
-    public Album(AlbumCreateDto dto) {
+    public Album(AlbumCreateRequest dto) {
         this.title = dto.getTitle();
         this.albumType = dto.getAlbumType();
         this.releaseDate = dto.getReleaseDate();
         this.imageKey = dto.getImageKey();
-        this.artists = dto.getArtists();
         this.explicit = dto.getExplicit();
     }
 }

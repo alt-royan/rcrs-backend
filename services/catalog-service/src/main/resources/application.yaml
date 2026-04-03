@@ -14,3 +14,9 @@ s3:
 logging:
   level:
     root: DEBUG
+
+app:
+  read:
+    enabled: true
+  write:
+    enabled: true

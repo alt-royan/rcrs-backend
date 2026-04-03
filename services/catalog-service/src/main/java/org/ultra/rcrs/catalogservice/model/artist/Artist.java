@@ -7,7 +7,7 @@ import lombok.Setter;
 import org.springframework.data.cassandra.core.mapping.Column;
 import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
-import org.ultra.rcrs.catalogservice.dto.request.ArtistRegisterDto;
+import org.ultra.rcrs.catalogservice.dto.request.ArtistRegisterRequest;
 
 import java.util.UUID;
 
@@ -28,10 +28,13 @@ public class Artist {
     @Column("bio")
     private String bio;
 
+    @Column("social_link")
+    private String socialLink;
+
     @Column("image_key")
     private String imageKey;
 
-    public Artist(ArtistRegisterDto dto) {
+    public Artist(ArtistRegisterRequest dto) {
         this.name = dto.getName();
         this.bio = dto.getBio();
         this.imageKey = dto.getImageExternalKey();

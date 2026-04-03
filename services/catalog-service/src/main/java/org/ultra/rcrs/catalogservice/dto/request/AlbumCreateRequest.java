@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
-import org.ultra.rcrs.catalogservice.model.artist.ArtistWithRole;
 import org.ultra.rcrs.enums.AlbumType;
 
 import java.time.LocalDate;
@@ -14,7 +13,7 @@ import java.util.Set;
 
 @Validated
 @Data
-public class AlbumCreateDto {
+public class AlbumCreateRequest {
 
     @NotNull
     private String title;
@@ -36,6 +35,6 @@ public class AlbumCreateDto {
 
     @NotNull
     @Valid
-    private List<TrackCreateDto> tracks;
+    private List<TrackCreateRequest> tracks;
 
 }

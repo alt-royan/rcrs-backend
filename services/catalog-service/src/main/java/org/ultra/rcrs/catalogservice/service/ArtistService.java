@@ -4,14 +4,12 @@ import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.dto.ArtistDto;
-import org.ultra.rcrs.catalogservice.dto.request.ArtistRegisterDto;
+import org.ultra.rcrs.catalogservice.dto.request.ArtistRegisterRequest;
 import org.ultra.rcrs.catalogservice.dto.simplify.ArtistSimplifyDto;
 import org.ultra.rcrs.catalogservice.model.artist.Artist;
-import org.ultra.rcrs.catalogservice.model.artist.ArtistWithRole;
 import org.ultra.rcrs.catalogservice.repository.ArtistRepository;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.exceptions.NotFoundException;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
@@ -32,7 +30,7 @@ public class ArtistService {
                 .map(ArtistDto::new);
     }
 
-    public Mono<ArtistDto> registerNewArtist(ArtistRegisterDto dto) {
+    public Mono<ArtistDto> registerNewArtist(ArtistRegisterRequest dto) {
         var artist = new Artist(dto);
         artist.setArtistId(UUID.randomUUID());
 
@@ -63,8 +61,7 @@ public class ArtistService {
     private Mono<List<ArtistSimplifyDto>> collectArtists(@Nonnull Collection<UUID> artistsIds) {
         Objects.requireNonNull(artistsIds, "artistsIds must not be null here");
 
-        return Flux.fromIterable(artistsIds)
-                .flatMap(artistRepository::findById)
+        return artistRepository.findAllByKeyArtistIdIn(artistsIds)
                 .map(ArtistSimplifyDto::new)
                 .collectList();
     }

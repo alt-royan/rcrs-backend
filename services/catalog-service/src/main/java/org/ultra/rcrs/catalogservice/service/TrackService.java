@@ -4,11 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.dto.ItemListDto;
 import org.ultra.rcrs.catalogservice.dto.TrackDto;
-import org.ultra.rcrs.catalogservice.dto.request.TrackCreateDto;
+import org.ultra.rcrs.catalogservice.dto.request.TrackCreateRequest;
 import org.ultra.rcrs.catalogservice.dto.simplify.AlbumSimplifyDto;
 import org.ultra.rcrs.catalogservice.dto.simplify.TrackSimplifyDto;
 import org.ultra.rcrs.catalogservice.model.album.Album;
-import org.ultra.rcrs.catalogservice.model.artist.ArtistWithRole;
 import org.ultra.rcrs.catalogservice.model.track.Track;
 import org.ultra.rcrs.catalogservice.model.track.TrackByAlbum;
 import org.ultra.rcrs.catalogservice.model.track.TrackByArtist;
@@ -22,6 +21,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -41,15 +41,16 @@ public class TrackService {
                 .flatMap(this::trackToDto);
     }
 
-    public Mono<TrackDto> createTrack(TrackCreateDto dto) {
+    public Mono<TrackDto> createTrack(TrackCreateRequest dto) {
         return trackRepository.save(new Track(dto)).flatMap(this::trackToDto);
     }
 
-    public Mono<TrackSimplifyDto> getTrack(TrackByAlbum trackByAlbum) {
-        return trackRepository.findById(trackByAlbum.getKey().getTrackId())
-                .switchIfEmpty(Mono.error(new NotFoundException("Track with id " + trackByAlbum.getKey().getTrackId() + " was not found")))
+    public Mono<List<TrackSimplifyDto>> getTracks(Collection<TrackByAlbum> tracksByAlbum) {
+        var ids = tracksByAlbum.stream().map(track -> track.getKey().getTrackId()).toList();
+        return trackRepository.findAllByKeyTrackIdIn(ids)
                 .flatMap(track -> artistService.collectAllArtists(track.getArtists())
-                        .map(artists -> new TrackSimplifyDto(track, artists)));
+                        .map(artists -> new TrackSimplifyDto(track, artists)))
+                .collectList();
     }
 
     public Mono<TrackSimplifyDto> getTrack(TrackByArtist trackByArtist) {
@@ -61,8 +62,8 @@ public class TrackService {
 
     public Mono<ItemListDto<TrackSimplifyDto>> getTracksForAlbum(Album album) {
         return trackByAlbumRepository.findByKeyAlbumId(album.getAlbumId())
-                .flatMap(this::getTrack)
                 .collectList()
+                .flatMap(this::getTracks)
                 .map(ItemListDto::new);
     }
 

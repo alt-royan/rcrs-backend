@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
-public class ArtistRegisterDto {
+public class ArtistRegisterRequest {
 
     @NotNull
     private String name;
