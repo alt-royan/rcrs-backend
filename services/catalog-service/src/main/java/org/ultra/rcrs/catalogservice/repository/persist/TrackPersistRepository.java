@@ -1,4 +1,4 @@
-package org.ultra.rcrs.catalogservice.repository;
+package org.ultra.rcrs.catalogservice.repository.persist;
 
 import jakarta.annotation.Nonnull;
 import reactor.core.publisher.Mono;

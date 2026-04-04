@@ -1,4 +1,6 @@
 package org.ultra.rcrs.enums;
 
-public class TrackStatus {
+public enum TrackStatus {
+    CREATED, PUBLISHED
+
 }

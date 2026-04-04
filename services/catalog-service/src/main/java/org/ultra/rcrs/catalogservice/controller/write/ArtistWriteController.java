@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.ultra.rcrs.catalogservice.dto.ArtistDto;
+import org.ultra.rcrs.catalogservice.dto.ArtistMetadataAbstract;
 import org.ultra.rcrs.catalogservice.dto.request.ArtistRegisterRequest;
-import org.ultra.rcrs.catalogservice.service.ArtistService;
+import org.ultra.rcrs.catalogservice.service.ArtistCrudService;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -19,11 +19,11 @@ import reactor.core.publisher.Mono;
 @ConditionalOnProperty(name = "app.write.enabled", havingValue = "true")
 public class ArtistWriteController {
 
-    private final ArtistService artistService;
+    private final ArtistCrudService artistCrudService;
 
     @PostMapping
-    public Mono<ResponseEntity<ArtistDto>> registerNewArtist(@RequestBody @Validated ArtistRegisterRequest artistRegisterRequest) {
-        return artistService.registerNewArtist(artistRegisterRequest)
+    public Mono<ResponseEntity<ArtistMetadataAbstract>> registerNewArtist(@RequestBody @Validated ArtistRegisterRequest artistRegisterRequest) {
+        return artistCrudService.registerNewArtist(artistRegisterRequest)
                 .map(ResponseEntity::ok);
     }
 }

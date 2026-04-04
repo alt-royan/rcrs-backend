@@ -4,12 +4,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.PrimaryKey;
-import org.springframework.data.cassandra.core.mapping.Table;
-import org.ultra.rcrs.catalogservice.dto.request.TrackCreateRequest;
+import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
+import org.springframework.data.cassandra.core.mapping.*;
+import org.ultra.rcrs.catalogservice.model.ArtistOther;
+import org.ultra.rcrs.catalogservice.model.ArtistsOn;
+import org.ultra.rcrs.enums.ArtistRole;
+import org.ultra.rcrs.enums.TrackStatus;
 
-import java.util.UUID;
+import java.time.OffsetDateTime;
+import java.util.*;
 
 @Getter
 @Setter
@@ -19,16 +22,16 @@ import java.util.UUID;
 public class Track {
 
     @PrimaryKey
-    @Column("track_id")
-    private UUID trackId;
+    private TrackKey key;
 
+    @Column("title")
     private String title;
 
-    @Column("duration_ms")
-    private Long durationMs;
+    @Column("release_date")
+    private OffsetDateTime releaseDate;
 
-    @Column("album_id")
-    private UUID albumId;
+    @Column("duration_ms")
+    private Integer durationMs;
 
     @Column("track_number")
     private Integer trackNumber;
@@ -39,10 +42,35 @@ public class Track {
     @Column("available")
     private Boolean available;
 
-    public Track(TrackCreateRequest dto) {
-        this.title = dto.getTitle();
-        this.trackNumber = dto.getTrackNumber();
-        this.explicit = dto.getExplicit();
+    @Column("album_id")
+    private UUID albumId;
+
+    @Column("artists")
+    private ArtistsOn artists;
+
+    @Column("other")
+    private List<ArtistOther> others;
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @PrimaryKeyClass
+    public static class TrackKey {
+
+        @PrimaryKeyColumn(
+                name = "id",
+                ordinal = 0,
+                type = PrimaryKeyType.PARTITIONED
+        )
+        private UUID id;
+
+        @PrimaryKeyColumn(
+                name = "status",
+                ordinal = 1,
+                type = PrimaryKeyType.CLUSTERED
+        )
+        private TrackStatus status;
+
     }
 
 }

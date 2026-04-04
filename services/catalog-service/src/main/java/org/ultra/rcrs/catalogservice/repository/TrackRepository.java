@@ -1,16 +1,20 @@
 package org.ultra.rcrs.catalogservice.repository;
 
+import org.springframework.data.cassandra.repository.Query;
 import org.springframework.data.cassandra.repository.ReactiveCassandraRepository;
 import org.springframework.stereotype.Repository;
 import org.ultra.rcrs.catalogservice.model.track.Track;
-import reactor.core.publisher.Flux;
+import org.ultra.rcrs.catalogservice.repository.persist.TrackPersistRepository;
+import org.ultra.rcrs.enums.TrackStatus;
+import reactor.core.publisher.Mono;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface TrackRepository extends ReactiveCassandraRepository<Track, UUID>, TrackPersistRepository<Track> {
+public interface TrackRepository extends ReactiveCassandraRepository<Track, Track.TrackKey>, TrackPersistRepository<Track> {
 
-    Flux<Track> findAllByKeyTrackIdIn(Collection<UUID> trackIds);
+    @Query("SELECT * FROM tracks WHERE id = ? and status IN ?")
+    Mono<Track> findByIdAndStatusIn(UUID id, List<TrackStatus> statuses);
 
 }

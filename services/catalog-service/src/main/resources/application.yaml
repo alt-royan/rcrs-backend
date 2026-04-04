@@ -4,11 +4,14 @@ spring:
   cassandra:
     keyspace-name: "rcrs"
     contact-points: "localhost:9042"
-    local-datacenter: "my-datacenter-1"
-    schema-action: CREATE_IF_NOT_EXISTS
+    local-datacenter: "datacenter-1"
   kafka:
     bootstrap-servers: localhost:9092
     process-topic: "entity-process-topic"
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    url: jdbc:cassandra://localhost:9042/rcrs?localdatacenter=my-datacenter-1&compliancemode=Liquibase
+    driver-class-name: com.ing.data.cassandra.jdbc.CassandraDriver
 s3:
   url: http://localhost:9444
 logging:

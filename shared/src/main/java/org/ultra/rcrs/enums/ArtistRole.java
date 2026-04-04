@@ -1,7 +1,7 @@
 package org.ultra.rcrs.enums;
 
 public enum ArtistRole {
-    MAIN_ARTIST("main_artist"), APPEARS_ON("appears_on");
+    MAIN_ARTIST("main_artist"), FEATURED_ARTIST("appears_on");
 
     private final String value;
 

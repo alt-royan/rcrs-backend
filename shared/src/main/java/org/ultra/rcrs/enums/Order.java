@@ -1,11 +1,11 @@
 package org.ultra.rcrs.enums;
 
-public enum AlbumsOrder {
+public enum Order {
     ASC("asc"), DESC("desc");
 
     private final String value;
 
-    AlbumsOrder(String value) {
+    Order(String value) {
         this.value = value;
     }
 

@@ -9,8 +9,8 @@ public class ArtistRegisterRequest {
     @NotNull
     private String name;
 
-    private String bio;
+    private String socialLink;
 
-    private String imageExternalKey;
+    private String avatarKey;
 
 }

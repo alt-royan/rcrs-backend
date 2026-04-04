@@ -5,9 +5,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.ultra.rcrs.catalogservice.dto.AlbumDto;
+import org.ultra.rcrs.catalogservice.dto.full.FullAlbumMetadata;
 import org.ultra.rcrs.catalogservice.dto.request.AlbumCreateRequest;
-import org.ultra.rcrs.catalogservice.service.AlbumService;
+import org.ultra.rcrs.catalogservice.service.AlbumCrudService;
 import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Mono;
 
@@ -17,17 +17,17 @@ import reactor.core.publisher.Mono;
 @ConditionalOnProperty(name = "app.write.enabled", havingValue = "true")
 public class AlbumWriteController {
 
-    private final AlbumService albumService;
+    private final AlbumCrudService albumCrudService;
 
     @DeleteMapping("/{albumId}")
     public Mono<ResponseEntity<Void>> deleteAlbum(@PathVariable("albumId") String albumId) {
-        return albumService.deleteAlbumCascadeById(Url62.decode(albumId))
+        return albumCrudService.deleteAlbumCascadeById(Url62.decode(albumId))
                 .map(ResponseEntity::ok);
     }
 
     @PostMapping
-    public Mono<ResponseEntity<AlbumDto>> createAlbum(@RequestBody @Validated AlbumCreateRequest request) {
-        return albumService.createAlbum(request)
+    public Mono<ResponseEntity<FullAlbumMetadata>> createAlbum(@RequestBody @Validated AlbumCreateRequest request) {
+        return albumCrudService.createAlbum(request)
                 .map(ResponseEntity::ok);
     }
 }
