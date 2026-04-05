@@ -6,13 +6,14 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
-import org.ultra.rcrs.catalogservice.model.ArtistsOn;
-import org.ultra.rcrs.enums.AlbumStatus;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
+import org.ultra.rcrs.enums.EntityStatus;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.Year;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -49,8 +50,11 @@ public class AlbumByArtist {
     @Column("available")
     private Boolean available;
 
-    @Column("artists")
-    private ArtistsOn artists;
+    @Column("main_artists")
+    private Set<UUID> mainArtists;
+
+    @Column("featured_artists")
+    private Set<UUID> featuredArtists;
 
     public AlbumByArtist(final Album album, UUID artistId, ArtistRole artistRole) {
         this.key = new AlbumByArtistKey(artistId, album.getKey().getStatus(), artistRole, album.getType(), album.getReleaseDate());
@@ -62,7 +66,8 @@ public class AlbumByArtist {
         this.totalTracks = album.getTotalTracks();
         this.explicit = album.getExplicit();
         this.available = album.getAvailable();
-        this.artists = album.getArtists();
+        this.mainArtists = album.getMainArtists();
+        this.featuredArtists = album.getFeaturedArtists();
     }
 
     @Getter
@@ -83,7 +88,7 @@ public class AlbumByArtist {
                 ordinal = 1,
                 type = PrimaryKeyType.CLUSTERED
         )
-        private AlbumStatus albumStatus;
+        private EntityStatus albumStatus;
 
         @PrimaryKeyColumn(
                 name = "artist_role",

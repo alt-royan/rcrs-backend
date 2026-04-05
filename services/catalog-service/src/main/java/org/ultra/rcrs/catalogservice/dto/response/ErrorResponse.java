@@ -1,4 +1,4 @@
-package org.ultra.rcrs.catalogservice.dto;
+package org.ultra.rcrs.catalogservice.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.AllArgsConstructor;

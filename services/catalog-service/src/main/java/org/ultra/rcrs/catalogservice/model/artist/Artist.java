@@ -9,6 +9,7 @@ import org.springframework.data.cassandra.core.mapping.PrimaryKey;
 import org.springframework.data.cassandra.core.mapping.Table;
 import org.ultra.rcrs.catalogservice.model.SocialLink;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -27,8 +28,9 @@ public class Artist {
     private String name;
 
     @Column("social_links")
-    private List<SocialLink> socialLinks;
+    @Builder.Default
+    private List<SocialLink> socialLinks = new ArrayList<>();
 
     @Column("avatar_s3_key")
-    private String avatarKey;
+    private String avatarS3Key;
 }

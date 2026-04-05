@@ -6,11 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
-import org.ultra.rcrs.catalogservice.model.ArtistsOn;
-import org.ultra.rcrs.enums.ArtistRole;
-import org.ultra.rcrs.enums.TrackStatus;
+import org.ultra.rcrs.enums.EntityStatus;
 
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -39,8 +36,11 @@ public class TrackByAlbum {
     @Column("available")
     private Boolean available;
 
-    @Column("artists")
-    private ArtistsOn artists;
+    @Column("main_artists")
+    private Set<UUID> mainArtists;
+
+    @Column("featured_artists")
+    private Set<UUID> featuredArtists;
 
     public TrackByAlbum(final Track track) {
         this.key = new TrackByAlbumKey(track.getAlbumId(), track.getKey().getStatus(), track.getTrackNumber());
@@ -49,7 +49,8 @@ public class TrackByAlbum {
         this.durationMs = track.getDurationMs();
         this.explicit = track.getExplicit();
         this.available = track.getAvailable();
-        this.artists = track.getArtists();
+        this.mainArtists = track.getMainArtists();
+        this.featuredArtists = track.getFeaturedArtists();
     }
 
     @Getter
@@ -70,7 +71,7 @@ public class TrackByAlbum {
                 ordinal = 1,
                 type = PrimaryKeyType.CLUSTERED
         )
-        private TrackStatus trackStatus;
+        private EntityStatus trackStatus;
 
         @PrimaryKeyColumn(
                 name = "track_number",

@@ -6,12 +6,13 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
-import org.ultra.rcrs.catalogservice.model.ArtistsOn;
-import org.ultra.rcrs.enums.AlbumStatus;
 import org.ultra.rcrs.enums.AlbumType;
+import org.ultra.rcrs.enums.EntityStatus;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.Year;
+import java.util.Set;
 import java.util.UUID;
 
 @Getter
@@ -51,8 +52,11 @@ public class Album {
     @Column("available")
     private Boolean available;
 
-    @Column("artists")
-    private ArtistsOn artists;
+    @Column("main_artists")
+    private Set<UUID> mainArtists;
+
+    @Column("featured_artists")
+    private Set<UUID> featuredArtists;
 
     @Getter
     @Setter
@@ -72,7 +76,7 @@ public class Album {
                 ordinal = 1,
                 type = PrimaryKeyType.CLUSTERED
         )
-        private AlbumStatus status;
+        private EntityStatus status;
 
     }
 }

@@ -7,12 +7,13 @@ import lombok.Setter;
 import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
 import org.springframework.data.cassandra.core.mapping.*;
 import org.ultra.rcrs.catalogservice.model.ArtistOther;
-import org.ultra.rcrs.catalogservice.model.ArtistsOn;
-import org.ultra.rcrs.enums.ArtistRole;
-import org.ultra.rcrs.enums.TrackStatus;
+import org.ultra.rcrs.enums.EntityStatus;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -45,8 +46,11 @@ public class Track {
     @Column("album_id")
     private UUID albumId;
 
-    @Column("artists")
-    private ArtistsOn artists;
+    @Column("main_artists")
+    private Set<UUID> mainArtists;
+
+    @Column("featured_artists")
+    private Set<UUID> featuredArtists;
 
     @Column("other")
     private List<ArtistOther> others;
@@ -69,7 +73,7 @@ public class Track {
                 ordinal = 1,
                 type = PrimaryKeyType.CLUSTERED
         )
-        private TrackStatus status;
+        private EntityStatus status;
 
     }
 

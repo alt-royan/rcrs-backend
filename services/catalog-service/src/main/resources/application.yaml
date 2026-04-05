@@ -12,11 +12,15 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yaml
     url: jdbc:cassandra://localhost:9042/rcrs?localdatacenter=my-datacenter-1&compliancemode=Liquibase
     driver-class-name: com.ing.data.cassandra.jdbc.CassandraDriver
-s3:
-  url: http://localhost:9444
+
+service:
+  media-service:
+    url: http://media-service:8080
+
 logging:
   level:
     root: DEBUG
+
 
 app:
   read:

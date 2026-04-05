@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
-import org.ultra.rcrs.catalogservice.dto.full.FullAlbumMetadata;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.ultra.rcrs.catalogservice.dto.request.AlbumCreateRequest;
+import org.ultra.rcrs.catalogservice.dto.response.album.AlbumPage;
 import org.ultra.rcrs.catalogservice.service.AlbumCrudService;
-import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -19,14 +21,8 @@ public class AlbumWriteController {
 
     private final AlbumCrudService albumCrudService;
 
-    @DeleteMapping("/{albumId}")
-    public Mono<ResponseEntity<Void>> deleteAlbum(@PathVariable("albumId") String albumId) {
-        return albumCrudService.deleteAlbumCascadeById(Url62.decode(albumId))
-                .map(ResponseEntity::ok);
-    }
-
     @PostMapping
-    public Mono<ResponseEntity<FullAlbumMetadata>> createAlbum(@RequestBody @Validated AlbumCreateRequest request) {
+    public Mono<ResponseEntity<AlbumPage>> createAlbum(@RequestBody @Validated AlbumCreateRequest request) {
         return albumCrudService.createAlbum(request)
                 .map(ResponseEntity::ok);
     }

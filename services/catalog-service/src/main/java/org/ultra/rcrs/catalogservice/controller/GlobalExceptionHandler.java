@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.support.WebExchangeBindException;
 import org.springframework.web.server.ServerWebInputException;
-import org.ultra.rcrs.catalogservice.dto.ErrorResponse;
+import org.ultra.rcrs.catalogservice.dto.response.ErrorResponse;
+import org.ultra.rcrs.exceptions.BadRequestException;
 import org.ultra.rcrs.exceptions.DecodeFromBase62Exception;
 import org.ultra.rcrs.exceptions.EncodeToBase62Exception;
 import org.ultra.rcrs.exceptions.NotFoundException;
@@ -38,6 +39,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(produces = "application/json", exception = DecodeFromBase62Exception.class)
     public ResponseEntity<ErrorResponse> handleDecodeFromBase62Exception(final DecodeFromBase62Exception ex) {
+        log.debug(ex.getMessage(), ex);
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
+    }
+
+    @ExceptionHandler(produces = "application/json", exception = BadRequestException.class)
+    public ResponseEntity<ErrorResponse> handleBadRequestException(final BadRequestException ex) {
         log.debug(ex.getMessage(), ex);
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)

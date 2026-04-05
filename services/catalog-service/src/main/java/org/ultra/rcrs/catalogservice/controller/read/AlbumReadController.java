@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.ultra.rcrs.catalogservice.dto.full.FullAlbumMetadata;
-import org.ultra.rcrs.catalogservice.dto.simplify.SimpleTrackMetadata;
+import org.ultra.rcrs.catalogservice.dto.response.album.AlbumPage;
+import org.ultra.rcrs.catalogservice.dto.response.track.TrackInAlbum;
 import org.ultra.rcrs.catalogservice.service.AlbumCrudService;
+import org.ultra.rcrs.catalogservice.service.TrackCrudService;
+import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Mono;
 
@@ -22,16 +24,17 @@ import java.util.List;
 public class AlbumReadController {
 
     private final AlbumCrudService albumCrudService;
+    private final TrackCrudService trackCrudService;
 
     @GetMapping("/{albumId}")
-    public Mono<ResponseEntity<FullAlbumMetadata>> getAlbum(@PathVariable("albumId") String albumId, @PathVariable("published") boolean published) {
-        return albumCrudService.getAlbum(Url62.decode(albumId), published)
+    public Mono<ResponseEntity<AlbumPage>> getAlbum(@PathVariable("albumId") String albumId) {
+        return albumCrudService.getAlbum(Url62.decode(albumId), List.of(EntityStatus.PUBLISHED))
                 .map(ResponseEntity::ok);
     }
 
     @GetMapping("/{albumId}/tracks")
-    public Mono<ResponseEntity<List<SimpleTrackMetadata>>> getTracksForAlbum(@PathVariable("albumId") String albumId) {
-        return albumCrudService.getTracksForAlbum(Url62.decode(albumId))
+    public Mono<ResponseEntity<List<TrackInAlbum>>> getTracksForAlbum(@PathVariable("albumId") String albumId) {
+        return trackCrudService.getTracksForAlbum(Url62.decode(albumId), List.of(EntityStatus.PUBLISHED))
                 .map(ResponseEntity::ok);
     }
 }

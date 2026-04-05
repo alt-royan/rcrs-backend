@@ -11,14 +11,18 @@ import org.ultra.rcrs.catalogservice.model.track.TrackByAlbum;
 import org.ultra.rcrs.catalogservice.model.track.TrackByArtist;
 import org.ultra.rcrs.catalogservice.repository.AlbumRepository;
 import org.ultra.rcrs.catalogservice.repository.ArtistRepository;
-import org.ultra.rcrs.catalogservice.utils.Utils;
-import org.ultra.rcrs.enums.TrackStatus;
+import org.ultra.rcrs.enums.ArtistRole;
+import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -32,33 +36,37 @@ public class TrackPersistRepositoryImpl implements TrackPersistRepository<Track>
     @Override
     public @NonNull <S extends Track> Mono<S> save(@Nonnull S track) {
         Assert.notNull(track.getTitle(), "Title must not be null");
-        Assert.notNull(track.getReleaseDate(), "Release date must not be null");
         Assert.notNull(track.getTrackNumber(), "Track number must not be null");
         Assert.notNull(track.getExplicit(), "Explicit must not be null");
         Assert.notNull(track.getAlbumId(), "Album id must not be null");
-        Assert.notNull(track.getArtists(), "Artists must not be null");
-        Assert.notEmpty(track.getArtists().getMainArtists(), "At least 1 main artist must be present on the track");
+        Assert.notEmpty(track.getMainArtists(), "At least 1 main artist must be present on the track");
 
-        track.setKey(new Track.TrackKey(UUID.randomUUID(), TrackStatus.CREATED));
+        track.setKey(new Track.TrackKey(UUID.randomUUID(), EntityStatus.CREATED));
         track.setDurationMs(0);
         track.setAvailable(true);
 
+        track.getMainArtists().forEach(uuid -> {
+            track.getFeaturedArtists().remove(uuid);
+        });
+
+        Set<UUID> artists = Stream.concat(track.getMainArtists().stream(), track.getFeaturedArtists().stream()).collect(Collectors.toSet());
 
         return albumRepository.findById(track.getAlbumId())
                 .switchIfEmpty(Mono.error(new NotFoundException("Album with id " + track.getAlbumId() + " was not found")))
-                .thenMany(Flux.fromIterable(Utils.flatArtists(track.getArtists()))
+                .thenMany(Flux.fromIterable(artists)
                         .doOnNext(artistId -> artistRepository.findById(artistId)
                                 .switchIfEmpty(Mono.error(new NotFoundException("Artist with id " + artistId + " was not found"))))
-                ).doOnComplete(() -> log.info("Track validation completed successfully. The track has been assigned UUID {}", track.getKey().getId()))
+                ).doOnComplete(() -> log.info("Track {} validation completed successfully. The track has been assigned UUID {}", track.getTitle(), track.getKey().getId()))
                 .then(this.saveAll(track));
 
     }
 
     private <S extends Track> Mono<S> saveAll(final S track) {
         TrackByAlbum trackByAlbum = new TrackByAlbum(track);
-        List<TrackByArtist> trackByArtistList = Utils.artistsToMap(track.getArtists()).entrySet().stream()
-                .map(entry -> new TrackByArtist(track, entry.getKey(), entry.getValue()))
-                .toList();
+
+        List<TrackByArtist> trackByArtistList = new LinkedList<>();
+        track.getMainArtists().forEach(uuid -> trackByArtistList.add(new TrackByArtist(track, uuid, ArtistRole.MAIN_ARTIST)));
+        track.getFeaturedArtists().forEach(uuid -> trackByArtistList.add(new TrackByArtist(track, uuid, ArtistRole.FEATURED_ARTIST)));
 
         return cassandraTemplate.batchOps()
                 .insert(track)
@@ -66,7 +74,7 @@ public class TrackPersistRepositoryImpl implements TrackPersistRepository<Track>
                 .insert(trackByArtistList)
                 .execute().doOnSuccess(writeResult -> {
                     if (writeResult != null && writeResult.wasApplied()) {
-                        log.info("The batch [Track, TrackByAlbum, TrackByArtist] completed successfully. Track UUID {}", track.getKey().getId());
+                        log.info("The batch [Track, TrackByAlbum, TrackByArtist] completed successfully. Track {} with UUID {} was added into album {}", track.getTitle(), track.getKey().getId(), track.getAlbumId());
                     }
                 }).thenReturn(track);
     }

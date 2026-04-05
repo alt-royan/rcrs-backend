@@ -1,26 +1,30 @@
-package org.ultra.rcrs.catalogservice.dto;
+package org.ultra.rcrs.catalogservice.dto.response.album;
 
 import lombok.Data;
+import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistSimple;
 import org.ultra.rcrs.catalogservice.model.album.Album;
-import org.ultra.rcrs.catalogservice.utils.S3Utils;
 import org.ultra.rcrs.enums.AlbumType;
-import org.ultra.rcrs.enums.TrackStatus;
+import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.utils.Url62;
 
 import java.time.LocalDate;
+import java.time.Year;
+import java.util.Set;
 
 @Data
-public abstract class AlbumMetadataAbstract {
+public class AlbumInTrack {
 
     private String id;
 
-    private TrackStatus status;
+    private EntityStatus status;
 
     private String title;
 
-    private Long totalDurationMs;
+    private Integer totalDurationMs;
 
     private AlbumType type;
+
+    private Year year;
 
     private LocalDate releaseDate;
 
@@ -32,17 +36,21 @@ public abstract class AlbumMetadataAbstract {
 
     private Boolean available;
 
-    protected AlbumMetadataAbstract(Album album) {
+    private Set<ArtistSimple> mainArtists;
+
+    public AlbumInTrack(Album album, String coverUrl, Set<ArtistSimple> mainArtists) {
         this.id = Url62.encode(album.getKey().getId());
         this.status = album.getKey().getStatus();
         this.title = album.getTitle();
         this.totalDurationMs = album.getTotalDurationMs();
         this.type = album.getType();
-        this.releaseDate = album.getReleaseDate();
-        this.coverUrl = S3Utils.createResourceS3Url(album.getCoverKey());
+        this.year = album.getYear();
+        this.releaseDate = album.getReleaseDate().toLocalDate();
+        this.coverUrl = coverUrl;
         this.totalTracks = album.getTotalTracks();
         this.explicit = album.getExplicit();
         this.available = album.getAvailable();
+        this.mainArtists = mainArtists;
     }
 
 }
