@@ -90,6 +90,7 @@ public class AlbumCrudService {
                     return Track.builder()
                             .albumId(album.getKey().getId())
                             .title(dto.getTitle())
+                            .releaseDate(album.getReleaseDate())
                             .trackNumber(dto.getTrackNumber())
                             .explicit(dto.getExplicit())
                             .mainArtists(mainArtists)

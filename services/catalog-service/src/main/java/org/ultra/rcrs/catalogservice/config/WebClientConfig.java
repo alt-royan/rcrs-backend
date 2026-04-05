@@ -13,17 +13,13 @@ import org.springframework.web.reactive.function.client.WebClient;
 import reactor.netty.http.client.HttpClient;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
 
 
 @Configuration
 public class WebClientConfig {
 
-    @Value("service.media-service.url")
-    private String mediaServiceUrl;
-
     @Bean(name = "mediaWebClient")
-    public WebClient mediaWebClient() {
+    public WebClient mediaWebClient(@Value("${service.media-service.url}") String mediaServiceUrl) {
         return WebClient.builder()
                 .baseUrl(mediaServiceUrl)
                 .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)

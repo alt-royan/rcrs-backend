@@ -8,11 +8,9 @@ import lombok.Data;
 import org.springframework.validation.annotation.Validated;
 import org.ultra.rcrs.enums.AlbumType;
 
+import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Validated
 @Data
@@ -25,7 +23,7 @@ public class AlbumCreateRequest {
     private AlbumType type;
 
     @NotNull
-    private OffsetDateTime releaseDate;
+    private Instant releaseDate;
 
     //Ссылки на s3 приходят в формате s3://{bucket}/{key}
     @NotNull

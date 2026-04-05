@@ -54,7 +54,7 @@ public class TrackPersistRepositoryImpl implements TrackPersistRepository<Track>
         return albumRepository.findById(track.getAlbumId())
                 .switchIfEmpty(Mono.error(new NotFoundException("Album with id " + track.getAlbumId() + " was not found")))
                 .thenMany(Flux.fromIterable(artists)
-                        .doOnNext(artistId -> artistRepository.findById(artistId)
+                        .flatMap(artistId -> artistRepository.findById(artistId)
                                 .switchIfEmpty(Mono.error(new NotFoundException("Artist with id " + artistId + " was not found"))))
                 ).doOnComplete(() -> log.info("Track {} validation completed successfully. The track has been assigned UUID {}", track.getTitle(), track.getKey().getId()))
                 .then(this.saveAll(track));

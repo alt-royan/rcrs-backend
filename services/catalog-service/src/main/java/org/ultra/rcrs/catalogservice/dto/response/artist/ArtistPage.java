@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 import org.ultra.rcrs.catalogservice.model.SocialLink;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data

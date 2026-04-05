@@ -17,7 +17,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @AllArgsConstructor
-@Table("artists_by_id")
+@Table("artists")
 public class Artist {
 
     @PrimaryKey

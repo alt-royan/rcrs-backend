@@ -15,7 +15,8 @@ import org.ultra.rcrs.exceptions.NotFoundException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.time.Year;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -39,7 +40,7 @@ public class AlbumPersistRepositoryImpl implements AlbumPersistRepository<Album>
         album.setTotalDurationMs(0);
         album.setTotalTracks(0);
         album.setAvailable(true);
-        album.setYear(Year.of(album.getReleaseDate().getYear()));
+        album.setYear(album.getReleaseDate() == null ? null : OffsetDateTime.ofInstant(album.getReleaseDate(), ZoneId.systemDefault()).getYear());
         album.setFeaturedArtists(new HashSet<>());
 
         album.getMainArtists().forEach(uuid -> {
@@ -49,7 +50,7 @@ public class AlbumPersistRepositoryImpl implements AlbumPersistRepository<Album>
         Set<UUID> artists = Stream.concat(album.getMainArtists().stream(), album.getFeaturedArtists().stream()).collect(Collectors.toSet());
 
         return Flux.fromIterable(artists)
-                .doOnNext(artistId -> artistRepository.findById(artistId)
+                .flatMap(artistId -> artistRepository.findById(artistId)
                         .switchIfEmpty(Mono.error(new NotFoundException("Artist with id " + artistId + " was not found")))
                 ).doOnComplete(() -> log.info("Album {} validation completed successfully. The album has been assigned UUID {}", album.getTitle(), album.getKey().getId()))
                 .then(this.saveAll(album));

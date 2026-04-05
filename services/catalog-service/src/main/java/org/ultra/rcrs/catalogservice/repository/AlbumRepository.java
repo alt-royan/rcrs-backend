@@ -14,12 +14,12 @@ import java.util.UUID;
 @Repository
 public interface AlbumRepository extends ReactiveCassandraRepository<Album, Album.AlbumKey>, AlbumPersistRepository<Album> {
 
-    @Query("SELECT * FROM albums WHERE id = ?")
+    @Query("SELECT * FROM albums WHERE id = :id")
     Mono<Album> findById(UUID id);
 
-    @Query("SELECT * FROM albums WHERE id = ? and status IN ?")
+    @Query("SELECT * FROM albums WHERE id = :id and status IN :statuses")
     Mono<Album> findByIdAndStatusIn(UUID id, List<EntityStatus> statuses);
 
-    @Query("UPDATE albums SET totalTracks = totalTracks + 1 WHERE id = ?")
+    @Query("UPDATE albums SET total_tracks = total_tracks + 1 WHERE id = :id")
     Mono<Void> incTotalTracks(UUID id);
 }

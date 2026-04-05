@@ -9,9 +9,11 @@ import org.springframework.data.cassandra.core.mapping.*;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.EntityStatus;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.Year;
+import java.util.Date;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,7 +21,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @AllArgsConstructor
-@Table("albums_by_id")
+@Table("albums")
 public class Album {
 
     @PrimaryKey
@@ -35,10 +37,10 @@ public class Album {
     private AlbumType type;
 
     @Column("year")
-    private Year year;
+    private Integer year;
 
     @Column("release_date")
-    private OffsetDateTime releaseDate;
+    private Instant releaseDate;
 
     @Column("cover_s3_key")
     private String coverS3Key;

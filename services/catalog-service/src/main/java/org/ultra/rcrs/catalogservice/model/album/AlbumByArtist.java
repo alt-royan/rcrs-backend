@@ -10,6 +10,7 @@ import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.Year;
@@ -36,7 +37,7 @@ public class AlbumByArtist {
     private Integer totalDurationMs;
 
     @Column("year")
-    private Year year;
+    private Integer year;
 
     @Column("cover_s3_key")
     private String coverS3Key;
@@ -109,7 +110,7 @@ public class AlbumByArtist {
                 ordinal = 4,
                 type = PrimaryKeyType.CLUSTERED
         )
-        private OffsetDateTime releaseDate;
+        private Instant releaseDate;
 
     }
 

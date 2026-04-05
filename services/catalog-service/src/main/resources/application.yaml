@@ -2,20 +2,21 @@ spring:
   application:
     name: catalog-service
   cassandra:
-    keyspace-name: "rcrs"
+    keyspace-name: "rcrs_catalog"
     contact-points: "localhost:9042"
-    local-datacenter: "datacenter-1"
+    local-datacenter: "my-datacenter-1"
+    #schema-action: CREATE_IF_NOT_EXISTS
   kafka:
     bootstrap-servers: localhost:9092
     process-topic: "entity-process-topic"
 
 service:
   media-service:
-    url: http://media-service:8080
+    url: "http://media-service:8080"
 
 logging:
   level:
-    root: INFO
+    root: DEBUG
 
 
 app:

@@ -9,6 +9,7 @@ import org.springframework.data.cassandra.core.mapping.*;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Set;
@@ -97,7 +98,7 @@ public class TrackByArtist {
                 ordinal = 3,
                 type = PrimaryKeyType.CLUSTERED
         )
-        private OffsetDateTime releaseDate;
+        private Instant releaseDate;
 
     }
 

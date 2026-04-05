@@ -1,5 +1,7 @@
 package org.ultra.rcrs.catalogservice.service;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.stereotype.Service;
@@ -9,6 +11,7 @@ import reactor.util.retry.Retry;
 
 import java.time.Duration;
 
+@Slf4j
 @Service
 public class MediaServiceClient {
 
@@ -19,6 +22,10 @@ public class MediaServiceClient {
     }
 
     public Mono<String> fetchImageUrl(String imageKey) {
+        if (StringUtils.isEmpty(imageKey)){
+            return Mono.just("");
+        }
+        log.info("Fetching image url...");
         return mediaWebClient.get()
                 .uri("/images/{imageKey}", imageKey)
                 .retrieve()
@@ -28,6 +35,7 @@ public class MediaServiceClient {
                         Mono.error(new RuntimeException("Server Error: " + response.statusCode())))
                 .bodyToMono(String.class)
                 .retryWhen(Retry.backoff(3, Duration.ofSeconds(2)))
+                .timeout(Duration.ofMillis(1500))
                 .onErrorReturn("");
     }
 

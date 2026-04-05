@@ -8,6 +8,7 @@ import org.ultra.rcrs.catalogservice.model.track.Track;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.utils.Url62;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
@@ -21,7 +22,7 @@ public class TrackPage {
 
     private String title;
 
-    private LocalDate releaseDate;
+    private Instant releaseDate;
 
     private Integer durationMs;
 
@@ -43,7 +44,7 @@ public class TrackPage {
         this.id = Url62.encode(track.getKey().getId());
         this.status = track.getKey().getStatus();
         this.title = track.getTitle();
-        this.releaseDate = track.getReleaseDate().toLocalDate();
+        this.releaseDate = track.getReleaseDate();
         this.durationMs = track.getDurationMs();
         this.trackNumber = track.getTrackNumber();
         this.explicit = track.getExplicit();

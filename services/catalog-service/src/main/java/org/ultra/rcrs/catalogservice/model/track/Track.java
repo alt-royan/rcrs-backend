@@ -9,6 +9,7 @@ import org.springframework.data.cassandra.core.mapping.*;
 import org.ultra.rcrs.catalogservice.model.ArtistOther;
 import org.ultra.rcrs.enums.EntityStatus;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @Setter
 @Builder
 @AllArgsConstructor
-@Table("tracks_by_id")
+@Table("tracks")
 public class Track {
 
     @PrimaryKey
@@ -29,7 +30,7 @@ public class Track {
     private String title;
 
     @Column("release_date")
-    private OffsetDateTime releaseDate;
+    private Instant releaseDate;
 
     @Column("duration_ms")
     private Integer durationMs;
@@ -52,8 +53,8 @@ public class Track {
     @Column("featured_artists")
     private Set<UUID> featuredArtists;
 
-    @Column("other")
-    private List<ArtistOther> others;
+    @Column("others")
+    private List<@Frozen ArtistOther> others;
 
     @Getter
     @Setter

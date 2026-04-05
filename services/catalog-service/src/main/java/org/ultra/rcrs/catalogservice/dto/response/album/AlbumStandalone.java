@@ -8,6 +8,7 @@ import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.utils.Url62;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.Year;
 import java.util.Set;
@@ -25,9 +26,9 @@ public class AlbumStandalone {
 
     private AlbumType type;
 
-    private Year year;
+    private Integer year;
 
-    private LocalDate releaseDate;
+    private Instant releaseDate;
 
     private String coverUrl;
 
@@ -46,7 +47,7 @@ public class AlbumStandalone {
         this.totalDurationMs = album.getTotalDurationMs();
         this.type = album.getType();
         this.year = album.getYear();
-        this.releaseDate = album.getReleaseDate().toLocalDate();
+        this.releaseDate = album.getReleaseDate();
         this.coverUrl = coverUrl;
         this.totalTracks = album.getTotalTracks();
         this.explicit = album.getExplicit();
@@ -61,7 +62,7 @@ public class AlbumStandalone {
         this.totalDurationMs = album.getTotalDurationMs();
         this.type = album.getKey().getAlbumType();
         this.year = album.getYear();
-        this.releaseDate = album.getKey().getReleaseDate().toLocalDate();
+        this.releaseDate = album.getKey().getReleaseDate();
         this.coverUrl = coverUrl;
         this.totalTracks = album.getTotalTracks();
         this.explicit = album.getExplicit();

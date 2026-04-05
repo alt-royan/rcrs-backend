@@ -15,7 +15,7 @@ public class ArtistOther {
     private String name;
 
     @Column("social_link")
-    private String socialLink;
+    private SocialLink socialLink;
 
     @Column("roles")
     private Set<ArtistRole> roles;
