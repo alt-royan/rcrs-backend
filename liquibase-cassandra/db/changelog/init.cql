@@ -1,4 +1,4 @@
-CREATE KEYSPACE rcrs_catalog WITH REPLICATION = {
+CREATE KEYSPACE IF NOT EXISTS rcrs_catalog WITH REPLICATION = {
     'class' : 'SimpleStrategy',
     'replication_factor' : 1
     };
@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS rcrs_catalog.artists
 (
     id            uuid,
     name          text,
-    social_links  list<rcrs_catalog.social_link>,
+    social_links  list<frozen<rcrs_catalog.social_link>>,
     avatar_s3_key text,
     PRIMARY KEY (id)
 );
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS rcrs_catalog.artists
 CREATE TYPE IF NOT EXISTS rcrs_catalog.artist_other
     (
         name        text,
-        social_link rcrs_catalog.social_link,
+        social_link frozen<rcrs_catalog.social_link>,
         roles       set<varchar>
     );
 
@@ -41,10 +41,10 @@ CREATE TABLE IF NOT EXISTS rcrs_catalog.albums
     year              smallint,
     release_date      timestamp,
     cover_s3_key      text,
-    total_tracks      counter,
+    total_tracks      smallint,
     explicit          boolean,
     available         boolean,
-    artists           rcrs_catalog.artists_on,
+    artists           frozen<rcrs_catalog.artists_on>,
     PRIMARY KEY ( id, status )
 );
 
@@ -62,10 +62,10 @@ CREATE TABLE IF NOT EXISTS rcrs_catalog.albums_by_artist
     total_duration_ms int,
     year              smallint,
     cover_s3_key      text,
-    total_tracks      counter,
+    total_tracks      smallint,
     explicit          boolean,
     available         boolean,
-    artists           rcrs_catalog.artists_on,
+    artists           frozen<rcrs_catalog.artists_on>,
     PRIMARY KEY ( artist_id, album_status, artist_role, album_type, release_date )
 );
 
@@ -82,8 +82,8 @@ CREATE TABLE IF NOT EXISTS rcrs_catalog.tracks
     explicit     boolean,
     available    boolean,
     album_id     uuid,
-    artists      rcrs_catalog.artists_on,
-    others       list<rcrs_catalog.artist_other>,
+    artists      frozen<rcrs_catalog.artists_on>,
+    others       list<frozen<rcrs_catalog.artist_other>>,
     PRIMARY KEY ( id, status )
 );
 
@@ -102,8 +102,8 @@ CREATE TABLE IF NOT EXISTS rcrs_catalog.tracks_by_artist
     explicit     boolean,
     available    boolean,
     album_id     uuid,
-    artists      rcrs_catalog.artists_on,
-    others       list<rcrs_catalog.artist_other>,
+    artists      frozen<rcrs_catalog.artists_on>,
+    others       list<frozen<rcrs_catalog.artist_other>>,
     PRIMARY KEY ( artist_id, track_status, artist_role, release_date )
 );
 
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS rcrs_catalog.tracks_by_album
     duration_ms  int,
     explicit     boolean,
     available    boolean,
-    artists      rcrs_catalog.artists_on,
+    artists      frozen<rcrs_catalog.artists_on>,
     PRIMARY KEY ( album_id, track_status, track_number )
 );
 
