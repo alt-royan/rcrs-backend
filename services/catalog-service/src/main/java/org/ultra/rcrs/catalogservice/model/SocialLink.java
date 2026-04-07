@@ -1,11 +1,9 @@
 package org.ultra.rcrs.catalogservice.model;
 
 import lombok.Data;
-import org.springframework.data.cassandra.core.mapping.Column;
-import org.springframework.data.cassandra.core.mapping.UserDefinedType;
+import org.springframework.data.relational.core.mapping.Column;
 
 @Data
-@UserDefinedType("social_link")
 public class SocialLink {
 
     @Column("resource_name")

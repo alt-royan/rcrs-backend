@@ -1,3 +1,4 @@
+/*
 package org.ultra.rcrs.catalogservice.repository.persist;
 
 import jakarta.annotation.Nonnull;
@@ -6,9 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.cassandra.core.ReactiveCassandraTemplate;
 import org.springframework.util.Assert;
-import org.ultra.rcrs.catalogservice.model.track.Track;
-import org.ultra.rcrs.catalogservice.model.track.TrackByAlbum;
-import org.ultra.rcrs.catalogservice.model.track.TrackByArtist;
+import org.ultra.rcrs.catalogservice.model.write.Track;
+import org.ultra.rcrs.catalogservice.model.write.ArtistToTrack;
 import org.ultra.rcrs.catalogservice.repository.AlbumRepository;
 import org.ultra.rcrs.catalogservice.repository.ArtistRepository;
 import org.ultra.rcrs.enums.ArtistRole;
@@ -64,14 +64,14 @@ public class TrackPersistRepositoryImpl implements TrackPersistRepository<Track>
     private <S extends Track> Mono<S> saveAll(final S track) {
         TrackByAlbum trackByAlbum = new TrackByAlbum(track);
 
-        List<TrackByArtist> trackByArtistList = new LinkedList<>();
-        track.getMainArtists().forEach(uuid -> trackByArtistList.add(new TrackByArtist(track, uuid, ArtistRole.MAIN_ARTIST)));
-        track.getFeaturedArtists().forEach(uuid -> trackByArtistList.add(new TrackByArtist(track, uuid, ArtistRole.FEATURED_ARTIST)));
+        List<ArtistToTrack> artistTrackList = new LinkedList<>();
+        track.getMainArtists().forEach(uuid -> artistTrackList.add(new ArtistToTrack(track, uuid, ArtistRole.MAIN_ARTIST)));
+        track.getFeaturedArtists().forEach(uuid -> artistTrackList.add(new ArtistToTrack(track, uuid, ArtistRole.FEATURED_ARTIST)));
 
         return cassandraTemplate.batchOps()
                 .insert(track)
                 .insert(trackByAlbum)
-                .insert(trackByArtistList)
+                .insert(artistTrackList)
                 .execute().doOnSuccess(writeResult -> {
                     if (writeResult != null && writeResult.wasApplied()) {
                         log.info("The batch [Track, TrackByAlbum, TrackByArtist] completed successfully. Track {} with UUID {} was added into album {}", track.getTitle(), track.getKey().getId(), track.getAlbumId());
@@ -80,3 +80,4 @@ public class TrackPersistRepositoryImpl implements TrackPersistRepository<Track>
     }
 }
 
+*/

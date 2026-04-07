@@ -18,7 +18,7 @@ import java.time.Duration;
 @Configuration
 public class WebClientConfig {
 
-    @Bean(name = "mediaWebClient")
+/*    @Bean(name = "mediaWebClient")
     public WebClient mediaWebClient(@Value("${service.media-service.url}") String mediaServiceUrl) {
         return WebClient.builder()
                 .baseUrl(mediaServiceUrl)
@@ -31,5 +31,5 @@ public class WebClientConfig {
         return HttpClient.create()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
                 .responseTimeout(Duration.ofMillis(1000));
-    }
+    }*/
 }

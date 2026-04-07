@@ -5,8 +5,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.ultra.rcrs.catalogservice.dto.response.album.AlbumStandalone;
-import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistPage;
+import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistDto;
 import org.ultra.rcrs.catalogservice.service.AlbumCrudService;
 import org.ultra.rcrs.catalogservice.service.ArtistCrudService;
 import org.ultra.rcrs.enums.AlbumType;
@@ -27,12 +26,12 @@ public class ArtistReadController {
     private final AlbumCrudService albumCrudService;
 
     @GetMapping("/{artistId}")
-    public Mono<ResponseEntity<ArtistPage>> getArtist(@PathVariable("artistId") String artistId) {
+    public Mono<ResponseEntity<ArtistDto>> getArtist(@PathVariable("artistId") String artistId) {
         return artistCrudService.getArtist(Url62.decode(artistId))
                 .map(ResponseEntity::ok);
     }
 
-    @GetMapping("/{artistId}/albums?role=main_artist?type=single")
+/*    @GetMapping("/{artistId}/albums?role=main_artist?type=single")
     public Mono<ResponseEntity<List<AlbumStandalone>>> getAlbumsForArtist(@PathVariable("artistId") String artistId,
                                                                           @RequestParam(value = "direction", required = false) Sort.Direction direction,
                                                                           @RequestParam(value = "types", required = false) AlbumType[] types,
@@ -44,6 +43,6 @@ public class ArtistReadController {
 
         return albumCrudService.getAlbumsForArtist(Url62.decode(artistId), List.of(EntityStatus.PUBLISHED), roles, types, direction)
                 .map(ResponseEntity::ok);
-    }
+    }*/
 
 }

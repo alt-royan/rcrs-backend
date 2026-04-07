@@ -1,10 +1,10 @@
+/*
 package org.ultra.rcrs.catalogservice.dto.request;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
-import org.ultra.rcrs.catalogservice.model.ArtistOther;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -28,4 +28,4 @@ public class TrackCreateRequest {
     private Set<ArtistId> artists = new HashSet<>();
 
     private List<ArtistOther> others = new ArrayList<>();
-}
+}*/

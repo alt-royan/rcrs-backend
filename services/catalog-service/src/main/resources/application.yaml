@@ -1,22 +1,31 @@
 spring:
   application:
     name: catalog-service
-  cassandra:
-    keyspace-name: "rcrs_catalog"
-    contact-points: "localhost:9042"
-    local-datacenter: "my-datacenter-1"
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    user: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/rcrs?currentSchema=rcrs_catalog
+  r2dbc:
+    username: postgres
+    password: postgres
+    url: r2dbc:postgresql://localhost:5432/rcrs?currentSchema=rcrs_catalog
+  #cassandra:
+    #keyspace-name: "rcrs_catalog"
+    #contact-points: "localhost:9042"
+    #local-datacenter: "my-datacenter-1"
     #schema-action: CREATE_IF_NOT_EXISTS
   kafka:
     bootstrap-servers: localhost:9092
     process-topic: "entity-process-topic"
 
-service:
-  media-service:
-    url: "http://media-service:8080"
+s3:
+  images:
+    endpoint: "http://localhost:9444"
 
 logging:
   level:
-    root: DEBUG
+    root: INFO
 
 
 app:

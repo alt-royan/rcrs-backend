@@ -1,16 +1,12 @@
 package org.ultra.rcrs.catalogservice.repository;
 
-import org.springframework.data.cassandra.repository.Query;
-import org.springframework.data.cassandra.repository.ReactiveCassandraRepository;
+import org.springframework.data.repository.reactive.ReactiveCrudRepository;
 import org.springframework.stereotype.Repository;
-import org.ultra.rcrs.catalogservice.model.artist.Artist;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
+import org.ultra.rcrs.catalogservice.model.write.Artist;
 
-import java.util.Collection;
 import java.util.UUID;
 
 @Repository
-public interface ArtistRepository extends ReactiveCassandraRepository<Artist, UUID> {
+public interface ArtistRepository extends ReactiveCrudRepository<Artist, UUID> {
 
 }

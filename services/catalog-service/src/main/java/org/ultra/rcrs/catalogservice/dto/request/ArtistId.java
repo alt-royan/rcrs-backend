@@ -1,3 +1,4 @@
+/*
 package org.ultra.rcrs.catalogservice.dto.request;
 
 import jakarta.validation.constraints.NotNull;
@@ -13,4 +14,4 @@ public class ArtistId {
     private String id;
 
     private ArtistRole role = ArtistRole.MAIN_ARTIST;
-}
+}*/

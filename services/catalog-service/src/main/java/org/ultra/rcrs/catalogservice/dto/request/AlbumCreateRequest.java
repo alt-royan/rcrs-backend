@@ -1,3 +1,4 @@
+/*
 package org.ultra.rcrs.catalogservice.dto.request;
 
 import jakarta.validation.Valid;
@@ -41,4 +42,4 @@ public class AlbumCreateRequest {
     @Valid
     private List<TrackCreateRequest> tracks = new ArrayList<>();
 
-}
+}*/

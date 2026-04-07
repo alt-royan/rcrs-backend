@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistPage;
 import org.ultra.rcrs.catalogservice.dto.request.ArtistCreateRequest;
+import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistDto;
 import org.ultra.rcrs.catalogservice.service.ArtistCrudService;
 import reactor.core.publisher.Mono;
 
@@ -22,8 +22,9 @@ public class ArtistWriteController {
     private final ArtistCrudService artistCrudService;
 
     @PostMapping
-    public Mono<ResponseEntity<ArtistPage>> createNewArtist(@RequestBody @Validated ArtistCreateRequest request) {
+    public Mono<ResponseEntity<ArtistDto>> createNewArtist(@RequestBody @Validated ArtistCreateRequest request) {
         return artistCrudService.createArtist(request)
                 .map(ResponseEntity::ok);
     }
 }
+

@@ -1,3 +1,4 @@
+/*
 package org.ultra.rcrs.catalogservice.repository.persist;
 
 import jakarta.annotation.Nonnull;
@@ -6,8 +7,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.data.cassandra.core.ReactiveCassandraTemplate;
 import org.springframework.util.Assert;
-import org.ultra.rcrs.catalogservice.model.album.Album;
-import org.ultra.rcrs.catalogservice.model.album.AlbumByArtist;
+import org.ultra.rcrs.catalogservice.model.write.Album;
+import org.ultra.rcrs.catalogservice.model.write.ArtistToAlbum;
 import org.ultra.rcrs.catalogservice.repository.ArtistRepository;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
@@ -57,13 +58,13 @@ public class AlbumPersistRepositoryImpl implements AlbumPersistRepository<Album>
     }
 
     private <S extends Album> Mono<S> saveAll(final S album) {
-        List<AlbumByArtist> albumByArtistList = new LinkedList<>();
-        album.getMainArtists().forEach(uuid -> albumByArtistList.add(new AlbumByArtist(album, uuid, ArtistRole.MAIN_ARTIST)));
-        album.getFeaturedArtists().forEach(uuid -> albumByArtistList.add(new AlbumByArtist(album, uuid, ArtistRole.FEATURED_ARTIST)));
+        List<ArtistToAlbum> artistAlbumList = new LinkedList<>();
+        album.getMainArtists().forEach(uuid -> artistAlbumList.add(new ArtistToAlbum(album, uuid, ArtistRole.MAIN_ARTIST)));
+        album.getFeaturedArtists().forEach(uuid -> artistAlbumList.add(new ArtistToAlbum(album, uuid, ArtistRole.FEATURED_ARTIST)));
 
         return cassandraTemplate.batchOps()
                 .insert(album)
-                .insert(albumByArtistList)
+                .insert(artistAlbumList)
                 .execute().doOnSuccess(writeResult -> {
                     if (writeResult != null && writeResult.wasApplied()) {
                         log.info("The batch [Album, AlbumByArtist] completed successfully. Album {} with UUID {}", album.getTitle(), album.getKey().getId());
@@ -71,3 +72,4 @@ public class AlbumPersistRepositoryImpl implements AlbumPersistRepository<Album>
                 }).thenReturn(album);
     }
 }
+*/

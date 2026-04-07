@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.ultra.rcrs.catalogservice.dto.response.track.TrackPage;
+import org.ultra.rcrs.catalogservice.dto.response.track.TrackFullDto;
 import org.ultra.rcrs.catalogservice.service.TrackCrudService;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.utils.Url62;
@@ -24,7 +24,7 @@ public class TrackReadController {
     private final TrackCrudService trackCrudService;
 
     @GetMapping("/{trackId}")
-    public Mono<ResponseEntity<TrackPage>> getTrack(@PathVariable("trackId") String trackId) {
+    public Mono<ResponseEntity<TrackFullDto>> getTrack(@PathVariable("trackId") String trackId) {
         return trackCrudService.getTrack(Url62.decode(trackId), List.of(EntityStatus.PUBLISHED))
                 .map(ResponseEntity::ok);
     }
