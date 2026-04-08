@@ -57,11 +57,6 @@
         </dependency>
 
         <dependency>
-            <groupId>org.ultra.rcrs</groupId>
-            <artifactId>shared-lib</artifactId>
-        </dependency>
-
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>

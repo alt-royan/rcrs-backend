@@ -1,3 +1,6 @@
+server:
+  port: 8080
+
 spring:
   application:
     name: catalog-service
@@ -5,11 +8,11 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
     user: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:5432/rcrs?currentSchema=rcrs_catalog
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=rcrs_catalog
   r2dbc:
     username: postgres
     password: postgres
-    url: r2dbc:postgresql://localhost:5432/rcrs?currentSchema=rcrs_catalog
+    url: r2dbc:postgresql://localhost:5432/postgres?currentSchema=rcrs_catalog
   #cassandra:
     #keyspace-name: "rcrs_catalog"
     #contact-points: "localhost:9042"

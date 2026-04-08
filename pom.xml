@@ -32,7 +32,15 @@
     <modules>
         <module>shared-lib</module>
         <module>services/catalog-service</module>
+        <module>services/media-service</module>
     </modules>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.ultra.rcrs</groupId>
+            <artifactId>shared-lib</artifactId>
+        </dependency>
+    </dependencies>
 
     <dependencyManagement>
         <dependencies>
@@ -55,6 +63,13 @@
             <dependency>
                 <groupId>org.springdoc</groupId>
                 <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
+                <version>${spring-doc.version}</version>
+                <scope>compile</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
                 <version>${spring-doc.version}</version>
                 <scope>compile</scope>
             </dependency>
