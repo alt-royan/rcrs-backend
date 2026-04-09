@@ -1,6 +1,7 @@
-/*
 package org.ultra.rcrs.catalogservice.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -10,12 +11,12 @@ import org.springframework.validation.annotation.Validated;
 import org.ultra.rcrs.enums.AlbumType;
 
 import java.time.Instant;
-import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.List;
 
 @Validated
 @Data
-public class AlbumCreateRequest {
+public class AlbumUploadRequest {
+
 
     @NotNull
     private String title;
@@ -23,7 +24,6 @@ public class AlbumCreateRequest {
     @NotNull
     private AlbumType type;
 
-    @NotNull
     private Instant releaseDate;
 
     //Ссылки на s3 приходят в формате s3://{bucket}/{key}
@@ -33,13 +33,13 @@ public class AlbumCreateRequest {
 
     @NotEmpty
     @Valid
-    private Set<ArtistId> artists = new HashSet<>();
+    private List<ArtistIdDto> artists;
 
     @NotNull
     private Boolean explicit;
 
-    @NotNull
     @Valid
-    private List<TrackCreateRequest> tracks = new ArrayList<>();
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<TrackUploadRequest> tracks;
 
-}*/
+}

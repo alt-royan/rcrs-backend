@@ -2,9 +2,9 @@ package org.ultra.rcrs.catalogservice.dto.response.track;
 
 import lombok.Builder;
 import lombok.Data;
+import org.ultra.rcrs.catalogservice.dto.ArtistOtherDto;
 import org.ultra.rcrs.catalogservice.dto.response.album.AlbumSimpleDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistOnTrackDto;
-import org.ultra.rcrs.catalogservice.model.OthersOnTrack;
 import org.ultra.rcrs.enums.EntityStatus;
 
 import java.time.Instant;
@@ -34,6 +34,6 @@ public class TrackFullDto {
 
     private List<ArtistOnTrackDto> artists;
 
-    private List<OthersOnTrack.ArtistOther> others;
+    private List<ArtistOtherDto> others;
 
 }

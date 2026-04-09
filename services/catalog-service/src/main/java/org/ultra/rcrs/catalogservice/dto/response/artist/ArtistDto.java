@@ -2,7 +2,7 @@ package org.ultra.rcrs.catalogservice.dto.response.artist;
 
 import lombok.Builder;
 import lombok.Data;
-import org.ultra.rcrs.catalogservice.model.SocialLink;
+import org.ultra.rcrs.catalogservice.dto.SocialLinkDto;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ public class ArtistDto {
 
     private String name;
 
-    private List<SocialLink> socialLinks;
+    private List<SocialLinkDto> socialLinks;
 
     private String avatarUrl;
 }

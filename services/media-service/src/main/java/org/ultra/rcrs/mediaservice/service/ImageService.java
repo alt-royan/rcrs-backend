@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 import org.ultra.rcrs.exceptions.BadRequestException;
 import org.ultra.rcrs.exceptions.ServiceUnavailableException;
 import org.ultra.rcrs.mediaservice.utils.Hash;
@@ -56,7 +57,7 @@ public class ImageService {
             String contentType = dataUrl.substring(contentTypeStartIndex, contentTypeEndIndex);
 
             if (!Arrays.asList(MIME_TYPES).contains(contentType)) {
-                throw new BadRequestException("Wrong image mime type");
+                throw new UnsupportedMediaTypeStatusException("Wrong image mime type");
             }
 
             String format = contentType.split("/")[1];

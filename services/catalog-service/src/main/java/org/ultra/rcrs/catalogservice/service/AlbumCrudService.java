@@ -1,31 +1,49 @@
 package org.ultra.rcrs.catalogservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.ultra.rcrs.catalogservice.dto.request.AlbumUploadRequest;
+import org.ultra.rcrs.catalogservice.dto.request.ArtistIdDto;
+import org.ultra.rcrs.catalogservice.dto.request.TrackUploadRequest;
 import org.ultra.rcrs.catalogservice.dto.response.album.AlbumFullDto;
 import org.ultra.rcrs.catalogservice.dto.response.track.TrackInAlbumDto;
-import org.ultra.rcrs.catalogservice.repository.AlbumViewRepository;
-import org.ultra.rcrs.catalogservice.repository.TrackInAlbumViewRepository;
+import org.ultra.rcrs.catalogservice.kafka.producer.EventProducer;
+import org.ultra.rcrs.catalogservice.model.write.Album;
+import org.ultra.rcrs.catalogservice.model.write.ArtistToAlbum;
+import org.ultra.rcrs.catalogservice.repository.*;
 import org.ultra.rcrs.catalogservice.utils.S3Utils;
 import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.exceptions.BadRequestException;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.utils.Url62;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class AlbumCrudService {
 
-    private final AlbumViewRepository albumRepository;
+    private final AlbumViewRepository albumViewRepository;
+    private final AlbumRepository albumRepository;
+    private final ArtistRepository artistRepository;
+    private final ArtistToAlbumRepository artistToAlbumRepository;
     private final TrackInAlbumViewRepository trackInAlbumViewRepository;
     private final ArtistConverter artistConverter;
+    private final TrackCrudService trackCrudService;
     private final S3Utils s3Utils;
+    private final EventProducer eventProducer;
 
     public Mono<AlbumFullDto> getAlbum(UUID albumId, List<EntityStatus> statuses) {
-        return albumRepository.findByIdAndStatusIn(albumId, statuses)
+        return albumViewRepository.findByIdAndStatusIn(albumId, statuses)
                 .switchIfEmpty(Mono.error(new NotFoundException("Album with id " + albumId + " was not found")))
                 .zipWith(getTracksInAlbum(albumId, statuses))
                 .map(tuple -> {
@@ -64,69 +82,60 @@ public class AlbumCrudService {
                         .build()).collectList();
     }
 
-  /*  public Mono<List<AlbumStandalone>> getAlbumsForArtist(UUID artistId, List<EntityStatus> statuses, ArtistRole[] roles, AlbumType[] types, Sort.Direction direction) {
+    /*public Mono<List<AlbumStandalone>> getAlbumsForArtist(UUID artistId, List<EntityStatus> statuses, ArtistRole[] roles, AlbumType[] types, Sort.Direction direction) {
         return albumByArtistRepository.findAll(artistId, statuses, roles, types, direction)
                 .flatMap(albumConverter::toDto)
                 .collectList();
-    }
+    }*/
 
-    public Mono<AlbumFullDto> createAlbum(AlbumCreateRequest request) {
-        Set<Integer> numbers = request.getTracks().stream()
-                .map(TrackCreateRequest::getTrackNumber)
-                .collect(Collectors.toSet());
+    @Transactional
+    public Mono<Void> createAlbum(AlbumUploadRequest request) {
+        if (request.getTracks() != null && !request.getTracks().isEmpty()) {
+            Set<Integer> numbers = request.getTracks().stream()
+                    .map(TrackUploadRequest::getTrackNumber)
+                    .collect(Collectors.toSet());
 
-        if (numbers.size() != request.getTracks().size()) {
-            throw new BadRequestException("trackNumbers are wrong");
-        }
-        int size = request.getTracks().size();
+            int size = request.getTracks().size();
 
-        for (int i = 1; i <= size; i++) {
-            if (!numbers.contains(i)) {
+            if (numbers.size() != size || !IntStream.rangeClosed(1, size).allMatch(numbers::contains)) {
                 throw new BadRequestException("trackNumbers are wrong");
             }
         }
 
-        return albumRepository.save(Album.builder()
-                .title(request.getTitle())
-                .type(request.getType())
-                .releaseDate(request.getReleaseDate())
-                .coverS3Key(S3Utils.parseKey(request.getCoverUri()))
-                .explicit(request.getExplicit())
-                .mainArtists(request.getArtists().stream()
-                        .map(dto -> Url62.decode(dto.getId()))
-                        .collect(Collectors.toSet()))
-                .build()
-        ).flatMap(album -> Flux.fromIterable(request.getTracks())
-                .map(dto -> {
-                    Set<UUID> mainArtists = dto.getArtists().stream()
-                            .filter(a -> ArtistRole.MAIN_ARTIST.equals(a.getRole()))
-                            .map(a -> Url62.decode(a.getId())).collect(Collectors.toSet());
-                    Set<UUID> featuredArtists = dto.getArtists().stream()
-                            .filter(a -> ArtistRole.FEATURED_ARTIST.equals(a.getRole()))
-                            .map(a -> Url62.decode(a.getId())).collect(Collectors.toSet());
-
-                    return Track.builder()
-                            .albumId(album.getKey().getId())
-                            .title(dto.getTitle())
-                            .releaseDate(album.getReleaseDate())
-                            .trackNumber(dto.getTrackNumber())
-                            .explicit(dto.getExplicit())
-                            .mainArtists(mainArtists)
-                            .featuredArtists(featuredArtists)
-                            .others(dto.getOthers())
-                            .build();
-                }).flatMap(t -> trackRepository.save(t).then(incTotalTracks(album.getKey().getId())))
-                .then(getAlbum(album.getKey().getId(), List.of(EntityStatus.values()))));
-
+        UUID albumId = UUID.randomUUID();
+        return checkArtists(request.getArtists())
+                .then(albumRepository.save(Album.builder()
+                                .id(albumId)
+                                .status(EntityStatus.CREATED)
+                                .title(request.getTitle())
+                                .type(request.getType())
+                                .releaseDate(request.getReleaseDate())
+                                .coverS3Key(s3Utils.parseKey(request.getCoverUri()))
+                                .available(true)
+                                .build()).doOnSuccess(v -> log.info("Album {} saved with id {}", request.getTitle(), albumId))
+                        .thenMany(saveArtistsToAlbum(request.getArtists(), albumId))
+                        .thenMany(trackCrudService.saveTracks(request.getTracks(), albumId))
+                        .then(Mono.fromRunnable(() -> eventProducer.albumCreated(albumId))));
     }
 
-    public Mono<Void> incTotalTracks(UUID albumId) {
-        return albumRepository.findById(albumId).flatMap(a -> {
-            var totalTracks = a.getTotalTracks() + 1;
-            var statuses = EntityStatus.values();
-            return albumRepository.updateTotalTracks(albumId, List.of(statuses), totalTracks).then(albumByArtistRepository.updateTotalTracks(albumId, statuses, totalTracks));
-        });
-    }*/
+    private Flux<Void> checkArtists(List<ArtistIdDto> artists) {
+        return Flux.fromIterable(artists)
+                .flatMap(a -> {
+                    var id = Url62.decode(a.getId());
+                    return artistRepository.existsById(id)
+                            .switchIfEmpty(Mono.error(new NotFoundException("Artist with id " + id + " was not found")))
+                            .then();
+                });
+    }
 
+    private Flux<ArtistToAlbum> saveArtistsToAlbum(List<ArtistIdDto> artists, UUID albumId) {
+        return Flux.fromIterable(artists)
+                .map(a -> ArtistToAlbum.builder()
+                        .id(new ArtistToAlbum.ArtistToAlbumId(Url62.decode(a.getId()), albumId))
+                        .artistRole(a.getRole())
+                        .build())
+                .flatMap(a -> artistToAlbumRepository.save(a).doOnSuccess(v ->
+                        log.info("Artist {} with role {} attached to album {}", a.getId(), a.getArtistRole(), albumId)));
+    }
 
 }

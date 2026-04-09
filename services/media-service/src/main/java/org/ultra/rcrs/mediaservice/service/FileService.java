@@ -13,10 +13,7 @@ import org.ultra.rcrs.mediaservice.dto.FileStatusResponse;
 import org.ultra.rcrs.mediaservice.dto.PreloadFileRequest;
 import org.ultra.rcrs.mediaservice.dto.S3PresignUrlResponse;
 import org.ultra.rcrs.mediaservice.utils.Hash;
-import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.services.s3.model.ServerSideEncryption;
-import software.amazon.awssdk.services.s3.model.StorageClass;
+import software.amazon.awssdk.services.s3.model.*;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
@@ -26,6 +23,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -91,10 +89,10 @@ public class FileService {
                 .build();
     }
 
-    public List<FileStatusResponse> getFilesStatus(List<String> uids) {
+    public Map<String, FileStatusResponse> getFilesStatus(List<String> uids) {
         List<AudioUpload> files = audioUploadRepository.findAllById(uids);
         return files.stream().map(file -> new FileStatusResponse(file.getUid(), file.getStatus(), file.getError()))
-                .toList();
+                .collect(Collectors.toMap(FileStatusResponse::getUid, r -> r));
     }
 
 

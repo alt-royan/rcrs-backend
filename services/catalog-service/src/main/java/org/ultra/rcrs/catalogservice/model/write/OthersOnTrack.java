@@ -1,8 +1,11 @@
-package org.ultra.rcrs.catalogservice.model;
+package org.ultra.rcrs.catalogservice.model.write;
 
 import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Embedded;
+import org.ultra.rcrs.catalogservice.dto.ArtistOtherDto;
+import org.ultra.rcrs.catalogservice.model.SocialLink;
 import org.ultra.rcrs.enums.ArtistRole;
 
 import java.util.List;
@@ -19,6 +22,7 @@ public class OthersOnTrack {
     @Column("track_id")
     private UUID trackId;
 
+    @Embedded.Empty
     private List<ArtistOther> others;
 
     @Data
@@ -31,7 +35,14 @@ public class OthersOnTrack {
         private SocialLink socialLink;
 
         @Column("roles")
+        @Embedded.Empty
         private Set<ArtistRole> roles;
+
+        public ArtistOther(ArtistOtherDto artistOtherDto) {
+            this.name = artistOtherDto.getName();
+            this.socialLink = new SocialLink(artistOtherDto.getSocialLink());
+            this.roles = artistOtherDto.getRoles();
+        }
     }
 
 }

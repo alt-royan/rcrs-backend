@@ -12,6 +12,7 @@ import org.ultra.rcrs.mediaservice.service.FileService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class FileController {
     }
 
     @GetMapping(value = "/status", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<FileStatusResponse>> getFilesStatus(@RequestParam(value = "uids") List<String> uids) {
+    public ResponseEntity<Map<String, FileStatusResponse>> getFilesStatus(@RequestParam(value = "uids") List<String> uids) {
         if (uids == null) {
             uids = new ArrayList<>();
         }

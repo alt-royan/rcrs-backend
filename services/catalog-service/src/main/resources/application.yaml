@@ -19,8 +19,20 @@ spring:
     #local-datacenter: "my-datacenter-1"
     #schema-action: CREATE_IF_NOT_EXISTS
   kafka:
-    bootstrap-servers: localhost:9092
-    process-topic: "entity-process-topic"
+    topic:
+      in: ${spring-application}-in
+      media-service: media-topic-in
+    consumer:
+      bootstrap-servers: localhost:9092
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.StringDeserializer
+      group-id: my-group
+      properties:
+        reactiveAutoCommit: true
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.StringSerializer
 
 s3:
   images:

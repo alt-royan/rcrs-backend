@@ -5,9 +5,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.ultra.rcrs.enums.FileStatus;
+import org.ultra.rcrs.exceptions.BadRequestException;
 import org.ultra.rcrs.exceptions.ServiceUnavailableException;
 import org.ultra.rcrs.uploadservice.dto.AlbumUploadRequest;
 import org.ultra.rcrs.uploadservice.dto.PreloadFileRequest;
+import org.ultra.rcrs.uploadservice.dto.TrackUploadRequest;
 import org.ultra.rcrs.uploadservice.feign.CatalogClient;
 import org.ultra.rcrs.uploadservice.feign.MediaClient;
 
@@ -37,6 +40,16 @@ public class UploadService {
 
     public ResponseEntity<Object> uploadAlbum(AlbumUploadRequest request) {
         try {
+            if (request.getTracks() != null && !request.getTracks().isEmpty()) {
+                List<String> uids = request.getTracks().stream().map(TrackUploadRequest::getUid).toList();
+                var statuses = mediaClient.getFilesStatus(uids).getBody();
+                if (statuses == null || uids.stream()
+                        .allMatch(uid -> statuses.containsKey(uid) &&
+                                FileStatus.UPLOADED.equals((statuses.get(uid).getStatus())))) {
+                    throw new BadRequestException("Incorrect file UIDs or not all files have been uploaded yet. Check and try again.");
+                }
+            }
+
             var response = catalogClient.uploadAlbum(request);
             return ResponseEntity.ok(response.getBody());
         } catch (FeignException e) {

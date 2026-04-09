@@ -20,7 +20,6 @@ public class AlbumUploadRequest {
     @NotNull
     private AlbumType type;
 
-    @NotNull
     private Instant releaseDate;
 
     //Ссылки на s3 приходят в формате s3://{bucket}/{key}

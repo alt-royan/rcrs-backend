@@ -1,0 +1,16 @@
+services:
+  localstack:
+    container_name: "${LOCALSTACK_DOCKER_NAME-localstack-main}"
+    restart: unless-stopped
+    image: localstack/localstack
+    ports:
+      - "127.0.0.1:4566:4566"
+    environment:
+      SERVICES: sqs, s3
+      LOCALSTACK_AUTH_TOKEN: ls-hUtAmODE-HAME-rEMA-4794-KOSA1443feca
+      PERSISTENCE: 1
+    volumes:
+      - localstack-data:/var/lib/localstack"
+
+volumes:
+  localstack-data: {}

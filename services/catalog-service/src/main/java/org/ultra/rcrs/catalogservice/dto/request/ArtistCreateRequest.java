@@ -1,5 +1,7 @@
 package org.ultra.rcrs.catalogservice.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
@@ -17,6 +19,7 @@ public class ArtistCreateRequest {
     @NotNull
     private String name;
 
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<SocialLink> socialLinks;
 
     //Ссылки на s3 приходят в формате s3://{bucket}/{key}
