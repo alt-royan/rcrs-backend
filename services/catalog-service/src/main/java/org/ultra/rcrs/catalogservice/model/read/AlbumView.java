@@ -1,5 +1,6 @@
 package org.ultra.rcrs.catalogservice.model.read;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.EntityStatus;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +23,6 @@ import java.util.UUID;
 @Table("album_view")
 public class AlbumView {
 
-    @Id
     private UUID id;
 
     private EntityStatus status;
@@ -31,7 +32,7 @@ public class AlbumView {
     private AlbumType type;
 
     @Column("release_date")
-    private Instant releaseDate;
+    private LocalDate releaseDate;
 
     private Integer year;
 
@@ -42,6 +43,7 @@ public class AlbumView {
     private Integer totalDurationMs;
 
     @Column("cover_s3_key")
+    @JsonProperty("cover_s3_key")
     private String coverS3Key;
 
     @Column("explicit")
@@ -50,5 +52,5 @@ public class AlbumView {
     @Column("available")
     private Boolean available;
 
-    private List<ArtistOnAlbum> artists;
+    private List<ArtistOnAlbumView> artists;
 }

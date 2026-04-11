@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ultra.rcrs.catalogservice.dto.request.AlbumUploadRequest;
-import org.ultra.rcrs.catalogservice.service.AlbumCrudService;
+import org.ultra.rcrs.catalogservice.dto.response.IdResponse;
+import org.ultra.rcrs.catalogservice.service.write.AlbumWriteService;
 import reactor.core.publisher.Mono;
 
 @RestController
@@ -18,11 +19,11 @@ import reactor.core.publisher.Mono;
 @ConditionalOnProperty(name = "app.write.enabled", havingValue = "true")
 public class AlbumWriteController {
 
-    private final AlbumCrudService albumCrudService;
+    private final AlbumWriteService albumWriteService;
 
     @PostMapping
-    public Mono<ResponseEntity<Void>> createAlbum(@RequestBody @Validated AlbumUploadRequest request) {
-        return albumCrudService.createAlbum(request)
+    public Mono<ResponseEntity<IdResponse>> createAlbum(@RequestBody @Validated AlbumUploadRequest request) {
+        return albumWriteService.createAlbum(request)
                 .map(ResponseEntity::ok);
     }
 }

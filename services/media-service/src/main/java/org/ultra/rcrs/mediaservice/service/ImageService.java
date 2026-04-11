@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 import org.ultra.rcrs.exceptions.BadRequestException;
 import org.ultra.rcrs.exceptions.ServiceUnavailableException;
+import org.ultra.rcrs.mediaservice.dto.ImageResponse;
 import org.ultra.rcrs.mediaservice.utils.Hash;
 import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -45,7 +46,7 @@ public class ImageService {
     @Value("${s3.image-bucket}")
     private String s3ImageBucket;
 
-    public String uploadImage(String dataUrl) {
+    public ImageResponse uploadImage(String dataUrl) {
         if (!dataUrl.startsWith(CONTENT_TYPE_PREFIX) || !dataUrl.contains(ENCODING_PREFIX)) {
             throw new BadRequestException("It is not data url string");
         }
@@ -87,6 +88,8 @@ public class ImageService {
                             .build(),
                     RequestBody.fromBytes(ogImageOutputStream.toByteArray()));
 
+            log.info("Image saved {}", key);
+
             thumbnails.forEach((size, imageOS) ->
                     CompletableFuture.runAsync(() -> {
                         s3Client.putObject(PutObjectRequest.builder()
@@ -101,7 +104,7 @@ public class ImageService {
                     })
             );
 
-            return String.format("s3://%s/%s", s3ImageBucket, key);
+            return new ImageResponse(String.format("s3://%s/%s", s3ImageBucket, key));
         } catch (IOException | IllegalArgumentException e) {
             throw new BadRequestException("Unable to decode image. Try another one", e);
         } catch (BadRequestException e) {

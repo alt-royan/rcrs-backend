@@ -8,6 +8,7 @@ import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.EntityStatus;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -22,7 +23,7 @@ public class AlbumFullDto {
 
     private AlbumType type;
 
-    private Instant releaseDate;
+    private LocalDate releaseDate;
 
     private Integer year;
 

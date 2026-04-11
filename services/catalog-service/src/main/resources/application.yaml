@@ -20,19 +20,19 @@ spring:
     #schema-action: CREATE_IF_NOT_EXISTS
   kafka:
     topic:
-      in: ${spring-application}-in
+      in: ${spring.application.name}-in
       media-service: media-topic-in
     consumer:
       bootstrap-servers: localhost:9092
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       group-id: my-group
       properties:
         reactiveAutoCommit: true
     producer:
       bootstrap-servers: localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
 s3:
   images:

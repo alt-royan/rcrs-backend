@@ -18,8 +18,6 @@ public class TrackInAlbumDto {
 
     private String title;
 
-    private Instant releaseDate;
-
     private Integer durationMs;
 
     private Integer trackNumber;

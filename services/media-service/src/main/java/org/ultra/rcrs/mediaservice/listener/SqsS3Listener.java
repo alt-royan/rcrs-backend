@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.enums.FileStatus;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioUploadRepository;
 import software.amazon.awssdk.eventnotifications.s3.model.S3EventNotification;
-import software.amazon.awssdk.eventnotifications.s3.model.S3EventNotificationRecord;
 import software.amazon.awssdk.services.sqs.model.Message;
 
 @Component
@@ -24,11 +23,15 @@ public class SqsS3Listener {
         log.info("Received: {}", message);
         String sqsEventBody = message.body();
         S3EventNotification s3EventNotification = S3EventNotification.fromJson(sqsEventBody);
-        S3EventNotificationRecord record = s3EventNotification.getRecords().getFirst();
-        if (record.getEventName().contains("Put")) {
-            String key = record.getS3().getObject().getKey();
-            audioUploadRepository.updateStatusByUid(FileStatus.UPLOADED, key);
-            log.info("Object {} was UPLOADED", key);
+        var records = s3EventNotification.getRecords();
+        if (records != null) {
+            records.forEach(record -> {
+                if (record.getEventName().equals("s3:ObjectCreated:Put")) {
+                    String key = record.getS3().getObject().getKey();
+                    audioUploadRepository.updateStatusByUid(FileStatus.UPLOADED, key);
+                    log.info("Object {} was UPLOADED", key);
+                }
+            });
         }
     }
 }

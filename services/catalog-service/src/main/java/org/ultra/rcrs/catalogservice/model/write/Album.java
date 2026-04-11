@@ -20,7 +20,6 @@ import java.util.UUID;
 @Table("albums")
 public class Album {
 
-    @Id
     private UUID id;
 
     @Column("status")

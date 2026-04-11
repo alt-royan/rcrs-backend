@@ -6,11 +6,10 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.springframework.validation.annotation.Validated;
-import org.ultra.rcrs.catalogservice.dto.ArtistOtherDto;
+import org.ultra.rcrs.catalogservice.dto.OtherArtistDto;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Set;
 
 @Validated
 @Data
@@ -36,5 +35,5 @@ public class TrackUploadRequest {
     private List<ArtistIdDto> artists;
 
     @JsonSetter(nulls = Nulls.AS_EMPTY)
-    private List<ArtistOtherDto> others;
+    private List<OtherArtistDto> others;
 }

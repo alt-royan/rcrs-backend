@@ -7,6 +7,7 @@ import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistOnTrackDto;
 import org.ultra.rcrs.enums.EntityStatus;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -19,7 +20,7 @@ public class TrackStandaloneDto {
 
     private String title;
 
-    private Instant releaseDate;
+    private LocalDate releaseDate;
 
     private Integer durationMs;
 

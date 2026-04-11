@@ -21,7 +21,7 @@ public interface MediaClient {
     ResponseEntity<S3PresignUrlResponse> getPreSignUrl(@RequestBody PreloadFileRequest request);
 
     @PostMapping("/image")
-    ResponseEntity<String> uploadImage(@RequestBody String dataUrl);
+    ResponseEntity<Object> uploadImage(@RequestBody String dataUrl);
 
     @GetMapping("/status")
     ResponseEntity<Map<String, FileStatusResponse>> getFilesStatus(@RequestParam(value = "uids") List<String> uids);

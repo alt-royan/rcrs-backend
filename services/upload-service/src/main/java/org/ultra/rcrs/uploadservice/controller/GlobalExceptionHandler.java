@@ -33,13 +33,13 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
     }
 
-    @ExceptionHandler(produces = "application/json", exception = Exception.class)
+/*    @ExceptionHandler(produces = "application/json", exception = Exception.class)
     public ResponseEntity<ErrorResponse> handleException(final Exception ex) {
         log.error(ex.getMessage(), ex);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(new ErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR.value(), HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase()));
-    }
+    }*/
 
     @ExceptionHandler(produces = "application/json", exception = ServiceUnavailableException.class)
     public ResponseEntity<ErrorResponse> handleServiceUnavailableException(final ServiceUnavailableException ex) {

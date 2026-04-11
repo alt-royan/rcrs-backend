@@ -27,7 +27,7 @@ public class S3Utils {
 
     public String parseUrl(String imageKey) {
         if (StringUtils.isEmpty(imageKey)) {
-            return "";
+            return null;
         }
         return URI.create(s3ImagesEndpoint + "/" + imageKey).toString();
     }

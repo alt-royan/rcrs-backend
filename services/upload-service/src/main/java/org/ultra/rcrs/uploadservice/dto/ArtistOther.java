@@ -11,8 +11,5 @@ public class ArtistOther {
 
     private String name;
 
-
-    private SocialLink socialLink;
-
     private Set<ArtistRole> roles;
 }

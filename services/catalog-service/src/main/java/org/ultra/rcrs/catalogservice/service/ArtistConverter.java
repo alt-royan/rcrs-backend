@@ -4,20 +4,17 @@ import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.ultra.rcrs.catalogservice.dto.SocialLinkDto;
-import org.ultra.rcrs.catalogservice.dto.request.ArtistCreateRequest;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistOnAlbumDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistOnTrackDto;
-import org.ultra.rcrs.catalogservice.model.read.ArtistOnAlbum;
-import org.ultra.rcrs.catalogservice.model.read.ArtistOnTrack;
-import org.ultra.rcrs.catalogservice.model.write.Artist;
+import org.ultra.rcrs.catalogservice.model.read.ArtistOnAlbumView;
+import org.ultra.rcrs.catalogservice.model.read.ArtistOnTrackView;
+import org.ultra.rcrs.catalogservice.model.read.ArtistView;
 import org.ultra.rcrs.catalogservice.utils.S3Utils;
 import org.ultra.rcrs.utils.Url62;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 @Service
 @Slf4j
@@ -26,7 +23,7 @@ public class ArtistConverter {
 
     private final S3Utils s3Utils;
 
-    public List<ArtistOnAlbumDto> onAlbumToDto(@Nonnull List<ArtistOnAlbum> artists) {
+    public List<ArtistOnAlbumDto> onAlbumToDto(@Nonnull List<ArtistOnAlbumView> artists) {
         Objects.requireNonNull(artists, "artists must not be null");
         return artists.stream()
                 .map(a -> ArtistOnAlbumDto.builder()
@@ -36,7 +33,7 @@ public class ArtistConverter {
                         .role(a.getRole()).build()).toList();
     }
 
-    public List<ArtistOnTrackDto> onTackToDto(@Nonnull List<ArtistOnTrack> artists) {
+    public List<ArtistOnTrackDto> onTackToDto(@Nonnull List<ArtistOnTrackView> artists) {
         Objects.requireNonNull(artists, "artists must not be null");
         return artists.stream()
                 .map(a -> ArtistOnTrackDto.builder()
@@ -46,24 +43,13 @@ public class ArtistConverter {
                         .role(a.getRole()).build()).toList();
     }
 
-    public ArtistDto toDto(@Nonnull Artist artist) {
+    public ArtistDto toDto(@Nonnull ArtistView artist) {
         Objects.requireNonNull(artist, "artist must not be null");
         return ArtistDto.builder()
                 .id(Url62.encode(artist.getId()))
                 .name(artist.getName())
-                .socialLinks(artist.getSocialLinks().stream().map(SocialLinkDto::new).toList())
                 .avatarUrl(s3Utils.parseUrl(artist.getAvatarS3Key()))
                 .build();
     }
-
-    public Artist requestToEntity(@Nonnull ArtistCreateRequest request) {
-        Objects.requireNonNull(request, "request must not be null");
-        return Artist.builder()
-                .id(UUID.randomUUID())
-                .name(request.getName())
-                .socialLinks(request.getSocialLinks())
-                .avatarS3Key(s3Utils.parseKey(request.getAvatarUri())).build();
-    }
-
 
 }

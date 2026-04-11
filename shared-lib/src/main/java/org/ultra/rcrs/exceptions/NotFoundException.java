@@ -1,19 +1,13 @@
 package org.ultra.rcrs.exceptions;
 
 
+import org.ultra.rcrs.utils.Url62;
+
+import java.util.UUID;
+
 public class NotFoundException extends RuntimeException {
 
-    private final static String messageTemplate = "%s with %s=%s was not found";
-
-    public NotFoundException(Class<?> entityClass, String idValue) {
-        this(entityClass, "id", idValue);
-    }
-
-    public NotFoundException(Class<?> entityClass, String param, Object paramValue) {
-        super(String.format(messageTemplate, entityClass.getSimpleName(), param, paramValue.toString()));
-    }
-
-    public NotFoundException(String message) {
-        super(message);
+    public NotFoundException(String prefix, UUID id) {
+        super(String.format("%s with id %s not found", prefix, Url62.encode(id)));
     }
 }

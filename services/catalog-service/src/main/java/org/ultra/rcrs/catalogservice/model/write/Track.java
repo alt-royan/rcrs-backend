@@ -19,7 +19,6 @@ import java.util.UUID;
 @Table("tracks")
 public class Track {
 
-    @Id
     private UUID id;
 
     private EntityStatus status;
