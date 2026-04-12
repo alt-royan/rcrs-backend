@@ -9,6 +9,7 @@ import org.ultra.rcrs.enums.FileStatus;
 import org.ultra.rcrs.exceptions.BadRequestException;
 import org.ultra.rcrs.exceptions.ServiceUnavailableException;
 import org.ultra.rcrs.uploadservice.dto.AlbumUploadRequest;
+import org.ultra.rcrs.uploadservice.dto.ArtistCreateRequest;
 import org.ultra.rcrs.uploadservice.dto.ImageUploadRequest;
 import org.ultra.rcrs.uploadservice.dto.PreloadFileRequest;
 import org.ultra.rcrs.uploadservice.dto.TrackUploadRequest;
@@ -69,6 +70,19 @@ public class UploadService {
     public ResponseEntity<Object> uploadImage(ImageUploadRequest request) {
         try {
             var response = mediaClient.uploadImage(request);
+            return ResponseEntity.ok(response.getBody());
+        } catch (FeignException e) {
+            if (e.status() == -1) {
+                throw new ServiceUnavailableException(e);
+            }
+            log.info(e.getMessage(), e);
+            return ResponseEntity.status(e.status()).body(e.contentUTF8());
+        }
+    }
+
+    public ResponseEntity<Object> uploadArtist(ArtistCreateRequest request) {
+        try {
+            var response = catalogClient.createArtist(request);
             return ResponseEntity.ok(response.getBody());
         } catch (FeignException e) {
             if (e.status() == -1) {
