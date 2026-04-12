@@ -42,11 +42,11 @@ async function submitArtistForm(event) {
         const imagePath = await uploadImage('artist');
         const payload = {
             name: document.getElementById('artist-name').value.trim(),
-            imagePath,
+            avatarUri: imagePath,
             socialLinks: state.socialLinks.filter(l => l.name && l.url),
         };
 
-        const res = await fetch('/artist', {
+        const res = await fetch('/upload/artist', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
