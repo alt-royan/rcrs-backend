@@ -7,9 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.ultra.rcrs.mediaservice.dto.ImageResponse;
+import org.ultra.rcrs.mediaservice.dto.ImageUploadRequest;
 import org.ultra.rcrs.mediaservice.service.ImageService;
-
-import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
@@ -17,8 +16,8 @@ public class ImageController {
 
     private final ImageService imageService;
 
-    @PostMapping(value = "/image", consumes = {MediaType.TEXT_PLAIN_VALUE})
-    public ResponseEntity<ImageResponse> uploadImage(@RequestBody String dataUrl) throws IOException {
-        return ResponseEntity.ok(imageService.uploadImage(dataUrl));
+    @PostMapping(value = "/image")
+    public ResponseEntity<ImageResponse> uploadImage(@RequestBody ImageUploadRequest request) {
+        return ResponseEntity.ok(imageService.uploadImage(request.getImage()));
     }
 }

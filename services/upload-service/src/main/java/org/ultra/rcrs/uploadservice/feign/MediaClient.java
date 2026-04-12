@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.ultra.rcrs.uploadservice.config.FeignConfig;
 import org.ultra.rcrs.uploadservice.dto.FileStatusResponse;
+import org.ultra.rcrs.uploadservice.dto.ImageUploadRequest;
 import org.ultra.rcrs.uploadservice.dto.PreloadFileRequest;
 import org.ultra.rcrs.uploadservice.dto.S3PresignUrlResponse;
 
@@ -21,7 +22,7 @@ public interface MediaClient {
     ResponseEntity<Object> getPreSignUrl(@RequestBody PreloadFileRequest request);
 
     @PostMapping("/image")
-    ResponseEntity<Object> uploadImage(@RequestBody String dataUrl);
+    ResponseEntity<Object> uploadImage(@RequestBody ImageUploadRequest request);
 
     @PostMapping("/status")
     ResponseEntity<List<FileStatusResponse>> getFilesStatus(@RequestParam(value = "uids") List<String> uids);

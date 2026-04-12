@@ -4,7 +4,7 @@ async function uploadImage(target) {
     if (!imgState.imageBlob) return null;
     if (imgState.imagePath) return imgState.imagePath;
 
-    const endpoint = target === 'artist' ? '/api/artists/upload-image' : '/api/albums/upload-image';
+    const endpoint = '/upload/image';
 
     try {
         const res = await fetch(endpoint, {
@@ -12,8 +12,8 @@ async function uploadImage(target) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ image: imgState.imageBlob }),
         });
-        const data = await res.json();
-        if (data.success) { imgState.imagePath = data.path; return data.path; }
+    
+        if (res.ok) {const data = await res.json(); imgState.imagePath = data.uri; return data.uri; }
         else throw new Error(data.message || 'Upload failed');
     } catch (e) {
         throw new Error('Image upload failed: ' + e.message);
@@ -46,7 +46,7 @@ async function submitArtistForm(event) {
             socialLinks: state.socialLinks.filter(l => l.name && l.url),
         };
 
-        const res = await fetch('/api/artists', {
+        const res = await fetch('/artist', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),

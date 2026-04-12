@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ultra.rcrs.uploadservice.dto.AlbumUploadRequest;
+import org.ultra.rcrs.uploadservice.dto.ImageUploadRequest;
 import org.ultra.rcrs.uploadservice.dto.PreloadFileRequest;
 import org.ultra.rcrs.uploadservice.service.UploadService;
 
@@ -32,8 +33,8 @@ public class UploadController {
     }
 
     @PostMapping(value = "/upload/image", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> uploadImage(@RequestBody @Validated @NotNull String dataUrl) {
-        return service.uploadImage(dataUrl);
+    public ResponseEntity<Object> uploadImage(@RequestBody @Validated @NotNull ImageUploadRequest request) {
+        return service.uploadImage(request);
     }
 
     @PostMapping(value = "/status", produces = MediaType.APPLICATION_JSON_VALUE)
