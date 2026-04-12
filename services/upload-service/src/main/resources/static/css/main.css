@@ -1,22 +1,22 @@
 /* ===== CSS VARIABLES ===== */
 :root {
-    --bg:          #0d0d0d;
-    --bg-2:        #141414;
-    --bg-3:        #1c1c1e;
-    --bg-4:        #242426;
-    --bg-5:        #2c2c2e;
+ --bg:          #f8f9fa;
+    --bg-2:        #ffffff;
+    --bg-3:        #ffffff;
+    --bg-4:        #f1f3f5;
+    --bg-5:        #e9ecef;
 
-    --surface:     #1c1c1e;
-    --surface-2:   #242426;
-    --surface-3:   #2c2c2e;
+    --surface:     #ffffff;
+    --surface-2:   #f8f9fa;
+    --surface-3:   #f1f3f5;
 
-    --border:      rgba(255,255,255,0.08);
-    --border-2:    rgba(255,255,255,0.12);
+    --border:      rgba(0,0,0,0.08);
+    --border-2:    rgba(0,0,0,0.12);
 
-    --on-bg:       #ffffff;
-    --on-bg-2:     rgba(255,255,255,0.72);
-    --on-bg-3:     rgba(255,255,255,0.40);
-    --on-bg-4:     rgba(255,255,255,0.20);
+    --on-bg:       #1a1a1a;
+    --on-bg-2:     rgba(0,0,0,0.72);
+    --on-bg-3:     rgba(0,0,0,0.48);
+    --on-bg-4:     rgba(0,0,0,0.24);
 
     --accent:      #fc3c44;        /* Apple Music red */
     --accent-2:    #1db954;        /* Spotify green */
@@ -26,10 +26,10 @@
     --gradient-artist: linear-gradient(135deg, #fc3c44 0%, #ff6b81 100%);
     --gradient-album:  linear-gradient(135deg, #1db954 0%, #17a849 100%);
 
-    --shadow-sm:  0 1px 4px rgba(0,0,0,0.4);
-    --shadow-md:  0 4px 20px rgba(0,0,0,0.5);
-    --shadow-lg:  0 12px 48px rgba(0,0,0,0.6);
-    --shadow-xl:  0 24px 80px rgba(0,0,0,0.7);
+    --shadow-sm:  0 1px 4px rgba(0,0,0,0.04);
+    --shadow-md:  0 4px 12px rgba(0,0,0,0.08);
+    --shadow-lg:  0 12px 32px rgba(0,0,0,0.12);
+    --shadow-xl:  0 24px 64px rgba(0,0,0,0.16);
 
     --radius-sm: 8px;
     --radius-md: 12px;
@@ -67,7 +67,7 @@ body {
     position: fixed;
     top: 0; left: 0; right: 0;
     height: var(--header-h);
-    background: rgba(13,13,13,0.82);
+    background: rgba(255,255,255,0.92);
     backdrop-filter: blur(20px) saturate(180%);
     -webkit-backdrop-filter: blur(20px) saturate(180%);
     border-bottom: 1px solid var(--border);
@@ -80,26 +80,29 @@ body {
     height: 100%;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;  /* было space-between, стало center */
     padding: 0 28px;
 }
 
 .logo {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;               /* увеличили отступ */
     cursor: pointer;
     user-select: none;
 }
 
-.logo-icon { font-size: 26px; color: var(--accent); }
+.logo-icon {
+    font-size: 32px;         /* было 26px */
+    color: var(--accent);
+}
 
 .logo-text {
     font-family: var(--font-display);
-    font-size: 20px;
+    font-size: 26px;         /* было 20px */
     font-weight: 700;
     color: var(--on-bg);
-    letter-spacing: -0.3px;
+    letter-spacing: -0.5px;
 }
 
 .logo-accent { color: var(--accent); }
@@ -450,7 +453,7 @@ body {
     padding: 11px 14px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border-2);
-    background: var(--bg-3);
+    background: var(--bg-2);
     color: var(--on-bg);
     font-family: var(--font-body);
     font-size: 14px;
@@ -464,7 +467,7 @@ body {
 
 .field-input:focus {
     border-color: var(--accent);
-    background: var(--bg-4);
+    background: var(--bg-2);
     box-shadow: 0 0 0 3px rgba(252,60,68,0.12);
 }
 
@@ -492,14 +495,27 @@ body {
 
 /* ===== SELECT ===== */
 select.field-input {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.4)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(0,0,0,0.4)' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 12px center;
     padding-right: 36px;
     cursor: pointer;
+    background-color: var(--bg-2); /* явно задаём белый фон */
+    color: var(--on-bg);           /* чёрный текст */
 }
 
-select.field-input option { background: #1c1c1e; }
+/* Стили для выпадающих опций */
+select.field-input option {
+    background-color: var(--bg-2);
+    color: var(--on-bg);
+}
+
+/* Для браузеров на WebKit (Chrome, Safari) - задаём фон через -webkit-appearance */
+select.field-input {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
 
 /* ===== SOCIAL LINKS ===== */
 .social-links-list {
@@ -878,6 +894,24 @@ select.field-input option { background: #1c1c1e; }
 
 .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); box-shadow: 0 6px 24px rgba(252,60,68,0.4); }
 .btn-primary:active { transform: translateY(0); }
+.btn-primary:disabled {
+    opacity: 0.6;
+    background: var(--bg-5);
+    color: var(--on-bg-4);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+    pointer-events: none;
+}
+.btn-primary:hover:not(:disabled) {
+     filter: brightness(1.05);
+     transform: translateY(-1px);
+     box-shadow: 0 4px 12px rgba(252,60,68,0.3);
+ }
+
+.btn-primary:active:not(:disabled) {
+     transform: translateY(0);
+ }
 .btn-primary .material-icons-round { font-size: 18px; }
 
 .btn-ghost {

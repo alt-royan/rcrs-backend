@@ -267,7 +267,15 @@ async function pollUploadStatus(track, attempt = 1) {
 function updateSubmitButtonState() {
     const submitBtn = document.getElementById('submit-album-btn');
     if (!submitBtn) return;
-    const allSuccess = tracksData.length > 0 && tracksData.every(t => t.uploadStatus === 'success');
+
+    // Если треков нет – кнопка активна
+    if (!tracksData.length) {
+        submitBtn.disabled = false;
+        return;
+    }
+
+    // Если треки есть – активна только когда все success
+    const allSuccess = tracksData.every(t => t.uploadStatus === 'success');
     submitBtn.disabled = !allSuccess;
 }
 
@@ -375,45 +383,27 @@ async function onTrackArtistSearch(trackId, query) {
         dropdown.classList.add('hidden');
         return;
     }
-    window._trackArtistTimeout = setTimeout(async () => {
-        const results = await searchArtists(query);
-        if (!dropdown) return;
-        if (results.length === 0) {
-            dropdown.innerHTML = '<div class="artist-dropdown-item">No results</div>';
-        } else {
-            dropdown.innerHTML = results.map(artist => `
-                <div class="artist-dropdown-item" data-artist-id="${artist.id}" data-artist-name="${escapeHtml(artist.name)}">
-                    <span class="artist-avatar">${artist.name[0]}</span>
-                    ${escapeHtml(artist.name)}
-                </div>
-            `).join('');
-            dropdown.querySelectorAll('.artist-dropdown-item').forEach(item => {
-                item.addEventListener('mousedown', (e) => {
-                    e.preventDefault();
-                    const artistId = parseInt(item.dataset.artistId);
-                    const artistName = item.dataset.artistName;
-                    const track = tracksData.find(t => t.id === trackId);
-                    if (track && !track.artists.find(a => a.id === artistId)) {
-                        track.artists.push({ id: artistId, name: artistName, locked: false });
-                        // Перерисовать теги артистов
-                        const tagsContainer = document.getElementById(`track-artist-tags-${trackId}`);
-                        if (tagsContainer) {
-                            tagsContainer.innerHTML = track.artists.map(a => `
-                                <span class="artist-tag ${a.locked ? 'locked' : ''}">
-                                    ${a.locked ? '<span class="material-icons-round lock-icon">lock</span>' : ''}
-                                    ${escapeHtml(a.name)}
-                                    ${!a.locked ? `<button class="artist-tag-remove" onclick="removeTrackArtistFromCard(${trackId}, ${a.id})">✕</button>` : ''}
-                                </span>
-                            `).join('');
-                        }
-                    }
-                    const searchInput = document.getElementById(`track-artist-search-${trackId}`);
-                    if (searchInput) searchInput.value = '';
-                    dropdown.classList.add('hidden');
-                });
-            });
-        }
-        dropdown.classList.remove('hidden');
+    window._trackArtistTimeout = setTimeout(() => {
+        fetchAndRenderArtists(query, dropdown, (artist) => {
+            const track = tracksData.find(t => t.id === trackId);
+            if (track && !track.artists.find(a => a.id === artist.id)) {
+                track.artists.push({ ...artist, locked: false });
+                // Перерисовываем теги артистов у этого трека
+                const tagsContainer = document.getElementById(`track-artist-tags-${trackId}`);
+                if (tagsContainer) {
+                    tagsContainer.innerHTML = track.artists.map(a => `
+                        <span class="artist-tag ${a.locked ? 'locked' : ''}">
+                            ${a.locked ? '<span class="material-icons-round lock-icon">lock</span>' : ''}
+                            ${escapeHtml(a.name)}
+                            ${!a.locked ? `<button class="artist-tag-remove" onclick="removeTrackArtistFromCard(${trackId}, ${a.id})">✕</button>` : ''}
+                        </span>
+                    `).join('');
+                }
+            }
+            const searchInput = document.getElementById(`track-artist-search-${trackId}`);
+            if (searchInput) searchInput.value = '';
+            dropdown.classList.add('hidden');
+        });
     }, 200);
 }
 

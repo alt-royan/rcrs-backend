@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/albums")
+@RequestMapping("/albums")
 @ConditionalOnProperty(name = "app.write.enabled", havingValue = "true")
 public class AlbumWriteController {
 

@@ -15,7 +15,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/artists")
+@RequestMapping("/artists")
 @ConditionalOnProperty(name = "app.write.enabled", havingValue = "true")
 public class ArtistWriteController {
 

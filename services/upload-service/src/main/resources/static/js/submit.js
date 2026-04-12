@@ -69,10 +69,27 @@ async function submitArtistForm(event) {
 
 /* ===== ALBUM FORM SUBMIT ===== */
 async function submitAlbumForm() {
+    console.log('submitAlbumForm called'); // для отладки
+
+    // Валидация названия альбома
     if (!validateField('album-title', 'album-title-error', 'Album title is required')) return;
 
-    // Проверяем, что все треки успешно загружены
-    if (tracksData.some(t => t.uploadStatus !== 'success')) {
+    // Проверка: у альбома должен быть хотя бы один артист
+    if (!state.albumArtists.length) {
+        showToast('Please add at least one artist to the album', 'error');
+        return;
+    }
+
+    // Проверка артистов у треков (если есть треки)
+    for (const track of tracksData) {
+        if (!track.artists.length) {
+            showToast(`Track "${track.title}" has no artists. Please add at least one artist.`, 'error');
+            return;
+        }
+    }
+
+    // Проверка загрузки треков (только если есть треки)
+    if (tracksData.length > 0 && tracksData.some(t => t.uploadStatus !== 'success')) {
         showToast('Wait for all tracks to finish uploading.', 'error');
         return;
     }
@@ -110,6 +127,7 @@ async function submitAlbumForm() {
             showToast(data.message || 'Failed to save album.', 'error');
         }
     } catch (e) {
+        console.error(e);
         showToast('Error: ' + e.message, 'error');
     } finally {
         showLoading(false);
@@ -138,13 +156,20 @@ function resetArtistForm() {
 }
 
 function resetAlbumForm() {
-    // ... остальные сбросы ...
+    // ... остальной код сброса (очистка полей, image, albumArtists, tracksData и т.д.) ...
     tracksData = [];
     nextTrackId = 0;
     const trackList = document.getElementById('track-list');
     if (trackList) trackList.innerHTML = '<div class="track-empty-state" id="track-empty"><span class="material-icons-round">music_note</span><p>No tracks added yet.</p></div>';
     updateTrackCount();
     updateTrackListVisibility();
-    updateSubmitButtonState();
+    updateSubmitButtonState();  // Важно: обновляем состояние кнопки после сброса
     initSortable();
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const submitBtn = document.getElementById('submit-album-btn');
+    if (submitBtn) {
+        submitBtn.addEventListener('click', submitAlbumForm);
+    }
+});

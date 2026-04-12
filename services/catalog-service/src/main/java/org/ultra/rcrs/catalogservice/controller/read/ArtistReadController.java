@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/artists")
+@RequestMapping("/artists")
 @ConditionalOnProperty(name = "app.read.enabled", havingValue = "true")
 public class ArtistReadController {
 
@@ -26,6 +26,12 @@ public class ArtistReadController {
 
     @GetMapping("/{artistId}")
     public Mono<ResponseEntity<ArtistDto>> getArtist(@PathVariable("artistId") String artistId) {
+        return artistReadService.getArtist(Url62.decode(artistId))
+                .map(ResponseEntity::ok);
+    }
+
+    @GetMapping("/")
+    public Mono<ResponseEntity<ArtistDto>> searchArtists(@PathVariable("artistId") String artistId) {
         return artistReadService.getArtist(Url62.decode(artistId))
                 .map(ResponseEntity::ok);
     }
