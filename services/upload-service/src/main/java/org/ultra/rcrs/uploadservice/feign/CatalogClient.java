@@ -12,7 +12,7 @@ import org.ultra.rcrs.uploadservice.dto.IdResponse;
 public interface CatalogClient {
 
     @PostMapping("/albums")
-    ResponseEntity<Void> uploadAlbum(@RequestBody AlbumUploadRequest request);
+    ResponseEntity<IdResponse> uploadAlbum(@RequestBody AlbumUploadRequest request);
 
     @PostMapping("/artists")
     ResponseEntity<IdResponse> createArtist(@RequestBody ArtistCreateRequest request);
