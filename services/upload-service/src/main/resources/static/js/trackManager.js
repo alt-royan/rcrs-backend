@@ -180,7 +180,7 @@ async function startUpload(track) {
     updateUploadIcon(track.id, 'uploading');
     try {
         // 1. Получить presigned URL
-        const presignRes = await fetch('/upload/preload', {
+        const presignRes = await fetch('/preload', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -198,7 +198,7 @@ async function startUpload(track) {
 
         // 2. Загрузить файл в S3 через PUT
         const uploadRes = await fetch(track.presignUrl, {
-            method: 'PUT',
+            method: presignData.method,
             headers: convertHeadersArrayToObj(track.presignHeaders),
             body: track.file
         });
@@ -208,7 +208,7 @@ async function startUpload(track) {
         updateUploadIcon(track.id, 'half_uploaded');
 
         // 3. Проверить статус (polling)
-        await pollUploadStatus(track);
+        setTimeout(() => pollUploadStatus(track), 3000)
 
     } catch (err) {
         console.error(err);
@@ -227,6 +227,7 @@ function convertHeadersArrayToObj(headersArray) {
             headers[key] = value;
         }
     });
+    console.log(headers)
     return headers;
 }
 
@@ -244,7 +245,7 @@ async function pollUploadStatus(track, attempt = 1) {
         const item = statusData.find(s => s.uid === track.uid);
         if (!item) throw new Error('No status info');
 
-        if (item.status === 'UPLOAD') {
+        if (item.status === 'UPLOADED') {
             track.uploadStatus = 'success';
             updateUploadIcon(track.id, 'success');
             updateSubmitButtonState();

@@ -42,14 +42,14 @@ public class FileService {
 
     @Transactional
     public S3PresignUrlResponse getPreSignUrl(PreloadFileRequest request) {
-        String key = Hash.sha1Base64(request.getFileName());
+        String key = Hash.sha1Base64(request.getName());
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(s3UploadBucket)
                 .key(key)
-                .contentLength(request.getFileSize())
+                .contentLength(request.getLength())
                 .contentDisposition(ContentDisposition.attachment()
-                        .filename(request.getFileName(), StandardCharsets.UTF_8)
+                        .filename(request.getName(), StandardCharsets.UTF_8)
                         .build().toString())
                 .acl(ObjectCannedACL.PRIVATE)
                 .serverSideEncryption(ServerSideEncryption.AES256)
@@ -75,8 +75,8 @@ public class FileService {
         audioUploadRepository.save(AudioUpload.builder()
                 .uid(key)
                 .status(FileStatus.WAIT_FOR_UPLOAD)
-                .originalFileName(request.getFileName())
-                .contentLength(request.getFileSize())
+                .originalFileName(request.getName())
+                .contentLength(request.getLength())
                 .expiresAt(Instant.now().plusSeconds(duration.toSeconds()))
                 .error(null)
                 .build());
@@ -89,10 +89,10 @@ public class FileService {
                 .build();
     }
 
-    public Map<String, FileStatusResponse> getFilesStatus(List<String> uids) {
+    public List<FileStatusResponse> getFilesStatus(List<String> uids) {
         List<AudioUpload> files = audioUploadRepository.findAllById(uids);
         return files.stream().map(file -> new FileStatusResponse(file.getUid(), file.getStatus(), file.getError()))
-                .collect(Collectors.toMap(FileStatusResponse::getUid, r -> r));
+                .toList();
     }
 
 

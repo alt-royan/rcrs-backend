@@ -26,7 +26,7 @@ public class SqsS3Listener {
         var records = s3EventNotification.getRecords();
         if (records != null) {
             records.forEach(record -> {
-                if (record.getEventName().equals("s3:ObjectCreated:Put")) {
+                if (record.getEventName().equals("ObjectCreated:Put")) {
                     String key = record.getS3().getObject().getKey();
                     audioUploadRepository.updateStatusByUid(FileStatus.UPLOADED, key);
                     log.info("Object {} was UPLOADED", key);

@@ -1,0 +1,22 @@
+{
+  "CORSRules": [
+    {
+      "AllowedOrigins": [
+        "http://localhost:8082"
+      ],
+      "AllowedMethods": [
+        "PUT",
+        "GET",
+        "HEAD",
+        "DELETE"
+      ],
+      "AllowedHeaders": [
+        "*"
+      ],
+      "ExposeHeaders": [
+        "ETag"
+      ],
+      "MaxAgeSeconds": 3000
+    }
+  ]
+}

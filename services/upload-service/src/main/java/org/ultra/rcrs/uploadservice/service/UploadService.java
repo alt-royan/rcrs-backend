@@ -15,6 +15,7 @@ import org.ultra.rcrs.uploadservice.feign.CatalogClient;
 import org.ultra.rcrs.uploadservice.feign.MediaClient;
 
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -43,10 +44,13 @@ public class UploadService {
             if (request.getTracks() != null && !request.getTracks().isEmpty()) {
                 List<String> uids = request.getTracks().stream().map(TrackUploadRequest::getUid).toList();
                 var statuses = mediaClient.getFilesStatus(uids).getBody();
-                if (statuses == null || uids.stream()
-                        .allMatch(uid -> statuses.containsKey(uid) &&
-                                FileStatus.UPLOADED.equals((statuses.get(uid).getStatus())))) {
+                if (statuses == null){
                     throw new BadRequestException("Incorrect file UIDs or not all files have been uploaded yet. Check and try again.");
+                }
+                for (var uid : uids){
+                    statuses.stream()
+                            .filter(s -> Objects.equals(s.getUid(), uid) &&  FileStatus.UPLOADED.equals(s.getStatus()))
+                            .findAny().orElseThrow(() ->new BadRequestException("Incorrect file UIDs or not all files have been uploaded yet. Check and try again."));
                 }
             }
 

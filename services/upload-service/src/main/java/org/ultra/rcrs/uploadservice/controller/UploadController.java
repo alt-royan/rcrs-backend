@@ -17,12 +17,11 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/upload")
 public class UploadController {
 
     private final UploadService service;
 
-    @PostMapping(value = "/album", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/upload/album", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> uploadAlbum(@RequestBody @Validated @NotNull AlbumUploadRequest request) {
         return service.uploadAlbum(request);
     }
@@ -32,7 +31,7 @@ public class UploadController {
         return service.preSigned(request);
     }
 
-    @PostMapping(value = "/image", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/upload/image", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> uploadImage(@RequestBody @Validated @NotNull String dataUrl) {
         return service.uploadImage(dataUrl);
     }

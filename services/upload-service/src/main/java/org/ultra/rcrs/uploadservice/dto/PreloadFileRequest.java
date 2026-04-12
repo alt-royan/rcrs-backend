@@ -8,8 +8,8 @@ import lombok.Data;
 public class PreloadFileRequest {
 
     @NotEmpty
-    private String fileName;
+    private String name;
 
     @NotNull
-    private Long fileSize;
+    private Long length;
 }

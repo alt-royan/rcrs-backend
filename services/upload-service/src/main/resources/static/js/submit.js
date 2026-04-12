@@ -113,7 +113,7 @@ async function submitAlbumForm() {
             })),
         };
 
-        const res = await fetch('/api/albums', {
+        const res = await fetch('/upload/album', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),

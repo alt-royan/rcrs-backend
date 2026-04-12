@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.ultra.rcrs.mediaservice.dto.FileStatusResponse;
 import org.ultra.rcrs.mediaservice.dto.PreloadFileRequest;
 import org.ultra.rcrs.mediaservice.dto.S3PresignUrlResponse;
@@ -12,7 +15,6 @@ import org.ultra.rcrs.mediaservice.service.FileService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,8 +27,8 @@ public class FileController {
         return ResponseEntity.ok(fileService.getPreSignUrl(request));
     }
 
-    @GetMapping(value = "/status", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<String, FileStatusResponse>> getFilesStatus(@RequestParam(value = "uids") List<String> uids) {
+    @PostMapping(value = "/status", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<FileStatusResponse>> getFilesStatus(@RequestParam(value = "uids") List<String> uids) {
         if (uids == null) {
             uids = new ArrayList<>();
         }

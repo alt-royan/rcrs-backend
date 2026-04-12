@@ -18,12 +18,12 @@ import java.util.Map;
 public interface MediaClient {
 
     @PostMapping("/pre-sign")
-    ResponseEntity<S3PresignUrlResponse> getPreSignUrl(@RequestBody PreloadFileRequest request);
+    ResponseEntity<Object> getPreSignUrl(@RequestBody PreloadFileRequest request);
 
     @PostMapping("/image")
     ResponseEntity<Object> uploadImage(@RequestBody String dataUrl);
 
-    @GetMapping("/status")
-    ResponseEntity<Map<String, FileStatusResponse>> getFilesStatus(@RequestParam(value = "uids") List<String> uids);
+    @PostMapping("/status")
+    ResponseEntity<List<FileStatusResponse>> getFilesStatus(@RequestParam(value = "uids") List<String> uids);
 
 }
