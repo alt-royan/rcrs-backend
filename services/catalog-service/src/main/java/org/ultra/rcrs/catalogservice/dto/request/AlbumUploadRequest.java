@@ -35,9 +35,6 @@ public class AlbumUploadRequest {
     @Valid
     private List<ArtistIdDto> artists;
 
-    @NotNull
-    private Boolean explicit;
-
     @Valid
     @JsonSetter(nulls = Nulls.AS_EMPTY)
     private List<TrackUploadRequest> tracks;

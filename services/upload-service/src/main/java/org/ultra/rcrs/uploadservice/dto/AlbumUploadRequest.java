@@ -31,9 +31,6 @@ public class AlbumUploadRequest {
     @Valid
     private Set<ArtistId> artists;
 
-    @NotNull
-    private Boolean explicit;
-
     @Valid
     private List<TrackUploadRequest> tracks;
 }
