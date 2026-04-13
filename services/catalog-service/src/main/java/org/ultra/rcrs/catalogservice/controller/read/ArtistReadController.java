@@ -18,7 +18,8 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/artists")
+@RequestMapping("/api/artists")
+@CrossOrigin("*")
 @ConditionalOnProperty(name = "app.read.enabled", havingValue = "true")
 public class ArtistReadController {
 

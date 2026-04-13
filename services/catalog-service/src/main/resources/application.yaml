@@ -36,7 +36,7 @@ spring:
 
 s3:
   images:
-    endpoint: "http://localhost:9444"
+    endpoint: "http://192.168.0.12:4566/images"
 
 logging:
   level:

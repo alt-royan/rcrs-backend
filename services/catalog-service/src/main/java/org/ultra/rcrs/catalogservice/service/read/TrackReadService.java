@@ -2,6 +2,7 @@ package org.ultra.rcrs.catalogservice.service.read;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.dto.OtherArtistDto;
 import org.ultra.rcrs.catalogservice.dto.response.album.AlbumSimpleDto;
@@ -28,6 +29,7 @@ public class TrackReadService {
     private final OtherArtistViewRepository otherArtistViewRepository;
     private final S3Utils s3Utils;
 
+    @Cacheable("tracks")
     public Mono<TrackFullDto> getTrack(UUID trackId, List<EntityStatus> statuses) {
         return trackWithAlbumViewRepository.findByIdAndStatusIn(trackId, statuses)
                 .switchIfEmpty(Mono.error(new NotFoundException("Track", trackId)))

@@ -3,10 +3,7 @@ package org.ultra.rcrs.catalogservice.controller.read;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.catalogservice.dto.response.album.AlbumFullDto;
 import org.ultra.rcrs.catalogservice.dto.response.track.TrackInAlbumDto;
 import org.ultra.rcrs.catalogservice.service.read.AlbumReadService;
@@ -19,7 +16,8 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/albums")
+@RequestMapping("/api/albums")
+@CrossOrigin("*")
 @ConditionalOnProperty(name = "app.read.enabled", havingValue = "true")
 public class AlbumReadController {
 

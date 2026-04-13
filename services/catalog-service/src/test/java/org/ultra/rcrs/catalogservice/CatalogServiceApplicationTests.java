@@ -9,7 +9,7 @@ class CatalogServiceApplicationTests {
 
     @Test
     void contextLoads() {
-        System.out.println(Url62.encode(UUID.fromString("576b37f5-a599-48fd-9c03-50e3d328586b")));
+        System.out.println(Url62.encode(UUID.fromString("44260878-e50b-42fd-ac1f-31162e9ec505")));
     }
 
 }

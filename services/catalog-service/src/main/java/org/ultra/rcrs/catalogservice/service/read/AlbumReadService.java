@@ -2,6 +2,7 @@ package org.ultra.rcrs.catalogservice.service.read;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.dto.response.album.AlbumFullDto;
@@ -32,7 +33,7 @@ public class AlbumReadService {
     private final ArtistConverter artistConverter;
     private final S3Utils s3Utils;
 
-
+    @Cacheable("albums")
     public Mono<AlbumFullDto> getAlbum(UUID albumId, List<EntityStatus> statuses) {
         return albumViewRepository.findByIdAndStatusIn(albumId, statuses)
                 .switchIfEmpty(Mono.error(new NotFoundException("Album", albumId)))

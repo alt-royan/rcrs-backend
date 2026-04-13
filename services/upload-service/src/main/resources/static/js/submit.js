@@ -51,10 +51,11 @@ async function submitArtistForm(event) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload),
         });
-        const data = await res.json();
 
-        if (data.success) {
-            showToast(data.message || 'Artist saved!', 'success');
+        if (res.ok) {
+            const data = await res.json();
+            showToast('Artist saved!', 'success', data.id);
+            console.log(data.id);
             resetArtistForm();
             setTimeout(() => showHome(), 1200);
         } else {
