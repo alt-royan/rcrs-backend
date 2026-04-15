@@ -10,11 +10,11 @@ import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistDto;
 import org.ultra.rcrs.catalogservice.repository.read.ArtistAlbumViewRepository;
 import org.ultra.rcrs.catalogservice.repository.read.ArtistViewRepository;
 import org.ultra.rcrs.catalogservice.service.ArtistConverter;
-import org.ultra.rcrs.catalogservice.utils.S3Utils;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
+import org.ultra.rcrs.utils.S3Utils;
 import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Mono;
 

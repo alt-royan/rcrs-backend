@@ -10,7 +10,8 @@ import org.ultra.rcrs.catalogservice.model.SocialLinks;
 import org.ultra.rcrs.catalogservice.model.write.Artist;
 import org.ultra.rcrs.catalogservice.repository.AfterCommit;
 import org.ultra.rcrs.catalogservice.repository.write.impl.ArtistRepository;
-import org.ultra.rcrs.catalogservice.utils.S3Utils;
+
+import org.ultra.rcrs.utils.S3Utils;
 import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Mono;
 

@@ -14,11 +14,11 @@ import org.ultra.rcrs.catalogservice.model.read.ArtistView;
 import org.ultra.rcrs.catalogservice.repository.read.ArtistAlbumViewRepository;
 import org.ultra.rcrs.catalogservice.repository.read.ArtistViewRepository;
 import org.ultra.rcrs.catalogservice.service.ArtistConverter;
-import org.ultra.rcrs.catalogservice.utils.S3Utils;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
+import org.ultra.rcrs.utils.S3Utils;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)

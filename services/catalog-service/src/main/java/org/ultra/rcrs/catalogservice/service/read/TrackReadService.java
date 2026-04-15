@@ -10,9 +10,9 @@ import org.ultra.rcrs.catalogservice.dto.response.track.TrackFullDto;
 import org.ultra.rcrs.catalogservice.repository.read.OtherArtistViewRepository;
 import org.ultra.rcrs.catalogservice.repository.read.TrackWithAlbumViewRepository;
 import org.ultra.rcrs.catalogservice.service.ArtistConverter;
-import org.ultra.rcrs.catalogservice.utils.S3Utils;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
+import org.ultra.rcrs.utils.S3Utils;
 import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Mono;
 
