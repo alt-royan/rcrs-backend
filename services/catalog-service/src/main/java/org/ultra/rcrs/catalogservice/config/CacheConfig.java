@@ -20,6 +20,7 @@ public class CacheConfig {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
         cacheManager.setCacheNames(List.of("artists", "albums", "tracks"));
         cacheManager.setCaffeine(Caffeine.newBuilder().maximumSize(5000).expireAfterAccess(Duration.ofMinutes(10)));
+        cacheManager.setAsyncCacheMode(true);
         return cacheManager;
     }
 }

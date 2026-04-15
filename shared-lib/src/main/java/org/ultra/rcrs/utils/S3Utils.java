@@ -1,17 +1,15 @@
-package org.ultra.rcrs.catalogservice.utils;
+package org.ultra.rcrs.utils;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.util.regex.Pattern;
 
-@Component
+@RequiredArgsConstructor
 public class S3Utils {
 
-    @Value("${s3.images.endpoint}")
-    private String s3ImagesEndpoint;
+    private final String s3ImagesEndpoint;
 
     public String parseKey(String uri) {
         if (StringUtils.isEmpty(uri)) {
@@ -31,6 +29,5 @@ public class S3Utils {
         }
         return URI.create(s3ImagesEndpoint + "/" + imageKey).toString();
     }
-
 
 }

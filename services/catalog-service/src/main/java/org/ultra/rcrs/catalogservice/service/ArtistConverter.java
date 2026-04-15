@@ -4,6 +4,7 @@ import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.ultra.rcrs.catalogservice.dto.SocialLinkDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistOnAlbumDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistOnTrackDto;
@@ -49,6 +50,7 @@ public class ArtistConverter {
                 .id(Url62.encode(artist.getId()))
                 .name(artist.getName())
                 .avatarUrl(s3Utils.parseUrl(artist.getAvatarS3Key()))
+                .socialLinks(artist.getSocialLinks().getItems().stream().map(SocialLinkDto::new).toList())
                 .build();
     }
 

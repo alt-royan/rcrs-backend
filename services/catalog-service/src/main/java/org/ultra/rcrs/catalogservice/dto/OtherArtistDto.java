@@ -1,25 +1,31 @@
 package org.ultra.rcrs.catalogservice.dto;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.ultra.rcrs.catalogservice.model.read.OtherArtistView;
 import org.ultra.rcrs.enums.ArtistRole;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Data
 @NoArgsConstructor
 public class OtherArtistDto {
 
+    @NotBlank
     private String name;
 
-    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    @NotEmpty
     private Set<ArtistRole> roles;
+
+    private List<SocialLinkDto> socialLinks = new ArrayList<>();
 
     public OtherArtistDto(OtherArtistView other) {
         this.name = other.getName();
         this.roles = other.getRoles();
+        this.socialLinks = other.getSocialLinks().getItems().stream().map(SocialLinkDto::new).toList();
     }
 }

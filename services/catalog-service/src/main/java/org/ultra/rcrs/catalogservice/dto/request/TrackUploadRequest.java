@@ -2,16 +2,17 @@ package org.ultra.rcrs.catalogservice.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import org.springframework.validation.annotation.Validated;
 import org.ultra.rcrs.catalogservice.dto.OtherArtistDto;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
-@Validated
+
 @Data
 public class TrackUploadRequest {
 
@@ -31,9 +32,9 @@ public class TrackUploadRequest {
     private Boolean explicit;
 
     @NotEmpty
-    @JsonSetter(nulls = Nulls.AS_EMPTY)
-    private List<ArtistIdDto> artists;
+    @Valid
+    private List<ArtistIdDto> artists = new ArrayList<>();
 
-    @JsonSetter(nulls = Nulls.AS_EMPTY)
-    private List<OtherArtistDto> others;
+    @Valid
+    private List<OtherArtistDto> others = new ArrayList<>();
 }

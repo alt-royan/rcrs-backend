@@ -34,9 +34,9 @@ spring:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
 
-s3:
+cdn:
   images:
-    endpoint: "http://192.168.0.12:4566/images"
+    endpoint: "http://images.localhost:4566"
 
 logging:
   level:

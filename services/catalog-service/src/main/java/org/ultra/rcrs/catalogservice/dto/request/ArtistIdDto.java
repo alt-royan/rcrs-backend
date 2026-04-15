@@ -6,7 +6,6 @@ import org.springframework.validation.annotation.Validated;
 import org.ultra.rcrs.enums.ArtistRole;
 
 @Data
-@Validated
 public class ArtistIdDto {
 
     @NotNull

@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.catalogservice.dto.request.ArtistCreateRequest;
 import org.ultra.rcrs.catalogservice.dto.response.IdResponse;
+import org.ultra.rcrs.catalogservice.model.SocialLinks;
 import org.ultra.rcrs.catalogservice.model.write.Artist;
 import org.ultra.rcrs.catalogservice.repository.AfterCommit;
 import org.ultra.rcrs.catalogservice.repository.write.impl.ArtistRepository;
@@ -29,7 +30,9 @@ public class ArtistWriteService {
         return artistRepository.insert(Artist.builder()
                         .id(id)
                         .name(request.getName())
-                        .avatarS3Key(s3Utils.parseKey(request.getAvatarUri())).build())
+                        .avatarS3Key(s3Utils.parseKey(request.getAvatarUri()))
+                        .socialLinks(new SocialLinks(request.getSocialLinks()))
+                        .build())
                 .flatMap(a ->
                         AfterCommit.log("Artist {} was created successfully. Artist UUID {}", a.getName(), a.getId()))
                 .thenReturn(new IdResponse(Url62.encode(id)));

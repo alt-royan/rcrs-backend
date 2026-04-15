@@ -31,12 +31,6 @@ public class ArtistReadController {
                 .map(ResponseEntity::ok);
     }
 
-    @GetMapping("/")
-    public Mono<ResponseEntity<ArtistDto>> searchArtists(@PathVariable("artistId") String artistId) {
-        return artistReadService.getArtist(Url62.decode(artistId))
-                .map(ResponseEntity::ok);
-    }
-
     @GetMapping("/{artistId}/albums")
     public Mono<ResponseEntity<List<AlbumOfArtistDto>>> getAlbumsForArtist(@PathVariable("artistId") String artistId,
                                                                            @RequestParam(value = "direction", required = false) Sort.Direction direction,

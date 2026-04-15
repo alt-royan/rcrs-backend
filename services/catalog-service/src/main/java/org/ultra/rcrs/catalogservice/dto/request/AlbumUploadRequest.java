@@ -1,19 +1,16 @@
 package org.ultra.rcrs.catalogservice.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
-import org.springframework.validation.annotation.Validated;
 import org.ultra.rcrs.enums.AlbumType;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
-@Validated
 @Data
 public class AlbumUploadRequest {
 
@@ -36,7 +33,6 @@ public class AlbumUploadRequest {
     private List<ArtistIdDto> artists;
 
     @Valid
-    @JsonSetter(nulls = Nulls.AS_EMPTY)
-    private List<TrackUploadRequest> tracks;
+    private List<TrackUploadRequest> tracks = new ArrayList<>();
 
 }

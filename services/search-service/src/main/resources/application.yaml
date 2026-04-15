@@ -1,3 +1,18 @@
 spring:
   application:
     name: search-service
+  cloud:
+    openfeign:
+      client:
+        config:
+          default:
+            connectTimeout: 5000
+            readTimeout: 5000
+
+cdn:
+  images:
+    endpoint: "http://images.localhost:4566"
+
+feign:
+  catalog-service.url: http://localhost:8080
+

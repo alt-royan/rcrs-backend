@@ -1,18 +1,16 @@
 package org.ultra.rcrs.catalogservice.dto.request;
 
-import com.fasterxml.jackson.annotation.JsonSetter;
-import com.fasterxml.jackson.annotation.Nulls;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import org.ultra.rcrs.catalogservice.dto.SocialLinkDto;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@Builder
+
 @Data
-@AllArgsConstructor
 public class ArtistCreateRequest {
 
     @NotNull
@@ -21,5 +19,8 @@ public class ArtistCreateRequest {
     //Ссылки на s3 приходят в формате s3://{bucket}/{key}
     @Pattern(regexp = "s3://[\\w\\-]+/[\\w\\-.]+", message = "URI must be s3://{bucket}/{key} formatted")
     private String avatarUri;
+
+    @Valid
+    private List<SocialLinkDto> socialLinks = new ArrayList<>();
 
 }
