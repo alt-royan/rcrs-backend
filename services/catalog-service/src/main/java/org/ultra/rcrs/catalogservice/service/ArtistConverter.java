@@ -11,7 +11,7 @@ import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistOnTrackDto;
 import org.ultra.rcrs.catalogservice.model.read.ArtistOnAlbumView;
 import org.ultra.rcrs.catalogservice.model.read.ArtistOnTrackView;
 import org.ultra.rcrs.catalogservice.model.read.ArtistView;
-import org.ultra.rcrs.catalogservice.utils.S3Utils;
+import org.ultra.rcrs.utils.S3Utils;
 import org.ultra.rcrs.utils.Url62;
 
 import java.util.List;
