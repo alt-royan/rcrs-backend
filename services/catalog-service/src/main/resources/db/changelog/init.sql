@@ -100,7 +100,7 @@ FROM albums a
          LEFT JOIN artists_on_album_view aoa ON a.id = aoa.album_id
 GROUP BY a.id;
 
-CREATE OR REPLACE VIEW track_view AS
+CREATE OR REPLACE VIEW track_without_album_view AS
 SELECT t.id,
        t.status,
        t.title,
@@ -115,7 +115,7 @@ FROM tracks t
          LEFT JOIN artists_on_track_view aot ON t.id = aot.track_id
 GROUP BY t.id;
 
-CREATE OR REPLACE VIEW track_with_album_view AS
+CREATE OR REPLACE VIEW track_view AS
 SELECT t.id,
        t.status,
        t.title,
@@ -126,6 +126,6 @@ SELECT t.id,
        t.available,
        t.artists,
        row_to_json(a) AS album
-FROM track_view t
+FROM track_without_album_view t
          LEFT JOIN album_view a ON t.album_id = a.id;
 

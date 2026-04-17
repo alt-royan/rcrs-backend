@@ -33,3 +33,5 @@ build/
 .vscode/
 
 /local/**/volume
+/local/**/multipart
+/local/**/elasticsearch_data

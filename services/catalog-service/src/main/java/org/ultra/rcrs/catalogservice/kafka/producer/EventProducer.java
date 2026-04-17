@@ -2,39 +2,72 @@ package org.ultra.rcrs.catalogservice.kafka.producer;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
-import org.ultra.rcrs.kafka.events.TrackCreatedEvent;
+import org.ultra.rcrs.catalogservice.service.IndexService;
+import org.ultra.rcrs.catalogservice.service.write.TrackWriteService;
+import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.EntityType;
+import org.ultra.rcrs.kafka.Topics;
+import org.ultra.rcrs.kafka.events.StartTrackTranscodingEvent;
+import org.ultra.rcrs.kafka.events.UpdateEntityStatusEvent;
+import org.ultra.rcrs.utils.Url62;
+import reactor.core.publisher.Mono;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class  EventProducer {
+public class EventProducer {
 
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final ObjectMapper objectMapper;
+    private final IndexService indexService;
 
-    @Value("${spring.kafka.topic.media-service}")
-    private String mediaTopic;
-
-
-    public void trackCreated(String uid, UUID trackId) {
-        var json = objectMapper.writeValueAsString(new TrackCreatedEvent(uid, trackId, Instant.now()));
-        kafkaTemplate.send(mediaTopic, json).thenAcceptAsync(result ->
-                        log.info("Sent message=[{}] with offset=[{}]", json, result.getRecordMetadata().offset()))
-                .exceptionallyAsync(err -> {
-                            log.info("Unable to send message=[{}] due to : {}", json, err.getMessage());
-                            return null;
-                        });
-
+    public Mono<Void> trackCreated(String uid, UUID trackId) {
+        return indexService.createTrackIndexEvent(trackId)
+                .map(objectMapper::writeValueAsString)
+                .map(event -> kafkaTemplate.send(Topics.SEARCH_INDEX_TOPIC, event))
+                .doOnNext(this::log)
+                .then(Mono.just(new StartTrackTranscodingEvent(uid, Url62.encode(trackId), Instant.now()))
+                        .map(objectMapper::writeValueAsString)
+                        .map(event -> kafkaTemplate.send(Topics.MEDIA_START_TRACK_TRANSCODING_TOPIC, event))
+                        .doOnNext(this::log)
+                ).then(Mono.just(new UpdateEntityStatusEvent(Url62.encode(trackId), EntityType.TRACK, EntityStatus.QUEUED_FOR_TRANSCODING))
+                        .map(objectMapper::writeValueAsString)
+                        .map(event -> kafkaTemplate.send(Topics.CATALOG_UPDATE_ENTITY_STATUS_TOPIC, event))
+                        .doOnNext(this::log)
+                        .then());
     }
 
-    public void albumCreated(UUID albumId) {
+    public Mono<Void> albumCreated(UUID albumId) {
+        return indexService.createAlbumIndexEvent(albumId)
+                .map(objectMapper::writeValueAsString)
+                .map(event -> kafkaTemplate.send(Topics.SEARCH_INDEX_TOPIC, event))
+                .doOnNext(this::log)
+                .then();
+    }
 
+    public Mono<Void> artistCreated(UUID artistId) {
+        return indexService.createArtistIndexEvent(artistId)
+                .map(objectMapper::writeValueAsString)
+                .map(event -> kafkaTemplate.send(Topics.SEARCH_INDEX_TOPIC, event))
+                .doOnNext(this::log)
+                .then();
+    }
+
+    private void log(CompletableFuture<SendResult<String, String>> future) {
+        future.thenAcceptAsync(result ->
+                        log.info("Sent message=[{}] to topic=[{}] with offset=[{}]", result.getProducerRecord().value(),
+                                result.getProducerRecord().topic(), result.getRecordMetadata().offset()))
+                .exceptionallyAsync(err -> {
+                    log.info("Unable to send message due to : {}", err.getMessage());
+                    return null;
+                });
     }
 }

@@ -7,7 +7,6 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @Document(indexName = "artists")
@@ -22,10 +21,10 @@ public class ArtistDoc {
     @Field(type = FieldType.Keyword)
     private List<String> tags;
 
-    @Field(type = FieldType.Text)
-    private List<String> albums;
+    @Field(type = FieldType.Nested)
+    private List<NestedAlbum> albums;
 
-    @Field(type = FieldType.Text)
-    private List<String> tracks;
+    @Field(type = FieldType.Nested)
+    private List<NestedTrack> tracks;
 
 }

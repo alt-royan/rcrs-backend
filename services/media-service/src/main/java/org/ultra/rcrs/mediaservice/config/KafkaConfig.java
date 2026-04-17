@@ -1,20 +1,46 @@
 package org.ultra.rcrs.mediaservice.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
-import org.springframework.beans.factory.annotation.Value;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
+import org.springframework.boot.kafka.autoconfigure.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
+import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.core.ProducerFactory;
+import org.springframework.kafka.core.*;
+import org.ultra.rcrs.kafka.Topics;
+
+import java.util.Map;
 
 @Configuration
 @EnableKafka
 public class KafkaConfig {
 
-    @Value("${spring.kafka.topic.in}")
-    private String topic;
+    private Map<String, Object> consumerProps(KafkaProperties kafkaProperties) {
+        var consumerProps = kafkaProperties.getConsumer();
+
+        consumerProps.setKeyDeserializer(StringDeserializer.class);
+        consumerProps.setValueDeserializer(StringDeserializer.class);
+
+        return consumerProps.buildProperties();
+    }
+
+
+    private Map<String, Object> producerProps(KafkaProperties kafkaProperties) {
+        var producerProps = kafkaProperties.getProducer();
+
+        producerProps.setKeySerializer(StringSerializer.class);
+        producerProps.setValueSerializer(StringSerializer.class);
+
+        return producerProps.buildProperties();
+    }
+
+    @Bean
+    public ProducerFactory<String, String> producerFactory(KafkaProperties kafkaProperties) {
+        return new DefaultKafkaProducerFactory<>(producerProps(kafkaProperties));
+    }
 
     @Bean
     public KafkaTemplate<String, String> stringTemplate(ProducerFactory<String, String> pf) {
@@ -22,7 +48,19 @@ public class KafkaConfig {
     }
 
     @Bean
+    public ConsumerFactory<String, String> consumerFactory(KafkaProperties kafkaProperties) {
+        return new DefaultKafkaConsumerFactory<>(consumerProps(kafkaProperties));
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory(ConsumerFactory<String, String> consumerFactory) {
+        ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactory);
+        return factory;
+    }
+
+    @Bean
     public NewTopic inTopic() {
-        return TopicBuilder.name(topic).build();
+        return TopicBuilder.name(Topics.MEDIA_START_TRACK_TRANSCODING_TOPIC).build();
     }
 }

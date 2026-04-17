@@ -8,7 +8,6 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import org.ultra.rcrs.enums.EntityStatus;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -41,8 +40,7 @@ public class TrackView {
     @Column("available")
     private Boolean available;
 
-    @Column("album_id")
-    private UUID albumId;
+    private AlbumView album;
 
     private List<ArtistOnTrackView> artists;
 

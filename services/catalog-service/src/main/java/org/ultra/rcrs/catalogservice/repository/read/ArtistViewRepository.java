@@ -4,11 +4,14 @@ package org.ultra.rcrs.catalogservice.repository.read;
 import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import org.ultra.rcrs.catalogservice.model.read.ArtistView;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.data.relational.core.query.Criteria.where;
@@ -26,9 +29,19 @@ public class ArtistViewRepository {
         return template.selectOne(query(where("id").is(id)), ArtistView.class);
     }
 
+    public Flux<ArtistView> findAllById(@Nonnull List<UUID> ids) {
+        Assert.notNull(ids, "ids must not be null");
+
+        return template.select(query(where("id").in(ids)), ArtistView.class);
+    }
+
     public Mono<Boolean> existsById(@Nonnull UUID id) {
         Assert.notNull(id, "id must not be null");
 
         return template.exists(query(where("id").is(id)), ArtistView.class);
+    }
+
+    public Flux<ArtistView> findAll() {
+        return template.select(Query.empty(), ArtistView.class);
     }
 }

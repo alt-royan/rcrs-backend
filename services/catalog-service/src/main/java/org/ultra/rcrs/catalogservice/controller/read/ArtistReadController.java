@@ -1,12 +1,15 @@
 package org.ultra.rcrs.catalogservice.controller.read;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.catalogservice.dto.response.album.AlbumOfArtistDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistDto;
+import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistStandaloneDto;
 import org.ultra.rcrs.catalogservice.service.read.ArtistReadService;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
@@ -28,6 +31,12 @@ public class ArtistReadController {
     @GetMapping("/{artistId}")
     public Mono<ResponseEntity<ArtistDto>> getArtist(@PathVariable("artistId") String artistId) {
         return artistReadService.getArtist(Url62.decode(artistId))
+                .map(ResponseEntity::ok);
+    }
+
+    @PostMapping("/get")
+    public Mono<ResponseEntity<List<ArtistStandaloneDto>>> getArtists(@RequestBody @Validated @NotNull List<String> ids) {
+        return artistReadService.getArtists(ids.stream().map(Url62::decode).toList())
                 .map(ResponseEntity::ok);
     }
 

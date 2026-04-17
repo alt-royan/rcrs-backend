@@ -1,17 +1,17 @@
-package org.ultra.rcrs.catalogservice.config;
+package org.ultra.rcrs.searchservice.config;
 
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.codec.json.JacksonJsonDecoder;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
+import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
+import org.ultra.rcrs.kafka.Topics;
 
 import java.util.Map;
 
@@ -19,14 +19,11 @@ import java.util.Map;
 @EnableKafka
 public class KafkaConfig {
 
-    @Value("${spring.kafka.topic.in}")
-    private String topic;
-
     private Map<String, Object> consumerProps(KafkaProperties kafkaProperties) {
         var consumerProps = kafkaProperties.getConsumer();
 
         consumerProps.setKeyDeserializer(StringDeserializer.class);
-        consumerProps.setValueDeserializer(JacksonJsonDecoder.class);
+        consumerProps.setValueDeserializer(JacksonJsonDeserializer.class);
 
         return consumerProps.buildProperties();
     }
@@ -64,7 +61,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public NewTopic inTopic() {
-        return TopicBuilder.name(topic).build();
+    public NewTopic indexTopic() {
+        return TopicBuilder.name(Topics.SEARCH_INDEX_TOPIC).build();
     }
 }

@@ -4,10 +4,12 @@ package org.ultra.rcrs.catalogservice.repository.read;
 import jakarta.annotation.Nonnull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import org.ultra.rcrs.catalogservice.model.read.AlbumView;
 import org.ultra.rcrs.enums.EntityStatus;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -27,6 +29,23 @@ public class AlbumViewRepository {
         Assert.notNull(statuses, "statuses must not be null");
 
         return template.selectOne(query(where("id").is(id).and("status").in(statuses)), AlbumView.class);
+    }
+
+    public Mono<AlbumView> findById(@Nonnull UUID id) {
+        Assert.notNull(id, "id must not be null");
+
+        return template.selectOne(query(where("id").is(id)), AlbumView.class);
+    }
+
+    public Flux<AlbumView> findAllByIdAndStatusIn(@Nonnull List<UUID> ids, @Nonnull List<EntityStatus> statuses) {
+        Assert.notNull(ids, "ids must not be null");
+        Assert.notNull(statuses, "statuses must not be null");
+
+        return template.select(query(where("id").in(ids).and("status").in(statuses)), AlbumView.class);
+    }
+
+    public Flux<AlbumView> findAll() {
+        return template.select(Query.empty(), AlbumView.class);
     }
 
 }

@@ -8,13 +8,14 @@ import org.ultra.rcrs.catalogservice.dto.SocialLinkDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistOnAlbumDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistOnTrackDto;
-import org.ultra.rcrs.catalogservice.model.read.ArtistOnAlbumView;
-import org.ultra.rcrs.catalogservice.model.read.ArtistOnTrackView;
-import org.ultra.rcrs.catalogservice.model.read.ArtistView;
+import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistStandaloneDto;
+import org.ultra.rcrs.catalogservice.model.read.*;
 import org.ultra.rcrs.utils.S3Utils;
 import org.ultra.rcrs.utils.Url62;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -52,6 +53,26 @@ public class ArtistConverter {
                 .avatarUrl(s3Utils.parseUrl(artist.getAvatarS3Key()))
                 .socialLinks(artist.getSocialLinks().getItems().stream().map(SocialLinkDto::new).toList())
                 .build();
+    }
+
+    public ArtistStandaloneDto toStandaloneDto(@Nonnull ArtistView artist) {
+        Objects.requireNonNull(artist, "artist must not be null");
+        return ArtistStandaloneDto.builder()
+                .id(Url62.encode(artist.getId()))
+                .name(artist.getName())
+                .avatarUrl(s3Utils.parseUrl(artist.getAvatarS3Key()))
+                .build();
+    }
+
+    public Map<String, Object> toIndex(ArtistView artist, List<ArtistTrackView> tracks, List<ArtistAlbumView> albums) {
+        var tr = tracks.stream().map(t -> Map.of("id", Url62.encode(t.getTrackId()), "title", t.getTitle())).toList();
+        var al = albums.stream().map(a -> Map.of("id", Url62.encode(a.getAlbumId()), "title", a.getTitle())).toList();
+        Map<String, Object> index = new HashMap<>();
+        index.put("id", Url62.encode(artist.getId()));
+        index.put("name", artist.getName());
+        index.put("tracks", tr);
+        index.put("albums", al);
+        return index;
     }
 
 }

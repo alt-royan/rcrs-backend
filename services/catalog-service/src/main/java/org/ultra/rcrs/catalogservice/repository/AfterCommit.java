@@ -29,4 +29,20 @@ public class AfterCommit {
                 )
                 .then();
     }
+
+    public static Mono<Void> execute(Mono<?> mono) {
+        return TransactionSynchronizationManager.forCurrentTransaction()
+                .doOnNext(manager ->
+                        manager.registerSynchronization(
+                                new TransactionSynchronization() {
+                                    @Override
+                                    @Nonnull
+                                    public Mono<Void> afterCommit() {
+                                        return mono.then();
+                                    }
+                                }
+                        )
+                )
+                .then();
+    }
 }

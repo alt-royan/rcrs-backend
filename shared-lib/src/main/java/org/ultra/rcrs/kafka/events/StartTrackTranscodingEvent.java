@@ -8,10 +8,10 @@ import java.util.UUID;
 
 @Data
 @AllArgsConstructor
-public class TrackCreatedEvent {
+public class StartTrackTranscodingEvent {
 
     private String uid;
-    private UUID trackId;
+    private String trackId;
     private Instant timestamp;
 
 }

@@ -71,7 +71,7 @@ public class AlbumWriteService {
                         .flatMap(a -> AfterCommit.log("Album {} saved with id {}", request.getTitle(), albumId)
                                 .thenMany(saveArtistsToAlbum(request.getArtists(), a.getId()))
                                 .thenMany(trackWriteService.createTracks(request.getTracks(), a.getId()))
-                                .then(AfterCommit.execute(() -> eventProducer.albumCreated(a.getId())))
+                                .then(AfterCommit.execute(eventProducer.albumCreated(a.getId())))
                                 .thenReturn(new IdResponse(Url62.encode(a.getId())))));
     }
 
@@ -98,6 +98,16 @@ public class AlbumWriteService {
                 .flatMap(artistToAlbumRepository::insert)
                 .flatMap(a -> AfterCommit.log("Artist {} with role {} attached to album {}",
                         a.getArtistId(), a.getArtistRole(), a.getAlbumId()));
+    }
+
+    @Transactional
+    public Mono<Void> updateStatus(UUID albumId, EntityStatus status) {
+        return albumRepository.findById(albumId)
+                .filter(a -> !a.getStatus().equals(status))
+                .flatMap(a -> albumRepository.updateStatus(albumId, status)
+                        .flatMap(count ->
+                                AfterCommit.log("Update album {} status to {}: {} rows updated", albumId, status, count))
+                );
     }
 
 }

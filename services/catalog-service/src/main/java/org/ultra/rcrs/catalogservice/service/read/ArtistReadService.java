@@ -7,19 +7,26 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.dto.response.album.AlbumOfArtistDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistDto;
+import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistStandaloneDto;
+import org.ultra.rcrs.catalogservice.dto.response.track.TrackStandaloneDto;
+import org.ultra.rcrs.catalogservice.model.read.ArtistView;
 import org.ultra.rcrs.catalogservice.repository.read.ArtistAlbumViewRepository;
+import org.ultra.rcrs.catalogservice.repository.read.ArtistTrackViewRepository;
 import org.ultra.rcrs.catalogservice.repository.read.ArtistViewRepository;
+import org.ultra.rcrs.catalogservice.service.AlbumConverter;
 import org.ultra.rcrs.catalogservice.service.ArtistConverter;
+import org.ultra.rcrs.catalogservice.service.TrackConverter;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
-import org.ultra.rcrs.utils.S3Utils;
-import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -28,8 +35,10 @@ public class ArtistReadService {
 
     private final ArtistViewRepository artistRepository;
     private final ArtistAlbumViewRepository artistAlbumViewRepository;
+    private final ArtistTrackViewRepository artistTrackViewRepository;
     private final ArtistConverter artistConverter;
-    private final S3Utils s3Utils;
+    private final AlbumConverter albumConverter;
+    private final TrackConverter trackConverter;
 
     @Cacheable("artists")
     public Mono<ArtistDto> getArtist(UUID artistId) {
@@ -38,24 +47,19 @@ public class ArtistReadService {
                 .map(artistConverter::toDto);
     }
 
+    public Mono<List<ArtistStandaloneDto>> getArtists(List<UUID> ids) {
+        return artistRepository.findAllById(ids)
+                .collect(Collectors.toMap(ArtistView::getId, Function.identity()))
+                .map(m -> ids.stream()
+                        .map(m::get)
+                        .filter(Objects::nonNull)
+                        .toList())
+                .map(l -> l.stream().map(artistConverter::toStandaloneDto).toList());
+    }
+
     public Mono<List<AlbumOfArtistDto>> getAlbumsForArtist(UUID artistId, List<EntityStatus> statuses, ArtistRole role, AlbumType type, Sort.Direction direction) {
         return artistAlbumViewRepository.findAllByArtist(artistId, statuses, role, type, direction)
-                .map(a -> AlbumOfArtistDto.builder()
-                        .id(Url62.encode(a.getAlbumId()))
-                        .artistRole(a.getArtistRole())
-                        .status(a.getStatus())
-                        .title(a.getTitle())
-                        .type(a.getType())
-                        .releaseDate(a.getReleaseDate())
-                        .year(a.getYear())
-                        .totalTracks(a.getTotalTracks())
-                        .totalDurationMs(a.getTotalDurationMs())
-                        .coverUrl(s3Utils.parseUrl(a.getCoverS3Key()))
-                        .explicit(a.getExplicit())
-                        .available(a.getAvailable())
-                        .artists(artistConverter.onAlbumToDto(a.getArtists()))
-                        .build()
-                )
+                .map(albumConverter::toOfArtistDto)
                 .collectList();
     }
 }

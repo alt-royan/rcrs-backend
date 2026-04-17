@@ -10,12 +10,12 @@ import java.util.List;
 @FeignClient(name = "catalog-client", url = "${feign.catalog-service.url}")
 public interface CatalogClient {
 
-    @PostMapping("/artists")
+    @PostMapping("/artists/get")
     List<Object> getArtists(@RequestBody List<String> request);
 
-    @PostMapping("/albums")
+    @PostMapping("/albums/get")
     List<Object> getAlbums(@RequestBody List<String> request);
 
-    @PostMapping("/tracks")
+    @PostMapping("/tracks/get")
     List<Object> getTracks(@RequestBody List<String> request);
 }

@@ -8,6 +8,17 @@ spring:
           default:
             connectTimeout: 5000
             readTimeout: 5000
+  kafka:
+    reindex:
+      batch:
+        size: 1000
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: my-group
+      properties:
+        reactiveAutoCommit: true
+    producer:
+      bootstrap-servers: localhost:9092
 
 cdn:
   images:
@@ -15,4 +26,7 @@ cdn:
 
 feign:
   catalog-service.url: http://localhost:8080
+
+elasticsearch:
+  url:  http://localhost:9200
 

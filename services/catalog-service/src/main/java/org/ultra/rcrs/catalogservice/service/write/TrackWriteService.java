@@ -59,7 +59,7 @@ public class TrackWriteService {
                         .flatMap(t -> AfterCommit.log("Track {} saved with id {}", t.getTitle(), t.getId())
                                 .thenMany(saveArtistsToTrack(uploadRequest.getArtists(), t.getId()))
                                 .thenMany(saveOthersToTrack(uploadRequest.getOthers(), t.getId()))
-                                .then(AfterCommit.execute(() -> eventProducer.trackCreated(uploadRequest.getUid(), t.getId())))));
+                                .then(AfterCommit.execute(eventProducer.trackCreated(uploadRequest.getUid(), t.getId())))));
     }
 
     private Mono<Void> checkArtists(List<ArtistIdDto> artists) {
@@ -93,6 +93,16 @@ public class TrackWriteService {
                 .flatMap(otherArtistRepository::insert)
                 .flatMap(o -> AfterCommit.log("OtherArtist {} saved with for track {}",
                         o.getName(), o.getTrackId()));
+    }
+
+    @Transactional
+    public Mono<Void> updateStatus(UUID trackId, EntityStatus status) {
+        return trackRepository.findById(trackId)
+                .filter(t -> !t.getStatus().equals(status))
+                .flatMap(t -> trackRepository.updateStatus(trackId, status)
+                        .flatMap(count ->
+                                AfterCommit.log("Update album {} status to {}: {} rows updated", trackId, status, count))
+                );
     }
 
 }
