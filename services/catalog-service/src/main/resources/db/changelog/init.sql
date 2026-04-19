@@ -5,8 +5,11 @@ CREATE TABLE IF NOT EXISTS artists
     id            uuid PRIMARY KEY,
     name          text NOT NULL,
     avatar_s3_key text,
-    social_links json
+    social_links  json
 );
+
+ALTER TABLE artists
+    ADD COLUMN tags VARCHAR(20)[];
 
 CREATE TABLE IF NOT EXISTS albums
 (
@@ -45,9 +48,9 @@ CREATE TABLE IF NOT EXISTS tracks
 
 CREATE TABLE IF NOT EXISTS other_artist
 (
-    track_id uuid,
-    name     text,
-    roles    varchar(20)[],
+    track_id     uuid,
+    name         text,
+    roles        varchar(20)[],
     social_links json,
     FOREIGN KEY (track_id) REFERENCES tracks (id)
 );

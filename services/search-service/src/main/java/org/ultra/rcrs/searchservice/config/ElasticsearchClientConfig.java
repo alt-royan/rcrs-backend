@@ -11,7 +11,7 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 @EnableElasticsearchRepositories
 public class ElasticsearchClientConfig extends ElasticsearchConfiguration {
 
-    @Value("${elasticsearch.url}")
+    @Value("${spring.elasticsearch.url}")
     private String elasticsearchUrl;
 
     @Override

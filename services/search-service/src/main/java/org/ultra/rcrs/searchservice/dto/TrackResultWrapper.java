@@ -10,6 +10,6 @@ import org.ultra.rcrs.searchservice.enums.SearchType;
 @AllArgsConstructor
 public class TrackResultWrapper implements ResultWrapper {
 
-    private final SearchType type = SearchType.TRACK;
+    private final SearchType type = SearchType.track;
     private Object data;
 }

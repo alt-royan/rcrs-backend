@@ -2,6 +2,8 @@ package org.ultra.rcrs.catalogservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.repository.read.*;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
@@ -15,6 +17,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Slf4j
+@Component
 public class IndexService {
 
     private final ObjectMapper objectMapper;
@@ -41,7 +44,6 @@ public class IndexService {
                         })
                 )
                 .buffer(batchSize)
-                .map(objectMapper::writeValueAsString)
                 .map(json -> new IndexEntityEvent(IndexEntityEvent.ARTIST_CREATE_BATCH, json));
     }
 
@@ -51,7 +53,6 @@ public class IndexService {
                         .map(tracks -> albumConverter.toIndex(a, tracks))
                 )
                 .buffer(batchSize)
-                .map(objectMapper::writeValueAsString)
                 .map(json -> new IndexEntityEvent(IndexEntityEvent.ALBUM_CREATE_BATCH, json));
     }
 
@@ -59,7 +60,6 @@ public class IndexService {
         return trackViewRepository.findAll()
                 .map(trackConverter::toIndex)
                 .buffer(batchSize)
-                .map(objectMapper::writeValueAsString)
                 .map(json -> new IndexEntityEvent(IndexEntityEvent.TRACK_CREATE_BATCH, json));
     }
 
@@ -74,7 +74,6 @@ public class IndexService {
 
                     return artistConverter.toIndex(artist, tracks, albums);
                 })
-                .map(objectMapper::writeValueAsString)
                 .map(json -> new IndexEntityEvent(IndexEntityEvent.ARTIST_CREATE_SINGLE, json));
     }
 
@@ -82,14 +81,12 @@ public class IndexService {
         return albumViewRepository.findById(albumId)
                 .zipWith(trackWithoutAlbumViewRepository.findAllByAlbumId(albumId).collectList())
                 .map(tuple -> albumConverter.toIndex(tuple.getT1(), tuple.getT2()))
-                .map(objectMapper::writeValueAsString)
                 .map(json -> new IndexEntityEvent(IndexEntityEvent.ALBUM_CREATE_SINGLE, json));
     }
 
     public Mono<IndexEntityEvent> createTrackIndexEvent(UUID trackId) {
         return trackViewRepository.findById(trackId)
                 .map(trackConverter::toIndex)
-                .map(objectMapper::writeValueAsString)
                 .map(json -> new IndexEntityEvent(IndexEntityEvent.TRACK_CREATE_SINGLE, json));
     }
 

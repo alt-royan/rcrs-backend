@@ -6,7 +6,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.catalogservice.service.IndexService;
-import org.ultra.rcrs.catalogservice.service.write.TrackWriteService;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.EntityType;
 import org.ultra.rcrs.kafka.Topics;
@@ -32,7 +31,7 @@ public class EventProducer {
     public Mono<Void> trackCreated(String uid, UUID trackId) {
         return indexService.createTrackIndexEvent(trackId)
                 .map(objectMapper::writeValueAsString)
-                .map(event -> kafkaTemplate.send(Topics.SEARCH_INDEX_TOPIC, event))
+                .map(event -> kafkaTemplate.send(Topics.SEARCH_INDEX_TOPIC, UUID.randomUUID().toString(), event))
                 .doOnNext(this::log)
                 .then(Mono.just(new StartTrackTranscodingEvent(uid, Url62.encode(trackId), Instant.now()))
                         .map(objectMapper::writeValueAsString)
@@ -48,7 +47,7 @@ public class EventProducer {
     public Mono<Void> albumCreated(UUID albumId) {
         return indexService.createAlbumIndexEvent(albumId)
                 .map(objectMapper::writeValueAsString)
-                .map(event -> kafkaTemplate.send(Topics.SEARCH_INDEX_TOPIC, event))
+                .map(event -> kafkaTemplate.send(Topics.SEARCH_INDEX_TOPIC, UUID.randomUUID().toString(), event))
                 .doOnNext(this::log)
                 .then();
     }
@@ -56,7 +55,7 @@ public class EventProducer {
     public Mono<Void> artistCreated(UUID artistId) {
         return indexService.createArtistIndexEvent(artistId)
                 .map(objectMapper::writeValueAsString)
-                .map(event -> kafkaTemplate.send(Topics.SEARCH_INDEX_TOPIC, event))
+                .map(event -> kafkaTemplate.send(Topics.SEARCH_INDEX_TOPIC, UUID.randomUUID().toString(), event))
                 .doOnNext(this::log)
                 .then();
     }

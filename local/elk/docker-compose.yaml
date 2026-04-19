@@ -1,7 +1,7 @@
 version: '3.3'
 services:
   odfe-node:
-    image: elasticsearch:7.10.1
+    image: elasticsearch:9.2.5
     logging:
       driver: "json-file"
       options:
@@ -29,8 +29,9 @@ services:
       - "9600:9600"
     networks:
       - odfe-net
+    restart: unless-stopped
   kibana:
-    image: kibana:7.10.1
+    image: kibana:9.2.5
     logging:
       driver: "json-file"
       options:
@@ -44,6 +45,7 @@ services:
     environment:
       ELASTICSEARCH_URL: http://odfe-node:9200
       ELASTICSEARCH_HOSTS: http://odfe-node:9200
+    restart: unless-stopped
     networks:
       - odfe-net
 #  logstash:

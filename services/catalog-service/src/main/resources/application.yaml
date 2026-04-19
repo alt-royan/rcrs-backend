@@ -22,13 +22,7 @@ spring:
     topic:
       in: ${spring.application.name}-in
       media-service: media-topic-in
-    consumer:
-      bootstrap-servers: localhost:9092
-      group-id: my-group
-      properties:
-        reactiveAutoCommit: true
-    producer:
-      bootstrap-servers: localhost:9092
+    bootstrap-servers: localhost:9092
 
 cdn:
   images:

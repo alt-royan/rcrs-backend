@@ -10,6 +10,6 @@ import org.ultra.rcrs.searchservice.enums.SearchType;
 @AllArgsConstructor
 public class AlbumResultWrapper implements ResultWrapper {
 
-    private final SearchType type = SearchType.ALBUM;
+    private final SearchType type = SearchType.album;
     private Object data;
 }

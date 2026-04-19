@@ -14,7 +14,6 @@ import org.ultra.rcrs.searchservice.document.AlbumDoc;
 import org.ultra.rcrs.searchservice.document.ArtistDoc;
 import org.ultra.rcrs.searchservice.document.TrackDoc;
 import org.ultra.rcrs.searchservice.service.IndexService;
-import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
@@ -28,7 +27,7 @@ public class KafkaIndexEventListener {
 
     private final ObjectMapper objectMapper;
     private final ApplicationContext context;
-    private final Map<String, Consumer<String>> events = Map.of(
+    private final Map<String, Consumer<Object>> events = Map.of(
             IndexEntityEvent.ARTIST_CREATE_SINGLE, entityCreateSingle(ArtistDoc.class),
             IndexEntityEvent.ALBUM_CREATE_SINGLE, entityCreateSingle(AlbumDoc.class),
             IndexEntityEvent.TRACK_CREATE_SINGLE, entityCreateSingle(TrackDoc.class),
@@ -37,8 +36,9 @@ public class KafkaIndexEventListener {
             IndexEntityEvent.TRACK_CREATE_BATCH, entityCreateBatch(TrackDoc.class)
     );
 
-    @KafkaListener(topics = Topics.SEARCH_INDEX_TOPIC)
-    public void handleIndexEvent(IndexEntityEvent event) {
+    @KafkaListener(topics = Topics.SEARCH_INDEX_TOPIC, groupId = "my-group")
+    public void handleIndexEvent(String message) {
+        IndexEntityEvent event = objectMapper.readValue(message, IndexEntityEvent.class);
         log.info("Received event {}", event);
         if (event != null && !StringUtils.isEmpty(event.getEventType())) {
             if (events.containsKey(event.getEventType())) {
@@ -47,19 +47,19 @@ public class KafkaIndexEventListener {
         }
     }
 
-    public <T> Consumer<String> entityCreateSingle(Class<T> clazz) {
+    public <T> Consumer<Object> entityCreateSingle(Class<T> clazz) {
         return (payload) -> {
-            T doc = objectMapper.readValue(payload, clazz);
+            T doc = objectMapper.convertValue(payload, clazz);
             IndexService<T> indexService = this.getIndexServiceForClass(clazz);
             indexService.index(doc);
         };
     }
 
-    public <T> Consumer<String> entityCreateBatch(Class<T> clazz) {
+    public <T> Consumer<Object> entityCreateBatch(Class<T> clazz) {
         return (payload) -> {
 
-            List<T> batch = objectMapper.readValue(payload, new TypeReference<>() {
-            });
+            List<T> batch = objectMapper.convertValue(payload,
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
             IndexService<T> indexService = this.getIndexServiceForClass(clazz);
             indexService.indexBatch(batch);
         };

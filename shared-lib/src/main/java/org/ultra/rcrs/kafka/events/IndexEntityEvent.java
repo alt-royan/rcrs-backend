@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.ultra.rcrs.enums.EntityType;
 
+import java.util.Map;
+
 @Data
 @AllArgsConstructor
 public class IndexEntityEvent {
@@ -17,6 +19,6 @@ public class IndexEntityEvent {
     public static final String TRACK_CREATE_BATCH = "trackCreate:Batch";
 
     private String eventType;
-    private String payload;
+    private Object payload;
 
 }

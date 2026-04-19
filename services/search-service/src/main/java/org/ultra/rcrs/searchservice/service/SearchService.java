@@ -40,19 +40,20 @@ public class SearchService {
         SearchResponse response = new SearchResponse();
 
         var features = Arrays.stream(types).map(t -> switch (t) {
-            case ARTIST ->
+            case artist ->
                     CompletableFuture.supplyAsync(() -> this.searchArtists(query, page, size)).thenAccept(response::setArtists);
-            case ALBUM ->
+            case album ->
                     CompletableFuture.supplyAsync(() -> this.searchAlbums(query, page, size, onlyPublished)).thenAccept(response::setAlbums);
-            case TRACK ->
+            case track ->
                     CompletableFuture.supplyAsync(() -> this.searchTracks(query, page, size, onlyPublished)).thenAccept(response::setTracks);
         }).toArray(CompletableFuture<?>[]::new);
 
 
-        CompletableFuture.allOf(features);
+        CompletableFuture.allOf(features).join();
         return response;
     }
 
+    //nested queries
     private SearchCollection<ArtistResultWrapper> searchArtists(String query, int page, int size) {
         var query1 = Query.of(q -> q
                 .bool(b -> b
@@ -75,7 +76,7 @@ public class SearchService {
             var response = catalogClient.getArtists(ids);
             var list = response.stream().map(ArtistResultWrapper::new).toList();
             var sc = new SearchCollection<>(page, size, hits.getTotalHits(), list);
-            return enrichWithHref(sc, SearchType.ARTIST, query);
+            return enrichWithHref(sc, SearchType.artist, query);
         } catch (FeignException e) {
             throw new ServiceUnavailableException(e);
         }
@@ -107,7 +108,7 @@ public class SearchService {
             var response = catalogClient.getAlbums(ids);
             var list = response.stream().map(AlbumResultWrapper::new).toList();
             var sc = new SearchCollection<>(page, size, hits.getTotalHits(), list);
-            return enrichWithHref(sc, SearchType.ALBUM, query);
+            return enrichWithHref(sc, SearchType.album, query);
         } catch (FeignException e) {
             throw new ServiceUnavailableException(e);
         }
@@ -139,7 +140,7 @@ public class SearchService {
             var response = catalogClient.getTracks(ids);
             var list = response.stream().map(TrackResultWrapper::new).toList();
             var sc = new SearchCollection<>(page, size, hits.getTotalHits(), list);
-            return enrichWithHref(sc, SearchType.TRACK, query);
+            return enrichWithHref(sc, SearchType.track, query);
         } catch (FeignException e) {
             throw new ServiceUnavailableException(e);
         }
@@ -152,7 +153,7 @@ public class SearchService {
                     .setParameter("q", q)
                     .setParameter("page", String.valueOf(searchCollection.getPage() + 1))
                     .setParameter("size", String.valueOf(searchCollection.getSize()))
-                    .setParameter("type", type.getValue())
+                    .setParameter("type", type.name())
                     .setCharset(StandardCharsets.UTF_8)
                     .toString();
             searchCollection.setNext(next);

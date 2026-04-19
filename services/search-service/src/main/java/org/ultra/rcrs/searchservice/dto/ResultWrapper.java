@@ -8,5 +8,5 @@ public interface ResultWrapper {
 
     SearchType getType();
 
-    Map<String, Object> getData();
+    Object getData();
 }

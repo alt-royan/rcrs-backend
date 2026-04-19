@@ -54,6 +54,11 @@
             <scope>test</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-kafka-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.ultra.rcrs</groupId>
             <artifactId>shared-lib</artifactId>
         </dependency>

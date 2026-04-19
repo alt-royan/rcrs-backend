@@ -34,9 +34,10 @@ public class KafkaEventListener {
     private final TrackWriteService trackService;
     private final TrackRepository trackRepository;
 
-    @KafkaListener(topics = Topics.CATALOG_UPDATE_ENTITY_STATUS_TOPIC)
-    public void handleUpdateStatusEvent(UpdateEntityStatusEvent event) {
-        log.info("Received event {}", event);
+    @KafkaListener(topics = Topics.CATALOG_UPDATE_ENTITY_STATUS_TOPIC, groupId = "my-group")
+    public void handleUpdateStatusEvent(String message) {
+        log.info("Received message {}", message);
+        UpdateEntityStatusEvent event = objectMapper.readValue(message, UpdateEntityStatusEvent.class);
         var status = event.getNewStatus();
         Mono<Void> mono = Mono.empty();
         if (EntityType.TRACK.equals(event.getEntityType()) && !StringUtils.isEmpty(event.getId())) {
@@ -62,9 +63,10 @@ public class KafkaEventListener {
         mono.subscribe();
     }
 
-    @KafkaListener(topics = Topics.SEARCH_START_REINDEX_TOPIC)
-    public void handleReindexEvent(StartReindexEvent event) {
-        log.info("Received event {}", event);
+    @KafkaListener(topics = Topics.SEARCH_START_REINDEX_TOPIC, groupId = "my-group")
+    public void handleReindexEvent(String message) {
+        log.info("Received message {}", message);
+        StartReindexEvent event = objectMapper.readValue(message, StartReindexEvent.class);
         if (event != null && event.getEntityType() != null && event.getBatchSize() > 0) {
             AtomicReference<Mono<Void>> mono = new AtomicReference<>(Mono.empty());
             if (event.getEntityType() == EntityType.ARTIST) {

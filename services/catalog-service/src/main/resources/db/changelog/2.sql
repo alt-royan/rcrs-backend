@@ -30,4 +30,4 @@ SELECT att.artist_id,
        t.artists,
        t.album
 FROM artist_to_track att
-         LEFT JOIN track_with_album_view t ON t.id = att.track_id;
+         LEFT JOIN track_view t ON t.id = att.track_id;
