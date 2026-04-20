@@ -34,7 +34,6 @@
         <module>shared-lib</module>
         <module>services/catalog-service</module>
         <module>services/media-service</module>
-        <module>services/upload-service</module>
     </modules>
 
     <dependencyManagement>
