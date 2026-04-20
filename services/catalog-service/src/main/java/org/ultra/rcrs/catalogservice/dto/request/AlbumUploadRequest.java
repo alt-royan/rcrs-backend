@@ -24,7 +24,6 @@ public class AlbumUploadRequest {
     private Instant releaseDate;
 
     //Ссылки на s3 приходят в формате s3://{bucket}/{key}
-    @NotNull
     @Pattern(regexp = "s3://[\\w\\-]+/[\\w\\-.]+", message = "URI must be s3://{bucket}/{key} formatted")
     private String coverUri;
 

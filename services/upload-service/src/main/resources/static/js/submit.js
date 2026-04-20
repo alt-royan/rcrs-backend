@@ -25,16 +25,16 @@ async function submitArtistForm(event) {
     if (event) event.preventDefault();
     if (!validateField('artist-name', 'artist-name-error', 'Artist name is required')) return;
 
-    if (!state.artist.imageBlob) {
+/*    if (!state.artist.imageBlob) {
         showToast('Please upload and crop an artist photo.', 'error');
         return;
-    }
+    }*/
 
-    if (!state.artist.cropped) {
+/*    if (!state.artist.cropped) {
         showToast('Please crop the artist photo first.', 'error');
         openCropDialog('artist');
         return;
-    }
+    }*/
 
     showLoading(true);
 

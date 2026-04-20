@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor
-@Document(indexName = "artists")
+@Document(indexName = "artists", storeIdInSource = false)
 public class ArtistDoc {
 
     @Id

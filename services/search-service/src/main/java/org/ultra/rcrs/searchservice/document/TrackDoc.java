@@ -9,7 +9,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import java.util.List;
 
 @Data
-@Document(indexName = "tracks")
+@Document(indexName = "tracks", storeIdInSource = false)
 public class TrackDoc {
 
     @Id

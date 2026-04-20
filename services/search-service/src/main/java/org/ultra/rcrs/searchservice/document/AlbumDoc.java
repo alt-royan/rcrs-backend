@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Data
-@Document(indexName = "albums")
+@Document(indexName = "albums", storeIdInSource = false)
 public class AlbumDoc {
 
     @Id
