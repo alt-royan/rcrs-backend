@@ -22,6 +22,7 @@ import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -62,6 +63,16 @@ public class TrackWriteService {
                                 .then(AfterCommit.execute(eventProducer.trackCreated(uploadRequest.getUid(), t.getId())))));
     }
 
+    @Transactional
+    public Mono<Void> deleteTrack(UUID trackId) {
+        return otherArtistRepository.deleteByTrackId(trackId)
+                .flatMap(l -> artistToTrackRepository.deleteByTrackId(trackId))
+                .flatMap(l -> trackRepository.delete(trackId))
+                .flatMap(l -> AfterCommit.log("Track {} deleted", trackId)
+                        .then(AfterCommit.execute(eventProducer.trackDeleted(trackId)))
+                );
+    }
+
     private Mono<Void> checkArtists(List<ArtistIdDto> artists) {
         return Flux.fromIterable(artists)
                 .flatMap(a -> {
@@ -97,12 +108,27 @@ public class TrackWriteService {
 
     @Transactional
     public Mono<Void> updateStatus(UUID trackId, EntityStatus status) {
-        return trackRepository.findById(trackId)
-                .filter(t -> !t.getStatus().equals(status))
-                .flatMap(t -> trackRepository.updateStatus(trackId, status)
-                        .flatMap(count ->
-                                AfterCommit.log("Update album {} status to {}: {} rows updated", trackId, status, count))
-                );
+        return trackRepository.updateStatus(trackId, status)
+                .flatMap(count ->
+                        AfterCommit.log("Update track {} status to {}: {} rows updated", trackId, status, count));
+    }
+
+    @Transactional
+    public Mono<Void> updateStatusForAllInAlbum(UUID albumId, EntityStatus status) {
+        return trackRepository.updateStatusForAllInAlbum(albumId, status)
+                .flatMap(count ->
+                        AfterCommit.log("Update status to {} for all tracks in album {}: {} rows updated", status, albumId, count));
+    }
+
+    @Transactional
+    public Mono<Void> publishTrack(UUID id) {
+        return trackRepository.updateStatusAndReleaseDate(id, EntityStatus.PUBLISHED, Instant.now())
+                .flatMap(c -> AfterCommit.log("Track {} published", id));
+    }
+
+    @Transactional
+    public Mono<Void> publishTracks(List<UUID> ids) {
+        return Flux.fromIterable(ids).flatMap(this::publishTrack).then();
     }
 
 }

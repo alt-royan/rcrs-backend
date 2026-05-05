@@ -26,6 +26,9 @@ public class AudioUpload {
     @Column(name = "original_file_name")
     private String originalFileName;
 
+    @Column(name = "track_id")
+    private String trackId;
+
     @Column(name = "content_length")
     private Long contentLength;
 
@@ -33,4 +36,5 @@ public class AudioUpload {
     private Instant expiresAt;
 
     private String error;
+
 }

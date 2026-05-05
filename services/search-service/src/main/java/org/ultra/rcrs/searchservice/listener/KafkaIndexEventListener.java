@@ -13,6 +13,7 @@ import org.ultra.rcrs.kafka.events.IndexEntityEvent;
 import org.ultra.rcrs.searchservice.document.AlbumDoc;
 import org.ultra.rcrs.searchservice.document.ArtistDoc;
 import org.ultra.rcrs.searchservice.document.TrackDoc;
+import org.ultra.rcrs.searchservice.dto.IdDto;
 import org.ultra.rcrs.searchservice.service.IndexService;
 import tools.jackson.databind.ObjectMapper;
 
@@ -33,7 +34,10 @@ public class KafkaIndexEventListener {
             IndexEntityEvent.TRACK_CREATE_SINGLE, entityCreateSingle(TrackDoc.class),
             IndexEntityEvent.ARTIST_CREATE_BATCH, entityCreateBatch(ArtistDoc.class),
             IndexEntityEvent.ALBUM_CREATE_BATCH, entityCreateBatch(AlbumDoc.class),
-            IndexEntityEvent.TRACK_CREATE_BATCH, entityCreateBatch(TrackDoc.class)
+            IndexEntityEvent.TRACK_CREATE_BATCH, entityCreateBatch(TrackDoc.class),
+            IndexEntityEvent.TRACK_DELETE, entityDelete(TrackDoc.class),
+            IndexEntityEvent.ALBUM_DELETE, entityDelete(AlbumDoc.class),
+            IndexEntityEvent.ARTIST_DELETE, entityDelete(ArtistDoc.class)
     );
 
     @KafkaListener(topics = Topics.SEARCH_INDEX_TOPIC, groupId = "my-group")
@@ -62,6 +66,14 @@ public class KafkaIndexEventListener {
                     objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
             IndexService<T> indexService = this.getIndexServiceForClass(clazz);
             indexService.indexBatch(batch);
+        };
+    }
+
+    public <T> Consumer<Object> entityDelete(Class<T> clazz) {
+        return (payload) -> {
+            IdDto idDto = objectMapper.convertValue(payload, IdDto.class);
+            IndexService<T> indexService = this.getIndexServiceForClass(clazz);
+            indexService.delete(idDto.id());
         };
     }
 

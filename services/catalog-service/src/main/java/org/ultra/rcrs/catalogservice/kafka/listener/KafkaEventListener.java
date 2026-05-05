@@ -6,11 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
-import org.ultra.rcrs.catalogservice.repository.write.impl.TrackRepository;
 import org.ultra.rcrs.catalogservice.service.IndexService;
-import org.ultra.rcrs.catalogservice.service.write.AlbumWriteService;
-import org.ultra.rcrs.catalogservice.service.write.TrackWriteService;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.catalogservice.service.StatusService;
 import org.ultra.rcrs.enums.EntityType;
 import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.kafka.events.StartReindexEvent;
@@ -30,37 +27,16 @@ public class KafkaEventListener {
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final IndexService indexService;
-    private final AlbumWriteService albumService;
-    private final TrackWriteService trackService;
-    private final TrackRepository trackRepository;
+    private final StatusService statusService;
 
     @KafkaListener(topics = Topics.CATALOG_UPDATE_ENTITY_STATUS_TOPIC, groupId = "my-group")
     public void handleUpdateStatusEvent(String message) {
         log.info("Received message {}", message);
         UpdateEntityStatusEvent event = objectMapper.readValue(message, UpdateEntityStatusEvent.class);
         var status = event.getNewStatus();
-        Mono<Void> mono = Mono.empty();
         if (EntityType.TRACK.equals(event.getEntityType()) && !StringUtils.isEmpty(event.getId())) {
-            var trackId = Url62.decode(event.getId());
-            if (EntityStatus.QUEUED_FOR_TRANSCODING.equals(status) || EntityStatus.TRANSCODING.equals(status)) {
-                mono = trackService.updateStatus(trackId, status)
-                        .then(trackRepository.findById(trackId)
-                                .flatMap(t -> albumService.updateStatus(t.getAlbumId(), EntityStatus.TRANSCODING)));
-            } else if (EntityStatus.FAILED.equals(status)) {
-                mono = trackService.updateStatus(trackId, status)
-                        .then(trackRepository.findById(trackId)
-                                .flatMap(t -> albumService.updateStatus(t.getAlbumId(), status)));
-            } else if (EntityStatus.TRANSCODING_SUCCESS.equals(status)) {
-                //опубликовать либо поставить wait for publishing
-            } else if (EntityStatus.PUBLISHED.equals(status)) {
-                //опубликовать
-            }
-        } else if (EntityType.ALBUM.equals(event.getEntityType()) && !StringUtils.isEmpty(event.getId())) {
-            if (EntityStatus.PUBLISHED.equals(status)) {
-                //опубликовать
-            }
+            statusService.updateTrackStatus(Url62.decode(event.getId()), status).subscribe();
         }
-        mono.subscribe();
     }
 
     @KafkaListener(topics = Topics.SEARCH_START_REINDEX_TOPIC, groupId = "my-group")

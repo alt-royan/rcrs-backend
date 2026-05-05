@@ -11,7 +11,7 @@ import org.ultra.rcrs.searchservice.service.SearchService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
+@RequestMapping
 public class SearchController {
 
     private final SearchService searchService;

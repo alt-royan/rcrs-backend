@@ -1,0 +1,50 @@
+server:
+  port: 8081
+
+
+spring:
+  application:
+    name: media-service
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    user: postgres
+    password: postgres
+    default-schema: rcrs_upload
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=rcrs_upload
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=rcrs_upload
+    username: postgres
+    password: postgres
+  kafka:
+    bootstrap-servers: localhost:9092
+  cloud:
+    aws:
+      credentials:
+        access-key: test
+        secret-key: test
+      region:
+        static: eu-west-1
+      endpoint: http://localhost.localstack.cloud:4566
+      s3:
+        path-style-access-enabled: true
+
+
+thumbnail:
+  sizes: 64,300,640
+  
+s3:
+  image-bucket: images
+  upload:
+    bucket: rcrs-upload
+    signature-duration: 24h
+    file-duration: 24h
+    sqs:
+      queue: rcrs-upload-queue
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    preferIpAddress: true
+

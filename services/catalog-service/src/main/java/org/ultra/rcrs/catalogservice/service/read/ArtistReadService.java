@@ -8,14 +8,11 @@ import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.dto.response.album.AlbumOfArtistDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistStandaloneDto;
-import org.ultra.rcrs.catalogservice.dto.response.track.TrackStandaloneDto;
 import org.ultra.rcrs.catalogservice.model.read.ArtistView;
 import org.ultra.rcrs.catalogservice.repository.read.ArtistAlbumViewRepository;
-import org.ultra.rcrs.catalogservice.repository.read.ArtistTrackViewRepository;
 import org.ultra.rcrs.catalogservice.repository.read.ArtistViewRepository;
 import org.ultra.rcrs.catalogservice.service.AlbumConverter;
 import org.ultra.rcrs.catalogservice.service.ArtistConverter;
-import org.ultra.rcrs.catalogservice.service.TrackConverter;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
@@ -35,10 +32,8 @@ public class ArtistReadService {
 
     private final ArtistViewRepository artistRepository;
     private final ArtistAlbumViewRepository artistAlbumViewRepository;
-    private final ArtistTrackViewRepository artistTrackViewRepository;
     private final ArtistConverter artistConverter;
     private final AlbumConverter albumConverter;
-    private final TrackConverter trackConverter;
 
     @Cacheable("artists")
     public Mono<ArtistDto> getArtist(UUID artistId) {
@@ -52,7 +47,6 @@ public class ArtistReadService {
                 .collect(Collectors.toMap(ArtistView::getId, Function.identity()))
                 .map(m -> ids.stream()
                         .map(m::get)
-                        .filter(Objects::nonNull)
                         .toList())
                 .map(l -> l.stream().map(artistConverter::toStandaloneDto).toList());
     }

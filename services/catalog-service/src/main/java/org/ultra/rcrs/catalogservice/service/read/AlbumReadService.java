@@ -49,7 +49,6 @@ public class AlbumReadService {
                 .collect(Collectors.toMap(AlbumView::getId, Function.identity()))
                 .map(m -> ids.stream()
                         .map(m::get)
-                        .filter(Objects::nonNull)
                         .toList())
                 .map(l -> l.stream().map(albumConverter::toStandaloneDto).toList());
     }

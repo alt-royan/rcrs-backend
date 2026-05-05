@@ -17,8 +17,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/tracks")
-@CrossOrigin("*")
+@RequestMapping(value = "/metadata/tracks")
 @ConditionalOnProperty(name = "app.read.enabled", havingValue = "true")
 public class TrackReadController {
 

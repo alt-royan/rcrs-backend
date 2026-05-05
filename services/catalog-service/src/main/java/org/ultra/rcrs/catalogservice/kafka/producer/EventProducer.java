@@ -9,6 +9,7 @@ import org.ultra.rcrs.catalogservice.service.IndexService;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.EntityType;
 import org.ultra.rcrs.kafka.Topics;
+import org.ultra.rcrs.kafka.events.IndexEntityEvent;
 import org.ultra.rcrs.kafka.events.StartTrackTranscodingEvent;
 import org.ultra.rcrs.kafka.events.UpdateEntityStatusEvent;
 import org.ultra.rcrs.utils.Url62;
@@ -42,6 +43,22 @@ public class EventProducer {
                         .map(event -> kafkaTemplate.send(Topics.CATALOG_UPDATE_ENTITY_STATUS_TOPIC, event))
                         .doOnNext(this::log)
                         .then());
+    }
+
+    public Mono<Void> trackDeleted(UUID trackId) {
+        return indexService.deleteIndexEvent(trackId, IndexEntityEvent.TRACK_DELETE)
+                .map(objectMapper::writeValueAsString)
+                .map(event -> kafkaTemplate.send(Topics.SEARCH_INDEX_TOPIC, UUID.randomUUID().toString(), event))
+                .doOnNext(this::log)
+                .then();
+    }
+
+    public Mono<Void> albumDeleted(UUID albumId) {
+        return indexService.deleteIndexEvent(albumId, IndexEntityEvent.ALBUM_DELETE)
+                .map(objectMapper::writeValueAsString)
+                .map(event -> kafkaTemplate.send(Topics.SEARCH_INDEX_TOPIC, UUID.randomUUID().toString(), event))
+                .doOnNext(this::log)
+                .then();
     }
 
     public Mono<Void> albumCreated(UUID albumId) {

@@ -8,11 +8,12 @@ import org.springframework.data.relational.core.query.Update;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import org.ultra.rcrs.catalogservice.model.write.Album;
-import org.ultra.rcrs.catalogservice.model.write.Track;
 import org.ultra.rcrs.catalogservice.repository.write.ReactiveAbstractWriteRepository;
 import org.ultra.rcrs.enums.EntityStatus;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.util.UUID;
 
 import static org.springframework.data.relational.core.query.Criteria.where;
@@ -27,7 +28,7 @@ public class AlbumRepository extends ReactiveAbstractWriteRepository<Album> {
 
     public Mono<Long> updateStatus(UUID id, EntityStatus status) {
         return template.update(Album.class)
-                .matching(query(where("id").is(id)))
+                .matching(query(where("id").is(id).and("status").not(status)))
                 .apply(Update.update("status", status));
     }
 
@@ -36,4 +37,26 @@ public class AlbumRepository extends ReactiveAbstractWriteRepository<Album> {
 
         return template.selectOne(query(where("id").is(id)), Album.class);
     }
+
+    public Mono<Boolean> albumHasStatus(@Nonnull UUID albumId, @Nonnull EntityStatus status) {
+        Assert.notNull(albumId, "albumId must not be null");
+        Assert.notNull(status, "status must not be null");
+
+        return template.selectOne(query(where("album_id").is(albumId)), Album.class)
+                .map(album -> status.equals(album.getStatus()));
+    }
+
+    public Flux<Album> findAllReadyForPublishing() {
+        return template.select(query(where("status").is(EntityStatus.READY_FOR_PUBLISHING)
+                .and("release_date").isNull()
+                .or("release_date").lessThan(Instant.now())), Album.class);
+    }
+
+    public Mono<Long> updateStatusAndReleaseDate(UUID id, EntityStatus status, Instant releaseDate) {
+        return template.update(Album.class)
+                .matching(query(where("id").is(id)))
+                .apply(Update.update("status", status).set("release_date", releaseDate));
+    }
+
+
 }

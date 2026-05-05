@@ -7,10 +7,33 @@ import org.springframework.stereotype.Repository;
 import org.ultra.rcrs.enums.FileStatus;
 import org.ultra.rcrs.mediaservice.dao.model.AudioUpload;
 
+import java.time.Instant;
+import java.util.List;
+
 @Repository
 public interface AudioUploadRepository extends JpaRepository<AudioUpload, String> {
 
     @Modifying
     @Query("UPDATE AudioUpload SET status=:status WHERE uid = :uid")
     void updateStatusByUid(FileStatus status, String uid);
+
+    @Modifying
+    @Query("UPDATE AudioUpload SET expiredAt=:expiredAt WHERE uid = :uid")
+    void updateExpiredAtByUid(Instant expiredAt, String uid);
+
+    @Modifying
+    @Query("UPDATE AudioUpload SET trackId=:trackId WHERE uid = :uid")
+    void updateTrackIdAtByUid(String trackId, String uid);
+
+    @Modifying
+    @Query("UPDATE AudioUpload SET status=:status, error=:error WHERE uid = :uid")
+    void updateStatusAndErrorByUid(FileStatus status, String error, String uid);
+
+    @Query("""
+            SELECT a.uid
+            FROM AudioUpload a
+            WHERE a.expiresAt IS NOT NULL
+              AND a.expiresAt < :now
+            """)
+    List<String> findAllExpired(Instant now);
 }

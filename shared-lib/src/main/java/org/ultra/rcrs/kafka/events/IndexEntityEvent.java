@@ -18,6 +18,10 @@ public class IndexEntityEvent {
     public static final String ALBUM_CREATE_BATCH = "albumCreate:Batch";
     public static final String TRACK_CREATE_BATCH = "trackCreate:Batch";
 
+    public static final String ARTIST_DELETE = "artistDelete";
+    public static final String ALBUM_DELETE = "albumDelete";
+    public static final String TRACK_DELETE = "trackDelete";
+
     private String eventType;
     private Object payload;
 

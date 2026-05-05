@@ -47,7 +47,6 @@ public class TrackReadService {
                 .collect(Collectors.toMap(TrackView::getId, Function.identity()))
                 .map(m -> ids.stream()
                         .map(m::get)
-                        .filter(Objects::nonNull)
                         .toList())
                 .map(l -> l.stream().map(trackConverter::toStandaloneDto).toList());
     }

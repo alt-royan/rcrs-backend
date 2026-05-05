@@ -3,16 +3,18 @@ package org.ultra.rcrs.catalogservice.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.repository.read.*;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.kafka.events.IndexEntityEvent;
+import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -88,6 +90,12 @@ public class IndexService {
         return trackViewRepository.findById(trackId)
                 .map(trackConverter::toIndex)
                 .map(json -> new IndexEntityEvent(IndexEntityEvent.TRACK_CREATE_SINGLE, json));
+    }
+
+    public Mono<IndexEntityEvent> deleteIndexEvent(UUID uuid, String event) {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("id", Url62.encode(uuid));
+        return Mono.just(new IndexEntityEvent(event, payload));
     }
 
 

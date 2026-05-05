@@ -19,9 +19,6 @@ spring:
     #local-datacenter: "my-datacenter-1"
     #schema-action: CREATE_IF_NOT_EXISTS
   kafka:
-    topic:
-      in: ${spring.application.name}-in
-      media-service: media-topic-in
     bootstrap-servers: localhost:9092
 
 cdn:
@@ -32,6 +29,12 @@ logging:
   level:
     root: INFO
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    preferIpAddress: true
 
 app:
   read:

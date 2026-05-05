@@ -11,10 +11,12 @@ import org.ultra.rcrs.catalogservice.dto.response.IdResponse;
 import org.ultra.rcrs.catalogservice.kafka.producer.EventProducer;
 import org.ultra.rcrs.catalogservice.model.write.Album;
 import org.ultra.rcrs.catalogservice.model.write.ArtistToAlbum;
+import org.ultra.rcrs.catalogservice.model.write.Track;
 import org.ultra.rcrs.catalogservice.repository.AfterCommit;
 import org.ultra.rcrs.catalogservice.repository.write.impl.AlbumRepository;
 import org.ultra.rcrs.catalogservice.repository.write.impl.ArtistRepository;
 import org.ultra.rcrs.catalogservice.repository.write.impl.ArtistToAlbumRepository;
+import org.ultra.rcrs.catalogservice.repository.write.impl.TrackRepository;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.exceptions.BadRequestException;
 import org.ultra.rcrs.exceptions.NotFoundException;
@@ -23,6 +25,7 @@ import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -38,6 +41,7 @@ public class AlbumWriteService {
     private final ArtistRepository artistRepository;
     private final ArtistToAlbumRepository artistToAlbumRepository;
     private final TrackWriteService trackWriteService;
+    private final TrackRepository trackRepository;
     private final S3Utils s3Utils;
     private final EventProducer eventProducer;
 
@@ -75,6 +79,18 @@ public class AlbumWriteService {
                                 .thenReturn(new IdResponse(Url62.encode(a.getId())))));
     }
 
+    @Transactional
+    public Mono<Void> deleteAlbum(UUID albumId) {
+        return trackRepository.findAllByAlbumId(albumId)
+                .flatMap(track -> trackWriteService.deleteTrack(track.getId()))
+                .collectList()
+                .flatMap(l -> artistToAlbumRepository.deleteByAlbumId(albumId))
+                .flatMap(l -> albumRepository.delete(albumId))
+                .flatMap(l -> AfterCommit.log("Album {} deleted", albumId)
+                        .then(AfterCommit.execute(eventProducer.albumDeleted(albumId)))
+                );
+    }
+
     private Mono<Void> checkArtists(List<ArtistIdDto> artists) {
         return Flux.fromIterable(artists)
                 .flatMap(a -> {
@@ -102,12 +118,25 @@ public class AlbumWriteService {
 
     @Transactional
     public Mono<Void> updateStatus(UUID albumId, EntityStatus status) {
-        return albumRepository.findById(albumId)
-                .filter(a -> !a.getStatus().equals(status))
-                .flatMap(a -> albumRepository.updateStatus(albumId, status)
-                        .flatMap(count ->
-                                AfterCommit.log("Update album {} status to {}: {} rows updated", albumId, status, count))
-                );
+        return albumRepository.updateStatus(albumId, status)
+                .flatMap(count ->
+                        AfterCommit.log("Update album {} status to {}: {} rows updated", albumId, status, count));
+    }
+
+    @Transactional
+    public Mono<Void> readyForPublishing(UUID albumId) {
+        return albumRepository.updateStatus(albumId, EntityStatus.READY_FOR_PUBLISHING)
+                .flatMap(count ->
+                        AfterCommit.log("Update album {} status to {}: {} rows updated", albumId, EntityStatus.READY_FOR_PUBLISHING, count))
+                .flatMap(v -> trackWriteService.updateStatusForAllInAlbum(albumId, EntityStatus.READY_FOR_PUBLISHING));
+    }
+
+    @Transactional
+    public Mono<Void> publishAlbum(UUID id) {
+        return albumRepository.updateStatusAndReleaseDate(id, EntityStatus.PUBLISHED, Instant.now())
+                .flatMap(c -> AfterCommit.log("Album {} published", id))
+                .flatMap(c -> trackRepository.findAllByAlbumId(id).map(Track::getId).collectList())
+                .flatMap(trackWriteService::publishTracks);
     }
 
 }

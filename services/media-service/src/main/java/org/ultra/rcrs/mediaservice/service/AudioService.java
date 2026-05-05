@@ -13,7 +13,10 @@ import org.ultra.rcrs.mediaservice.dto.FileStatusResponse;
 import org.ultra.rcrs.mediaservice.dto.PreloadFileRequest;
 import org.ultra.rcrs.mediaservice.dto.S3PresignUrlResponse;
 import org.ultra.rcrs.mediaservice.utils.Hash;
-import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.services.s3.model.ServerSideEncryption;
+import software.amazon.awssdk.services.s3.model.StorageClass;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
@@ -21,14 +24,14 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class FileService {
+public class AudioService {
 
 
     private final AudioUploadRepository audioUploadRepository;
@@ -42,7 +45,7 @@ public class FileService {
 
     @Transactional
     public S3PresignUrlResponse getPreSignUrl(PreloadFileRequest request) {
-        String key = Hash.sha1Base64(request.getName());
+        String key = Hash.sha1Base64(request.getName() + "_" + LocalDateTime.now());
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(s3UploadBucket)
@@ -89,7 +92,7 @@ public class FileService {
                 .build();
     }
 
-    public List<FileStatusResponse> getFilesStatus(List<String> uids) {
+    public List<FileStatusResponse> getAudioStatus(List<String> uids) {
         List<AudioUpload> files = audioUploadRepository.findAllById(uids);
         return files.stream().map(file -> new FileStatusResponse(file.getUid(), file.getStatus(), file.getError()))
                 .toList();

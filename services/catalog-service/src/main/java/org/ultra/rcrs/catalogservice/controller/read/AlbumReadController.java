@@ -20,8 +20,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/albums")
-@CrossOrigin("*")
+@RequestMapping(value = "/metadata/albums")
 @ConditionalOnProperty(name = "app.read.enabled", havingValue = "true")
 public class AlbumReadController {
 
