@@ -40,10 +40,10 @@ public class ImageService {
     private final S3Client s3Client;
     private final ExecutorService executor = Executors.newFixedThreadPool(3);
 
-    @Value("${thumbnail.sizes}")
+    @Value("${cdn.images.thumbnails}")
     private int[] thumbnailSizes;
 
-    @Value("${s3.image-bucket}")
+    @Value("${cdn.images.bucket}")
     private String s3ImageBucket;
 
     public ImageResponse uploadImage(String dataUrl) {

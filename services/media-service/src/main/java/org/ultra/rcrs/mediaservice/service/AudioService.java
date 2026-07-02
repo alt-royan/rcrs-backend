@@ -37,10 +37,10 @@ public class AudioService {
     private final AudioUploadRepository audioUploadRepository;
     private final S3Presigner s3Presigner;
 
-    @Value("${s3.upload.bucket}")
+    @Value("${cdn.uploads.bucket}")
     private String s3UploadBucket;
 
-    @Value("${s3.upload.signature-duration}")
+    @Value("${cdn.uploads.signature-duration}")
     private Duration duration;
 
     @Transactional
@@ -97,6 +97,5 @@ public class AudioService {
         return files.stream().map(file -> new FileStatusResponse(file.getUid(), file.getStatus(), file.getError()))
                 .toList();
     }
-
 
 }

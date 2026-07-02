@@ -21,10 +21,10 @@ public class SqsS3Listener {
 
     private final AudioUploadRepository audioUploadRepository;
 
-    @Value("${s3.upload.file-duration}")
+    @Value("${cdn.uploads.file-duration}")
     private Duration duration;
 
-    @SqsListener("${s3.upload.sqs.queue}")
+    @SqsListener("${cdn.uploads.sqs.queue}")
     @Transactional
     public void handleEventObjectPut(Message message) {
         log.info("Received: {}", message);

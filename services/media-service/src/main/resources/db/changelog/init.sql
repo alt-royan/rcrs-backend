@@ -10,3 +10,12 @@ CREATE TABLE IF NOT EXISTS audio_upload
     expires_at         timestamp,
     error              text
 );
+
+CREATE TABLE IF NOT EXISTS audio
+(
+    uid                text PRIMARY KEY,
+    original_file_name text NOT NULL,
+    track_id           text,
+    content_length     bigint,
+
+);

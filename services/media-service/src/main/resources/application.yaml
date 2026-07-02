@@ -1,7 +1,6 @@
 server:
   port: 8081
 
-
 spring:
   application:
     name: media-service
@@ -28,13 +27,14 @@ spring:
       s3:
         path-style-access-enabled: true
 
-
-thumbnail:
-  sizes: 64,300,640
-  
-s3:
-  image-bucket: images
-  upload:
+cdn:
+  images:
+    bucket: images
+    thumbnails: 64,300,640
+  audios:
+    bucket: rcrs-audio
+    qualities: 3,5,7
+  uploads:
     bucket: rcrs-upload
     signature-duration: 24h
     file-duration: 24h

@@ -30,24 +30,24 @@ services:
     networks:
       - odfe-net
     restart: unless-stopped
-  kibana:
-    image: kibana:9.2.5
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "100m"
-        max-file: "3"
-    container_name: odfe-kibana
-    ports:
-      - "5601:5601"
-    expose:
-      - "5601"
-    environment:
-      ELASTICSEARCH_URL: http://odfe-node:9200
-      ELASTICSEARCH_HOSTS: http://odfe-node:9200
-    restart: unless-stopped
-    networks:
-      - odfe-net
+#  kibana:
+#    image: kibana:9.2.5
+#    logging:
+#      driver: "json-file"
+#      options:
+#        max-size: "100m"
+#        max-file: "3"
+#    container_name: odfe-kibana
+#    ports:
+#      - "5601:5601"
+#    expose:
+#      - "5601"
+#    environment:
+#      ELASTICSEARCH_URL: http://odfe-node:9200
+#      ELASTICSEARCH_HOSTS: http://odfe-node:9200
+#    restart: unless-stopped
+#    networks:
+#      - odfe-net
 #  logstash:
 #    user: root
 #    image: docker.elastic.co/logstash/logstash-oss:7.9.1

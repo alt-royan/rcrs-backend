@@ -35,7 +35,7 @@ public class SearchService {
     private final CatalogClient catalogClient;
 
     public SearchResponse search(SearchType[] types, String query, int page, int size, boolean onlyPublished, HttpServletRequest request) {
-        log.info("Searching with types {},  query: {} with offset: {} limit: {}", types, query, page, size);
+        log.debug("Searching with types {}, query: {}, offset: {}, limit: {}", types, query, page, size);
 
         SearchResponse response = new SearchResponse();
 

@@ -52,7 +52,6 @@ public class StatusService {
         return mono;
     }
 
-
     private Mono<Album> getAlbumForTrack(UUID trackId) {
         return trackRepository.findById(trackId)
                 .flatMap(t -> albumRepository.findById(t.getAlbumId()));
