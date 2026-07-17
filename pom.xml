@@ -35,7 +35,8 @@
         <module>shared-lib</module>
         <module>discovery-server</module>
         <module>gateway-api</module>
-        <module>services/catalog-service</module>
+        <module>services/catalog-write-service</module>
+        <module>services/catalog-read-service</module>
         <module>services/media-service</module>
         <module>services/search-service</module>
     </modules>

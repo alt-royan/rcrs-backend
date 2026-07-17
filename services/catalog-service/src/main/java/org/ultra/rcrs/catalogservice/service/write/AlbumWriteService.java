@@ -125,10 +125,10 @@ public class AlbumWriteService {
 
     @Transactional
     public Mono<Void> readyForPublishing(UUID albumId) {
-        return albumRepository.updateStatus(albumId, EntityStatus.READY_FOR_PUBLISHING)
+        return albumRepository.updateStatus(albumId, EntityStatus.READY)
                 .flatMap(count ->
-                        AfterCommit.log("Update album {} status to {}: {} rows updated", albumId, EntityStatus.READY_FOR_PUBLISHING, count))
-                .flatMap(v -> trackWriteService.updateStatusForAllInAlbum(albumId, EntityStatus.READY_FOR_PUBLISHING));
+                        AfterCommit.log("Update album {} status to {}: {} rows updated", albumId, EntityStatus.READY, count))
+                .flatMap(v -> trackWriteService.updateStatusForAllInAlbum(albumId, EntityStatus.READY));
     }
 
     @Transactional

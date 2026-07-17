@@ -23,7 +23,7 @@ public class StatusService {
 
     public Mono<Void> updateTrackStatus(UUID trackId, EntityStatus status) {
         Mono<Void> mono = Mono.empty();
-        if (EntityStatus.QUEUED_FOR_TRANSCODING.equals(status) || EntityStatus.TRANSCODING.equals(status)) {
+        if ( EntityStatus.TRANSCODING.equals(status)) {
             mono = trackWriteService.updateStatus(trackId, status)
                     .flatMap(v -> trackRepository.findById(trackId)
                             .flatMap(t -> albumWriteService.updateStatus(t.getAlbumId(), EntityStatus.TRANSCODING)));
@@ -31,10 +31,10 @@ public class StatusService {
             mono = trackWriteService.updateStatus(trackId, status)
                     .flatMap(v -> trackRepository.findById(trackId)
                             .flatMap(t -> albumWriteService.updateStatus(t.getAlbumId(), status)));
-        } else if (EntityStatus.TRANSCODING_SUCCESS.equals(status)) {
+        } else if (EntityStatus.READY.equals(status)) {
             mono = getAlbumForTrack(trackId).flatMap(album -> {
                 if (isAlbumPublished(album)) {
-                    return trackWriteService.updateStatus(trackId, EntityStatus.READY_FOR_PUBLISHING);
+                    return trackWriteService.updateStatus(trackId, EntityStatus.READY);
                 } else {
                     return trackWriteService.updateStatus(trackId, status)
                             .flatMap(v -> isThisLastTranscodeTrack(album.getId())
@@ -62,7 +62,7 @@ public class StatusService {
     }
 
     private Mono<Boolean> isThisLastTranscodeTrack(UUID albumId) {
-        return trackRepository.allTracksInAlbumHaveStatus(albumId, EntityStatus.TRANSCODING_SUCCESS);
+        return trackRepository.allTracksInAlbumHaveStatus(albumId, EntityStatus.READY);
     }
 
 }

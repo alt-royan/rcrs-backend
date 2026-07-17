@@ -38,7 +38,7 @@ public class EventProducer {
                         .map(objectMapper::writeValueAsString)
                         .map(event -> kafkaTemplate.send(Topics.MEDIA_START_TRACK_TRANSCODING_TOPIC, event))
                         .doOnNext(this::log)
-                ).then(Mono.just(new UpdateEntityStatusEvent(Url62.encode(trackId), EntityType.TRACK, EntityStatus.QUEUED_FOR_TRANSCODING))
+                ).then(Mono.just(new UpdateEntityStatusEvent(Url62.encode(trackId), EntityType.TRACK, EntityStatus.TRANSCODING))
                         .map(objectMapper::writeValueAsString)
                         .map(event -> kafkaTemplate.send(Topics.CATALOG_UPDATE_ENTITY_STATUS_TOPIC, event))
                         .doOnNext(this::log)

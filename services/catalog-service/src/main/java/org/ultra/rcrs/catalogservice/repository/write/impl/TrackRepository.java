@@ -77,7 +77,7 @@ public class TrackRepository extends ReactiveAbstractWriteRepository<Track> {
     }
 
     public Flux<Track> findAllReadyForPublishing() {
-        return template.select(query(where("status").is(EntityStatus.READY_FOR_PUBLISHING)
+        return template.select(query(where("status").is(EntityStatus.READY)
                 .and("release_date").isNull()
                 .or("release_date").lessThan(Instant.now())), Track.class);
     }

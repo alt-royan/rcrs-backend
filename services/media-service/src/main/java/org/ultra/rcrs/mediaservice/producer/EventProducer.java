@@ -31,7 +31,7 @@ public class EventProducer {
     }
 
     public void successTranscoding(String trackId) {
-        updateTrackStatus(trackId, EntityStatus.TRANSCODING_SUCCESS);
+        updateTrackStatus(trackId, EntityStatus.READY);
     }
 
     public void updateTrackStatus(String trackId, EntityStatus status) {

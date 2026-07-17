@@ -47,7 +47,7 @@ public class AlbumRepository extends ReactiveAbstractWriteRepository<Album> {
     }
 
     public Flux<Album> findAllReadyForPublishing() {
-        return template.select(query(where("status").is(EntityStatus.READY_FOR_PUBLISHING)
+        return template.select(query(where("status").is(EntityStatus.READY)
                 .and("release_date").isNull()
                 .or("release_date").lessThan(Instant.now())), Album.class);
     }
