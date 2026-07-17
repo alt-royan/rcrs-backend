@@ -32,6 +32,7 @@ public class TrackDocument {
     @Data
     @AllArgsConstructor
     @NoArgsConstructor
+    @Builder
     public static class AlbumEmbed {
         private String id;
         private String title;

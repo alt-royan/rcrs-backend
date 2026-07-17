@@ -52,6 +52,6 @@ public class AlbumDocument {
         private Integer trackNumber;
         private Boolean explicit;
         private Boolean available;
-        private List<ArtistEmbed> artists;
+        private List<TrackDocument.ArtistEmbed> artists;
     }
 }
