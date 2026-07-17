@@ -24,9 +24,9 @@ public class PublishScheduler {
 
     @Scheduled(fixedRate = 60000)
     public void schedulePublish() {
-        albumRepository.findAllReadyForPublishing(LifecycleStatus.READY_FOR_PUBLISHING, java.time.Instant.now())
+        albumRepository.findAllReadyForPublishing(LifecycleStatus.READY, java.time.Instant.now())
                 .forEach(album -> albumWriteService.publishAlbum(album.getId()));
-        trackRepository.findAllReadyForPublishing(LifecycleStatus.READY_FOR_PUBLISHING, java.time.Instant.now())
+        trackRepository.findAllReadyForPublishing(LifecycleStatus.READY, java.time.Instant.now())
                 .forEach(track -> trackWriteService.publishTrack(track.getId()));
     }
 }
