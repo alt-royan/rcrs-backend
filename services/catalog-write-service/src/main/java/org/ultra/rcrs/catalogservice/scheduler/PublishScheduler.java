@@ -7,8 +7,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.catalogservice.repository.write.AlbumRepository;
 import org.ultra.rcrs.catalogservice.repository.write.TrackRepository;
-import org.ultra.rcrs.catalogservice.service.write.AlbumWriteService;
-import org.ultra.rcrs.catalogservice.service.write.TrackWriteService;
+import org.ultra.rcrs.catalogservice.service.AlbumWriteService;
+import org.ultra.rcrs.catalogservice.service.TrackWriteService;
 import org.ultra.rcrs.enums.LifecycleStatus;
 
 @Component

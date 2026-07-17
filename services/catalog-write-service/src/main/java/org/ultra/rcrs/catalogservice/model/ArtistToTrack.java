@@ -1,4 +1,4 @@
-package org.ultra.rcrs.catalogservice.model.write;
+package org.ultra.rcrs.catalogservice.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

@@ -1,17 +1,28 @@
 package org.ultra.rcrs.catalogservice.dto.response.artist;
 
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Data;
-import org.ultra.rcrs.catalogservice.dto.SocialLinkDto;
+import org.ultra.rcrs.catalogservice.model.SocialLinks;
+import org.ultra.rcrs.catalogservice.model.converter.SocialLinksConverter;
 
-import java.util.List;
+import java.util.UUID;
 
 @Data
 @Builder
 public class ArtistDto {
 
-    private String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(name = "name", nullable = false)
     private String name;
-    private String avatarUrl;
-    private List<SocialLinkDto> socialLinks;
+
+    @Column(name = "avatar_s3_key")
+    private String avatarS3Key;
+
+    @Column(name = "social_links")
+    @Convert(converter = SocialLinksConverter.class)
+    private SocialLinks socialLinks;
 }

@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.ultra.rcrs.catalogservice.model.write.*;
+import org.ultra.rcrs.catalogservice.model.Artist;
 import org.ultra.rcrs.catalogservice.repository.write.*;
 import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.kafka.events.CatalogCdcEvent;

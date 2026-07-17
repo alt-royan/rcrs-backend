@@ -1,4 +1,4 @@
-package org.ultra.rcrs.catalogservice.model.write;
+package org.ultra.rcrs.catalogservice.model.converter;
 
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;

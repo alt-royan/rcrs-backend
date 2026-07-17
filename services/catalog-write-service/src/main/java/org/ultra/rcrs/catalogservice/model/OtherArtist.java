@@ -1,4 +1,4 @@
-package org.ultra.rcrs.catalogservice.model.write;
+package org.ultra.rcrs.catalogservice.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -7,7 +7,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.ultra.rcrs.catalogservice.dto.OtherArtistDto;
-import org.ultra.rcrs.catalogservice.model.SocialLinks;
+import org.ultra.rcrs.catalogservice.model.converter.ArtistRolesConverter;
+import org.ultra.rcrs.catalogservice.model.converter.SocialLinksConverter;
 import org.ultra.rcrs.enums.ArtistRole;
 
 import java.util.Set;

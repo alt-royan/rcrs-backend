@@ -1,4 +1,4 @@
-package org.ultra.rcrs.catalogservice.service.write;
+package org.ultra.rcrs.catalogservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,14 +8,13 @@ import org.ultra.rcrs.catalogservice.dto.request.AlbumUploadRequest;
 import org.ultra.rcrs.catalogservice.dto.request.ArtistIdDto;
 import org.ultra.rcrs.catalogservice.dto.request.TrackUploadRequest;
 import org.ultra.rcrs.catalogservice.dto.response.IdResponse;
-import org.ultra.rcrs.catalogservice.model.write.Album;
-import org.ultra.rcrs.catalogservice.model.write.ArtistToAlbum;
-import org.ultra.rcrs.catalogservice.model.write.Track;
+import org.ultra.rcrs.catalogservice.model.Album;
+import org.ultra.rcrs.catalogservice.model.ArtistToAlbum;
+import org.ultra.rcrs.catalogservice.model.Track;
 import org.ultra.rcrs.catalogservice.repository.write.AlbumRepository;
 import org.ultra.rcrs.catalogservice.repository.write.ArtistRepository;
 import org.ultra.rcrs.catalogservice.repository.write.ArtistToAlbumRepository;
 import org.ultra.rcrs.catalogservice.repository.write.TrackRepository;
-import org.ultra.rcrs.catalogservice.service.CdcService;
 import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.BadRequestException;
 import org.ultra.rcrs.exceptions.NotFoundException;
@@ -108,8 +107,8 @@ public class AlbumWriteService {
 
     @Transactional
     public void updateStatus(UUID albumId, LifecycleStatus status) {
-        int count = albumRepository.updateStatus(albumId, status);
-        log.info("Update album {} status to {}: {} rows updated", albumId, status, count);
+        albumRepository.updateStatus(albumId, status);
+        log.info("Update album {} status to {}", albumId, status);
     }
 
     @Transactional

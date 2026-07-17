@@ -3,11 +3,9 @@ package org.ultra.rcrs.catalogservice.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.ultra.rcrs.catalogservice.model.write.Album;
+import org.ultra.rcrs.catalogservice.model.Album;
 import org.ultra.rcrs.catalogservice.repository.write.AlbumRepository;
 import org.ultra.rcrs.catalogservice.repository.write.TrackRepository;
-import org.ultra.rcrs.catalogservice.service.write.AlbumWriteService;
-import org.ultra.rcrs.catalogservice.service.write.TrackWriteService;
 import org.ultra.rcrs.enums.LifecycleStatus;
 
 import java.util.UUID;

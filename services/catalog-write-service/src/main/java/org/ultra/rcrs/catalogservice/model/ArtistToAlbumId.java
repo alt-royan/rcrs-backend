@@ -1,4 +1,4 @@
-package org.ultra.rcrs.catalogservice.model.write;
+package org.ultra.rcrs.catalogservice.model;
 
 import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
@@ -11,11 +11,11 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ArtistToTrackId implements Serializable {
+public class ArtistToAlbumId implements Serializable {
 
     @Column(name = "artist_id")
     private UUID artistId;
 
-    @Column(name = "track_id")
-    private UUID trackId;
+    @Column(name = "album_id")
+    private UUID albumId;
 }

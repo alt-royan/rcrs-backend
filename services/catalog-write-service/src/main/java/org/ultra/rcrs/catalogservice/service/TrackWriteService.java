@@ -1,4 +1,4 @@
-package org.ultra.rcrs.catalogservice.service.write;
+package org.ultra.rcrs.catalogservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,14 +7,13 @@ import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.catalogservice.dto.OtherArtistDto;
 import org.ultra.rcrs.catalogservice.dto.request.ArtistIdDto;
 import org.ultra.rcrs.catalogservice.dto.request.TrackUploadRequest;
-import org.ultra.rcrs.catalogservice.model.write.ArtistToTrack;
-import org.ultra.rcrs.catalogservice.model.write.OtherArtist;
-import org.ultra.rcrs.catalogservice.model.write.Track;
+import org.ultra.rcrs.catalogservice.model.ArtistToTrack;
+import org.ultra.rcrs.catalogservice.model.OtherArtist;
+import org.ultra.rcrs.catalogservice.model.Track;
 import org.ultra.rcrs.catalogservice.repository.write.ArtistRepository;
 import org.ultra.rcrs.catalogservice.repository.write.ArtistToTrackRepository;
 import org.ultra.rcrs.catalogservice.repository.write.OtherArtistRepository;
 import org.ultra.rcrs.catalogservice.repository.write.TrackRepository;
-import org.ultra.rcrs.catalogservice.service.CdcService;
 import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.utils.Url62;
@@ -98,8 +97,8 @@ public class TrackWriteService {
 
     @Transactional
     public void updateStatus(UUID trackId, LifecycleStatus status) {
-        int count = trackRepository.updateStatusByIds(List.of(trackId), status);
-        log.info("Update track {} status to {}: {} rows updated", trackId, status, count);
+        trackRepository.updateStatusByIds(List.of(trackId), status);
+        log.info("Update track {} status to {}", trackId, status);
     }
 
     @Transactional

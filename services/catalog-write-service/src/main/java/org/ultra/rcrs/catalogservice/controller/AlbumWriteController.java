@@ -1,12 +1,13 @@
-package org.ultra.rcrs.catalogservice.controller.write;
+package org.ultra.rcrs.catalogservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.catalogservice.dto.request.AlbumUploadRequest;
+import org.ultra.rcrs.catalogservice.dto.request.StatusDto;
 import org.ultra.rcrs.catalogservice.dto.response.IdResponse;
-import org.ultra.rcrs.catalogservice.service.write.AlbumWriteService;
+import org.ultra.rcrs.catalogservice.service.AlbumWriteService;
 import org.ultra.rcrs.utils.Url62;
 
 @RestController
@@ -19,6 +20,12 @@ public class AlbumWriteController {
     @PostMapping
     public ResponseEntity<IdResponse> createAlbum(@RequestBody @Validated AlbumUploadRequest request) {
         return ResponseEntity.ok(albumWriteService.createAlbum(request));
+    }
+
+    @PostMapping("/{albumId}/status")
+    public ResponseEntity<Void> updateAlbumStatus(@RequestBody @Validated StatusDto statusDto, @PathVariable("albumId") String albumId) {
+        albumWriteService.updateStatus(Url62.decode(albumId), statusDto.getStatus());
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{albumId}")

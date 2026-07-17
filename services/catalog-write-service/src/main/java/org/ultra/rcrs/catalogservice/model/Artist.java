@@ -1,4 +1,4 @@
-package org.ultra.rcrs.catalogservice.model.write;
+package org.ultra.rcrs.catalogservice.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.ultra.rcrs.catalogservice.model.SocialLinks;
+import org.ultra.rcrs.catalogservice.model.converter.SocialLinksConverter;
 
 import java.util.UUID;
 
@@ -20,7 +20,7 @@ import java.util.UUID;
 public class Artist {
 
     @Id
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "name", nullable = false)
