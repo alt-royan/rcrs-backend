@@ -32,6 +32,9 @@ public class AudioUpload {
     @Column(name = "content_length")
     private Long contentLength;
 
+    @Column(name = "content_type")
+    private String contentType;
+
     @Column(name = "expires_at")
     private Instant expiresAt;
 

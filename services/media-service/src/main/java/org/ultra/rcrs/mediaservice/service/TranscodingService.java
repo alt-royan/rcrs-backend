@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.ultra.rcrs.enums.FileStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.kafka.events.StartTrackTranscodingEvent;
@@ -29,6 +30,7 @@ public class TranscodingService {
 
     private final EventProducer eventProducer;
     private final AudioUploadRepository audioUploadRepository;
+    private final TransactionTemplate transactionTemplate;
     private final S3Client s3Client;
 
     @Value("${cdn.uploads.bucket}")
@@ -45,9 +47,11 @@ public class TranscodingService {
         String uid = event.getUid();
         AudioUpload audioUpload = audioUploadRepository.findById(uid)
                 .orElseThrow(() -> new NotFoundException("Audio file", uid));
-        audioUploadRepository.updateStatusByUid(FileStatus.TRANSCODING, uid);
-        audioUploadRepository.updateExpiredAtByUid(null, uid);
-        audioUploadRepository.updateTrackIdAtByUid(event.getTrackId(), uid);
+        transactionTemplate.executeWithoutResult(status -> {
+            audioUploadRepository.updateStatusByUid(FileStatus.TRANSCODING, uid);
+            audioUploadRepository.updateExpiredAtByUid(null, uid);
+            audioUploadRepository.updateTrackIdAtByUid(event.getTrackId(), uid);
+        });
         eventProducer.startTranscoding(event.getTrackId());
         try {
             ProcessBuilder pb;
@@ -61,26 +65,27 @@ public class TranscodingService {
             log.error("Error during transcoding file with uid {}: {}", uid, e.getMessage());
             audioUploadRepository.updateStatusAndErrorByUid(FileStatus.FAILED, e.getMessage(), uid);
             eventProducer.failedTranscoding(event.getTrackId());
-            throw e;
+            throw new RuntimeException(e);
         }
     }
 
     private void processS3Audio(String inputBucket, String inputKey, String outputBucket, String outputKey, ProcessBuilder pb) throws IOException, InterruptedException {
-            Process process = pb.start();
-            ResponseInputStream<GetObjectResponse> s3Stream = s3Client.getObject(
-                    GetObjectRequest.builder().bucket(inputBucket).key(inputKey).build());
-            OutputStream processStdIn = process.getOutputStream();
+        ResponseInputStream<GetObjectResponse> s3Stream = s3Client.getObject(
+                GetObjectRequest.builder().bucket(inputBucket).key(inputKey).build());
 
-            s3Stream.transferTo(processStdIn);
-            processStdIn.flush();
+        Process process = pb.start();
+        OutputStream processStdIn = process.getOutputStream();
 
-            process.waitFor();
-            var bytes = process.getInputStream().readAllBytes();
-            s3Client.putObject(PutObjectRequest.builder()
-                    .bucket(outputBucket)
-                    .key(outputKey)
-                    .contentType("audio/ogg")
-                    .build(), RequestBody.fromBytes(bytes));
+        s3Stream.transferTo(processStdIn);
+        processStdIn.flush();
+
+        process.waitFor();
+        var bytes = process.getInputStream().readAllBytes();
+        s3Client.putObject(PutObjectRequest.builder()
+                .bucket(outputBucket)
+                .key(outputKey)
+                .contentType("audio/ogg")
+                .build(), RequestBody.fromBytes(bytes));
     }
 
     private ProcessBuilder createFfmpegProcess(int quality) {
