@@ -5,9 +5,8 @@ import lombok.Data;
 import org.ultra.rcrs.catalogservice.dto.OtherArtistDto;
 import org.ultra.rcrs.catalogservice.dto.response.album.AlbumSimpleDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistOnTrackDto;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -17,7 +16,7 @@ public class TrackFullDto {
 
     private String id;
 
-    private EntityStatus status;
+    private LifecycleStatus status;
 
     private String title;
 

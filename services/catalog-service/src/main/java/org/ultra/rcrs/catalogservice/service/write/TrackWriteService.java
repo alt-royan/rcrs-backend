@@ -16,7 +16,7 @@ import org.ultra.rcrs.catalogservice.repository.write.impl.ArtistRepository;
 import org.ultra.rcrs.catalogservice.repository.write.impl.ArtistToTrackRepository;
 import org.ultra.rcrs.catalogservice.repository.write.impl.OtherArtistRepository;
 import org.ultra.rcrs.catalogservice.repository.write.impl.TrackRepository;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Flux;
@@ -48,7 +48,7 @@ public class TrackWriteService {
         return checkArtists(uploadRequest.getArtists())
                 .then(trackRepository.insert(Track.builder()
                                 .id(trackId)
-                                .status(EntityStatus.CREATED)
+                                .status(LifecycleStatus.CREATED)
                                 .title(uploadRequest.getTitle())
                                 .releaseDate(uploadRequest.getReleaseDate())
                                 .durationMs(0)
@@ -107,14 +107,14 @@ public class TrackWriteService {
     }
 
     @Transactional
-    public Mono<Void> updateStatus(UUID trackId, EntityStatus status) {
+    public Mono<Void> updateStatus(UUID trackId, LifecycleStatus status) {
         return trackRepository.updateStatus(trackId, status)
                 .flatMap(count ->
                         AfterCommit.log("Update track {} status to {}: {} rows updated", trackId, status, count));
     }
 
     @Transactional
-    public Mono<Void> updateStatusForAllInAlbum(UUID albumId, EntityStatus status) {
+    public Mono<Void> updateStatusForAllInAlbum(UUID albumId, LifecycleStatus status) {
         return trackRepository.updateStatusForAllInAlbum(albumId, status)
                 .flatMap(count ->
                         AfterCommit.log("Update status to {} for all tracks in album {}: {} rows updated", status, albumId, count));
@@ -122,7 +122,7 @@ public class TrackWriteService {
 
     @Transactional
     public Mono<Void> publishTrack(UUID id) {
-        return trackRepository.updateStatusAndReleaseDate(id, EntityStatus.PUBLISHED, Instant.now())
+        return trackRepository.updateStatusAndReleaseDate(id, LifecycleStatus.PUBLISHED, Instant.now())
                 .flatMap(c -> AfterCommit.log("Track {} published", id));
     }
 

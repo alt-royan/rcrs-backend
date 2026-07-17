@@ -12,7 +12,7 @@ import org.ultra.rcrs.catalogservice.dto.response.track.TrackInAlbumDto;
 import org.ultra.rcrs.catalogservice.model.read.AlbumView;
 import org.ultra.rcrs.catalogservice.model.read.ArtistAlbumView;
 import org.ultra.rcrs.catalogservice.model.read.TrackWithoutAlbumView;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.utils.S3Utils;
 import org.ultra.rcrs.utils.Url62;
 
@@ -108,7 +108,7 @@ public class AlbumConverter {
         index.put("id", Url62.encode(album.getId()));
         index.put("title", album.getTitle());
         index.put("year", album.getYear());
-        index.put("published", album.getStatus() == EntityStatus.PUBLISHED);
+        index.put("published", album.getStatus() == LifecycleStatus.PUBLISHED);
         index.put("tracks", tr);
         index.put("artists", artists);
         return index;

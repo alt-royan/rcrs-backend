@@ -8,7 +8,7 @@ import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import org.ultra.rcrs.catalogservice.model.read.TrackWithoutAlbumView;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -23,7 +23,7 @@ public class TrackWithoutAlbumViewRepository {
 
     private final R2dbcEntityTemplate template;
 
-    public Flux<TrackWithoutAlbumView> findAllByAlbumIdAndStatusId(@Nonnull UUID albumId, @Nonnull List<EntityStatus> statuses) {
+    public Flux<TrackWithoutAlbumView> findAllByAlbumIdAndStatusId(@Nonnull UUID albumId, @Nonnull List<LifecycleStatus> statuses) {
         Assert.notNull(albumId, "albumId must not be null");
         Assert.notNull(statuses, "statuses must not be null");
 

@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.ultra.rcrs.enums.AlbumType;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -27,7 +27,7 @@ public class Album {
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private EntityStatus status;
+    private LifecycleStatus status;
 
     @Column(name = "title", nullable = false)
     private String title;

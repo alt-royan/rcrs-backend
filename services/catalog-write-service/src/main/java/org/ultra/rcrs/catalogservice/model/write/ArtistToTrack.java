@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.ultra.rcrs.enums.ArtistRole;
 
+import java.util.UUID;
+
 @Getter
 @Setter
 @Builder

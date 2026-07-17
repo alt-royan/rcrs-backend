@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.catalogservice.repository.read.*;
 import org.ultra.rcrs.enums.ArtistRole;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.kafka.events.IndexEntityEvent;
 import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Flux;
@@ -37,8 +37,8 @@ public class IndexService {
 
     public Flux<IndexEntityEvent> createArtistIndexEvents(int batchSize) {
         return artistViewRepository.findAll()
-                .flatMap(a -> artistAlbumViewRepository.findAllByArtist(a.getId(), List.of(EntityStatus.PUBLISHED), ArtistRole.MAIN_ARTIST).collectList()
-                        .zipWith(artistTrackViewRepository.findAllByArtist(a.getId(), List.of(EntityStatus.PUBLISHED)).collectList())
+                .flatMap(a -> artistAlbumViewRepository.findAllByArtist(a.getId(), List.of(LifecycleStatus.PUBLISHED), ArtistRole.MAIN_ARTIST).collectList()
+                        .zipWith(artistTrackViewRepository.findAllByArtist(a.getId(), List.of(LifecycleStatus.PUBLISHED)).collectList())
                         .map(tuple -> {
                             var albums = tuple.getT1();
                             var tracks = tuple.getT2();
@@ -67,8 +67,8 @@ public class IndexService {
 
     public Mono<IndexEntityEvent> createArtistIndexEvent(UUID artistId) {
         return artistViewRepository.findById(artistId)
-                .zipWith(artistAlbumViewRepository.findAllByArtist(artistId, List.of(EntityStatus.PUBLISHED), ArtistRole.MAIN_ARTIST).collectList())
-                .zipWith(artistTrackViewRepository.findAllByArtist(artistId, List.of(EntityStatus.PUBLISHED)).collectList())
+                .zipWith(artistAlbumViewRepository.findAllByArtist(artistId, List.of(LifecycleStatus.PUBLISHED), ArtistRole.MAIN_ARTIST).collectList())
+                .zipWith(artistTrackViewRepository.findAllByArtist(artistId, List.of(LifecycleStatus.PUBLISHED)).collectList())
                 .map(tuple -> {
                     var artist = tuple.getT1().getT1();
                     var albums = tuple.getT1().getT2();

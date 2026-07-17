@@ -9,13 +9,11 @@ import org.ultra.rcrs.catalogservice.dto.SocialLinkDto;
 import org.ultra.rcrs.catalogservice.dto.response.album.AlbumOfArtistDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistDto;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistStandaloneDto;
-import org.ultra.rcrs.catalogservice.model.AlbumDocument;
-import org.ultra.rcrs.catalogservice.model.ArtistDocument;
 import org.ultra.rcrs.catalogservice.repository.AlbumDocumentRepository;
 import org.ultra.rcrs.catalogservice.repository.ArtistDocumentRepository;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import reactor.core.publisher.Mono;
 
@@ -61,7 +59,7 @@ public class ArtistReadService {
                 });
     }
 
-    public Mono<List<AlbumOfArtistDto>> getAlbumsForArtist(UUID artistId, List<EntityStatus> statuses, ArtistRole role, AlbumType type, Sort.Direction direction) {
+    public Mono<List<AlbumOfArtistDto>> getAlbumsForArtist(UUID artistId, List<LifecycleStatus> statuses, ArtistRole role, AlbumType type, Sort.Direction direction) {
         direction = direction == null ? Sort.Direction.DESC : direction;
         List<String> statusNames = statuses.stream().map(Enum::name).toList();
         return albumDocumentRepository.findByArtistsIdAndStatusIn(artistId.toString(), statusNames, Sort.by(direction, "releaseDate"))
@@ -81,7 +79,7 @@ public class ArtistReadService {
                     return AlbumOfArtistDto.builder()
                             .id(a.getId())
                             .artistRole(artistRole)
-                            .status(a.getStatus() != null ? EntityStatus.valueOf(a.getStatus()) : null)
+                            .status(a.getStatus() != null ? LifecycleStatus.valueOf(a.getStatus()) : null)
                             .title(a.getTitle())
                             .type(albumType)
                             .releaseDate(a.getReleaseDate() != null && !a.getReleaseDate().isEmpty()

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import org.ultra.rcrs.catalogservice.model.write.Album;
 import org.ultra.rcrs.catalogservice.repository.write.ReactiveAbstractWriteRepository;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -26,7 +26,7 @@ public class AlbumRepository extends ReactiveAbstractWriteRepository<Album> {
         super(template, Album.class);
     }
 
-    public Mono<Long> updateStatus(UUID id, EntityStatus status) {
+    public Mono<Long> updateStatus(UUID id, LifecycleStatus status) {
         return template.update(Album.class)
                 .matching(query(where("id").is(id).and("status").not(status)))
                 .apply(Update.update("status", status));
@@ -38,7 +38,7 @@ public class AlbumRepository extends ReactiveAbstractWriteRepository<Album> {
         return template.selectOne(query(where("id").is(id)), Album.class);
     }
 
-    public Mono<Boolean> albumHasStatus(@Nonnull UUID albumId, @Nonnull EntityStatus status) {
+    public Mono<Boolean> albumHasStatus(@Nonnull UUID albumId, @Nonnull LifecycleStatus status) {
         Assert.notNull(albumId, "albumId must not be null");
         Assert.notNull(status, "status must not be null");
 
@@ -47,12 +47,12 @@ public class AlbumRepository extends ReactiveAbstractWriteRepository<Album> {
     }
 
     public Flux<Album> findAllReadyForPublishing() {
-        return template.select(query(where("status").is(EntityStatus.READY)
+        return template.select(query(where("status").is(LifecycleStatus.READY)
                 .and("release_date").isNull()
                 .or("release_date").lessThan(Instant.now())), Album.class);
     }
 
-    public Mono<Long> updateStatusAndReleaseDate(UUID id, EntityStatus status, Instant releaseDate) {
+    public Mono<Long> updateStatusAndReleaseDate(UUID id, LifecycleStatus status, Instant releaseDate) {
         return template.update(Album.class)
                 .matching(query(where("id").is(id)))
                 .apply(Update.update("status", status).set("release_date", releaseDate));

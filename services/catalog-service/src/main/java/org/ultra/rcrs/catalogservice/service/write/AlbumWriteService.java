@@ -17,7 +17,7 @@ import org.ultra.rcrs.catalogservice.repository.write.impl.AlbumRepository;
 import org.ultra.rcrs.catalogservice.repository.write.impl.ArtistRepository;
 import org.ultra.rcrs.catalogservice.repository.write.impl.ArtistToAlbumRepository;
 import org.ultra.rcrs.catalogservice.repository.write.impl.TrackRepository;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.BadRequestException;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.utils.S3Utils;
@@ -65,7 +65,7 @@ public class AlbumWriteService {
         return checkArtists(request.getArtists())
                 .then(albumRepository.insert(Album.builder()
                                 .id(albumId)
-                                .status(EntityStatus.CREATED)
+                                .status(LifecycleStatus.CREATED)
                                 .title(request.getTitle())
                                 .type(request.getType())
                                 .releaseDate(request.getReleaseDate())
@@ -117,7 +117,7 @@ public class AlbumWriteService {
     }
 
     @Transactional
-    public Mono<Void> updateStatus(UUID albumId, EntityStatus status) {
+    public Mono<Void> updateStatus(UUID albumId, LifecycleStatus status) {
         return albumRepository.updateStatus(albumId, status)
                 .flatMap(count ->
                         AfterCommit.log("Update album {} status to {}: {} rows updated", albumId, status, count));
@@ -125,15 +125,15 @@ public class AlbumWriteService {
 
     @Transactional
     public Mono<Void> readyForPublishing(UUID albumId) {
-        return albumRepository.updateStatus(albumId, EntityStatus.READY)
+        return albumRepository.updateStatus(albumId, LifecycleStatus.READY)
                 .flatMap(count ->
-                        AfterCommit.log("Update album {} status to {}: {} rows updated", albumId, EntityStatus.READY, count))
-                .flatMap(v -> trackWriteService.updateStatusForAllInAlbum(albumId, EntityStatus.READY));
+                        AfterCommit.log("Update album {} status to {}: {} rows updated", albumId, LifecycleStatus.READY, count))
+                .flatMap(v -> trackWriteService.updateStatusForAllInAlbum(albumId, LifecycleStatus.READY));
     }
 
     @Transactional
     public Mono<Void> publishAlbum(UUID id) {
-        return albumRepository.updateStatusAndReleaseDate(id, EntityStatus.PUBLISHED, Instant.now())
+        return albumRepository.updateStatusAndReleaseDate(id, LifecycleStatus.PUBLISHED, Instant.now())
                 .flatMap(c -> AfterCommit.log("Album {} published", id))
                 .flatMap(c -> trackRepository.findAllByAlbumId(id).map(Track::getId).collectList())
                 .flatMap(trackWriteService::publishTracks);

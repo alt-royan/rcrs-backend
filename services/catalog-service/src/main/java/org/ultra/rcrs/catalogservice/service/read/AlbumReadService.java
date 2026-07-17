@@ -12,12 +12,11 @@ import org.ultra.rcrs.catalogservice.repository.read.AlbumViewRepository;
 import org.ultra.rcrs.catalogservice.repository.read.TrackWithoutAlbumViewRepository;
 import org.ultra.rcrs.catalogservice.service.AlbumConverter;
 import org.ultra.rcrs.catalogservice.service.TrackConverter;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -33,7 +32,7 @@ public class AlbumReadService {
     private final TrackConverter trackConverter;
 
     @Cacheable("albums")
-    public Mono<AlbumFullDto> getAlbum(UUID albumId, List<EntityStatus> statuses) {
+    public Mono<AlbumFullDto> getAlbum(UUID albumId, List<LifecycleStatus> statuses) {
         return albumViewRepository.findByIdAndStatusIn(albumId, statuses)
                 .switchIfEmpty(Mono.error(new NotFoundException("Album", albumId)))
                 .zipWith(getTracksInAlbum(albumId, statuses))
@@ -44,7 +43,7 @@ public class AlbumReadService {
                 });
     }
 
-    public Mono<List<AlbumStandaloneDto>> getAlbums(List<UUID> ids, List<EntityStatus> statuses) {
+    public Mono<List<AlbumStandaloneDto>> getAlbums(List<UUID> ids, List<LifecycleStatus> statuses) {
         return albumViewRepository.findAllByIdAndStatusIn(ids, statuses)
                 .collect(Collectors.toMap(AlbumView::getId, Function.identity()))
                 .map(m -> ids.stream()
@@ -53,7 +52,7 @@ public class AlbumReadService {
                 .map(l -> l.stream().map(albumConverter::toStandaloneDto).toList());
     }
 
-    public Mono<List<TrackInAlbumDto>> getTracksInAlbum(UUID albumId, List<EntityStatus> statuses) {
+    public Mono<List<TrackInAlbumDto>> getTracksInAlbum(UUID albumId, List<LifecycleStatus> statuses) {
         return trackWithoutAlbumViewRepository.findAllByAlbumIdAndStatusId(albumId, statuses)
                 .map(trackConverter::toTrackInAlbumDto).collectList();
     }

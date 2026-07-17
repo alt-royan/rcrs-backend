@@ -4,11 +4,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import org.ultra.rcrs.enums.AlbumType;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -23,7 +22,7 @@ public class Album {
     private UUID id;
 
     @Column("status")
-    private EntityStatus status;
+    private LifecycleStatus status;
 
     @Column("title")
     private String title;

@@ -11,12 +11,11 @@ import org.ultra.rcrs.catalogservice.model.read.TrackView;
 import org.ultra.rcrs.catalogservice.repository.read.OtherArtistViewRepository;
 import org.ultra.rcrs.catalogservice.repository.read.TrackViewRepository;
 import org.ultra.rcrs.catalogservice.service.TrackConverter;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -31,7 +30,7 @@ public class TrackReadService {
     private final OtherArtistViewRepository otherArtistViewRepository;
 
     @Cacheable("tracks")
-    public Mono<TrackFullDto> getTrack(UUID trackId, List<EntityStatus> statuses) {
+    public Mono<TrackFullDto> getTrack(UUID trackId, List<LifecycleStatus> statuses) {
         return trackViewRepository.findByIdAndStatusIn(trackId, statuses)
                 .switchIfEmpty(Mono.error(new NotFoundException("Track", trackId)))
                 .zipWith(otherArtistViewRepository.findAllByTrackId(trackId).map(OtherArtistDto::new).collectList())
@@ -42,7 +41,7 @@ public class TrackReadService {
                 });
     }
 
-    public Mono<List<TrackStandaloneDto>> getTracks(List<UUID> ids, List<EntityStatus> statuses) {
+    public Mono<List<TrackStandaloneDto>> getTracks(List<UUID> ids, List<LifecycleStatus> statuses) {
         return trackViewRepository.findAllByIdAndStatusIn(ids, statuses)
                 .collect(Collectors.toMap(TrackView::getId, Function.identity()))
                 .map(m -> ids.stream()

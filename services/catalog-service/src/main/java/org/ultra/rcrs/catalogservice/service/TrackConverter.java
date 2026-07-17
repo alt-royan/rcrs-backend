@@ -10,7 +10,7 @@ import org.ultra.rcrs.catalogservice.dto.response.track.TrackInAlbumDto;
 import org.ultra.rcrs.catalogservice.dto.response.track.TrackStandaloneDto;
 import org.ultra.rcrs.catalogservice.model.read.TrackView;
 import org.ultra.rcrs.catalogservice.model.read.TrackWithoutAlbumView;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.utils.Url62;
 
 import java.util.HashMap;
@@ -84,7 +84,7 @@ public class TrackConverter {
         Map<String, Object> index = new HashMap<>();
         index.put("id", Url62.encode(track.getId()));
         index.put("title", track.getTitle());
-        index.put("published", track.getStatus() == EntityStatus.PUBLISHED);
+        index.put("published", track.getStatus() == LifecycleStatus.PUBLISHED);
         index.put("album", album);
         index.put("artists", artists);
         return index;

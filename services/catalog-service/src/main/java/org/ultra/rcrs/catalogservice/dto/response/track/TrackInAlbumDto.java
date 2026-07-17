@@ -3,9 +3,8 @@ package org.ultra.rcrs.catalogservice.dto.response.track;
 import lombok.Builder;
 import lombok.Data;
 import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistOnTrackDto;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 
-import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -14,7 +13,7 @@ public class TrackInAlbumDto {
 
     private String id;
 
-    private EntityStatus status;
+    private LifecycleStatus status;
 
     private String title;
 

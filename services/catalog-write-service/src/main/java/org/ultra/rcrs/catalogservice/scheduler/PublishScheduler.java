@@ -9,7 +9,7 @@ import org.ultra.rcrs.catalogservice.repository.write.AlbumRepository;
 import org.ultra.rcrs.catalogservice.repository.write.TrackRepository;
 import org.ultra.rcrs.catalogservice.service.write.AlbumWriteService;
 import org.ultra.rcrs.catalogservice.service.write.TrackWriteService;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 
 @Component
 @EnableAsync
@@ -24,9 +24,9 @@ public class PublishScheduler {
 
     @Scheduled(fixedRate = 60000)
     public void schedulePublish() {
-        albumRepository.findAllReadyForPublishing(EntityStatus.READY_FOR_PUBLISHING, java.time.Instant.now())
+        albumRepository.findAllReadyForPublishing(LifecycleStatus.READY_FOR_PUBLISHING, java.time.Instant.now())
                 .forEach(album -> albumWriteService.publishAlbum(album.getId()));
-        trackRepository.findAllReadyForPublishing(EntityStatus.READY_FOR_PUBLISHING, java.time.Instant.now())
+        trackRepository.findAllReadyForPublishing(LifecycleStatus.READY_FOR_PUBLISHING, java.time.Instant.now())
                 .forEach(track -> trackWriteService.publishTrack(track.getId()));
     }
 }

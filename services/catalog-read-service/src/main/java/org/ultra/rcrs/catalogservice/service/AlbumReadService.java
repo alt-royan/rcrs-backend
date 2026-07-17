@@ -14,7 +14,7 @@ import org.ultra.rcrs.catalogservice.model.TrackDocument;
 import org.ultra.rcrs.catalogservice.repository.AlbumDocumentRepository;
 import org.ultra.rcrs.catalogservice.repository.TrackDocumentRepository;
 import org.ultra.rcrs.enums.ArtistRole;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import reactor.core.publisher.Mono;
 
@@ -32,7 +32,7 @@ public class AlbumReadService {
     private final TrackDocumentRepository trackDocumentRepository;
 
     @Cacheable("albums")
-    public Mono<AlbumFullDto> getAlbum(UUID albumId, List<EntityStatus> statuses) {
+    public Mono<AlbumFullDto> getAlbum(UUID albumId, List<LifecycleStatus> statuses) {
         return albumDocumentRepository.findById(albumId.toString())
                 .switchIfEmpty(Mono.error(new NotFoundException("Album", albumId)))
                 .flatMap(album -> {
@@ -47,7 +47,7 @@ public class AlbumReadService {
                 });
     }
 
-    public Mono<List<AlbumStandaloneDto>> getAlbums(List<UUID> ids, List<EntityStatus> statuses) {
+    public Mono<List<AlbumStandaloneDto>> getAlbums(List<UUID> ids, List<LifecycleStatus> statuses) {
         List<String> stringIds = ids.stream().map(UUID::toString).toList();
         List<String> statusNames = statuses.stream().map(Enum::name).toList();
         return albumDocumentRepository.findAllByIdIn(stringIds)
@@ -60,7 +60,7 @@ public class AlbumReadService {
                 });
     }
 
-    public Mono<List<TrackInAlbumDto>> getTracksInAlbum(UUID albumId, List<EntityStatus> statuses) {
+    public Mono<List<TrackInAlbumDto>> getTracksInAlbum(UUID albumId, List<LifecycleStatus> statuses) {
         List<String> statusNames = statuses.stream().map(Enum::name).toList();
         return trackDocumentRepository.findAll()
                 .filter(t -> albumId.toString().equals(t.getAlbum() != null ? t.getAlbum().getId() : null))
@@ -73,7 +73,7 @@ public class AlbumReadService {
     private AlbumFullDto toFullDto(AlbumDocument a, List<TrackInAlbumDto> tracks) {
         return AlbumFullDto.builder()
                 .id(a.getId())
-                .status(a.getStatus() != null ? EntityStatus.valueOf(a.getStatus()) : null)
+                .status(a.getStatus() != null ? LifecycleStatus.valueOf(a.getStatus()) : null)
                 .title(a.getTitle())
                 .type(a.getType() != null ? org.ultra.rcrs.enums.AlbumType.valueOf(a.getType()) : null)
                 .releaseDate(parseLocalDate(a.getReleaseDate()))
@@ -91,7 +91,7 @@ public class AlbumReadService {
     private AlbumStandaloneDto toStandaloneDto(AlbumDocument a) {
         return AlbumStandaloneDto.builder()
                 .id(a.getId())
-                .status(a.getStatus() != null ? EntityStatus.valueOf(a.getStatus()) : null)
+                .status(a.getStatus() != null ? LifecycleStatus.valueOf(a.getStatus()) : null)
                 .title(a.getTitle())
                 .type(a.getType() != null ? org.ultra.rcrs.enums.AlbumType.valueOf(a.getType()) : null)
                 .releaseDate(parseLocalDate(a.getReleaseDate()))
@@ -108,7 +108,7 @@ public class AlbumReadService {
     private TrackInAlbumDto toTrackInAlbumDto(TrackDocument t) {
         return TrackInAlbumDto.builder()
                 .id(t.getId())
-                .status(t.getStatus() != null ? EntityStatus.valueOf(t.getStatus()) : null)
+                .status(t.getStatus() != null ? LifecycleStatus.valueOf(t.getStatus()) : null)
                 .title(t.getTitle())
                 .durationMs(t.getDurationMs())
                 .trackNumber(t.getTrackNumber())

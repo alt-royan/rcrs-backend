@@ -6,7 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -21,7 +21,7 @@ public class TrackView {
 
     private UUID id;
 
-    private EntityStatus status;
+    private LifecycleStatus status;
 
     private String title;
 

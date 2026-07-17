@@ -6,7 +6,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.catalogservice.service.IndexService;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.enums.EntityType;
 import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.kafka.events.IndexEntityEvent;
@@ -38,7 +38,7 @@ public class EventProducer {
                         .map(objectMapper::writeValueAsString)
                         .map(event -> kafkaTemplate.send(Topics.MEDIA_START_TRACK_TRANSCODING_TOPIC, event))
                         .doOnNext(this::log)
-                ).then(Mono.just(new UpdateEntityStatusEvent(Url62.encode(trackId), EntityType.TRACK, EntityStatus.TRANSCODING))
+                ).then(Mono.just(new UpdateEntityStatusEvent(Url62.encode(trackId), EntityType.TRACK, LifecycleStatus.TRANSCODING))
                         .map(objectMapper::writeValueAsString)
                         .map(event -> kafkaTemplate.send(Topics.CATALOG_UPDATE_ENTITY_STATUS_TOPIC, event))
                         .doOnNext(this::log)

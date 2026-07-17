@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import org.ultra.rcrs.catalogservice.model.write.Track;
 import org.ultra.rcrs.catalogservice.repository.write.ReactiveAbstractWriteRepository;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -27,23 +27,23 @@ public class TrackRepository extends ReactiveAbstractWriteRepository<Track> {
         super(template, Track.class);
     }
 
-    public Mono<Long> updateStatus(UUID id, EntityStatus status) {
+    public Mono<Long> updateStatus(UUID id, LifecycleStatus status) {
         return updateStatus(List.of(id), status);
     }
 
-    public Mono<Long> updateStatus(List<UUID> ids, EntityStatus status) {
+    public Mono<Long> updateStatus(List<UUID> ids, LifecycleStatus status) {
         return template.update(Track.class)
                 .matching(query(where("id").in(ids).and("status").not(status)))
                 .apply(Update.update("status", status));
     }
 
-    public Mono<Long> updateStatusForAllInAlbum(UUID albumId, EntityStatus status) {
+    public Mono<Long> updateStatusForAllInAlbum(UUID albumId, LifecycleStatus status) {
         return template.update(Track.class)
                 .matching(query(where("album_id").is(albumId)))
                 .apply(Update.update("status", status));
     }
 
-    public Mono<Long> updateStatusAndReleaseDate(UUID id, EntityStatus status, Instant releaseDate) {
+    public Mono<Long> updateStatusAndReleaseDate(UUID id, LifecycleStatus status, Instant releaseDate) {
         return template.update(Track.class)
                 .matching(query(where("id").is(id)))
                 .apply(Update.update("status", status).set("release_date", releaseDate));
@@ -67,7 +67,7 @@ public class TrackRepository extends ReactiveAbstractWriteRepository<Track> {
         return template.select(query(where("album_id").is(albumId)), Track.class);
     }
 
-    public Mono<Boolean> allTracksInAlbumHaveStatus(@Nonnull UUID albumId, @Nonnull EntityStatus status) {
+    public Mono<Boolean> allTracksInAlbumHaveStatus(@Nonnull UUID albumId, @Nonnull LifecycleStatus status) {
         Assert.notNull(albumId, "albumId must not be null");
         Assert.notNull(status, "status must not be null");
 
@@ -77,7 +77,7 @@ public class TrackRepository extends ReactiveAbstractWriteRepository<Track> {
     }
 
     public Flux<Track> findAllReadyForPublishing() {
-        return template.select(query(where("status").is(EntityStatus.READY)
+        return template.select(query(where("status").is(LifecycleStatus.READY)
                 .and("release_date").isNull()
                 .or("release_date").lessThan(Instant.now())), Track.class);
     }

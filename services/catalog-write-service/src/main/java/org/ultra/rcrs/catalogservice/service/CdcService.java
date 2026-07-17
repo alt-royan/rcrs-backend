@@ -6,13 +6,13 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.model.write.*;
 import org.ultra.rcrs.catalogservice.repository.write.*;
-import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.kafka.events.CatalogCdcEvent;
 import org.ultra.rcrs.utils.S3Utils;
 import org.ultra.rcrs.utils.Url62;
 import tools.jackson.databind.ObjectMapper;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -123,21 +123,21 @@ public class CdcService {
         int totalDurationMs = tracks.stream().mapToInt(t -> t.getDurationMs() != null ? t.getDurationMs() : 0).sum();
         boolean explicit = tracks.stream().allMatch(t -> Boolean.TRUE.equals(t.getExplicit()));
 
-        return Map.of(
-                "id", Url62.encode(album.getId()),
-                "status", album.getStatus().name(),
-                "title", album.getTitle(),
-                "type", album.getType().getValue(),
-                "releaseDate", album.getReleaseDate() != null ? album.getReleaseDate().toString() : "",
-                "year", album.getReleaseDate() != null ? album.getReleaseDate().atZone(java.time.ZoneId.systemDefault()).getYear() : 0,
-                "totalTracks", totalTracks,
-                "totalDurationMs", totalDurationMs,
-                "coverUrl", s3Utils.parseUrl(album.getCoverS3Key()) != null ? s3Utils.parseUrl(album.getCoverS3Key()) : "",
-                "explicit", explicit,
-                "available", album.getAvailable(),
-                "artists", artists,
-                "tracks", trackDocs
-        );
+        var albumDoc = new HashMap<String, Object>();
+        albumDoc.put("id", Url62.encode(album.getId()));
+        albumDoc.put("status", album.getStatus().name());
+        albumDoc.put("title", album.getTitle());
+        albumDoc.put("type", album.getType().getValue());
+        albumDoc.put("releaseDate", album.getReleaseDate() != null ? album.getReleaseDate().toString() : "");
+        albumDoc.put("year", album.getReleaseDate() != null ? album.getReleaseDate().atZone(java.time.ZoneId.systemDefault()).getYear() : 0);
+        albumDoc.put("totalTracks", totalTracks);
+        albumDoc.put("totalDurationMs", totalDurationMs);
+        albumDoc.put("coverUrl", s3Utils.parseUrl(album.getCoverS3Key()) != null ? s3Utils.parseUrl(album.getCoverS3Key()) : "");
+        albumDoc.put("explicit", explicit);
+        albumDoc.put("available", album.getAvailable());
+        albumDoc.put("artists", artists);
+        albumDoc.put("tracks", trackDocs);
+        return albumDoc;
     }
 
     private Map<String, Object> buildTrackDoc(UUID trackId) {
@@ -173,19 +173,19 @@ public class CdcService {
                 "coverUrl", s3Utils.parseUrl(album.getCoverS3Key()) != null ? s3Utils.parseUrl(album.getCoverS3Key()) : ""
         ) : Map.of();
 
-        return Map.of(
-                "id", Url62.encode(track.getId()),
-                "status", track.getStatus().name(),
-                "title", track.getTitle(),
-                "releaseDate", track.getReleaseDate() != null ? track.getReleaseDate().toString() : "",
-                "durationMs", track.getDurationMs() != null ? track.getDurationMs() : 0,
-                "trackNumber", track.getTrackNumber(),
-                "explicit", track.getExplicit(),
-                "available", track.getAvailable(),
-                "album", albumDoc,
-                "artists", trackArtists,
-                "others", others
-        );
+        var trackDoc = new HashMap<String, Object>();
+        trackDoc.put("id", Url62.encode(track.getId()));
+        trackDoc.put("status", track.getStatus().name());
+        trackDoc.put("title", track.getTitle());
+        trackDoc.put("releaseDate", track.getReleaseDate() != null ? track.getReleaseDate().toString() : "");
+        trackDoc.put("durationMs", track.getDurationMs() != null ? track.getDurationMs() : 0);
+        trackDoc.put("trackNumber", track.getTrackNumber());
+        trackDoc.put("explicit", track.getExplicit());
+        trackDoc.put("available", track.getAvailable());
+        trackDoc.put("album", albumDoc);
+        trackDoc.put("artists", trackArtists);
+        trackDoc.put("others", others);
+        return trackDoc;
     }
 
     private void send(String action, String entityType, Object payload) {

@@ -15,7 +15,7 @@ import org.ultra.rcrs.catalogservice.repository.write.ArtistToTrackRepository;
 import org.ultra.rcrs.catalogservice.repository.write.OtherArtistRepository;
 import org.ultra.rcrs.catalogservice.repository.write.TrackRepository;
 import org.ultra.rcrs.catalogservice.service.CdcService;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.utils.Url62;
 
@@ -45,7 +45,7 @@ public class TrackWriteService {
         checkArtists(uploadRequest.getArtists());
         trackRepository.save(Track.builder()
                 .id(trackId)
-                .status(EntityStatus.CREATED)
+                .status(LifecycleStatus.CREATED)
                 .title(uploadRequest.getTitle())
                 .releaseDate(uploadRequest.getReleaseDate())
                 .durationMs(0)
@@ -97,20 +97,20 @@ public class TrackWriteService {
     }
 
     @Transactional
-    public void updateStatus(UUID trackId, EntityStatus status) {
+    public void updateStatus(UUID trackId, LifecycleStatus status) {
         int count = trackRepository.updateStatusByIds(List.of(trackId), status);
         log.info("Update track {} status to {}: {} rows updated", trackId, status, count);
     }
 
     @Transactional
-    public void updateStatusForAllInAlbum(UUID albumId, EntityStatus status) {
+    public void updateStatusForAllInAlbum(UUID albumId, LifecycleStatus status) {
         int count = trackRepository.updateStatusForAllInAlbum(albumId, status);
         log.info("Update status to {} for all tracks in album {}: {} rows updated", status, albumId, count);
     }
 
     @Transactional
     public void publishTrack(UUID id) {
-        int c = trackRepository.updateStatusAndReleaseDate(id, EntityStatus.PUBLISHED, Instant.now());
+        int c = trackRepository.updateStatusAndReleaseDate(id, LifecycleStatus.PUBLISHED, Instant.now());
         log.info("Track {} published", id);
         cdcService.trackUpserted(id);
     }

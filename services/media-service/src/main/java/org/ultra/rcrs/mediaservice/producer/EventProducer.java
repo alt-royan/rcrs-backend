@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.enums.EntityType;
 import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.kafka.events.UpdateEntityStatusEvent;
@@ -23,18 +23,18 @@ public class EventProducer {
     private final ObjectMapper objectMapper;
 
     public void startTranscoding(String trackId) {
-        updateTrackStatus(trackId, EntityStatus.TRANSCODING);
+        updateTrackStatus(trackId, LifecycleStatus.TRANSCODING);
     }
 
     public void failedTranscoding(String trackId) {
-        updateTrackStatus(trackId, EntityStatus.FAILED);
+        updateTrackStatus(trackId, LifecycleStatus.FAILED);
     }
 
     public void successTranscoding(String trackId) {
-        updateTrackStatus(trackId, EntityStatus.READY);
+        updateTrackStatus(trackId, LifecycleStatus.READY);
     }
 
-    public void updateTrackStatus(String trackId, EntityStatus status) {
+    public void updateTrackStatus(String trackId, LifecycleStatus status) {
         String event = objectMapper.writeValueAsString(new UpdateEntityStatusEvent(trackId, EntityType.TRACK, status));
         var future = kafkaTemplate.send(Topics.CATALOG_UPDATE_ENTITY_STATUS_TOPIC, UUID.randomUUID().toString(), event);
         log(future);

@@ -9,7 +9,7 @@ import org.ultra.rcrs.catalogservice.dto.response.album.AlbumFullDto;
 import org.ultra.rcrs.catalogservice.dto.response.album.AlbumStandaloneDto;
 import org.ultra.rcrs.catalogservice.dto.response.track.TrackInAlbumDto;
 import org.ultra.rcrs.catalogservice.service.AlbumReadService;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Mono;
 
@@ -24,19 +24,19 @@ public class AlbumReadController {
 
     @GetMapping("/{albumId}")
     public Mono<ResponseEntity<AlbumFullDto>> getAlbum(@PathVariable("albumId") String albumId) {
-        return albumReadService.getAlbum(Url62.decode(albumId), List.of(EntityStatus.PUBLISHED))
+        return albumReadService.getAlbum(Url62.decode(albumId), List.of(LifecycleStatus.PUBLISHED))
                 .map(ResponseEntity::ok);
     }
 
     @PostMapping("/get")
     public Mono<ResponseEntity<List<AlbumStandaloneDto>>> getAlbums(@RequestBody @Validated @NotNull List<String> ids) {
-        return albumReadService.getAlbums(ids.stream().map(Url62::decode).toList(), List.of(EntityStatus.PUBLISHED))
+        return albumReadService.getAlbums(ids.stream().map(Url62::decode).toList(), List.of(LifecycleStatus.PUBLISHED))
                 .map(ResponseEntity::ok);
     }
 
     @GetMapping("/{albumId}/tracks")
     public Mono<ResponseEntity<List<TrackInAlbumDto>>> getTracksInAlbum(@PathVariable("albumId") String albumId) {
-        return albumReadService.getTracksInAlbum(Url62.decode(albumId), List.of(EntityStatus.PUBLISHED))
+        return albumReadService.getTracksInAlbum(Url62.decode(albumId), List.of(LifecycleStatus.PUBLISHED))
                 .map(ResponseEntity::ok);
     }
 }

@@ -13,7 +13,7 @@ import org.ultra.rcrs.catalogservice.dto.response.track.TrackStandaloneDto;
 import org.ultra.rcrs.catalogservice.model.TrackDocument;
 import org.ultra.rcrs.catalogservice.repository.TrackDocumentRepository;
 import org.ultra.rcrs.enums.ArtistRole;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import reactor.core.publisher.Mono;
 
@@ -31,13 +31,13 @@ public class TrackReadService {
     private final TrackDocumentRepository trackDocumentRepository;
 
     @Cacheable("tracks")
-    public Mono<TrackFullDto> getTrack(UUID trackId, List<EntityStatus> statuses) {
+    public Mono<TrackFullDto> getTrack(UUID trackId, List<LifecycleStatus> statuses) {
         return trackDocumentRepository.findById(trackId.toString())
                 .switchIfEmpty(Mono.error(new NotFoundException("Track", trackId)))
                 .map(this::toFullDto);
     }
 
-    public Mono<List<TrackStandaloneDto>> getTracks(List<UUID> ids, List<EntityStatus> statuses) {
+    public Mono<List<TrackStandaloneDto>> getTracks(List<UUID> ids, List<LifecycleStatus> statuses) {
         List<String> stringIds = ids.stream().map(UUID::toString).toList();
         List<String> statusNames = statuses.stream().map(Enum::name).toList();
         return trackDocumentRepository.findAllByIdIn(stringIds)
@@ -53,7 +53,7 @@ public class TrackReadService {
     private TrackFullDto toFullDto(TrackDocument t) {
         return TrackFullDto.builder()
                 .id(t.getId())
-                .status(t.getStatus() != null ? EntityStatus.valueOf(t.getStatus()) : null)
+                .status(t.getStatus() != null ? LifecycleStatus.valueOf(t.getStatus()) : null)
                 .title(t.getTitle())
                 .releaseDate(parseLocalDate(t.getReleaseDate()))
                 .durationMs(t.getDurationMs())
@@ -73,7 +73,7 @@ public class TrackReadService {
     private TrackStandaloneDto toStandaloneDto(TrackDocument t) {
         return TrackStandaloneDto.builder()
                 .id(t.getId())
-                .status(t.getStatus() != null ? EntityStatus.valueOf(t.getStatus()) : null)
+                .status(t.getStatus() != null ? LifecycleStatus.valueOf(t.getStatus()) : null)
                 .title(t.getTitle())
                 .releaseDate(parseLocalDate(t.getReleaseDate()))
                 .durationMs(t.getDurationMs())

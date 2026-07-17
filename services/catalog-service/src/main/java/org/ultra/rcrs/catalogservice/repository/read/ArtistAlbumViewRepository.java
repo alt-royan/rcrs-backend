@@ -10,7 +10,7 @@ import org.springframework.util.Assert;
 import org.ultra.rcrs.catalogservice.model.read.ArtistAlbumView;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public class ArtistAlbumViewRepository {
 
     private final R2dbcEntityTemplate template;
 
-    public Flux<ArtistAlbumView> findAllByArtist(@Nonnull UUID artistId, @Nonnull List<EntityStatus> statuses,
+    public Flux<ArtistAlbumView> findAllByArtist(@Nonnull UUID artistId, @Nonnull List<LifecycleStatus> statuses,
                                                  ArtistRole artistRole, AlbumType type, Sort.Direction direction) {
         Assert.notNull(artistId, "artistId must not be null");
         Assert.notNull(statuses, "statuses must not be null");
@@ -44,7 +44,7 @@ public class ArtistAlbumViewRepository {
         return template.select(query(criteria).sort(Sort.by(direction, "release_date")), ArtistAlbumView.class);
     }
 
-    public Flux<ArtistAlbumView> findAllByArtist(@Nonnull UUID artistId, @Nonnull List<EntityStatus> statuses, ArtistRole artistRole) {
+    public Flux<ArtistAlbumView> findAllByArtist(@Nonnull UUID artistId, @Nonnull List<LifecycleStatus> statuses, ArtistRole artistRole) {
         return findAllByArtist(artistId, statuses, artistRole, null, Sort.Direction.DESC);
     }
 

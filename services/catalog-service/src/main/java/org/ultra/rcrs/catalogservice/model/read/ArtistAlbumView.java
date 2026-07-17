@@ -9,7 +9,7 @@ import org.springframework.data.relational.core.mapping.Column;
 import org.springframework.data.relational.core.mapping.Table;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,7 +31,7 @@ public class ArtistAlbumView {
     @Column("album_id")
     private UUID albumId;
 
-    private EntityStatus status;
+    private LifecycleStatus status;
 
     private String title;
 

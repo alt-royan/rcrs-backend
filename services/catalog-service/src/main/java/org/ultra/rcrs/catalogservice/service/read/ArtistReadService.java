@@ -15,12 +15,11 @@ import org.ultra.rcrs.catalogservice.service.AlbumConverter;
 import org.ultra.rcrs.catalogservice.service.ArtistConverter;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -51,7 +50,7 @@ public class ArtistReadService {
                 .map(l -> l.stream().map(artistConverter::toStandaloneDto).toList());
     }
 
-    public Mono<List<AlbumOfArtistDto>> getAlbumsForArtist(UUID artistId, List<EntityStatus> statuses, ArtistRole role, AlbumType type, Sort.Direction direction) {
+    public Mono<List<AlbumOfArtistDto>> getAlbumsForArtist(UUID artistId, List<LifecycleStatus> statuses, ArtistRole role, AlbumType type, Sort.Direction direction) {
         return artistAlbumViewRepository.findAllByArtist(artistId, statuses, role, type, direction)
                 .map(albumConverter::toOfArtistDto)
                 .collectList();

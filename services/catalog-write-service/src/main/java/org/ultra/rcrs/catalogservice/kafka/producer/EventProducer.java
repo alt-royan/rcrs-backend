@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.stereotype.Component;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.enums.EntityType;
 import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.kafka.events.IndexEntityEvent;
@@ -13,7 +14,6 @@ import org.ultra.rcrs.kafka.events.UpdateEntityStatusEvent;
 import org.ultra.rcrs.utils.Url62;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -31,7 +31,7 @@ public class EventProducer {
         sendEvent(Topics.MEDIA_START_TRACK_TRANSCODING_TOPIC,
                 new StartTrackTranscodingEvent(uid, Url62.encode(trackId), Instant.now()));
         sendEvent(Topics.CATALOG_UPDATE_ENTITY_STATUS_TOPIC,
-                new UpdateEntityStatusEvent(Url62.encode(trackId), EntityType.TRACK, org.ultra.rcrs.enums.EntityStatus.QUEUED_FOR_TRANSCODING));
+                new UpdateEntityStatusEvent(Url62.encode(trackId), EntityType.TRACK, LifecycleStatus.TRANSCODING));
     }
 
     public void trackDeleted(UUID trackId) {

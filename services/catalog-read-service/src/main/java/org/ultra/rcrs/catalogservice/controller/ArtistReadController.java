@@ -12,7 +12,7 @@ import org.ultra.rcrs.catalogservice.dto.response.artist.ArtistStandaloneDto;
 import org.ultra.rcrs.catalogservice.service.ArtistReadService;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.utils.Url62;
 import reactor.core.publisher.Mono;
 
@@ -46,7 +46,7 @@ public class ArtistReadController {
 
         direction = direction == null ? Sort.Direction.DESC : direction;
 
-        return artistReadService.getAlbumsForArtist(Url62.decode(artistId), List.of(EntityStatus.PUBLISHED), role, type, direction)
+        return artistReadService.getAlbumsForArtist(Url62.decode(artistId), List.of(LifecycleStatus.PUBLISHED), role, type, direction)
                 .map(ResponseEntity::ok);
     }
 }

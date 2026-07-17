@@ -7,7 +7,7 @@ import org.ultra.rcrs.catalogservice.repository.write.impl.AlbumRepository;
 import org.ultra.rcrs.catalogservice.repository.write.impl.TrackRepository;
 import org.ultra.rcrs.catalogservice.service.write.AlbumWriteService;
 import org.ultra.rcrs.catalogservice.service.write.TrackWriteService;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import reactor.core.publisher.Mono;
 
 import java.util.UUID;
@@ -21,20 +21,20 @@ public class StatusService {
     private final AlbumRepository albumRepository;
     private final TrackRepository trackRepository;
 
-    public Mono<Void> updateTrackStatus(UUID trackId, EntityStatus status) {
+    public Mono<Void> updateTrackStatus(UUID trackId, LifecycleStatus status) {
         Mono<Void> mono = Mono.empty();
-        if ( EntityStatus.TRANSCODING.equals(status)) {
+        if ( LifecycleStatus.TRANSCODING.equals(status)) {
             mono = trackWriteService.updateStatus(trackId, status)
                     .flatMap(v -> trackRepository.findById(trackId)
-                            .flatMap(t -> albumWriteService.updateStatus(t.getAlbumId(), EntityStatus.TRANSCODING)));
-        } else if (EntityStatus.FAILED.equals(status)) {
+                            .flatMap(t -> albumWriteService.updateStatus(t.getAlbumId(), LifecycleStatus.TRANSCODING)));
+        } else if (LifecycleStatus.FAILED.equals(status)) {
             mono = trackWriteService.updateStatus(trackId, status)
                     .flatMap(v -> trackRepository.findById(trackId)
                             .flatMap(t -> albumWriteService.updateStatus(t.getAlbumId(), status)));
-        } else if (EntityStatus.READY.equals(status)) {
+        } else if (LifecycleStatus.READY.equals(status)) {
             mono = getAlbumForTrack(trackId).flatMap(album -> {
                 if (isAlbumPublished(album)) {
-                    return trackWriteService.updateStatus(trackId, EntityStatus.READY);
+                    return trackWriteService.updateStatus(trackId, LifecycleStatus.READY);
                 } else {
                     return trackWriteService.updateStatus(trackId, status)
                             .flatMap(v -> isThisLastTranscodeTrack(album.getId())
@@ -58,11 +58,11 @@ public class StatusService {
     }
 
     private boolean isAlbumPublished(Album album) {
-        return EntityStatus.PUBLISHED.equals(album.getStatus());
+        return LifecycleStatus.PUBLISHED.equals(album.getStatus());
     }
 
     private Mono<Boolean> isThisLastTranscodeTrack(UUID albumId) {
-        return trackRepository.allTracksInAlbumHaveStatus(albumId, EntityStatus.READY);
+        return trackRepository.allTracksInAlbumHaveStatus(albumId, LifecycleStatus.READY);
     }
 
 }

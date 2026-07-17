@@ -1,6 +1,6 @@
 package org.ultra.rcrs.enums;
 
-public enum EntityStatus {
+public enum LifecycleStatus {
     CREATED,
     TRANSCODING,
     FAILED,

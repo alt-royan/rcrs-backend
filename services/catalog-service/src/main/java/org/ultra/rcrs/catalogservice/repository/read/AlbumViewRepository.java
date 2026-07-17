@@ -8,7 +8,7 @@ import org.springframework.data.relational.core.query.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.Assert;
 import org.ultra.rcrs.catalogservice.model.read.AlbumView;
-import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -24,7 +24,7 @@ public class AlbumViewRepository {
 
     private final R2dbcEntityTemplate template;
 
-    public Mono<AlbumView> findByIdAndStatusIn(@Nonnull UUID id, @Nonnull List<EntityStatus> statuses) {
+    public Mono<AlbumView> findByIdAndStatusIn(@Nonnull UUID id, @Nonnull List<LifecycleStatus> statuses) {
         Assert.notNull(id, "id must not be null");
         Assert.notNull(statuses, "statuses must not be null");
 
@@ -37,7 +37,7 @@ public class AlbumViewRepository {
         return template.selectOne(query(where("id").is(id)), AlbumView.class);
     }
 
-    public Flux<AlbumView> findAllByIdAndStatusIn(@Nonnull List<UUID> ids, @Nonnull List<EntityStatus> statuses) {
+    public Flux<AlbumView> findAllByIdAndStatusIn(@Nonnull List<UUID> ids, @Nonnull List<LifecycleStatus> statuses) {
         Assert.notNull(ids, "ids must not be null");
         Assert.notNull(statuses, "statuses must not be null");
 
