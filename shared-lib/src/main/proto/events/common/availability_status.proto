@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.common";
+
+enum AvailabilityStatus{
+  AVAILABILITY_STATUS_UNSPECIFIED = 0;
+  ACTIVE = 1;
+  HIDDEN = 2;
+  DELETED = 3;
+}

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.catalogservice.dto.request.TrackUploadRequest;
+import org.ultra.rcrs.catalogservice.kafka.CatalogEventProducer;
 import org.ultra.rcrs.catalogservice.model.Track;
 import org.ultra.rcrs.catalogservice.repository.TrackRepository;
 import org.ultra.rcrs.enums.EntityStatus;
@@ -21,7 +22,7 @@ public class TrackService {
 
     private final TrackRepository trackRepository;
     private final ArtistService artistService;
-    private final CdcService cdcService;
+    private final CatalogEventProducer catalogEventProducer;
 
     @Transactional
     public void createTrack(TrackUploadRequest uploadRequest) {
@@ -39,19 +40,19 @@ public class TrackService {
         log.info("Track {} saved with UUID: {}, public Id {}", track.getTitle(), track.getId(), Url62.encode(track.getId()));
         artistService.saveArtistsToTrack(uploadRequest.getArtists(), track.getId());
         artistService.saveOthersToTrack(uploadRequest.getOthers(), track.getId());
-        cdcService.trackCreated(track.getId(), uploadRequest.getUid());
+        //catalogEventProducer.trackCreated(track, uploadRequest.getUid());
     }
 
     @Transactional
     public void deleteTrack(UUID trackId) {
         updateAvailability(EntityStatus.DELETED, trackId);
-        cdcService.trackDeleted(trackId);
+        catalogEventProducer.trackDeleted(trackId);
     }
 
     @Transactional
     public void hideTrack(UUID trackId) {
         updateAvailability(EntityStatus.HIDDEN, trackId);
-        cdcService.trackHidden(trackId);
+        catalogEventProducer.trackHidden(trackId);
     }
 
     @Transactional

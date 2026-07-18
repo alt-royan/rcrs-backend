@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.common";
+
+message SocialLink {
+  string resource_name = 1;
+  string url = 2;
+}

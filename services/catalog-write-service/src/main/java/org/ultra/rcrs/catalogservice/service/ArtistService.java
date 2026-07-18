@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.catalogservice.dto.OtherArtistDto;
 import org.ultra.rcrs.catalogservice.dto.request.ArtistCreateRequest;
 import org.ultra.rcrs.catalogservice.dto.request.ArtistIdDto;
+import org.ultra.rcrs.catalogservice.kafka.CatalogEventProducer;
 import org.ultra.rcrs.catalogservice.model.*;
 import org.ultra.rcrs.catalogservice.repository.ArtistRepository;
 import org.ultra.rcrs.catalogservice.repository.ArtistToAlbumRepository;
@@ -29,7 +30,7 @@ public class ArtistService {
     private final OtherArtistRepository otherArtistRepository;
     private final ArtistToTrackRepository artistToTrackRepository;
     private final ArtistToAlbumRepository artistToAlbumRepository;
-    private final CdcService cdcService;
+    private final CatalogEventProducer catalogEventProducer;
     private final S3Utils s3Utils;
 
     @Transactional
@@ -43,19 +44,19 @@ public class ArtistService {
                 .build());
         log.info("Artist {} was created successfully. Artist UUID: {}, public Id: {}",
                 request.getName(), artist.getId(), Url62.encode(artist.getId()));
-        cdcService.artistCreated(artist.getId());
+        catalogEventProducer.artistCreated(artist);
     }
 
     @Transactional
     public void deleteArtist(UUID artistId) {
         updateAvailability(EntityStatus.DELETED, artistId);
-        cdcService.artistDeleted(artistId);
+        catalogEventProducer.artistDeleted(artistId);
     }
 
     @Transactional
     public void hideArtist(UUID artistId) {
         updateAvailability(EntityStatus.HIDDEN, artistId);
-        cdcService.artistHidden(artistId);
+        catalogEventProducer.artistHidden(artistId);
     }
 
     public void checkArtistExists(UUID id) {

@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.track";
+
+message TrackHiddenEvent {
+  string id = 1;
+}

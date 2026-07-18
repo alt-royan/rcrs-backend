@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.catalogservice.dto.request.AlbumUploadRequest;
 import org.ultra.rcrs.catalogservice.dto.request.ArtistIdDto;
 import org.ultra.rcrs.catalogservice.dto.response.IdResponse;
+import org.ultra.rcrs.catalogservice.kafka.CatalogEventProducer;
 import org.ultra.rcrs.catalogservice.model.Album;
 import org.ultra.rcrs.catalogservice.model.ArtistToAlbum;
 import org.ultra.rcrs.catalogservice.model.Track;
@@ -31,7 +32,7 @@ public class AlbumService {
     private final AlbumRepository albumRepository;
     private final ArtistService artistService;
     private final S3Utils s3Utils;
-    private final CdcService cdcService;
+    private final CatalogEventProducer catalogEventProducer;
 
     @Transactional
     public void createAlbum(AlbumUploadRequest request) {
@@ -46,19 +47,19 @@ public class AlbumService {
 
         log.info("Album {} saved with id {}", request.getTitle(), album.getId());
         artistService.saveArtistsToAlbum(request.getArtists(), album.getId());
-        cdcService.albumCreated(album.getId());
+        //catalogEventProducer.albumCreated(album);
     }
 
     @Transactional
     public void deleteAlbum(UUID albumId) {
         updateAvailability(EntityStatus.DELETED, albumId);
-        cdcService.albumDeleted(albumId);
+        catalogEventProducer.albumDeleted(albumId);
     }
 
     @Transactional
     public void hideAlbum(UUID albumId) {
         updateAvailability(EntityStatus.HIDDEN, albumId);
-        cdcService.albumHidden(albumId);
+        catalogEventProducer.albumHidden(albumId);
     }
 
     @Transactional
