@@ -9,8 +9,6 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
@@ -21,16 +19,28 @@ import org.ultra.rcrs.kafka.Topics;
 import java.util.HashMap;
 import java.util.Map;
 
-@Configuration
-@EnableKafka
-public class KafkaConfig {
+public class KafkaBaseConfig {
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
     @Bean
-    public ProducerFactory<String, String> producerFactory() {
-        return new DefaultKafkaProducerFactory<>(producerProps());
+    public ProducerFactory<String, byte[]> producerFactoryByteArray() {
+        var producerProps = producerProps();
+        producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
+        return new DefaultKafkaProducerFactory<>(producerProps);
+    }
+
+    @Bean
+    public ProducerFactory<String, String> producerFactoryString() {
+        var producerProps = producerProps();
+        producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        return new DefaultKafkaProducerFactory<>(producerProps);
+    }
+
+    @Bean
+    public KafkaTemplate<String, byte[]> byteArrayTemplate(ProducerFactory<String, byte[]> pf) {
+        return new KafkaTemplate<>(pf);
     }
 
     @Bean
@@ -71,7 +81,6 @@ public class KafkaConfig {
         Map<String, Object> producerProps = new HashMap<>();
         producerProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         producerProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        producerProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, ByteArraySerializer.class);
         return producerProps;
     }
 

@@ -38,7 +38,7 @@ import java.util.UUID;
 @Component
 public class CatalogEventProducer extends ProtobufEventProducer {
 
-    @Value("${apring.application.name}")
+    @Value("${spring.application.name}")
     private String serviceName;
 
     public CatalogEventProducer(@Autowired KafkaTemplate<String, byte[]> kafkaTemplate) {
@@ -193,19 +193,11 @@ public class CatalogEventProducer extends ProtobufEventProducer {
         var eventBuilder = TrackCreatedEventOuterClass.TrackCreatedEvent.newBuilder()
                 .setId(trackId)
                 .setTitle(track.getTitle())
-                .setDurationMs(track.getDurationMs() != null ? track.getDurationMs() : 0)
                 .setTrackNumber(track.getTrackNumber())
                 .setExplicit(track.getExplicit())
                 .setAvailabilityStatus(AvailabilityStatusOuterClass.AvailabilityStatus.valueOf(track.getAvailabilityStatus().name()))
                 .setLifecycleStatus(LifecycleStatusOuterClass.LifecycleStatus.valueOf(track.getLifecycleStatus().name()))
                 .setAlbumId(albumId);
-
-        if (track.getReleaseDate() != null) {
-            Instant instant = track.getReleaseDate().toInstant();
-            eventBuilder.setReleaseDate(Timestamp.newBuilder()
-                    .setSeconds(instant.getEpochSecond())
-                    .setNanos(instant.getNano()));
-        }
 
         var event = eventBuilder.build();
 

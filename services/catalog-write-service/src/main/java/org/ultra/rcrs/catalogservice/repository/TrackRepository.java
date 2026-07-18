@@ -14,10 +14,10 @@ import java.util.UUID;
 public interface TrackRepository extends JpaRepository<Track, UUID> {
 
     @Modifying
-    @Query("UPDATE Track t SET t.lyfecycle_status = ? WHERE t.id = ?")
+    @Query("UPDATE Track t SET t.lifecycleStatus = :status WHERE t.id = :id")
     void updateLifecycleStatusById(LifecycleStatus status, UUID id);
 
     @Modifying
-    @Query("UPDATE Track t SET t.availability_status = ? WHERE t.id = ?")
+    @Query("UPDATE Track t SET t.availabilityStatus = :status WHERE t.id = :id")
     void updateAvailabilityStatusById(EntityStatus status, UUID id);
 }

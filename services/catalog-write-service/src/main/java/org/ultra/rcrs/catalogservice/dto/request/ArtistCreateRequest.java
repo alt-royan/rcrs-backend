@@ -1,5 +1,6 @@
 package org.ultra.rcrs.catalogservice.dto.request;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
@@ -15,7 +16,6 @@ public class ArtistCreateRequest {
     @NotNull
     private String name;
 
-    @Pattern(regexp = "s3://[\\w\\-]+/[\\w\\-.]+", message = "URI must be s3://{bucket}/{key} formatted")
     private String avatarUri;
 
     @Valid

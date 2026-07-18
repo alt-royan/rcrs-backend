@@ -8,10 +8,7 @@ import org.ultra.rcrs.catalogservice.dto.OtherArtistDto;
 import org.ultra.rcrs.catalogservice.dto.request.ArtistDto;
 import org.ultra.rcrs.catalogservice.dto.request.TrackUploadRequest;
 import org.ultra.rcrs.catalogservice.kafka.CatalogEventProducer;
-import org.ultra.rcrs.catalogservice.model.ArtistToTrack;
-import org.ultra.rcrs.catalogservice.model.ArtistToTrackPK;
-import org.ultra.rcrs.catalogservice.model.OtherArtist;
-import org.ultra.rcrs.catalogservice.model.Track;
+import org.ultra.rcrs.catalogservice.model.*;
 import org.ultra.rcrs.catalogservice.repository.ArtistToTrackRepository;
 import org.ultra.rcrs.catalogservice.repository.OtherArtistRepository;
 import org.ultra.rcrs.catalogservice.repository.TrackRepository;
@@ -45,8 +42,6 @@ public class TrackService {
         Track track = trackRepository.save(Track.builder()
                 .lifecycleStatus(LifecycleStatus.CREATED)
                 .title(uploadRequest.getTitle())
-                .releaseDate(uploadRequest.getReleaseDate())
-                .publishTimestamp(uploadRequest.getPublishTimestamp())
                 .durationMs(null)
                 .trackNumber(uploadRequest.getTrackNumber())
                 .explicit(uploadRequest.getExplicit())
@@ -55,9 +50,6 @@ public class TrackService {
                 .build());
         log.info("Track {} saved with UUID: {}, public Id {}", track.getTitle(), track.getId(), Url62.encode(track.getId()));
         catalogEventProducer.trackCreated(track);
-
-        addAllArtistToTrack(uploadRequest.getArtists(), track.getId());
-        addAllOthersToTrack(uploadRequest.getOthers(), track.getId());
     }
 
     @Transactional

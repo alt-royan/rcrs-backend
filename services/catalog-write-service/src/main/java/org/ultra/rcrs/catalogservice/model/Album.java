@@ -24,7 +24,7 @@ import java.util.UUID;
 public class Album {
 
     @Id
-    @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
     @Column(name = "lifecycle_status", nullable = false)

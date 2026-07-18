@@ -10,8 +10,4 @@ import java.util.UUID;
 
 @Repository
 public interface ArtistToTrackRepository extends JpaRepository<ArtistToTrack, ArtistToTrackPK> {
-
-    long deleteByTrackId(UUID trackId);
-
-    List<ArtistToTrack> findByTrackId(UUID trackId);
 }

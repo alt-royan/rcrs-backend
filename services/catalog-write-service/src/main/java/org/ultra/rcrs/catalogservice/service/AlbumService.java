@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.catalogservice.dto.request.AlbumUploadRequest;
 import org.ultra.rcrs.catalogservice.dto.request.ArtistDto;
-import org.ultra.rcrs.catalogservice.dto.request.TrackUploadRequest;
 import org.ultra.rcrs.catalogservice.kafka.CatalogEventProducer;
 import org.ultra.rcrs.catalogservice.model.Album;
 import org.ultra.rcrs.catalogservice.model.ArtistToAlbum;
@@ -40,14 +39,13 @@ public class AlbumService {
                 .title(request.getTitle())
                 .type(request.getType())
                 .releaseDate(request.getReleaseDate())
+                .publishTimestamp(request.getPublishTimestamp())
                 .coverS3Key(s3Utils.parseKey(request.getCoverUri()))
                 .availabilityStatus(EntityStatus.ACTIVE)
                 .build());
 
-        log.info("Album {} saved with id {}", request.getTitle(), album.getId());
+        log.info("Album {} saved with UUID: {}, public Id {}", request.getTitle(), album.getId(), Url62.encode(album.getId()));
         catalogEventProducer.albumCreated(album);
-
-        addAllArtistToAlbum(request.getArtists(), album.getId());
     }
 
     @Transactional

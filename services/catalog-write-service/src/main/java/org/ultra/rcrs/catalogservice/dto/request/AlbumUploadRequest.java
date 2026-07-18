@@ -21,10 +21,7 @@ public class AlbumUploadRequest {
 
     private OffsetDateTime releaseDate;
 
-    @Pattern(regexp = "s3://[\\w\\-]+/[\\w\\-.]+", message = "URI must be s3://{bucket}/{key} formatted")
-    private String coverUri;
+    private OffsetDateTime publishTimestamp;
 
-    @NotEmpty
-    @Valid
-    private List<ArtistDto> artists;
+    private String coverUri;
 }

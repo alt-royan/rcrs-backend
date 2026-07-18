@@ -33,12 +33,6 @@ public class Track {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "release_date")
-    private OffsetDateTime releaseDate;
-
-    @Column(name = "publish_timestamp")
-    private OffsetDateTime publishTimestamp;
-
     @Column(name = "duration_ms")
     private Integer durationMs;
 

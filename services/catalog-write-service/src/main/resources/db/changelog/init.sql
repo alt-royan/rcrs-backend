@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS artists
     name                text NOT NULL,
     availability_status text NOT NULL,
     avatar_s3_key       text,
-    social_links        json,
+    social_links        text,
     tags                VARCHAR(40)[]
 );
 
@@ -27,8 +27,6 @@ CREATE TABLE IF NOT EXISTS tracks
     id                  uuid PRIMARY KEY,
     lifecycle_status    text    NOT NULL,
     title               text    NOT NULL,
-    release_date        timestamp with time zone,
-    publish_timestamp   timestamp with time zone,
     duration_ms         int,
     track_number        int     NOT NULL,
     explicit            boolean NOT NULL,
@@ -42,8 +40,8 @@ CREATE TABLE IF NOT EXISTS other_artist
     id           uuid PRIMARY KEY,
     track_id     uuid NOT NULL,
     name         text,
-    roles        VARCHAR(20)[],
-    social_links json,
+    roles        text,
+    social_links text,
     FOREIGN KEY (track_id) REFERENCES tracks (id)
 );
 

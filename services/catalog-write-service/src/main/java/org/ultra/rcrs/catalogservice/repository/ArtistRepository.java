@@ -13,6 +13,6 @@ import java.util.UUID;
 public interface ArtistRepository extends JpaRepository<Artist, UUID> {
 
     @Modifying
-    @Query("UPDATE Artists a SET a.availability_status = ? WHERE a.id = ?")
+    @Query("UPDATE Artist a SET a.availabilityStatus = :status WHERE a.id = :id")
     void updateAvailabilityStatusById(EntityStatus status, UUID id);
 }

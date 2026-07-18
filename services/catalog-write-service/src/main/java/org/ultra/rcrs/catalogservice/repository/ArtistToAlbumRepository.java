@@ -11,7 +11,4 @@ import java.util.UUID;
 @Repository
 public interface ArtistToAlbumRepository extends JpaRepository<ArtistToAlbum, ArtistToAlbumPK> {
 
-    long deleteByAlbumId(UUID albumId);
-
-    List<ArtistToAlbum> findByAlbumId(UUID albumId);
 }

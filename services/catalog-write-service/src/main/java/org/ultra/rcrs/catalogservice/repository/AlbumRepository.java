@@ -17,10 +17,10 @@ import java.util.UUID;
 public interface AlbumRepository extends JpaRepository<Album, UUID> {
 
     @Modifying
-    @Query("UPDATE Album a SET a.lyfecycle_status = ? WHERE a.id = ?")
+    @Query("UPDATE Album a SET a.lifecycleStatus = :status WHERE a.id = :id")
     void updateLifecycleStatusById(LifecycleStatus status, UUID id);
 
     @Modifying
-    @Query("UPDATE Album a SET a.availability_status = ? WHERE a.id = ?")
+    @Query("UPDATE Album a SET a.availabilityStatus = :status WHERE a.id = :id")
     void updateAvailabilityStatusById(EntityStatus status, UUID id);
 }

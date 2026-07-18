@@ -10,7 +10,4 @@ import java.util.UUID;
 @Repository
 public interface OtherArtistRepository extends JpaRepository<OtherArtist, UUID> {
 
-    long deleteByTrackId(UUID trackId);
-
-    List<OtherArtist> findByTrackId(UUID trackId);
 }
