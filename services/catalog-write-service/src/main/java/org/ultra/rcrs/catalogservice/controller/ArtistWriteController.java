@@ -21,6 +21,12 @@ public class ArtistWriteController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{artistId}/hide")
+    public ResponseEntity<Void> hideArtist(@PathVariable("artistId") String artistId) {
+        artistService.hideArtist(Url62.decode(artistId));
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{artistId}")
     public ResponseEntity<Void> deleteArtist(@PathVariable("artistId") String artistId) {
         artistService.deleteArtist(Url62.decode(artistId));

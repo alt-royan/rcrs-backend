@@ -28,6 +28,12 @@ public class AlbumWriteController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{albumId}/hide")
+    public ResponseEntity<Void> hideAlbum(@PathVariable("albumId") String albumId) {
+        albumService.hideAlbum(Url62.decode(albumId));
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{albumId}")
     public ResponseEntity<Void> deleteAlbum(@PathVariable("albumId") String albumId) {
         albumService.deleteAlbum(Url62.decode(albumId));

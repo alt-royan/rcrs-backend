@@ -33,4 +33,10 @@ public class TrackWriteController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{trackId}/hide")
+    public ResponseEntity<Void> hideTrack(@PathVariable("trackId") String trackId) {
+        trackService.hideTrack(Url62.decode(trackId));
+        return ResponseEntity.ok().build();
+    }
+
 }

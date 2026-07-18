@@ -1,1 +1,0 @@
--- No additional changes needed. other_artist already has id column in init.sql.

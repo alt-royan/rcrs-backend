@@ -4,17 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
-import org.ultra.rcrs.catalogservice.model.Artist;
 import org.ultra.rcrs.catalogservice.repository.*;
 import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.kafka.events.CatalogCdcEvent;
 import org.ultra.rcrs.utils.S3Utils;
-import org.ultra.rcrs.utils.Url62;
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -34,9 +29,9 @@ public class CdcService {
     private final OtherArtistRepository otherArtistRepository;
 
     public void artistCreated(UUID artistId) {
-        var artist = artistRepository.findById(artistId).orElseThrow();
-        var doc = buildArtistDoc(artist);
-        send(CatalogCdcEvent.UPSERT, CatalogCdcEvent.ARTIST, doc);
+        // var artist = artistRepository.findById(artistId).orElseThrow();
+        // var doc = buildArtistDoc(artist);
+        //  send(CatalogCdcEvent.UPSERT, CatalogCdcEvent.ARTIST, doc);
     }
 
     public void artistDeleted(UUID artistId) {
@@ -48,41 +43,41 @@ public class CdcService {
     }
 
     public void albumCreated(UUID albumId) {
-        var doc = buildAlbumDoc(albumId);
-        send(CatalogCdcEvent.UPSERT, CatalogCdcEvent.ALBUM, doc);
+        // var doc = buildAlbumDoc(albumId);
+        //  send(CatalogCdcEvent.UPSERT, CatalogCdcEvent.ALBUM, doc);
     }
 
     public void albumUpserted(UUID albumId) {
-        var doc = buildAlbumDoc(albumId);
-        send(CatalogCdcEvent.UPSERT, CatalogCdcEvent.ALBUM, doc);
+        // var doc = buildAlbumDoc(albumId);
+        //  send(CatalogCdcEvent.UPSERT, CatalogCdcEvent.ALBUM, doc);
     }
 
     public void albumDeleted(UUID albumId) {
-        send(CatalogCdcEvent.DELETE, CatalogCdcEvent.ALBUM, Map.of("id", Url62.encode(albumId)));
+        //  send(CatalogCdcEvent.DELETE, CatalogCdcEvent.ALBUM, Map.of("id", Url62.encode(albumId)));
     }
 
     public void albumHidden(UUID albumId) {
     }
 
     public void trackCreated(UUID trackId, String uid) {
-        var doc = buildTrackDoc(trackId);
-        send(CatalogCdcEvent.UPSERT, CatalogCdcEvent.TRACK, doc);
+        // var doc = buildTrackDoc(trackId);
+        //send(CatalogCdcEvent.UPSERT, CatalogCdcEvent.TRACK, doc);
     }
 
     public void trackUpserted(UUID trackId) {
-        var doc = buildTrackDoc(trackId);
-        send(CatalogCdcEvent.UPSERT, CatalogCdcEvent.TRACK, doc);
+        //var doc = buildTrackDoc(trackId);
+        //send(CatalogCdcEvent.UPSERT, CatalogCdcEvent.TRACK, doc);
     }
 
     public void trackDeleted(UUID trackId) {
-        send(CatalogCdcEvent.DELETE, CatalogCdcEvent.TRACK, Map.of("id", Url62.encode(trackId)));
+        //send(CatalogCdcEvent.DELETE, CatalogCdcEvent.TRACK, Map.of("id", Url62.encode(trackId)));
     }
 
     public void trackHidden(UUID trackId) {
-        send(CatalogCdcEvent.DELETE, CatalogCdcEvent.TRACK, Map.of("id", Url62.encode(trackId)));
+        //send(CatalogCdcEvent.DELETE, CatalogCdcEvent.TRACK, Map.of("id", Url62.encode(trackId)));
     }
 
-    private Map<String, Object> buildArtistDoc(Artist artist) {
+/*    private Map<String, Object> buildArtistDoc(Artist artist) {
         return Map.of(
                 "id", Url62.encode(artist.getId()),
                 "name", artist.getName(),
@@ -201,7 +196,7 @@ public class CdcService {
         trackDoc.put("artists", trackArtists);
         trackDoc.put("others", others);
         return trackDoc;
-    }
+    }*/
 
     private void send(String action, String entityType, Object payload) {
         try {
