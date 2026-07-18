@@ -1,15 +1,12 @@
 package org.ultra.rcrs.catalogservice.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.ultra.rcrs.enums.ArtistRole;
 
 import java.util.UUID;
 
+@ToString
 @Getter
 @Setter
 @Builder
@@ -17,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "artist_to_track")
-@IdClass(ArtistToTrackId.class)
+@IdClass(ArtistToTrackPK.class)
 public class ArtistToTrack {
 
     @Id

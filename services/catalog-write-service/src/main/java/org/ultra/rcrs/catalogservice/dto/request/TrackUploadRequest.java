@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.ultra.rcrs.catalogservice.dto.OtherArtistDto;
 
-import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,12 +18,18 @@ public class TrackUploadRequest {
     private String uid;
 
     @NotNull
+    private String albumId;
+
+    @NotNull
     private String title;
 
     @NotNull
     private Integer trackNumber;
 
-    private Instant releaseDate;
+    @NotNull
+    private OffsetDateTime releaseDate;
+
+    private OffsetDateTime publishTimestamp;
 
     @NotNull
     private Boolean explicit;

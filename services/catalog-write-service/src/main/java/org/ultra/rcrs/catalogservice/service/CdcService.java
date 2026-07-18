@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.model.Artist;
-import org.ultra.rcrs.catalogservice.repository.write.*;
+import org.ultra.rcrs.catalogservice.repository.*;
 import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.kafka.events.CatalogCdcEvent;
 import org.ultra.rcrs.utils.S3Utils;
@@ -39,6 +39,14 @@ public class CdcService {
         send(CatalogCdcEvent.UPSERT, CatalogCdcEvent.ARTIST, doc);
     }
 
+    public void artistDeleted(UUID artistId) {
+
+    }
+
+    public void artistHidden(UUID artistId) {
+
+    }
+
     public void albumCreated(UUID albumId) {
         var doc = buildAlbumDoc(albumId);
         send(CatalogCdcEvent.UPSERT, CatalogCdcEvent.ALBUM, doc);
@@ -53,6 +61,9 @@ public class CdcService {
         send(CatalogCdcEvent.DELETE, CatalogCdcEvent.ALBUM, Map.of("id", Url62.encode(albumId)));
     }
 
+    public void albumHidden(UUID albumId) {
+    }
+
     public void trackCreated(UUID trackId, String uid) {
         var doc = buildTrackDoc(trackId);
         send(CatalogCdcEvent.UPSERT, CatalogCdcEvent.TRACK, doc);
@@ -64,6 +75,10 @@ public class CdcService {
     }
 
     public void trackDeleted(UUID trackId) {
+        send(CatalogCdcEvent.DELETE, CatalogCdcEvent.TRACK, Map.of("id", Url62.encode(trackId)));
+    }
+
+    public void trackHidden(UUID trackId) {
         send(CatalogCdcEvent.DELETE, CatalogCdcEvent.TRACK, Map.of("id", Url62.encode(trackId)));
     }
 

@@ -11,11 +11,11 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ArtistToTrackId implements Serializable {
+public class ArtistToAlbumPK implements Serializable {
 
     @Column(name = "artist_id")
     private UUID artistId;
 
-    @Column(name = "track_id")
-    private UUID trackId;
+    @Column(name = "album_id")
+    private UUID albumId;
 }

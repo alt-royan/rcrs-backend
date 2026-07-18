@@ -7,7 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.ultra.rcrs.catalogservice.model.converter.SocialLinksConverter;
+import org.ultra.rcrs.enums.EntityStatus;
 
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -32,4 +34,10 @@ public class Artist {
     @Column(name = "social_links")
     @Convert(converter = SocialLinksConverter.class)
     private SocialLinks socialLinks;
+
+    private List<String> tags;
+
+    @Column(name = "availability_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EntityStatus availabilityStatus;
 }

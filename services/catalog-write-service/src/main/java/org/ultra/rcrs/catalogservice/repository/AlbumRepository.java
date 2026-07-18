@@ -1,0 +1,26 @@
+package org.ultra.rcrs.catalogservice.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import org.ultra.rcrs.catalogservice.model.Album;
+import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
+@Repository
+public interface AlbumRepository extends JpaRepository<Album, UUID> {
+
+    @Modifying
+    @Query("UPDATE Album a SET a.lyfecycle_status = ? WHERE a.id = ?")
+    void updateLifecycleStatusById(LifecycleStatus status, UUID id);
+
+    @Modifying
+    @Query("UPDATE Album a SET a.availability_status = ? WHERE a.id = ?")
+    void updateAvailabilityStatusById(EntityStatus status, UUID id);
+}

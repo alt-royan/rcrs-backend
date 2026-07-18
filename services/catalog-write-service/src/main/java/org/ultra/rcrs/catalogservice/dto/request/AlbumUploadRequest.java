@@ -8,6 +8,7 @@ import lombok.Data;
 import org.ultra.rcrs.enums.AlbumType;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class AlbumUploadRequest {
     @NotNull
     private AlbumType type;
 
-    private Instant releaseDate;
+    private OffsetDateTime releaseDate;
 
     @Pattern(regexp = "s3://[\\w\\-]+/[\\w\\-.]+", message = "URI must be s3://{bucket}/{key} formatted")
     private String coverUri;
@@ -28,7 +29,4 @@ public class AlbumUploadRequest {
     @NotEmpty
     @Valid
     private List<ArtistIdDto> artists;
-
-    @Valid
-    private List<TrackUploadRequest> tracks = new ArrayList<>();
 }

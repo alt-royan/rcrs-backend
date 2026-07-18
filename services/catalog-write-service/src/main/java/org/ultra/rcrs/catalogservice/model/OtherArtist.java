@@ -1,11 +1,7 @@
 package org.ultra.rcrs.catalogservice.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.ultra.rcrs.catalogservice.dto.OtherArtistDto;
 import org.ultra.rcrs.catalogservice.model.converter.ArtistRolesConverter;
 import org.ultra.rcrs.catalogservice.model.converter.SocialLinksConverter;
@@ -14,6 +10,7 @@ import org.ultra.rcrs.enums.ArtistRole;
 import java.util.Set;
 import java.util.UUID;
 
+@ToString
 @Getter
 @Setter
 @Builder

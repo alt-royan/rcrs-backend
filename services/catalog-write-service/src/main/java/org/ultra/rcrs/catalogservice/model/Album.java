@@ -7,9 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.ultra.rcrs.enums.AlbumType;
+import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Getter
@@ -25,9 +27,9 @@ public class Album {
     @Column(name = "id")
     private UUID id;
 
-    @Column(name = "status", nullable = false)
+    @Column(name = "lifecycle_status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private LifecycleStatus status;
+    private LifecycleStatus lifecycleStatus;
 
     @Column(name = "title", nullable = false)
     private String title;
@@ -37,11 +39,15 @@ public class Album {
     private AlbumType type;
 
     @Column(name = "release_date")
-    private Instant releaseDate;
+    private OffsetDateTime releaseDate;
+
+    @Column(name = "publish_timestamp")
+    private OffsetDateTime publishTimestamp;
 
     @Column(name = "cover_s3_key")
     private String coverS3Key;
 
-    @Column(name = "available")
-    private Boolean available;
+    @Column(name = "availability_status", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private EntityStatus availabilityStatus;
 }

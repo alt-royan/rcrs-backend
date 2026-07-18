@@ -17,7 +17,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "artist_to_album")
-@IdClass(ArtistToAlbumId.class)
+@IdClass(ArtistToAlbumPK.class)
 public class ArtistToAlbum {
 
     @Id

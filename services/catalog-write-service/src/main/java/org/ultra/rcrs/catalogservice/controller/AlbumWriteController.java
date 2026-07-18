@@ -6,8 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.catalogservice.dto.request.AlbumUploadRequest;
 import org.ultra.rcrs.catalogservice.dto.request.StatusDto;
-import org.ultra.rcrs.catalogservice.dto.response.IdResponse;
-import org.ultra.rcrs.catalogservice.service.AlbumWriteService;
+import org.ultra.rcrs.catalogservice.service.AlbumService;
 import org.ultra.rcrs.utils.Url62;
 
 @RestController
@@ -15,22 +14,23 @@ import org.ultra.rcrs.utils.Url62;
 @RequestMapping("/metadata/albums")
 public class AlbumWriteController {
 
-    private final AlbumWriteService albumWriteService;
+    private final AlbumService albumService;
 
     @PostMapping
-    public ResponseEntity<IdResponse> createAlbum(@RequestBody @Validated AlbumUploadRequest request) {
-        return ResponseEntity.ok(albumWriteService.createAlbum(request));
+    public ResponseEntity<Void> createAlbum(@RequestBody @Validated AlbumUploadRequest request) {
+        albumService.createAlbum(request);
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{albumId}/status")
     public ResponseEntity<Void> updateAlbumStatus(@RequestBody @Validated StatusDto statusDto, @PathVariable("albumId") String albumId) {
-        albumWriteService.updateStatus(Url62.decode(albumId), statusDto.getStatus());
+        albumService.updateLifecycleStatus(statusDto.getStatus(), Url62.decode(albumId));
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{albumId}")
     public ResponseEntity<Void> deleteAlbum(@PathVariable("albumId") String albumId) {
-        albumWriteService.deleteAlbum(Url62.decode(albumId));
+        albumService.deleteAlbum(Url62.decode(albumId));
         return ResponseEntity.ok().build();
     }
 }

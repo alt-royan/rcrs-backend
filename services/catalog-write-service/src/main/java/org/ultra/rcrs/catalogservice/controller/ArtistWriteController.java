@@ -3,23 +3,27 @@ package org.ultra.rcrs.catalogservice.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.catalogservice.dto.request.ArtistCreateRequest;
-import org.ultra.rcrs.catalogservice.service.ArtistWriteService;
+import org.ultra.rcrs.catalogservice.service.ArtistService;
+import org.ultra.rcrs.utils.Url62;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/artists")
 public class ArtistWriteController {
 
-    private final ArtistWriteService artistWriteService;
+    private final ArtistService artistService;
 
     @PostMapping
-    public ResponseEntity<Void> createNewArtist(@RequestBody @Validated ArtistCreateRequest request) {
-        artistWriteService.createArtist(request);
+    public ResponseEntity<Void> createArtist(@RequestBody @Validated ArtistCreateRequest request) {
+        artistService.createArtist(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{artistId}")
+    public ResponseEntity<Void> deleteArtist(@PathVariable("artistId") String artistId) {
+        artistService.deleteArtist(Url62.decode(artistId));
         return ResponseEntity.ok().build();
     }
 }

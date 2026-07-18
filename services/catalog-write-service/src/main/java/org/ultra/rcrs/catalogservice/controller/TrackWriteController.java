@@ -5,7 +5,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.catalogservice.dto.request.StatusDto;
-import org.ultra.rcrs.catalogservice.service.TrackWriteService;
+import org.ultra.rcrs.catalogservice.dto.request.TrackUploadRequest;
+import org.ultra.rcrs.catalogservice.service.TrackService;
 import org.ultra.rcrs.utils.Url62;
 
 @RestController
@@ -13,17 +14,23 @@ import org.ultra.rcrs.utils.Url62;
 @RequestMapping("/metadata/tracks")
 public class TrackWriteController {
 
-    private final TrackWriteService trackWriteService;
+    private final TrackService trackService;
 
     @DeleteMapping("/{trackId}")
     public ResponseEntity<Void> deleteTrack(@PathVariable("trackId") String trackId) {
-        trackWriteService.deleteTrack(Url62.decode(trackId));
+        trackService.deleteTrack(Url62.decode(trackId));
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{trackId}/status")
     public ResponseEntity<Void> updateTrackStatus(@RequestBody @Validated StatusDto statusDto, @PathVariable("trackId") String trackId) {
-        trackWriteService.updateStatus(Url62.decode(trackId), statusDto.getStatus());
+        trackService.updateLifecycleStatus(statusDto.getStatus(), Url62.decode(trackId));
         return ResponseEntity.ok().build();
     }
+    @PostMapping
+    public ResponseEntity<Void> createTrack(@RequestBody @Validated TrackUploadRequest request) {
+        trackService.createTrack(request);
+        return ResponseEntity.ok().build();
+    }
+
 }

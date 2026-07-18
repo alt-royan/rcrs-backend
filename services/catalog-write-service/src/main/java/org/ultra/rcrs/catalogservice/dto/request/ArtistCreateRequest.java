@@ -20,4 +20,6 @@ public class ArtistCreateRequest {
 
     @Valid
     private List<SocialLinkDto> socialLinks = new ArrayList<>();
+
+    private List<String> tags = new ArrayList<>();
 }
