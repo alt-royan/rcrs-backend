@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.enums.EntityType;
 import org.ultra.rcrs.kafka.Topics;
-import org.ultra.rcrs.kafka.events.UpdateEntityStatusEvent;
+import org.ultra.rcrs.events.UpdateEntityStatusEvent;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.UUID;

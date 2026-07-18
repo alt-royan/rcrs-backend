@@ -11,12 +11,11 @@ import org.ultra.rcrs.catalogservice.repository.AlbumDocumentRepository;
 import org.ultra.rcrs.catalogservice.repository.ArtistDocumentRepository;
 import org.ultra.rcrs.catalogservice.repository.TrackDocumentRepository;
 import org.ultra.rcrs.kafka.Topics;
-import org.ultra.rcrs.kafka.events.CatalogCdcEvent;
+import org.ultra.rcrs.events.CatalogCdcEvent;
 import tools.jackson.databind.ObjectMapper;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor

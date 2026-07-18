@@ -9,7 +9,7 @@ import org.springframework.core.ResolvableType;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.kafka.Topics;
-import org.ultra.rcrs.kafka.events.IndexEntityEvent;
+import org.ultra.rcrs.events.IndexEntityEvent;
 import org.ultra.rcrs.searchservice.document.AlbumDoc;
 import org.ultra.rcrs.searchservice.document.ArtistDoc;
 import org.ultra.rcrs.searchservice.document.TrackDoc;

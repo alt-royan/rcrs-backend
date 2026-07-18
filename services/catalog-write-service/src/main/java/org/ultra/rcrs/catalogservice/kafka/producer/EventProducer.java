@@ -8,9 +8,9 @@ import org.springframework.stereotype.Component;
 import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.enums.EntityType;
 import org.ultra.rcrs.kafka.Topics;
-import org.ultra.rcrs.kafka.events.IndexEntityEvent;
-import org.ultra.rcrs.kafka.events.StartTrackTranscodingEvent;
-import org.ultra.rcrs.kafka.events.UpdateEntityStatusEvent;
+import org.ultra.rcrs.events.IndexEntityEvent;
+import org.ultra.rcrs.events.StartTrackTranscodingEvent;
+import org.ultra.rcrs.events.UpdateEntityStatusEvent;
 import org.ultra.rcrs.utils.Url62;
 
 import java.time.Instant;

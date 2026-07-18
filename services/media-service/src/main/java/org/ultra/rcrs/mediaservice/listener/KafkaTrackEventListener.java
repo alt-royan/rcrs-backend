@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.kafka.Topics;
-import org.ultra.rcrs.kafka.events.StartTrackTranscodingEvent;
+import org.ultra.rcrs.events.StartTrackTranscodingEvent;
 import org.ultra.rcrs.mediaservice.service.TranscodingService;
 import tools.jackson.databind.ObjectMapper;
 

@@ -7,7 +7,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.enums.EntityType;
 import org.ultra.rcrs.kafka.Topics;
-import org.ultra.rcrs.kafka.events.StartReindexEvent;
+import org.ultra.rcrs.events.StartReindexEvent;
 import tools.jackson.databind.ObjectMapper;
 
 @Component

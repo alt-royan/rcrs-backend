@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import org.ultra.rcrs.catalogservice.service.StatusService;
 import org.ultra.rcrs.enums.EntityType;
 import org.ultra.rcrs.kafka.Topics;
-import org.ultra.rcrs.kafka.events.UpdateEntityStatusEvent;
+import org.ultra.rcrs.events.UpdateEntityStatusEvent;
 import org.ultra.rcrs.utils.Url62;
 
 @Component

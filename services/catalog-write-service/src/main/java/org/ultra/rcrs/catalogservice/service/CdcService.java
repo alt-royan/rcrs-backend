@@ -6,7 +6,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.catalogservice.repository.*;
 import org.ultra.rcrs.kafka.Topics;
-import org.ultra.rcrs.kafka.events.CatalogCdcEvent;
+import org.ultra.rcrs.events.CatalogCdcEvent;
 import org.ultra.rcrs.utils.S3Utils;
 import tools.jackson.databind.ObjectMapper;
 

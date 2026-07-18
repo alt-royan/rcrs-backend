@@ -1,4 +1,4 @@
-package org.ultra.rcrs.kafka.events;
+package org.ultra.rcrs.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
