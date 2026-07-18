@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.track";
+
+import "events/common/artist_role.proto";
+
+message ArtistAddedToTrackEvent {
+  string artist_id = 1;
+  string track_id = 2;
+  ArtistRole role = 3;
+}

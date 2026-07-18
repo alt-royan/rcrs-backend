@@ -12,14 +12,21 @@ import org.ultra.rcrs.catalogservice.model.OtherArtist;
 import org.ultra.rcrs.catalogservice.model.Track;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.events.album.AlbumCreatedEventOuterClass;
+import org.ultra.rcrs.events.album.ArtistAddedToAlbumEventOuterClass;
+import org.ultra.rcrs.events.album.ArtistDeletedFromAlbumEventOuterClass;
 import org.ultra.rcrs.events.artist.ArtistCreatedEventOuterClass;
 import org.ultra.rcrs.events.artist.ArtistDeletedEventOuterClass;
 import org.ultra.rcrs.events.artist.ArtistHiddenEventOuterClass;
 import org.ultra.rcrs.events.common.AlbumTypeOuterClass;
+import org.ultra.rcrs.events.common.ArtistRoleOuterClass;
 import org.ultra.rcrs.events.common.AvailabilityStatusOuterClass;
 import org.ultra.rcrs.events.common.DomainEventOuterClass;
 import org.ultra.rcrs.events.common.LifecycleStatusOuterClass;
 import org.ultra.rcrs.events.common.SocialLinkOuterClass;
+import org.ultra.rcrs.events.track.ArtistAddedToTrackEventOuterClass;
+import org.ultra.rcrs.events.track.ArtistDeletedFromTrackEventOuterClass;
+import org.ultra.rcrs.events.track.OtherAddedToTrackEventOuterClass;
+import org.ultra.rcrs.events.track.OtherDeletedFromTrackEventOuterClass;
 import org.ultra.rcrs.events.track.TrackCreatedEventOuterClass;
 import org.ultra.rcrs.kafka.ProtobufEventProducer;
 import org.ultra.rcrs.kafka.Topics;
@@ -257,24 +264,143 @@ public class CatalogEventProducer extends ProtobufEventProducer {
     }
 
     public void artistAddedToTrack(UUID artistId, UUID trackId, ArtistRole role) {
+        String stringArtistId = Url62.encode(artistId);
+        String stringTrackId = Url62.encode(trackId);
+        var event = ArtistAddedToTrackEventOuterClass.ArtistAddedToTrackEvent.newBuilder()
+                .setArtistId(stringArtistId)
+                .setTrackId(stringTrackId)
+                .setRole(ArtistRoleOuterClass.ArtistRole.valueOf(role.name()))
+                .build();
 
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.ARTIST_ADDED_TO_TRACK)
+                .setAggregateType(DomainEventOuterClass.AggregateType.TRACK)
+                .setAggregateId(stringTrackId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(event))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
     }
 
     public void artistAddedToAlbum(UUID artistId, UUID albumId, ArtistRole role) {
+        String stringArtistId = Url62.encode(artistId);
+        String stringAlbumId = Url62.encode(albumId);
+        var event = ArtistAddedToAlbumEventOuterClass.ArtistAddedToAlbumEvent.newBuilder()
+                .setArtistId(stringArtistId)
+                .setAlbumId(stringAlbumId)
+                .setRole(ArtistRoleOuterClass.ArtistRole.valueOf(role.name()))
+                .build();
+
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.ARTIST_ADDED_TO_ALBUM)
+                .setAggregateType(DomainEventOuterClass.AggregateType.ALBUM)
+                .setAggregateId(stringAlbumId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(event))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
     }
 
     public void otherAddedToTrack(OtherArtist other, UUID trackUuid) {
+        String stringOtherId = Url62.encode(other.getId());
+        String stringTrackId = Url62.encode(trackUuid);
+        var event = OtherAddedToTrackEventOuterClass.OtherAddedToTrackEvent.newBuilder()
+                .setOtherId(stringOtherId)
+                .setTrackId(stringTrackId)
+                .setName(other.getName())
+                .addAllRoles(other.getRoles().stream()
+                        .map(r -> ArtistRoleOuterClass.ArtistRole.valueOf(r.name())).toList())
+                .addAllSocialLinks(other.getSocialLinks().getItems().stream()
+                        .map(link -> SocialLinkOuterClass.SocialLink.newBuilder()
+                                .setResourceName(link.getResourceName())
+                                .setUrl(link.getUrl()).build()).toList())
+                .build();
+
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.OTHER_ADDED_TO_TRACK)
+                .setAggregateType(DomainEventOuterClass.AggregateType.TRACK)
+                .setAggregateId(stringTrackId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(event))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
     }
 
     public void otherDeletedFromTrack(UUID otherId, UUID trackId) {
+        String stringOtherId = Url62.encode(otherId);
+        String stringTrackId = Url62.encode(trackId);
+        var event = OtherDeletedFromTrackEventOuterClass.OtherDeletedFromTrackEvent.newBuilder()
+                .setOtherId(stringOtherId)
+                .setTrackId(stringTrackId)
+                .build();
 
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.OTHER_DELETED_FROM_TRACK)
+                .setAggregateType(DomainEventOuterClass.AggregateType.TRACK)
+                .setAggregateId(stringTrackId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(event))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
     }
 
     public void artistDeletedFromAlbum(UUID artistUuid, UUID albumUuid) {
+        String stringArtistId = Url62.encode(artistUuid);
+        String stringAlbumId = Url62.encode(albumUuid);
+        var event = ArtistDeletedFromAlbumEventOuterClass.ArtistDeletedFromAlbumEvent.newBuilder()
+                .setArtistId(stringArtistId)
+                .setAlbumId(stringAlbumId)
+                .build();
 
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.ARTIST_DELETED_FROM_ALBUM)
+                .setAggregateType(DomainEventOuterClass.AggregateType.ALBUM)
+                .setAggregateId(stringAlbumId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(event))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
     }
 
     public void artistDeletedFromTrack(UUID artistUuid, UUID trackId) {
+        String stringArtistId = Url62.encode(artistUuid);
+        String stringTrackId = Url62.encode(trackId);
+        var event = ArtistDeletedFromTrackEventOuterClass.ArtistDeletedFromTrackEvent.newBuilder()
+                .setArtistId(stringArtistId)
+                .setTrackId(stringTrackId)
+                .build();
 
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.ARTIST_DELETED_FROM_TRACK)
+                .setAggregateType(DomainEventOuterClass.AggregateType.TRACK)
+                .setAggregateId(stringTrackId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(event))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
     }
 }

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.track";
+
+import "events/common/artist_role.proto";
+import "events/common/social_link.proto";
+
+message OtherAddedToTrackEvent {
+  string other_id = 1;
+  string track_id = 2;
+  string name = 3;
+  repeated ArtistRole roles = 4;
+  repeated SocialLink social_links = 5;
+}

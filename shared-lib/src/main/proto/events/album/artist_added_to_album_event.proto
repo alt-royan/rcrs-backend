@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.album";
+
+import "events/common/artist_role.proto";
+
+message ArtistAddedToAlbumEvent {
+  string artist_id = 1;
+  string album_id = 2;
+  ArtistRole role = 3;
+}

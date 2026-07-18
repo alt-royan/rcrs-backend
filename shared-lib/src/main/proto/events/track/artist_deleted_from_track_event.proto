@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.track";
+
+message ArtistDeletedFromTrackEvent {
+  string artist_id = 1;
+  string track_id = 2;
+}

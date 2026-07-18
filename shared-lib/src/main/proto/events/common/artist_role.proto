@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.common";
+
+enum ArtistRole {
+  ARTIST_ROLE_UNSPECIFIED = 0;
+  MAIN_ARTIST = 1;
+  FEATURED_ARTIST = 2;
+}
