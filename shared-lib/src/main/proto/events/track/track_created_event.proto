@@ -15,5 +15,4 @@ message TrackCreatedEvent {
   bool explicit = 4;
   AvailabilityStatus availability_status = 5;
   LifecycleStatus lifecycle_status = 6;
-  string album_id = 7;
 }

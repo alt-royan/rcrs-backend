@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.reactive.resource.NoResourceFoundException;
 import org.springframework.web.server.ServerWebInputException;
-import org.ultra.rcrs.catalogservice.dto.response.ErrorResponse;
+import org.ultra.rcrs.catalogservice.dto.ErrorResponse;
 import org.ultra.rcrs.exceptions.BadRequestException;
 import org.ultra.rcrs.exceptions.DecodeFromBase62Exception;
 import org.ultra.rcrs.exceptions.EncodeToBase62Exception;

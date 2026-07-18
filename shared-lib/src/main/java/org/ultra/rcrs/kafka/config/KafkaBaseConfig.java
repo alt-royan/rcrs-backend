@@ -4,6 +4,7 @@ import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.TopicPartition;
+import org.apache.kafka.common.serialization.ByteArrayDeserializer;
 import org.apache.kafka.common.serialization.ByteArraySerializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -49,11 +50,20 @@ public class KafkaBaseConfig {
     }
 
     @Bean
-    public ConsumerFactory<String, String> consumerFactory() {
-        return new DefaultKafkaConsumerFactory<>(consumerProps());
+    public ConsumerFactory<String, String> consumerFactoryString() {
+        var consumerProps = consumerProps();
+        consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        return new DefaultKafkaConsumerFactory<>(consumerProps);
     }
 
     @Bean
+    public ConsumerFactory<String, byte[]> consumerFactoryByteArray() {
+        var consumerProps = consumerProps();
+        consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ByteArrayDeserializer.class);
+        return new DefaultKafkaConsumerFactory<>(consumerProps);
+    }
+
+/*    @Bean
     public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory(
             ConsumerFactory<String, String> consumerFactory,
             KafkaTemplate<String, String> stringTemplate) {
@@ -68,7 +78,7 @@ public class KafkaBaseConfig {
         factory.setCommonErrorHandler(errorHandler);
 
         return factory;
-    }
+    }*/
 
     @Bean
     public KafkaAdmin admin() {
@@ -88,7 +98,6 @@ public class KafkaBaseConfig {
         Map<String, Object> consumerProps = new HashMap<>();
         consumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         return consumerProps;
     }
 }

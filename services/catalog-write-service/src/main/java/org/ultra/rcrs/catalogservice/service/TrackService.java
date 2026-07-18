@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.catalogservice.dto.OtherArtistDto;
-import org.ultra.rcrs.catalogservice.dto.request.ArtistDto;
+import org.ultra.rcrs.catalogservice.dto.ArtistDto;
 import org.ultra.rcrs.catalogservice.dto.request.TrackUploadRequest;
 import org.ultra.rcrs.catalogservice.kafka.CatalogEventProducer;
 import org.ultra.rcrs.catalogservice.model.*;
@@ -68,6 +68,7 @@ public class TrackService {
     public void updateLifecycleStatus(LifecycleStatus status, UUID trackId) {
         trackRepository.updateLifecycleStatusById(status, trackId);
         log.info("Track {} lifecycle_status updated to {}", trackId, status);
+        catalogEventProducer.updateTrackLifecycleStatus(status, trackId);
     }
 
     @Transactional

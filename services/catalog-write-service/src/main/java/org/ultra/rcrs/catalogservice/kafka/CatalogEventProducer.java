@@ -11,7 +11,10 @@ import org.ultra.rcrs.catalogservice.model.Artist;
 import org.ultra.rcrs.catalogservice.model.OtherArtist;
 import org.ultra.rcrs.catalogservice.model.Track;
 import org.ultra.rcrs.enums.ArtistRole;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.events.album.AlbumCreatedEventOuterClass;
+import org.ultra.rcrs.events.album.AlbumDeletedEventOuterClass;
+import org.ultra.rcrs.events.album.AlbumHiddenEventOuterClass;
 import org.ultra.rcrs.events.album.ArtistAddedToAlbumEventOuterClass;
 import org.ultra.rcrs.events.album.ArtistDeletedFromAlbumEventOuterClass;
 import org.ultra.rcrs.events.artist.ArtistCreatedEventOuterClass;
@@ -28,6 +31,11 @@ import org.ultra.rcrs.events.track.ArtistDeletedFromTrackEventOuterClass;
 import org.ultra.rcrs.events.track.OtherAddedToTrackEventOuterClass;
 import org.ultra.rcrs.events.track.OtherDeletedFromTrackEventOuterClass;
 import org.ultra.rcrs.events.track.TrackCreatedEventOuterClass;
+import org.ultra.rcrs.events.track.TrackDeletedEventOuterClass;
+import org.ultra.rcrs.events.track.TrackHiddenEventOuterClass;
+import org.ultra.rcrs.events.track.TrackAddedToAlbumEventOuterClass;
+import org.ultra.rcrs.events.album.AlbumUpdateLifecycleStatusEventOuterClass;
+import org.ultra.rcrs.events.track.TrackUpdateLifecycleStatusEventOuterClass;
 import org.ultra.rcrs.kafka.ProtobufEventProducer;
 import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.utils.Url62;
@@ -148,7 +156,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
 
     public void albumDeleted(UUID albumId) {
         String stringId = Url62.encode(albumId);
-        var event = ArtistDeletedEventOuterClass.ArtistDeletedEvent.newBuilder()
+        var event = AlbumDeletedEventOuterClass.AlbumDeletedEvent.newBuilder()
                 .setId(stringId)
                 .build();
 
@@ -168,7 +176,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
 
     public void albumHidden(UUID albumId) {
         String stringId = Url62.encode(albumId);
-        var event = ArtistHiddenEventOuterClass.ArtistHiddenEvent.newBuilder()
+        var event = AlbumHiddenEventOuterClass.AlbumHiddenEvent.newBuilder()
                 .setId(stringId)
                 .build();
 
@@ -188,7 +196,6 @@ public class CatalogEventProducer extends ProtobufEventProducer {
 
     public void trackCreated(Track track) {
         String trackId = Url62.encode(track.getId());
-        String albumId = Url62.encode(track.getAlbumId());
 
         var eventBuilder = TrackCreatedEventOuterClass.TrackCreatedEvent.newBuilder()
                 .setId(trackId)
@@ -196,8 +203,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setTrackNumber(track.getTrackNumber())
                 .setExplicit(track.getExplicit())
                 .setAvailabilityStatus(AvailabilityStatusOuterClass.AvailabilityStatus.valueOf(track.getAvailabilityStatus().name()))
-                .setLifecycleStatus(LifecycleStatusOuterClass.LifecycleStatus.valueOf(track.getLifecycleStatus().name()))
-                .setAlbumId(albumId);
+                .setLifecycleStatus(LifecycleStatusOuterClass.LifecycleStatus.valueOf(track.getLifecycleStatus().name()));
 
         var event = eventBuilder.build();
 
@@ -215,9 +221,31 @@ public class CatalogEventProducer extends ProtobufEventProducer {
         sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
     }
 
+    public void trackAddedToAlbum(UUID trackId, UUID albumId) {
+        String stringTrackId = Url62.encode(trackId);
+        String stringAlbumId = Url62.encode(albumId);
+        var event = TrackAddedToAlbumEventOuterClass.TrackAddedToAlbumEvent.newBuilder()
+                .setTrackId(stringTrackId)
+                .setAlbumId(stringAlbumId)
+                .build();
+
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.TRACK_ADDED_TO_ALBUM)
+                .setAggregateType(DomainEventOuterClass.AggregateType.TRACK)
+                .setAggregateId(stringTrackId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(event))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+    }
+
     public void trackDeleted(UUID trackId) {
         String stringId = Url62.encode(trackId);
-        var event = ArtistDeletedEventOuterClass.ArtistDeletedEvent.newBuilder()
+        var event = TrackDeletedEventOuterClass.TrackDeletedEvent.newBuilder()
                 .setId(stringId)
                 .build();
 
@@ -237,7 +265,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
 
     public void trackHidden(UUID trackId) {
         String stringId = Url62.encode(trackId);
-        var event = ArtistHiddenEventOuterClass.ArtistHiddenEvent.newBuilder()
+        var event = TrackHiddenEventOuterClass.TrackHiddenEvent.newBuilder()
                 .setId(stringId)
                 .build();
 
@@ -388,6 +416,48 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setEventType(DomainEventOuterClass.EventType.ARTIST_DELETED_FROM_TRACK)
                 .setAggregateType(DomainEventOuterClass.AggregateType.TRACK)
                 .setAggregateId(stringTrackId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(event))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+    }
+
+    public void updateAlbumLifecycleStatus(LifecycleStatus status, UUID albumId) {
+        String stringId = Url62.encode(albumId);
+        var event = AlbumUpdateLifecycleStatusEventOuterClass.AlbumUpdateLifecycleStatusEvent.newBuilder()
+                .setId(stringId)
+                .setLifecycleStatus(LifecycleStatusOuterClass.LifecycleStatus.valueOf(status.name()))
+                .build();
+
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.ALBUM_LIFECYCLE_STATUS_UPDATED)
+                .setAggregateType(DomainEventOuterClass.AggregateType.ALBUM)
+                .setAggregateId(stringId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(event))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+    }
+
+    public void updateTrackLifecycleStatus(LifecycleStatus status, UUID trackId) {
+        String stringId = Url62.encode(trackId);
+        var event = TrackUpdateLifecycleStatusEventOuterClass.TrackUpdateLifecycleStatusEvent.newBuilder()
+                .setId(stringId)
+                .setLifecycleStatus(LifecycleStatusOuterClass.LifecycleStatus.valueOf(status.name()))
+                .build();
+
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.TRACK_LIFECYCLE_STATUS_UPDATED)
+                .setAggregateType(DomainEventOuterClass.AggregateType.TRACK)
+                .setAggregateId(stringId)
                 .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
                 .setProducer(serviceName)
                 .setPayload(Any.pack(event))

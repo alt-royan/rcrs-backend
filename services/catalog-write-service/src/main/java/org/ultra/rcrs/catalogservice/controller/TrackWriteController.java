@@ -6,7 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.catalogservice.dto.request.ArtistsToEntityRequest;
 import org.ultra.rcrs.catalogservice.dto.request.OthersToTrackRequest;
-import org.ultra.rcrs.catalogservice.dto.request.StatusDto;
+import org.ultra.rcrs.catalogservice.dto.StatusDto;
 import org.ultra.rcrs.catalogservice.dto.request.TrackUploadRequest;
 import org.ultra.rcrs.catalogservice.service.TrackService;
 import org.ultra.rcrs.utils.Url62;

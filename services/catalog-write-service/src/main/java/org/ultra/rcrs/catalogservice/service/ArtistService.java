@@ -4,20 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.ultra.rcrs.catalogservice.dto.OtherArtistDto;
 import org.ultra.rcrs.catalogservice.dto.request.ArtistCreateRequest;
-import org.ultra.rcrs.catalogservice.dto.request.ArtistDto;
 import org.ultra.rcrs.catalogservice.kafka.CatalogEventProducer;
 import org.ultra.rcrs.catalogservice.model.*;
 import org.ultra.rcrs.catalogservice.repository.ArtistRepository;
-import org.ultra.rcrs.catalogservice.repository.ArtistToAlbumRepository;
-import org.ultra.rcrs.catalogservice.repository.ArtistToTrackRepository;
-import org.ultra.rcrs.catalogservice.repository.OtherArtistRepository;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.utils.S3Utils;
 import org.ultra.rcrs.utils.Url62;
 
-import java.util.List;
 import java.util.UUID;
 
 @Service

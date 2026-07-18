@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.track";
+
+message TrackAddedToAlbumEvent {
+  string track_id = 1;
+  string album_id = 2;
+}

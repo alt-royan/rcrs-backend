@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.album";
+
+import "events/common/lifecycle_status.proto";
+
+message AlbumUpdateLifecycleStatusEvent {
+  string id = 1;
+  LifecycleStatus lifecycle_status = 2;
+}
