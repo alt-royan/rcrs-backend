@@ -39,7 +39,7 @@
         <module>services/catalog-read-service</module>
         <module>services/media-service</module>
         <module>services/search-service</module>
-        <module>workflow-service</module>
+        <module>services/workflow-service</module>
     </modules>
 
     <dependencyManagement>

@@ -44,8 +44,4 @@ public class StatusService {
             }
         }*/
     }
-
-    private boolean isAlbumPublished(Album album) {
-        return LifecycleStatus.PUBLISHED.equals(album.getStatus());
-    }
 }

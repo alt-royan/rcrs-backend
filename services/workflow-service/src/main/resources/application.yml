@@ -1,0 +1,93 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: workflow-service
+
+temporal:
+  service-url: localhost:7233
+  namespace: default
+  task-queue: metadata-task-queue
+  activities:
+    metadata:
+      start-to-close-timeout: 30s
+      retry:
+        initial-interval: 1s
+        backoff-coefficient: 2
+        maximum-interval: 30s
+        maximum-attempts: 5
+    audio:
+      start-to-close-timeout: 60s
+      retry:
+        initial-interval: 2s
+        backoff-coefficient: 2
+        maximum-interval: 60s
+        maximum-attempts: 3
+    search:
+      start-to-close-timeout: 15s
+      retry:
+        initial-interval: 1s
+        backoff-coefficient: 2
+        maximum-interval: 20s
+        maximum-attempts: 5
+    text:
+      start-to-close-timeout: 30s
+      retry:
+        initial-interval: 1s
+        backoff-coefficient: 2
+        maximum-interval: 30s
+        maximum-attempts: 5
+    notification:
+      start-to-close-timeout: 10s
+      retry:
+        initial-interval: 1s
+        backoff-coefficient: 2
+        maximum-interval: 15s
+        maximum-attempts: 3
+    statistics:
+      start-to-close-timeout: 10s
+      retry:
+        initial-interval: 1s
+        backoff-coefficient: 2
+        maximum-interval: 15s
+        maximum-attempts: 3
+    cleanup:
+      start-to-close-timeout: 120s
+      retry:
+        initial-interval: 5s
+        backoff-coefficient: 2
+        maximum-interval: 120s
+        maximum-attempts: 3
+
+services:
+  metadata:
+    url: http://localhost:8080
+  audio:
+    url: http://localhost:8081
+  search:
+    url: http://localhost:8083
+  text:
+    url: http://localhost:8087
+  notification:
+    url: http://localhost:8088
+  statistics:
+    url: http://localhost:8089
+  cleanup:
+    url: http://localhost:8090
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    preferIpAddress: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
