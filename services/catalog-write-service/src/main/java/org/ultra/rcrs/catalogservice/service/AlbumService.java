@@ -112,7 +112,7 @@ public class AlbumService {
         log.info("Album {} availability_status updated to {}", albumId, status);
     }
 
-    private boolean albumExists(UUID albumId) {
+    public boolean albumExists(UUID albumId) {
         return albumRepository.existsById(albumId);
     }
 }

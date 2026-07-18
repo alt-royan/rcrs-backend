@@ -277,8 +277,4 @@ public class CatalogEventProducer extends ProtobufEventProducer {
     public void artistDeletedFromTrack(UUID artistUuid, UUID trackId) {
 
     }
-
-    public void trackAddedToAlbum(UUID id, UUID albumId) {
-
-    }
 }

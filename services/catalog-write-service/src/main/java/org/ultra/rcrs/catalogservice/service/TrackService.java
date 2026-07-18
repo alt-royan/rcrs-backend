@@ -32,10 +32,16 @@ public class TrackService {
     private final ArtistToTrackRepository artistToTrackRepository;
     private final OtherArtistRepository otherArtistRepository;
     private final ArtistService artistService;
+    private final AlbumService albumService;
     private final CatalogEventProducer catalogEventProducer;
 
     @Transactional
-    public Track createTrack(TrackUploadRequest uploadRequest) {
+    public void createTrack(TrackUploadRequest uploadRequest) {
+        UUID albumId = Url62.decode(uploadRequest.getAlbumId());
+        if (!albumService.albumExists(albumId)) {
+            throw new NotFoundException("Album", albumId);
+        }
+
         Track track = trackRepository.save(Track.builder()
                 .lifecycleStatus(LifecycleStatus.CREATED)
                 .title(uploadRequest.getTitle())
@@ -45,15 +51,13 @@ public class TrackService {
                 .trackNumber(uploadRequest.getTrackNumber())
                 .explicit(uploadRequest.getExplicit())
                 .availabilityStatus(EntityStatus.ACTIVE)
-                .albumId(Url62.decode(uploadRequest.getAlbumId()))
+                .albumId(albumId)
                 .build());
         log.info("Track {} saved with UUID: {}, public Id {}", track.getTitle(), track.getId(), Url62.encode(track.getId()));
         catalogEventProducer.trackCreated(track);
 
         addAllArtistToTrack(uploadRequest.getArtists(), track.getId());
         addAllOthersToTrack(uploadRequest.getOthers(), track.getId());
-
-        return track;
     }
 
     @Transactional
