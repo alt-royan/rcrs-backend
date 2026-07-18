@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.common";
+
+enum LifecycleStatus {
+  LIFECYCLE_STATUS_UNSPECIFIED = 0;
+  CREATED = 1;
+  TRANSCODING = 2;
+  FAILED = 3;
+  READY = 4;
+  PUBLISHED = 5;
+}

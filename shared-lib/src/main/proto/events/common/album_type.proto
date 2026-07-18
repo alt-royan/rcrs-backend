@@ -1,0 +1,12 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.common";
+
+enum AlbumType {
+  ALBUM_TYPE_UNSPECIFIED = 0;
+  FULL = 1;
+  SINGLE = 2;
+  EP = 3;
+}

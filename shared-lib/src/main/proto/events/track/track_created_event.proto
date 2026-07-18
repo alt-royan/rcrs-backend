@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.track";
+
+import "google/protobuf/timestamp.proto";
+import "events/common/availability_status.proto";
+import "events/common/lifecycle_status.proto";
+
+message TrackCreatedEvent {
+  string id = 1;
+  string title = 2;
+  google.protobuf.Timestamp release_date = 3;
+  int32 duration_ms = 4;
+  int32 track_number = 5;
+  bool explicit = 6;
+  AvailabilityStatus availability_status = 7;
+  LifecycleStatus lifecycle_status = 8;
+  string album_id = 9;
+}

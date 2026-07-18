@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.album";
+
+import "google/protobuf/timestamp.proto";
+import "events/common/album_type.proto";
+import "events/common/availability_status.proto";
+import "events/common/lifecycle_status.proto";
+
+message AlbumCreatedEvent {
+  string id = 1;
+  string title = 2;
+  AlbumType type = 3;
+  google.protobuf.Timestamp release_date = 4;
+  string cover_s3_key = 5;
+  AvailabilityStatus availability_status = 6;
+  LifecycleStatus lifecycle_status = 7;
+}
