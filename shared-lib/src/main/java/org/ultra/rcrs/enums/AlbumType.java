@@ -1,7 +1,7 @@
 package org.ultra.rcrs.enums;
 
 public enum AlbumType {
-    ALBUM("album"), SINGLE("single"), EP("ep");
+    FULL("album"), SINGLE("single"), EP("ep");
 
     private final String value;
 

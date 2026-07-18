@@ -7,9 +7,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import org.ultra.rcrs.enums.AlbumType;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -28,5 +26,5 @@ public class AlbumUploadRequest {
 
     @NotEmpty
     @Valid
-    private List<ArtistIdDto> artists;
+    private List<ArtistDto> artists;
 }

@@ -13,30 +13,22 @@ import java.util.List;
 @Data
 public class TrackUploadRequest {
 
-    @NotNull
-    @NotEmpty
-    private String uid;
+    private String id;
 
-    @NotNull
     private String albumId;
 
-    @NotNull
     private String title;
 
-    @NotNull
     private Integer trackNumber;
 
-    @NotNull
     private OffsetDateTime releaseDate;
 
     private OffsetDateTime publishTimestamp;
 
-    @NotNull
     private Boolean explicit;
 
-    @NotEmpty
     @Valid
-    private List<ArtistIdDto> artists = new ArrayList<>();
+    private List<ArtistDto> artists = new ArrayList<>();
 
     @Valid
     private List<OtherArtistDto> others = new ArrayList<>();

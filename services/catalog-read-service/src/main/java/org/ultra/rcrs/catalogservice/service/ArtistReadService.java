@@ -64,7 +64,7 @@ public class ArtistReadService {
         List<String> statusNames = statuses.stream().map(Enum::name).toList();
         return albumDocumentRepository.findByArtistsIdAndStatusIn(artistId.toString(), statusNames, Sort.by(direction, "releaseDate"))
                 .map(a -> {
-                    var albumType = a.getType() != null ? AlbumType.valueOf(a.getType()) : AlbumType.ALBUM;
+                    var albumType = a.getType() != null ? AlbumType.valueOf(a.getType()) : AlbumType.FULL;
                     if (type != null && !type.equals(albumType)) return null;
 
                     ArtistRole artistRole = null;

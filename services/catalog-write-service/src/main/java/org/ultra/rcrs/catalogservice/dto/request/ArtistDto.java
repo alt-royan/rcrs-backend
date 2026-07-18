@@ -1,14 +1,14 @@
 package org.ultra.rcrs.catalogservice.dto.request;
 
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.ultra.rcrs.enums.ArtistRole;
 
 @Data
-public class ArtistIdDto {
+public class ArtistDto {
 
-    @NotNull
     private String id;
+
+    private String name;
 
     private ArtistRole role = ArtistRole.MAIN_ARTIST;
 }
