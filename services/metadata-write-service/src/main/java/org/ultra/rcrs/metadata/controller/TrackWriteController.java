@@ -1,0 +1,73 @@
+package org.ultra.rcrs.metadata.controller;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+import org.ultra.rcrs.metadata.dto.StatusDto;
+import org.ultra.rcrs.metadata.dto.request.ArtistsToEntityRequest;
+import org.ultra.rcrs.metadata.dto.request.OthersToTrackRequest;
+import org.ultra.rcrs.metadata.dto.request.TrackUploadRequest;
+import org.ultra.rcrs.metadata.dto.response.CreateResponse;
+import org.ultra.rcrs.metadata.service.TrackService;
+import org.ultra.rcrs.utils.Url62;
+
+@RestController
+@RequiredArgsConstructor
+@RequestMapping("/tracks")
+public class TrackWriteController {
+
+    private final TrackService trackService;
+
+    @PostMapping
+    public ResponseEntity<CreateResponse> createTrack(@RequestBody @Validated TrackUploadRequest request) {
+        var res = trackService.createTrack(request);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(new CreateResponse(res));
+    }
+
+    @PostMapping("/{trackId}/artists")
+    public ResponseEntity<Void> addArtistsToTrack(@RequestBody @Validated ArtistsToEntityRequest request, @PathVariable("trackId") String trackId) {
+        trackService.addAllArtistToTrack(request.getArtists(), Url62.decode(trackId));
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{trackId}/artists")
+    public ResponseEntity<Void> deleteArtistsFromAlbum(@RequestBody @Validated ArtistsToEntityRequest request, @PathVariable("trackId") String trackId) {
+        trackService.deleteAllArtistFromTrack(request.getArtists(), Url62.decode(trackId));
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{trackId}/others")
+    public ResponseEntity<Void> addOthersToTrack(@RequestBody @Validated OthersToTrackRequest request, @PathVariable("trackId") String trackId) {
+        trackService.addAllOthersToTrack(request.getOthers(), Url62.decode(trackId));
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{trackId}/others")
+    public ResponseEntity<Void> deleteOthersFromTrack(@RequestBody @Validated OthersToTrackRequest request, @PathVariable("trackId") String trackId) {
+        trackService.deleteAllOthersFromTrack(request.getOthers(), Url62.decode(trackId));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{trackId}/status")
+    public ResponseEntity<Void> updateTrackStatus(@RequestBody @Validated StatusDto statusDto, @PathVariable("trackId") String trackId) {
+        trackService.updateLifecycleStatus(statusDto.getStatus(), Url62.decode(trackId));
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping("/{trackId}/hide")
+    public ResponseEntity<Void> hideTrack(@PathVariable("trackId") String trackId) {
+        trackService.hideTrack(Url62.decode(trackId));
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{trackId}")
+    public ResponseEntity<Void> deleteTrack(@PathVariable("trackId") String trackId) {
+        trackService.markTrackDelete(Url62.decode(trackId));
+        return ResponseEntity.noContent().build();
+    }
+
+}

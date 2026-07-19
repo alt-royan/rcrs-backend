@@ -1,0 +1,17 @@
+package org.ultra.rcrs.metadata.repository;
+
+import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.stereotype.Repository;
+import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
+import reactor.core.publisher.Mono;
+
+@Repository
+public interface AlbumDocumentRepository extends ReactiveMongoRepository<AlbumPublicDocument, String> {
+
+    @Query("{ '_id': ?0 }")
+    Mono<AlbumPublicDocument> findByIdForAdmin(String id);
+
+    @Query("{ '_id': ?0, 'lifecycleStatus': 'PUBLISHED', 'availabilityStatus': { '$in': [ 'ACTIVE', 'HIDDEN' ] } }")
+    Mono<AlbumPublicDocument> findByIdForPublic(String id);
+}

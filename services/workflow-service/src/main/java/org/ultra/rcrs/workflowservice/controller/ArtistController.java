@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.ultra.rcrs.workflowservice.config.temporal.TemporalProperties;
+import org.ultra.rcrs.workflowservice.config.TemporalProperties;
 import org.ultra.rcrs.workflowservice.dto.ArtistResponse;
 import org.ultra.rcrs.workflowservice.dto.CreateArtistRequest;
 import org.ultra.rcrs.workflowservice.workflow.ArtistCreationWorkflow;

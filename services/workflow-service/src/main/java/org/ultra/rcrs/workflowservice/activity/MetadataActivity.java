@@ -6,8 +6,4 @@ import org.ultra.rcrs.workflowservice.dto.CreateArtistRequest;
 public interface MetadataActivity {
 
     ArtistResponse createArtist(CreateArtistRequest request);
-
-    ArtistResponse updateArtist(String id, CreateArtistRequest request);
-
-    ArtistResponse deleteArtist(String id);
 }
