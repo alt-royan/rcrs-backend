@@ -1,5 +1,7 @@
 package org.ultra.rcrs.metadata.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -17,7 +19,9 @@ public class ArtistCreateRequest {
     private String avatarUri;
 
     @Valid
-    private List<SocialLinkDto> socialLinks = new ArrayList<>();
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<SocialLinkDto> socialLinks;
 
-    private List<String> tags = new ArrayList<>();
+    @JsonSetter(nulls = Nulls.AS_EMPTY)
+    private List<String> tags;
 }

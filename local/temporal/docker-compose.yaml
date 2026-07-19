@@ -1,74 +1,71 @@
 services:
-  temporal-postgres:
-    image: postgres:16
+  postgres:
     container_name: temporal-postgres
     environment:
-      POSTGRES_USER: temporal
       POSTGRES_PASSWORD: temporal
-      POSTGRES_DB: temporal
+      POSTGRES_USER: temporal
+    image: postgres:latest
+    networks:
+      - temporal-network
     ports:
-      - "5433:5432"
+      - 5454:5432
     volumes:
-      - temporal-pg-data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U temporal"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+      - /var/lib/postgres/data
     restart: unless-stopped
 
   temporal:
-    image: temporalio/server:1.24.1
-    container_name: temporal-server
-    ports:
-      - "7233:7233"
-      - "7234:7234"
-    environment:
-      DB: postgresql
-      DB_PORT: 5432
-      POSTGRES_USER: temporal
-      POSTGRES_PASSWORD: temporal
-      POSTGRES_SEEDS: temporal-postgres
+    container_name: temporal
     depends_on:
-      temporal-postgres:
-        condition: service_healthy
-    command: >
-      sh -c "
-        until temporal-sql-tool setup -u temporal -p temporal; do
-          echo 'Waiting for schema setup...'
-          sleep 1
-        done
-        temporal-server --config /etc/temporal/config/docker.yaml
-      "
+      - postgres
+    environment:
+      - DB=postgres12
+      - DB_PORT=5432
+      - POSTGRES_USER=temporal
+      - POSTGRES_PWD=temporal
+      - POSTGRES_SEEDS=postgres
+      - DYNAMIC_CONFIG_FILE_PATH=config/dynamicconfig/development-sql.yaml
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CLI_ADDRESS=temporal:7233
+      - TEMPORAL_NAMESPACE_DEFAULT=default
+      - TEMPORAL_DEFAULT_NAMESPACE=default
+    image: temporalio/auto-setup:latest
+    networks:
+      - temporal-network
+    ports:
+      - 7233:7233
+    volumes:
+      - ./dynamicconfig:/etc/temporal/config/dynamicconfig
     restart: unless-stopped
 
   temporal-admin-tools:
-    image: temporalio/admin-tools:1.24.1
     container_name: temporal-admin-tools
-    environment:
-      TEMPORAL_CLI_ADDRESS: temporal:7233
     depends_on:
       - temporal
-    command: >
-      bash -c "
-        until temporal operator namespace describe default; do
-          echo 'Waiting for Temporal server...'
-          sleep 2
-        done
-        temporal operator namespace create default || true
-      "
-
-  temporal-ui:
-    image: temporalio/ui:2.28.0
-    container_name: temporal-ui
-    ports:
-      - "8085:8080"
     environment:
-      TEMPORAL_ADDRESS: temporal:7233
-      TEMPORAL_CORS_ORIGINS: http://localhost:3000
-    depends_on:
-      - temporal
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CLI_ADDRESS=temporal:7233
+    image: temporalio/admin-tools:latest
+    networks:
+      - temporal-network
+    stdin_open: true
+    tty: true
     restart: unless-stopped
 
-volumes:
-  temporal-pg-data:
+  temporal-ui:
+    container_name: temporal-ui
+    depends_on:
+      - temporal
+    environment:
+      - TEMPORAL_ADDRESS=temporal:7233
+      - TEMPORAL_CORS_ORIGINS=http://localhost:3000
+    image: temporalio/ui:latest
+    networks:
+      - temporal-network
+    ports:
+      - 8888:8080
+    restart: unless-stopped
+
+networks:
+  temporal-network:
+    driver: bridge
+    name: temporal-network

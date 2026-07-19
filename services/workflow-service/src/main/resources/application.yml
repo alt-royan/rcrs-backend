@@ -11,67 +11,38 @@ spring:
           default:
             connectTimeout: 5000
             readTimeout: 5000
-
-temporal:
-  service-url: localhost:7233
-  namespace: default
-  task-queue: workflow-task-queue
-  activities:
-    metadata:
-      start-to-close-timeout: 30s
-      retry:
-        initial-interval: 1s
-        backoff-coefficient: 2
-        maximum-interval: 30s
-        maximum-attempts: 5
-    audio:
-      start-to-close-timeout: 60s
-      retry:
-        initial-interval: 2s
-        backoff-coefficient: 2
-        maximum-interval: 60s
-        maximum-attempts: 3
-    search:
-      start-to-close-timeout: 15s
-      retry:
-        initial-interval: 1s
-        backoff-coefficient: 2
-        maximum-interval: 20s
-        maximum-attempts: 5
-    text:
-      start-to-close-timeout: 30s
-      retry:
-        initial-interval: 1s
-        backoff-coefficient: 2
-        maximum-interval: 30s
-        maximum-attempts: 5
-    notification:
-      start-to-close-timeout: 10s
-      retry:
-        initial-interval: 1s
-        backoff-coefficient: 2
-        maximum-interval: 15s
-        maximum-attempts: 3
-    statistics:
-      start-to-close-timeout: 10s
-      retry:
-        initial-interval: 1s
-        backoff-coefficient: 2
-        maximum-interval: 15s
-        maximum-attempts: 3
-    cleanup:
-      start-to-close-timeout: 120s
-      retry:
-        initial-interval: 5s
-        backoff-coefficient: 2
-        maximum-interval: 120s
-        maximum-attempts: 3
+  kafka:
+    bootstrap-servers: localhost:9092
+  temporal:
+    connection:
+      target: 127.0.0.1:7233
+    workers:
+        capacity:
+          max-concurrent-workflow-task-pollers: 6
+          max-concurrent-activity-task-pollers: 6
+        rate-limits:
+          max-worker-activities-per-second: 2
+          max-task-queue-activities-per-second: 2
+    workflow-cache:
+      max-instances: 10
+      max-threads: 10
+    workersAutoDiscovery:
+      packages: org.ultra.rcrs.workflow
+    namespace: default
+    activities:
+      metadata:
+        start-to-close-timeout: 30s
+        retry:
+          initial-interval: 1s
+          backoff-coefficient: 2
+          maximum-interval: 30s
+          maximum-attempts: 5
 
 feign:
-  metadata-write-service:
+  metadata-service:
     url: http://localhost:8080
   media-service:
-    url: http://localhost:8082
+    url: http://localhost:8081
   search-service:
     url: http://localhost:8083
 

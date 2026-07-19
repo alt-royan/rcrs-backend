@@ -15,14 +15,15 @@
     <name>workflow-service</name>
     <description>Workflow Orchestration Service</description>
 
-    <properties>
-        <temporal-sdk.version>1.37.0</temporal-sdk.version>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.ultra.rcrs</groupId>
             <artifactId>shared-lib</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
         </dependency>
 
         <dependency>
@@ -42,8 +43,8 @@
 
         <dependency>
             <groupId>io.temporal</groupId>
-            <artifactId>temporal-sdk</artifactId>
-            <version>${temporal-sdk.version}</version>
+            <artifactId>temporal-spring-boot-starter</artifactId>
+            <scope>compile</scope>
         </dependency>
 
         <dependency>

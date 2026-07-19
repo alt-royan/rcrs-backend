@@ -30,6 +30,7 @@
         <spring-aws.version>4.0.0</spring-aws.version>
         <protobuf.version>4.35.1</protobuf.version>
         <ffmpeg-platform.version>8.0.1-1.5.13</ffmpeg-platform.version>
+        <temporal-spring.version>1.37.0</temporal-spring.version>
     </properties>
 
     <modules>
@@ -56,6 +57,12 @@
                 <groupId>io.github.openfeign</groupId>
                 <artifactId>feign-okhttp</artifactId>
                 <version>13.11</version>
+            </dependency>
+            <dependency>
+                <groupId>io.temporal</groupId>
+                <artifactId>temporal-spring-boot-starter</artifactId>
+                <version>${temporal-spring.version}</version>
+                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>org.springframework.cloud</groupId>

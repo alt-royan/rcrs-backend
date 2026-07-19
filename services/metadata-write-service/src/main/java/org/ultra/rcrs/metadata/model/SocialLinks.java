@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.ultra.rcrs.metadata.dto.SocialLinkDto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -15,7 +16,11 @@ public class SocialLinks {
     private List<Link> items;
 
     public SocialLinks(List<SocialLinkDto> dtos) {
-        this.items = dtos.stream().map(dto -> new Link(dto.getResourceName(), dto.getUrl().toString())).toList();
+        if (dtos == null) {
+            this.items = new ArrayList<>();
+        }else {
+            this.items = dtos.stream().map(dto -> new Link(dto.getResourceName(), dto.getUrl().toString())).toList();
+        }
     }
 
     public SocialLinks(SocialLinkDto dto) {
