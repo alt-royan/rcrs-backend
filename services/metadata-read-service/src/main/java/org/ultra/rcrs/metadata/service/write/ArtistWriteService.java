@@ -59,4 +59,15 @@ public class ArtistWriteService {
                 .doOnError(e -> log.error("Failed to hide artist: id={}, error={}", id, e.getMessage()))
                 .then();
     }
+
+    public Mono<Void> handleArtistActivated(String id) {
+        return artistDocumentRepository.findById(id)
+                .flatMap(doc -> {
+                    doc.setAvailabilityStatus(EntityStatus.ACTIVE);
+                    return artistDocumentRepository.save(doc);
+                })
+                .doOnSuccess(d -> log.info("Marked artist as active: id={}", id))
+                .doOnError(e -> log.error("Failed to activate artist: id={}, error={}", id, e.getMessage()))
+                .then();
+    }
 }

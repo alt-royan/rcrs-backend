@@ -70,6 +70,12 @@ public class TrackService {
     }
 
     @Transactional
+    public void activeTrack(UUID trackId) {
+        updateAvailability(EntityStatus.ACTIVE, trackId);
+        catalogEventProducer.trackActivated(trackId);
+    }
+
+    @Transactional
     public void updateLifecycleStatus(LifecycleStatus status, UUID trackId) {
         trackRepository.updateLifecycleStatusById(status, trackId);
         log.info("Track {} lifecycle_status updated to {}", trackId, status);

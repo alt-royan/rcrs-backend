@@ -2,16 +2,12 @@ package org.ultra.rcrs.workflow.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.ultra.rcrs.workflow.dto.ChangeAvailabilityStatusRequest;
 import org.ultra.rcrs.workflow.dto.CreateResponse;
 import org.ultra.rcrs.workflow.dto.RegisterArtistRequest;
 import org.ultra.rcrs.workflow.handler.WorkflowHandler;
-
-import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
@@ -21,10 +17,12 @@ public class ArtistController {
 
     @PostMapping("/artists")
     public ResponseEntity<CreateResponse> registerArtist(@Valid @RequestBody RegisterArtistRequest request) {
-        CreateResponse response = handler.startRegisterArtistWorkflow(request);
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .location(URI.create("/artists/" + response.id()))
-                .body(response);
+        return handler.startRegisterArtistWorkflow(request);
+    }
+
+    @PutMapping("/artists/{id}")
+    public ResponseEntity<Void> changeArtistAvailability(@Valid @RequestBody ChangeAvailabilityStatusRequest request, @PathVariable("id") String id) {
+        return handler.startArtistChangeAvailabilityStatusWorkflow(request.status(), id);
     }
 
 }

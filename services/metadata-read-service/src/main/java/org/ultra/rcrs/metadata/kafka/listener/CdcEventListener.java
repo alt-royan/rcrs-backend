@@ -8,12 +8,14 @@ import org.springframework.stereotype.Component;
 import org.ultra.rcrs.events.album.AlbumCreatedEventOuterClass;
 import org.ultra.rcrs.events.album.AlbumDeletedEventOuterClass;
 import org.ultra.rcrs.events.album.AlbumHiddenEventOuterClass;
+import org.ultra.rcrs.events.album.AlbumActivatedEventOuterClass;
 import org.ultra.rcrs.events.album.AlbumUpdateLifecycleStatusEventOuterClass;
 import org.ultra.rcrs.events.album.ArtistAddedToAlbumEventOuterClass;
 import org.ultra.rcrs.events.album.ArtistDeletedFromAlbumEventOuterClass;
 import org.ultra.rcrs.events.artist.ArtistCreatedEventOuterClass;
 import org.ultra.rcrs.events.artist.ArtistDeletedEventOuterClass;
 import org.ultra.rcrs.events.artist.ArtistHiddenEventOuterClass;
+import org.ultra.rcrs.events.artist.ArtistActivatedEventOuterClass;
 import org.ultra.rcrs.events.common.DomainEventOuterClass;
 import org.ultra.rcrs.events.track.ArtistAddedToTrackEventOuterClass;
 import org.ultra.rcrs.events.track.ArtistDeletedFromTrackEventOuterClass;
@@ -22,6 +24,7 @@ import org.ultra.rcrs.events.track.OtherDeletedFromTrackEventOuterClass;
 import org.ultra.rcrs.events.track.TrackCreatedEventOuterClass;
 import org.ultra.rcrs.events.track.TrackDeletedEventOuterClass;
 import org.ultra.rcrs.events.track.TrackHiddenEventOuterClass;
+import org.ultra.rcrs.events.track.TrackActivatedEventOuterClass;
 import org.ultra.rcrs.events.track.TrackAddedToAlbumEventOuterClass;
 import org.ultra.rcrs.events.track.TrackUpdateLifecycleStatusEventOuterClass;
 import org.ultra.rcrs.kafka.Topics;
@@ -63,6 +66,9 @@ public class CdcEventListener {
                 case ALBUM_LIFECYCLE_STATUS_UPDATED -> onAlbumLifecycleStatusUpdated(event.getPayload());
                 case TRACK_LIFECYCLE_STATUS_UPDATED -> onTrackLifecycleStatusUpdated(event.getPayload());
                 case TRACK_ADDED_TO_ALBUM -> onTrackAddedToAlbum(event.getPayload());
+                case ARTIST_ACTIVATED -> onArtistActivated(event.getPayload());
+                case ALBUM_ACTIVATED -> onAlbumActivated(event.getPayload());
+                case TRACK_ACTIVATED -> onTrackActivated(event.getPayload());
                 default -> log.warn("Unknown event type: {}", event.getEventType());
             }
         } catch (Exception e) {
@@ -229,6 +235,33 @@ public class CdcEventListener {
             trackWriteService.handleTrackAddedToAlbum(event).subscribe();
         } catch (Exception e) {
             log.error("Failed to unpack TrackAddedToAlbumEvent: {}", e.getMessage(), e);
+        }
+    }
+
+    private void onArtistActivated(Any payload) {
+        try {
+            ArtistActivatedEventOuterClass.ArtistActivatedEvent event = payload.unpack(ArtistActivatedEventOuterClass.ArtistActivatedEvent.class);
+            artistWriteService.handleArtistActivated(event.getId()).subscribe();
+        } catch (Exception e) {
+            log.error("Failed to unpack ArtistActivatedEvent: {}", e.getMessage(), e);
+        }
+    }
+
+    private void onAlbumActivated(Any payload) {
+        try {
+            AlbumActivatedEventOuterClass.AlbumActivatedEvent event = payload.unpack(AlbumActivatedEventOuterClass.AlbumActivatedEvent.class);
+            albumWriteService.handleAlbumActivated(event.getId()).subscribe();
+        } catch (Exception e) {
+            log.error("Failed to unpack AlbumActivatedEvent: {}", e.getMessage(), e);
+        }
+    }
+
+    private void onTrackActivated(Any payload) {
+        try {
+            TrackActivatedEventOuterClass.TrackActivatedEvent event = payload.unpack(TrackActivatedEventOuterClass.TrackActivatedEvent.class);
+            trackWriteService.handleTrackActivated(event.getId()).subscribe();
+        } catch (Exception e) {
+            log.error("Failed to unpack TrackActivatedEvent: {}", e.getMessage(), e);
         }
     }
 }

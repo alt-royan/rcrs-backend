@@ -1,6 +1,7 @@
 package org.ultra.rcrs.workflow.workflow.impl;
 
 import io.temporal.spring.boot.WorkflowImpl;
+import org.springframework.http.ResponseEntity;
 import org.ultra.rcrs.workflow.activity.ActivityFactory;
 import org.ultra.rcrs.workflow.dto.CreateResponse;
 import org.ultra.rcrs.workflow.dto.RegisterArtistRequest;
@@ -18,7 +19,7 @@ public class ArtistRegistrationWorkflowImpl implements ArtistRegistrationWorkflo
     }
 
     @Override
-    public CreateResponse registerArtist(RegisterArtistRequest request) {
-        return activityFactory.metadataActivity().createArtist(request);
+    public ResponseEntity<CreateResponse> registerArtist(RegisterArtistRequest request) {
+        return activityFactory.artistActivity().createArtist(request);
     }
 }

@@ -51,6 +51,12 @@ public class AlbumWriteController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{albumId}/active")
+    public ResponseEntity<Void> activeAlbum(@PathVariable("albumId") String albumId) {
+        albumService.activeAlbum(Url62.decode(albumId));
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{albumId}")
     public ResponseEntity<Void> deleteAlbum(@PathVariable("albumId") String albumId) {
         albumService.markAlbumDelete(Url62.decode(albumId));

@@ -50,6 +50,12 @@ public class ArtistService {
         catalogEventProducer.artistHidden(artistId);
     }
 
+    @Transactional
+    public void activeArtist(UUID artistId) {
+        updateAvailability(EntityStatus.ACTIVE, artistId);
+        catalogEventProducer.artistActivated(artistId);
+    }
+
     public boolean artistExists(UUID id) {
         return artistRepository.existsById(id);
     }

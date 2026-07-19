@@ -6,12 +6,10 @@ import io.temporal.worker.WorkerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import org.ultra.rcrs.workflow.activity.ActivityFactory;
-import org.ultra.rcrs.workflow.activity.AudioActivity;
-import org.ultra.rcrs.workflow.activity.MetadataActivity;
-import org.ultra.rcrs.workflow.activity.impl.MetadataActivityImpl;
-import org.ultra.rcrs.workflow.config.TemporalProperties;
-import org.ultra.rcrs.workflow.workflow.ArtistRegistrationWorkflow;
+import org.ultra.rcrs.workflow.activity.impl.AlbumActivityImpl;
+import org.ultra.rcrs.workflow.activity.impl.ArtistActivityImpl;
+import org.ultra.rcrs.workflow.activity.impl.TrackActivityImpl;
+import org.ultra.rcrs.workflow.workflow.impl.ArtistChangeAvailabilityStatusWorkflowImpl;
 import org.ultra.rcrs.workflow.workflow.impl.ArtistRegistrationWorkflowImpl;
 
 import static org.ultra.rcrs.workflow.config.TemporalConfig.WORKFLOW_TASK_QUEUE;
@@ -22,7 +20,9 @@ public class TemporalWorker implements CommandLineRunner {
 
     private final WorkflowClient workflowClient;
 
-    private final MetadataActivityImpl metadataActivityImpl;
+    private final ArtistActivityImpl artistActivityImpl;
+    private final AlbumActivityImpl albumActivityImpl;
+    private final TrackActivityImpl trackActivityImpl;
 
     @Override
     public void run(String... args) {
@@ -30,8 +30,11 @@ public class TemporalWorker implements CommandLineRunner {
         Worker worker = factory.newWorker(WORKFLOW_TASK_QUEUE);
 
         worker.registerWorkflowImplementationTypes(ArtistRegistrationWorkflowImpl.class);
+        worker.registerWorkflowImplementationTypes(ArtistChangeAvailabilityStatusWorkflowImpl.class);
 
-        worker.registerActivitiesImplementations(metadataActivityImpl);
+        worker.registerActivitiesImplementations(artistActivityImpl);
+        worker.registerActivitiesImplementations(albumActivityImpl);
+        worker.registerActivitiesImplementations(trackActivityImpl);
 
         factory.start();
     }

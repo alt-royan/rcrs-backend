@@ -89,6 +89,17 @@ public class TrackWriteService {
                 .then();
     }
 
+    public Mono<Void> handleTrackActivated(String id) {
+        return trackDocumentRepository.findById(id)
+                .flatMap(doc -> {
+                    doc.setAvailabilityStatus(EntityStatus.ACTIVE);
+                    return trackDocumentRepository.save(doc);
+                })
+                .doOnSuccess(d -> log.info("Marked track as active: id={}", id))
+                .doOnError(e -> log.error("Failed to activate track: id={}, error={}", id, e.getMessage()))
+                .then();
+    }
+
     public Mono<Void> handleTrackLifecycleStatusUpdated(TrackUpdateLifecycleStatusEventOuterClass.TrackUpdateLifecycleStatusEvent event) {
         return trackDocumentRepository.findById(event.getId())
                 .flatMap(doc -> {

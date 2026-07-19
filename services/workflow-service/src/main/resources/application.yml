@@ -30,7 +30,7 @@ spring:
       packages: org.ultra.rcrs.workflow
     namespace: default
     activities:
-      metadata:
+      artist:
         start-to-close-timeout: 30s
         retry:
           initial-interval: 1s

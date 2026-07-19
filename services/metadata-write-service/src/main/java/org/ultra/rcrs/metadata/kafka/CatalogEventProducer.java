@@ -33,9 +33,12 @@ import org.ultra.rcrs.events.track.OtherDeletedFromTrackEventOuterClass;
 import org.ultra.rcrs.events.track.TrackCreatedEventOuterClass;
 import org.ultra.rcrs.events.track.TrackDeletedEventOuterClass;
 import org.ultra.rcrs.events.track.TrackHiddenEventOuterClass;
+import org.ultra.rcrs.events.track.TrackActivatedEventOuterClass;
 import org.ultra.rcrs.events.track.TrackAddedToAlbumEventOuterClass;
 import org.ultra.rcrs.events.album.AlbumUpdateLifecycleStatusEventOuterClass;
 import org.ultra.rcrs.events.track.TrackUpdateLifecycleStatusEventOuterClass;
+import org.ultra.rcrs.events.artist.ArtistActivatedEventOuterClass;
+import org.ultra.rcrs.events.album.AlbumActivatedEventOuterClass;
 import org.ultra.rcrs.kafka.ProtobufEventProducer;
 import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.utils.Url62;
@@ -77,7 +80,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void artistDeleted(UUID artistId) {
@@ -97,7 +100,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void artistHidden(UUID artistId) {
@@ -117,7 +120,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void albumCreated(Album album) {
@@ -151,7 +154,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void albumDeleted(UUID albumId) {
@@ -171,7 +174,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void albumHidden(UUID albumId) {
@@ -191,7 +194,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void trackCreated(Track track) {
@@ -218,7 +221,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void trackAddedToAlbum(UUID trackId, UUID albumId) {
@@ -240,7 +243,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void trackDeleted(UUID trackId) {
@@ -260,7 +263,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void trackHidden(UUID trackId) {
@@ -280,7 +283,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void artistAddedToTrack(UUID artistId, UUID trackId, ArtistRole role) {
@@ -303,7 +306,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void artistAddedToAlbum(UUID artistId, UUID albumId, ArtistRole role) {
@@ -326,7 +329,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void otherAddedToTrack(OtherArtist other, UUID trackUuid) {
@@ -355,7 +358,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void otherDeletedFromTrack(UUID otherId, UUID trackId) {
@@ -377,7 +380,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void artistDeletedFromAlbum(UUID artistUuid, UUID albumUuid) {
@@ -399,7 +402,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void artistDeletedFromTrack(UUID artistUuid, UUID trackId) {
@@ -421,7 +424,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void updateAlbumLifecycleStatus(LifecycleStatus status, UUID albumId) {
@@ -442,7 +445,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
     public void updateTrackLifecycleStatus(LifecycleStatus status, UUID trackId) {
@@ -463,6 +466,66 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setPayload(Any.pack(event))
                 .build();
         sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
-        sendEvent(domainEvent, Topics.WORKFLOW_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
+    }
+
+    public void artistActivated(UUID artistId) {
+        String stringId = Url62.encode(artistId);
+        var event = ArtistActivatedEventOuterClass.ArtistActivatedEvent.newBuilder()
+                .setId(stringId)
+                .build();
+
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.ARTIST_ACTIVATED)
+                .setAggregateType(DomainEventOuterClass.AggregateType.ARTIST)
+                .setAggregateId(stringId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(event))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
+    }
+
+    public void albumActivated(UUID albumId) {
+        String stringId = Url62.encode(albumId);
+        var event = AlbumActivatedEventOuterClass.AlbumActivatedEvent.newBuilder()
+                .setId(stringId)
+                .build();
+
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.ALBUM_ACTIVATED)
+                .setAggregateType(DomainEventOuterClass.AggregateType.ALBUM)
+                .setAggregateId(stringId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(event))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
+    }
+
+    public void trackActivated(UUID trackId) {
+        String stringId = Url62.encode(trackId);
+        var event = TrackActivatedEventOuterClass.TrackActivatedEvent.newBuilder()
+                .setId(stringId)
+                .build();
+
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.TRACK_ACTIVATED)
+                .setAggregateType(DomainEventOuterClass.AggregateType.TRACK)
+                .setAggregateId(stringId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(event))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 }

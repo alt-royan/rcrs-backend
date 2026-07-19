@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>metadata-read-service</artifactId>
-    <name>catalog-read-service</name>
+    <name>metadata-read-service</name>
 
     <dependencies>
         <dependency>

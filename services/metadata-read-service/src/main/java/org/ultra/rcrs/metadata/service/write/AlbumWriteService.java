@@ -66,6 +66,17 @@ public class AlbumWriteService {
                 .then();
     }
 
+    public Mono<Void> handleAlbumActivated(String id) {
+        return albumDocumentRepository.findById(id)
+                .flatMap(doc -> {
+                    doc.setAvailabilityStatus(EntityStatus.ACTIVE);
+                    return albumDocumentRepository.save(doc);
+                })
+                .doOnSuccess(d -> log.info("Marked album as active: id={}", id))
+                .doOnError(e -> log.error("Failed to activate album: id={}, error={}", id, e.getMessage()))
+                .then();
+    }
+
     public Mono<Void> handleAlbumLifecycleStatusUpdated(AlbumUpdateLifecycleStatusEventOuterClass.AlbumUpdateLifecycleStatusEvent event) {
         return albumDocumentRepository.findById(event.getId())
                 .flatMap(doc -> {

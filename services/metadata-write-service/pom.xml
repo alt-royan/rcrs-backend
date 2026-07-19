@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>metadata-write-service</artifactId>
-    <name>catalog-write-service</name>
+    <name>metadata-write-service</name>
 
     <dependencies>
         <dependency>

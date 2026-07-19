@@ -63,6 +63,12 @@ public class AlbumService {
     }
 
     @Transactional
+    public void activeAlbum(UUID albumId) {
+        updateAvailability(EntityStatus.ACTIVE, albumId);
+        catalogEventProducer.albumActivated(albumId);
+    }
+
+    @Transactional
     public void updateLifecycleStatus(LifecycleStatus status, UUID albumId) {
         albumRepository.updateLifecycleStatusById(status, albumId);
         log.info("Album {} lifecycle_status updated to {}", albumId, status);

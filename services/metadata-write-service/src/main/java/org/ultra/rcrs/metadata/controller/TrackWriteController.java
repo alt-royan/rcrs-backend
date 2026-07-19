@@ -64,6 +64,12 @@ public class TrackWriteController {
         return ResponseEntity.ok().build();
     }
 
+    @PutMapping("/{trackId}/active")
+    public ResponseEntity<Void> activeTrack(@PathVariable("trackId") String trackId) {
+        trackService.activeTrack(Url62.decode(trackId));
+        return ResponseEntity.ok().build();
+    }
+
     @DeleteMapping("/{trackId}")
     public ResponseEntity<Void> deleteTrack(@PathVariable("trackId") String trackId) {
         trackService.markTrackDelete(Url62.decode(trackId));

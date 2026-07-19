@@ -29,8 +29,16 @@ public class ActivityFactory {
         return instance;
     }
 
-    public MetadataActivity metadataActivity() {
-        return Workflow.newActivityStub(MetadataActivity.class, buildOptions("metadata"));
+    public ArtistActivity artistActivity() {
+        return Workflow.newActivityStub(ArtistActivity.class, buildOptions("artist"));
+    }
+
+    public AlbumActivity albumActivity() {
+        return Workflow.newActivityStub(AlbumActivity.class, buildOptions("album"));
+    }
+
+    public TrackActivity trackActivity() {
+        return Workflow.newActivityStub(TrackActivity.class, buildOptions("track"));
     }
 
     public AudioActivity audioActivity() {
