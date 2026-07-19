@@ -1,5 +1,7 @@
-FROM eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jdk AS build
+
+COPY target/workflow-service-*.jar /app/workflow-service.jar
 WORKDIR /app
-COPY target/workflow-service-*.jar app.jar
+
 EXPOSE 8082
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["java", "-jar", "workflow-service.jar"]
