@@ -20,13 +20,13 @@ public class AlbumAdminDoc implements AlbumDoc {
     @Field(type = FieldType.Text)
     private String title;
 
-    @Field(type = FieldType.Integer)
-    private Integer year;
+    @Field(type = FieldType.Text)
+    private String year;
 
     @Field(type = FieldType.Keyword)
     private EntityStatus availability;
 
-    @Field(type = FieldType.Text)
+    @Field(type = FieldType.Keyword)
     private LifecycleStatus lifecycleStatus;
 
     @Field(type = FieldType.Nested)

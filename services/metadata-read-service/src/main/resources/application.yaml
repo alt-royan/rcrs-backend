@@ -6,7 +6,6 @@ spring:
     name: metadata-read-service
   mongodb:
     uri: mongodb://localhost:27017/rcrs_catalog
-
   kafka:
     bootstrap-servers: localhost:9092
 

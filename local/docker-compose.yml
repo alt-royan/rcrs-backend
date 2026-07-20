@@ -3,8 +3,9 @@ services:
 
   discovery-server:
     build:
-      context: .
+      context: ..
       dockerfile: discovery-server/Dockerfile
+      no_cache: true
     container_name: discovery-server
     ports:
       - "8761:8761"
@@ -21,8 +22,9 @@ services:
 
   metadata-write-service:
     build:
-      context: .
+      context: ..
       dockerfile: services/metadata-write-service/Dockerfile
+      no_cache: true
     container_name: metadata-write-service
     ports:
       - "8080:8080"
@@ -40,38 +42,34 @@ services:
     depends_on:
       discovery-server:
         condition: service_healthy
-      postgres:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
     networks:
       - rcrs
 
-  metadata-read-service:
-    build:
-      context: .
-      dockerfile: services/metadata-read-service/Dockerfile
-    container_name: metadata-read-service
-    ports:
-      - "8081:8081"
-    environment:
-      SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/rcrs_catalog?replicaSet=rs0
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      CDN_IMAGES_ENDPOINT: http://s3:9000
-      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-    depends_on:
-      discovery-server:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
-    networks:
-      - rcrs
+#  metadata-read-service:
+#    build:
+#      context: ..
+#      dockerfile: services/metadata-read-service/Dockerfile
+#      no_cache: true
+#    container_name: metadata-read-service
+#    ports:
+#      - "8081:8081"
+#    environment:
+#      SPRING_PROFILES_ACTIVE: dev
+#      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/rcrs_catalog?replicaSet=rs0
+#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      CDN_IMAGES_ENDPOINT: http://images.localhost:9000
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+#    depends_on:
+#      discovery-server:
+#        condition: service_healthy
+#    networks:
+#      - rcrs
 
   search-service:
     build:
-      context: .
+      context: ..
       dockerfile: services/search-service/Dockerfile
+      no_cache: true
     container_name: search-service
     ports:
       - "8083:8083"
@@ -80,22 +78,19 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
       SPRING_DATA_ELASTICSEARCH_URL: http://elasticsearch:9200
       FEIGN_CATALOG-SERVICE_URL: http://metadata-write-service:8080
-      CDN_IMAGES_ENDPOINT: http://s3:9000
+      CDN_IMAGES_ENDPOINT: http://images.localhost:9000
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
     depends_on:
       discovery-server:
-        condition: service_healthy
-      elasticsearch:
-        condition: service_healthy
-      kafka:
         condition: service_healthy
     networks:
       - rcrs
 
 #  media-service:
 #    build:
-#      context: .
+#      context: ..
 #      dockerfile: services/media-service/Dockerfile
+#      no_cache: true
 #    container_name: media-service
 #    ports:
 #      - "8082:8082"
@@ -112,17 +107,14 @@ services:
 #    depends_on:
 #      discovery-server:
 #        condition: service_healthy
-#      postgres:
-#        condition: service_healthy
-#      kafka:
-#        condition: service_healthy
 #    networks:
 #      - rcrs
 
   workflow-service:
     build:
-      context: .
+      context: ..
       dockerfile: services/workflow-service/Dockerfile
+      no_cache: true
     container_name: workflow-service
     ports:
       - "8085:8082"
@@ -137,19 +129,9 @@ services:
     depends_on:
       discovery-server:
         condition: service_healthy
-      temporal:
-        condition: service_healthy
-      kafka:
-        condition: service_healthy
     networks:
       - rcrs
 
 networks:
   rcrs:
-    driver: bridge
-
-volumes:
-  postgres_data:
-  mongodb_data:
-  elasticsearch_data:
-  temporal_pg_data:
+    external: true

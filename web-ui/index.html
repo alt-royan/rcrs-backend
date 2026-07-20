@@ -262,6 +262,95 @@
 
   #result { min-height: 200px; }
 
+  .global-search { margin-bottom: 24px; }
+  .global-search input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 12px 16px;
+    border-radius: var(--radius);
+    font-size: 15px;
+    outline: none;
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+  }
+  .global-search input:focus { border-color: var(--accent); }
+
+  .search-results { max-height: 50vh; overflow-y: auto; }
+  .search-results::-webkit-scrollbar { width: 6px; }
+  .search-results::-webkit-scrollbar-track { background: transparent; }
+  .search-results::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+  .search-section { margin-bottom: 8px; }
+  .search-section-header {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    padding: 8px 14px 4px;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 1;
+  }
+  .search-section-header span { color: var(--accent); }
+  .search-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .search-item:hover { background: var(--surface2); }
+  .search-item img {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+    background: var(--surface2);
+    flex-shrink: 0;
+  }
+  .search-item img.artist-thumb { border-radius: 50%; }
+  .search-item .si-info { flex: 1; min-width: 0; }
+  .search-item .si-name {
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .search-item .si-meta {
+    font-size: 12px;
+    color: var(--text2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .search-item .si-type {
+    font-size: 10px;
+    color: var(--text2);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 2px 8px;
+    border-radius: 12px;
+    flex-shrink: 0;
+  }
+  .search-load-more {
+    text-align: center;
+    padding: 12px;
+    color: var(--text2);
+    font-size: 13px;
+  }
+  .search-total {
+    padding: 6px 14px;
+    font-size: 12px;
+    color: var(--text2);
+    border-bottom: 1px solid var(--border);
+  }
+
   .json-toggle { margin-top: 12px; }
   .json-toggle summary {
     cursor: pointer;
@@ -291,6 +380,11 @@
 </header>
 
 <div class="container">
+  <div class="global-search">
+    <input type="text" id="searchInput" placeholder="Search artists, albums, tracks..." spellcheck="false">
+    <div class="search-results" id="searchResults" style="display:none"></div>
+  </div>
+
   <div class="search-bar">
     <select id="entityType">
       <option value="artist">Artist</option>
@@ -569,6 +663,208 @@ function renderTrack(d) {
   html += jsonDetails(d);
 
   document.getElementById('result').innerHTML = html;
+}
+
+var SEARCH_BASE = 'http://localhost:8083';
+var searchState = {
+  query: '',
+  types: ['artist', 'album', 'track'],
+  page: 0,
+  size: 20,
+  loading: false,
+  done: { artist: false, album: false, track: false },
+  total: { artist: 0, album: 0, track: 0 },
+  counts: { artist: 0, album: 0, track: 0 }
+};
+
+var searchInput = document.getElementById('searchInput');
+var searchResultsEl = document.getElementById('searchResults');
+var searchTimer = null;
+
+searchInput.addEventListener('input', function() {
+  clearTimeout(searchTimer);
+  var q = this.value.trim();
+  if (!q) {
+    hideSearch();
+    return;
+  }
+  searchTimer = setTimeout(function() { startSearch(q); }, 300);
+});
+
+searchInput.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    hideSearch();
+    searchInput.blur();
+  }
+});
+
+document.addEventListener('click', function(e) {
+  if (!searchResultsEl.contains(e.target) && e.target !== searchInput) {
+    hideSearch();
+  }
+});
+
+function hideSearch() {
+  searchResultsEl.style.display = 'none';
+  searchResultsEl.innerHTML = '';
+  resetSearchState();
+}
+
+function resetSearchState() {
+  searchState.query = '';
+  searchState.page = 0;
+  searchState.done = { artist: false, album: false, track: false };
+  searchState.total = { artist: 0, album: 0, track: 0 };
+  searchState.counts = { artist: 0, album: 0, track: 0 };
+  searchState.loading = false;
+}
+
+function startSearch(q) {
+  resetSearchState();
+  searchState.query = q;
+  searchResultsEl.style.display = 'block';
+  searchResultsEl.innerHTML = '<div class="search-load-more">Searching...</div>';
+  loadSearchPage(q, 0);
+}
+
+function loadSearchPage(q, page) {
+  if (searchState.loading) return;
+  searchState.loading = true;
+
+  var params = new URLSearchParams();
+  params.set('q', q);
+  params.set('page', page);
+  params.set('size', searchState.size);
+  searchState.types.forEach(function(t) { params.append('type', t); });
+
+  fetch(SEARCH_BASE + '/admin/search?' + params.toString())
+    .then(function(r) {
+      if (!r.ok) throw r;
+      return r.json();
+    })
+    .then(function(data) {
+      if (q !== searchState.query) return;
+      renderSearchPage(data, page === 0);
+      searchState.loading = false;
+      if (page === 0) searchResultsEl.innerHTML = '';
+      appendSearchResults(data);
+      searchState.page = page + 1;
+      checkSearchDone(data);
+    })
+    .catch(function(err) {
+      searchState.loading = false;
+      if (page === 0) {
+        searchResultsEl.innerHTML = '<div class="search-load-more" style="color:var(--red)">Search failed</div>';
+      }
+    });
+}
+
+function renderSearchPage(data, isFirst) {
+  if (!isFirst) return;
+  var parts = [];
+  if (data.artists) parts.push(data.artists.total + ' artist' + (data.artists.total !== 1 ? 's' : ''));
+  if (data.albums) parts.push(data.albums.total + ' album' + (data.albums.total !== 1 ? 's' : ''));
+  if (data.tracks) parts.push(data.tracks.total + ' track' + (data.tracks.total !== 1 ? 's' : ''));
+  if (parts.length) {
+    var totalAll = (data.artists ? data.artists.total : 0) + (data.albums ? data.albums.total : 0) + (data.tracks ? data.tracks.total : 0);
+    var totalHtml = '<div class="search-total">' + esc(totalAll) + ' results for "' + esc(searchState.query) + '"</div>';
+    searchResultsEl.innerHTML = totalHtml;
+  }
+}
+
+function appendSearchResults(data) {
+  var typeOrder = ['artist', 'album', 'track'];
+  var typeLabels = { artist: 'Artists', album: 'Albums', track: 'Tracks' };
+
+  for (var ti = 0; ti < typeOrder.length; ti++) {
+    var t = typeOrder[ti];
+    var col = data[t + 's'];
+    if (!col || !col.items || !col.items.length) continue;
+
+    var existing = searchResultsEl.querySelector('[data-search-type="' + t + '"]');
+    if (!existing) {
+      var section = document.createElement('div');
+      section.className = 'search-section';
+      section.setAttribute('data-search-type', t);
+      section.innerHTML = '<div class="search-section-header">' + typeLabels[t] + ' <span>' + col.total + '</span></div>' +
+        '<div class="search-section-items"></div>';
+      searchResultsEl.appendChild(section);
+    }
+    var itemsEl = searchResultsEl.querySelector('[data-search-type="' + t + '"] .search-section-items');
+
+    for (var i = 0; i < col.items.length; i++) {
+      var item = col.items[i];
+      var d = item.data;
+      var el = document.createElement('div');
+      el.className = 'search-item';
+      el.setAttribute('data-id', d.id);
+      el.onclick = (function(type, id) {
+        return function() {
+          navigateToSearchResult(type, id);
+        };
+      })(t, d.id);
+
+      var img = '';
+      var meta = '';
+      if (t === 'artist') {
+        img = d.avatarUrl ? '<img class="artist-thumb" src="' + esc(d.avatarUrl) + '" alt="">' : '<img class="artist-thumb" alt="">';
+        meta = (d.tags || []).join(', ');
+      } else if (t === 'album') {
+        img = d.coverUrl ? '<img src="' + esc(d.coverUrl) + '" alt="">' : '<img alt="">';
+        meta = (d.type || 'Album') + (d.year ? ' &middot; ' + d.year : '') + (d.totalTracks ? ' &middot; ' + d.totalTracks + ' tracks' : '');
+      } else if (t === 'track') {
+        img = (d.album && d.album.coverUrl) ? '<img src="' + esc(d.album.coverUrl) + '" alt="">' : '<img alt="">';
+        meta = (d.album ? esc(d.album.title) : '') + (d.trackNumber ? ' &middot; #' + d.trackNumber : '');
+      }
+
+      el.innerHTML = img +
+        '<div class="si-info"><div class="si-name">' + esc(d.name || d.title) + '</div>' +
+        '<div class="si-meta">' + meta + '</div></div>' +
+        '<span class="si-type">' + t + '</span>';
+      itemsEl.appendChild(el);
+      searchState.counts[t]++;
+    }
+  }
+}
+
+function checkSearchDone(data) {
+  var allDone = true;
+  searchState.types.forEach(function(t) {
+    var col = data[t + 's'];
+    if (!col) { searchState.done[t] = true; return; }
+    searchState.total[t] = col.total;
+    if (searchState.counts[t] >= col.total) {
+      searchState.done[t] = true;
+    } else {
+      allDone = false;
+    }
+  });
+
+  var existingLoadMore = searchResultsEl.querySelector('.search-load-more');
+  if (existingLoadMore) existingLoadMore.remove();
+
+  if (!allDone) {
+    var lm = document.createElement('div');
+    lm.className = 'search-load-more';
+    lm.textContent = 'Loading more...';
+    searchResultsEl.appendChild(lm);
+
+    searchResultsEl.onscroll = function() {
+      if (searchState.loading) return;
+      var atBottom = searchResultsEl.scrollTop + searchResultsEl.clientHeight >= searchResultsEl.scrollHeight - 40;
+      if (atBottom) {
+        loadSearchPage(searchState.query, searchState.page);
+      }
+    };
+  } else {
+    searchResultsEl.onscroll = null;
+  }
+}
+
+function navigateToSearchResult(type, id) {
+  hideSearch();
+  searchInput.value = '';
+  navigate(type, id);
 }
 </script>
 </body>

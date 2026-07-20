@@ -9,13 +9,12 @@ import org.ultra.rcrs.events.album.AlbumCreatedEventOuterClass;
 import org.ultra.rcrs.events.album.AlbumUpdateLifecycleStatusEventOuterClass;
 import org.ultra.rcrs.events.album.ArtistAddedToAlbumEventOuterClass;
 import org.ultra.rcrs.events.album.ArtistDeletedFromAlbumEventOuterClass;
-import org.ultra.rcrs.searchservice.document.AlbumAdminDoc;
-import org.ultra.rcrs.searchservice.document.AlbumPublicDoc;
-import org.ultra.rcrs.searchservice.document.ArtistAdminDoc;
-import org.ultra.rcrs.searchservice.document.NestedArtist;
+import org.ultra.rcrs.searchservice.document.*;
 import org.ultra.rcrs.searchservice.repository.AlbumIndexRepository;
 import org.ultra.rcrs.searchservice.repository.ArtistIndexRepository;
 
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 
 @Slf4j
@@ -30,6 +29,7 @@ public class AlbumIndexService {
         EntityStatus availability = EntityStatus.valueOf(event.getAvailabilityStatus().name());
         LifecycleStatus lifecycle = LifecycleStatus.valueOf(event.getLifecycleStatus().name());
 
+        var year = LocalDateTime.ofEpochSecond(event.getReleaseDate().getSeconds(), event.getReleaseDate().getNanos(), ZoneOffset.UTC).getYear();
         AlbumAdminDoc adminDoc = new AlbumAdminDoc();
         adminDoc.setId(event.getId());
         adminDoc.setTitle(event.getTitle());
@@ -37,6 +37,7 @@ public class AlbumIndexService {
         adminDoc.setLifecycleStatus(lifecycle);
         adminDoc.setTracks(new ArrayList<>());
         adminDoc.setArtists(new ArrayList<>());
+        adminDoc.setYear(String.valueOf(year));
         albumIndexRepository.index(adminDoc);
 
         log.info("Album created in admin index: id={}, availability={}, lifecycle={}", event.getId(), availability, lifecycle);
@@ -83,6 +84,27 @@ public class AlbumIndexService {
             albumIndexRepository.index(publicDoc);
         }
 
+        if (artistDoc != null) {
+            NestedAlbum nestedAlbum = new NestedAlbum();
+            nestedAlbum.setId(adminDoc.getId());
+            nestedAlbum.setTitle(adminDoc.getTitle());
+
+            if (artistDoc.getAlbums() == null) {
+                artistDoc.setAlbums(new ArrayList<>());
+            }
+            artistDoc.getAlbums().add(nestedAlbum);
+            artistIndexRepository.index(artistDoc);
+
+            ArtistPublicDoc artistPublicDoc = artistIndexRepository.get(event.getArtistId(), ArtistPublicDoc.class);
+            if (artistPublicDoc != null) {
+                if (artistPublicDoc.getAlbums() == null) {
+                    artistPublicDoc.setAlbums(new ArrayList<>());
+                }
+                artistPublicDoc.getAlbums().add(nestedAlbum);
+                artistIndexRepository.index(artistPublicDoc);
+            }
+        }
+
         log.info("Artist added to album: artistId={}, albumId={}", event.getArtistId(), event.getAlbumId());
     }
 
@@ -101,6 +123,22 @@ public class AlbumIndexService {
                 publicDoc.getArtists().removeIf(a -> a.getId().equals(event.getArtistId()));
             }
             albumIndexRepository.index(publicDoc);
+        }
+
+        ArtistAdminDoc artistDoc = artistIndexRepository.get(event.getArtistId(), ArtistAdminDoc.class);
+        if (artistDoc != null) {
+            if (artistDoc.getAlbums() != null) {
+                artistDoc.getAlbums().removeIf(a -> a.getId().equals(event.getAlbumId()));
+            }
+            artistIndexRepository.index(artistDoc);
+
+            ArtistPublicDoc artistPublicDoc = artistIndexRepository.get(event.getArtistId(), ArtistPublicDoc.class);
+            if (artistPublicDoc != null) {
+                if (artistPublicDoc.getAlbums() != null) {
+                    artistPublicDoc.getAlbums().removeIf(a -> a.getId().equals(event.getAlbumId()));
+                }
+                artistIndexRepository.index(artistPublicDoc);
+            }
         }
 
         log.info("Artist removed from album: artistId={}, albumId={}", event.getArtistId(), event.getAlbumId());

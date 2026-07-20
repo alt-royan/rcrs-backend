@@ -1,15 +1,17 @@
 package org.ultra.rcrs.searchservice.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 import org.ultra.rcrs.searchservice.enums.SearchType;
 
 @Getter
 @Setter
-@AllArgsConstructor
 public class AlbumResultWrapper implements ResultWrapper {
 
     private final SearchType type = SearchType.album;
-    private Object data;
+    private AlbumSearchResult data;
+
+    public AlbumResultWrapper(AlbumSearchResult data) {
+        this.data = data;
+    }
 }

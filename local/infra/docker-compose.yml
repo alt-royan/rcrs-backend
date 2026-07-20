@@ -126,7 +126,7 @@ services:
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
       - ./elk/init-indices.sh:/init-indices.sh:ro
-      - ./services/search-service/src/main/resources/index:/index-settings:ro
+      - ../../services/search-service/src/main/resources/index:/index-settings:ro
     command: >
       /bin/bash -c "/usr/share/elasticsearch/bin/elasticsearch & /init-indices.sh && wait"
     ports:
@@ -303,7 +303,7 @@ services:
 
 networks:
   rcrs:
-    driver: bridge
+    external: true
 
 volumes:
   postgres_data:

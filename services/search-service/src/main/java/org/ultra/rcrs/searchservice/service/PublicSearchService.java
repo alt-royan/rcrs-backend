@@ -3,7 +3,6 @@ package org.ultra.rcrs.searchservice.service;
 import co.elastic.clients.elasticsearch._types.query_dsl.ChildScoreMode;
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
 import co.elastic.clients.elasticsearch._types.query_dsl.TextQueryType;
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
@@ -12,14 +11,12 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
-import org.ultra.rcrs.exceptions.ServiceUnavailableException;
 import org.ultra.rcrs.searchservice.document.AlbumPublicDoc;
 import org.ultra.rcrs.searchservice.document.ArtistPublicDoc;
 import org.ultra.rcrs.searchservice.document.TrackPublicDoc;
 import org.ultra.rcrs.searchservice.dto.*;
-import org.ultra.rcrs.searchservice.enums.SearchType;
-import org.ultra.rcrs.searchservice.feign.CatalogClient;
 
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -28,7 +25,6 @@ import java.util.List;
 public class PublicSearchService {
 
     private final ElasticsearchOperations elasticsearchOperations;
-    private final CatalogClient catalogClient;
 
     public SearchCollection<ArtistResultWrapper> searchArtists(String query, int page, int size) {
         var nativeQ = NativeQuery.builder()
@@ -63,15 +59,14 @@ public class PublicSearchService {
                 .build();
 
         SearchHits<ArtistPublicDoc> hits = elasticsearchOperations.search(nativeQ, ArtistPublicDoc.class);
-        List<String> ids = hits.getSearchHits().stream().map(SearchHit::getId).toList();
 
-        try {
-            var response = catalogClient.getArtists(ids);
-            var list = response.stream().map(ArtistResultWrapper::new).toList();
-            return new SearchCollection<>(query, page, size, hits.getTotalHits(), list);
-        } catch (FeignException e) {
-            throw new ServiceUnavailableException(e);
-        }
+        var list = hits.getSearchHits().stream()
+                .map(SearchHit::getContent)
+                .map(this::toArtistResult)
+                .map(ArtistResultWrapper::new)
+                .toList();
+
+        return new SearchCollection<>(query, page, size, hits.getTotalHits(), list);
     }
 
     public SearchCollection<AlbumResultWrapper> searchAlbums(String query, int page, int size) {
@@ -107,15 +102,14 @@ public class PublicSearchService {
                 .build();
 
         SearchHits<AlbumPublicDoc> hits = elasticsearchOperations.search(nativeQ, AlbumPublicDoc.class);
-        List<String> ids = hits.getSearchHits().stream().map(SearchHit::getId).toList();
 
-        try {
-            var response = catalogClient.getAlbums(ids);
-            var list = response.stream().map(AlbumResultWrapper::new).toList();
-            return new SearchCollection<>(query, page, size, hits.getTotalHits(), list);
-        } catch (FeignException e) {
-            throw new ServiceUnavailableException(e);
-        }
+        var list = hits.getSearchHits().stream()
+                .map(SearchHit::getContent)
+                .map(this::toAlbumResult)
+                .map(AlbumResultWrapper::new)
+                .toList();
+
+        return new SearchCollection<>(query, page, size, hits.getTotalHits(), list);
     }
 
     public SearchCollection<TrackResultWrapper> searchTracks(String query, int page, int size) {
@@ -151,14 +145,50 @@ public class PublicSearchService {
                 .build();
 
         SearchHits<TrackPublicDoc> hits = elasticsearchOperations.search(nativeQ, TrackPublicDoc.class);
-        List<String> ids = hits.getSearchHits().stream().map(SearchHit::getId).toList();
 
-        try {
-            var response = catalogClient.getTracks(ids);
-            var list = response.stream().map(TrackResultWrapper::new).toList();
-            return new SearchCollection<>(query, page, size, hits.getTotalHits(), list);
-        } catch (FeignException e) {
-            throw new ServiceUnavailableException(e);
+        var list = hits.getSearchHits().stream()
+                .map(SearchHit::getContent)
+                .map(this::toTrackResult)
+                .map(TrackResultWrapper::new)
+                .toList();
+
+        return new SearchCollection<>(query, page, size, hits.getTotalHits(), list);
+    }
+
+    private ArtistSearchResult toArtistResult(ArtistPublicDoc doc) {
+        var albums = doc.getAlbums() != null
+                ? doc.getAlbums().stream().map(a -> new ArtistSearchResult.NestedAlbumDto(a.getId(), a.getTitle())).toList()
+                : Collections.<ArtistSearchResult.NestedAlbumDto>emptyList();
+        var tracks = doc.getTracks() != null
+                ? doc.getTracks().stream().map(t -> new ArtistSearchResult.NestedTrackDto(t.getId(), t.getTitle())).toList()
+                : Collections.<ArtistSearchResult.NestedTrackDto>emptyList();
+        return new ArtistSearchResult(doc.getId(), doc.getName(), doc.getTags(),
+                doc.getAvailability() != null ? doc.getAvailability().name() : null, albums, tracks);
+    }
+
+    private AlbumSearchResult toAlbumResult(AlbumPublicDoc doc) {
+        var artists = doc.getArtists() != null
+                ? doc.getArtists().stream().map(a -> new AlbumSearchResult.NestedArtistDto(a.getId(), a.getName())).toList()
+                : Collections.<AlbumSearchResult.NestedArtistDto>emptyList();
+        var tracks = doc.getTracks() != null
+                ? doc.getTracks().stream().map(t -> new AlbumSearchResult.NestedTrackDto(t.getId(), t.getTitle())).toList()
+                : Collections.<AlbumSearchResult.NestedTrackDto>emptyList();
+        return new AlbumSearchResult(doc.getId(), doc.getTitle(), doc.getYear(),
+                doc.getAvailability() != null ? doc.getAvailability().name() : null,
+                null, artists, tracks);
+    }
+
+    private TrackSearchResult toTrackResult(TrackPublicDoc doc) {
+        var artists = doc.getArtists() != null
+                ? doc.getArtists().stream().map(a -> new TrackSearchResult.NestedArtistDto(a.getId(), a.getName())).toList()
+                : Collections.<TrackSearchResult.NestedArtistDto>emptyList();
+        TrackSearchResult.NestedAlbumDto albumDto = null;
+        if (doc.getAlbum() != null) {
+            albumDto = new TrackSearchResult.NestedAlbumDto(doc.getAlbum().getId(), doc.getAlbum().getTitle());
         }
+        return new TrackSearchResult(doc.getId(), doc.getTitle(),
+                doc.getAvailability() != null ? doc.getAvailability().name() : null,
+                doc.getLifecycleStatus() != null ? doc.getLifecycleStatus().name() : null,
+                artists, albumDto);
     }
 }

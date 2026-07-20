@@ -3,10 +3,7 @@ package org.ultra.rcrs.searchservice.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.searchservice.dto.SearchResponse;
 import org.ultra.rcrs.searchservice.enums.SearchType;
 import org.ultra.rcrs.searchservice.service.SearchService;
@@ -14,6 +11,7 @@ import org.ultra.rcrs.searchservice.service.SearchService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping
+@CrossOrigin("*")
 public class SearchController {
 
     private final SearchService searchService;

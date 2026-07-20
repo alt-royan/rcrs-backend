@@ -78,6 +78,27 @@ public class TrackIndexService {
             trackIndexRepository.index(publicDoc);
         }
 
+        if (artistDoc != null) {
+            NestedTrack nestedTrack = new NestedTrack();
+            nestedTrack.setId(adminDoc.getId());
+            nestedTrack.setTitle(adminDoc.getTitle());
+
+            if (artistDoc.getTracks() == null) {
+                artistDoc.setTracks(new ArrayList<>());
+            }
+            artistDoc.getTracks().add(nestedTrack);
+            artistIndexRepository.index(artistDoc);
+
+            ArtistPublicDoc artistPublicDoc = artistIndexRepository.get(event.getArtistId(), ArtistPublicDoc.class);
+            if (artistPublicDoc != null) {
+                if (artistPublicDoc.getTracks() == null) {
+                    artistPublicDoc.setTracks(new ArrayList<>());
+                }
+                artistPublicDoc.getTracks().add(nestedTrack);
+                artistIndexRepository.index(artistPublicDoc);
+            }
+        }
+
         log.info("Artist added to track: artistId={}, trackId={}", event.getArtistId(), event.getTrackId());
     }
 
@@ -94,6 +115,22 @@ public class TrackIndexService {
         if (publicDoc != null && publicDoc.getArtists() != null) {
             publicDoc.getArtists().removeIf(a -> a.getId().equals(event.getArtistId()));
             trackIndexRepository.index(publicDoc);
+        }
+
+        ArtistAdminDoc artistDoc = artistIndexRepository.get(event.getArtistId(), ArtistAdminDoc.class);
+        if (artistDoc != null) {
+            if (artistDoc.getTracks() != null) {
+                artistDoc.getTracks().removeIf(t -> t.getId().equals(event.getTrackId()));
+            }
+            artistIndexRepository.index(artistDoc);
+
+            ArtistPublicDoc artistPublicDoc = artistIndexRepository.get(event.getArtistId(), ArtistPublicDoc.class);
+            if (artistPublicDoc != null) {
+                if (artistPublicDoc.getTracks() != null) {
+                    artistPublicDoc.getTracks().removeIf(t -> t.getId().equals(event.getTrackId()));
+                }
+                artistIndexRepository.index(artistPublicDoc);
+            }
         }
 
         log.info("Artist removed from track: artistId={}, trackId={}", event.getArtistId(), event.getTrackId());

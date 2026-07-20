@@ -3,13 +3,6 @@ server:
 spring:
   application:
     name: search-service
-  cloud:
-    openfeign:
-      client:
-        config:
-          default:
-            connectTimeout: 5000
-            readTimeout: 5000
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     reindex:
@@ -22,10 +15,6 @@ spring:
 cdn:
   images:
     endpoint: ${CDN_IMAGES_ENDPOINT:http://images.localhost:4566}
-
-feign:
-  catalog-service:
-    url: ${FEIGN_CATALOG-SERVICE_URL:http://localhost:8080}
 
 eureka:
   client:
