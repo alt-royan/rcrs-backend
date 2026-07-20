@@ -1,25 +1,25 @@
 {
   "mappings": {
     "properties": {
-      "artists": {
+      "albums": {
         "properties": {
           "id": {
             "type": "keyword",
             "ignore_above": 256
           },
-          "name": {
+          "title": {
             "type": "text"
           }
         }
       },
-      "title": {
+      "name": {
         "type": "text"
       },
-      "year": {
-        "type": "integer"
+      "tags": {
+        "type": "text"
       },
-      "published": {
-        "type": "boolean"
+      "availability": {
+        "type": "text"
       },
       "tracks": {
         "properties": {

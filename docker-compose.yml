@@ -1,0 +1,149 @@
+services:
+  # ==================== Application ====================
+
+  discovery-server:
+    build:
+      context: .
+      dockerfile: discovery-server/Dockerfile
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    environment:
+      EUREKA_INSTANCE_HOSTNAME: discovery-server
+    networks:
+      - rcrs
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8761/actuator/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+
+#  gateway-api:
+#    build:
+#      context: .
+#      dockerfile: gateway-api/Dockerfile
+#    container_name: gateway-api
+#    ports:
+#      - "8084:8084"
+#    environment:
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+#    depends_on:
+#      discovery-server:
+#        condition: service_healthy
+#    networks:
+#      - rcrs
+
+  metadata-write-service:
+    build:
+      context: .
+      dockerfile: services/metadata-write-service/Dockerfile
+    container_name: metadata-write-service
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres?currentSchema=rcrs_catalog
+      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/postgres?currentSchema=rcrs_catalog
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      CDN_IMAGES_ENDPOINT: http://s3:9000
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    networks:
+      - rcrs
+
+  metadata-read-service:
+    build:
+      context: .
+      dockerfile: services/metadata-read-service/Dockerfile
+    container_name: metadata-read-service
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/rcrs_catalog?replicaSet=rs0
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      CDN_IMAGES_ENDPOINT: http://s3:9000
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    networks:
+      - rcrs
+
+#  media-service:
+#    build:
+#      context: .
+#      dockerfile: services/media-service/Dockerfile
+#    container_name: media-service
+#    ports:
+#      - "8082:8082"
+#    environment:
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres?currentSchema=rcrs_upload
+#      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/postgres?currentSchema=rcrs_upload
+#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+#      SPRING_CLOUD_AWS_ENDPOINT: http://s3:9000
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+#    depends_on:
+#      discovery-server:
+#        condition: service_healthy
+#      postgres:
+#        condition: service_healthy
+#    networks:
+#      - rcrs
+
+  search-service:
+    build:
+      context: .
+      dockerfile: services/search-service/Dockerfile
+    container_name: search-service
+    ports:
+      - "8083:8083"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_DATA_ELASTICSEARCH_URL: http://elasticsearch:9200
+      FEIGN_CATALOG-SERVICE_URL: http://metadata-write-service:8080
+      CDN_IMAGES_ENDPOINT: http://s3:9000
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_started
+    networks:
+      - rcrs
+
+  workflow-service:
+    build:
+      context: .
+      dockerfile: services/workflow-service/Dockerfile
+    container_name: workflow-service
+    ports:
+      - "8085:8082"
+    environment:
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_TEMPORAL_CONNECTION_TARGET: temporal:7233
+      FEIGN_METADATA-SERVICE_URL: http://metadata-write-service:8080
+      FEIGN_MEDIA-SERVICE_URL: http://media-service:8082
+      FEIGN_SEARCH-SERVICE_URL: http://search-service:8083
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+      temporal:
+        condition: service_started
+    networks:
+      - rcrs
+
+networks:
+  rcrs:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  mongodb_data:
+  temporal_pg_data:

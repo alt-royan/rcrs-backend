@@ -13,9 +13,9 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.exceptions.ServiceUnavailableException;
-import org.ultra.rcrs.searchservice.document.AlbumDoc;
-import org.ultra.rcrs.searchservice.document.ArtistDoc;
-import org.ultra.rcrs.searchservice.document.TrackDoc;
+import org.ultra.rcrs.searchservice.document.AlbumPublicDoc;
+import org.ultra.rcrs.searchservice.document.ArtistPublicDoc;
+import org.ultra.rcrs.searchservice.document.TrackPublicDoc;
 import org.ultra.rcrs.searchservice.dto.*;
 import org.ultra.rcrs.searchservice.enums.SearchType;
 import org.ultra.rcrs.searchservice.feign.CatalogClient;
@@ -70,7 +70,7 @@ public class SearchService {
                 .withQuery(query1)
                 .withPageable(PageRequest.of(page, size))
                 .build();
-        var hits = elasticsearchOperations.search(nativeQ, ArtistDoc.class);
+        var hits = elasticsearchOperations.search(nativeQ, ArtistPublicDoc.class);
         List<String> ids = hits.get().map(SearchHit::getId).toList();
         try {
             var response = catalogClient.getArtists(ids);
@@ -101,7 +101,7 @@ public class SearchService {
                 .withQuery(query1)
                 .withPageable(PageRequest.of(page, size))
                 .build();
-        var hits = elasticsearchOperations.search(nativeQ, AlbumDoc.class);
+        var hits = elasticsearchOperations.search(nativeQ, AlbumPublicDoc.class);
         List<String> ids = hits.get().map(SearchHit::getId).toList();
         try {
             var response = catalogClient.getAlbums(ids);
@@ -132,7 +132,7 @@ public class SearchService {
                 .withQuery(query1)
                 .withPageable(PageRequest.of(page, size))
                 .build();
-        var hits = elasticsearchOperations.search(nativeQ, TrackDoc.class);
+        var hits = elasticsearchOperations.search(nativeQ, TrackPublicDoc.class);
         List<String> ids = hits.get().map(SearchHit::getId).toList();
         try {
             var response = catalogClient.getTracks(ids);

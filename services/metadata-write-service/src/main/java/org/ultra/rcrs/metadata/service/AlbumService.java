@@ -12,6 +12,7 @@ import org.ultra.rcrs.metadata.model.ArtistToAlbum;
 import org.ultra.rcrs.metadata.model.ArtistToAlbumPK;
 import org.ultra.rcrs.metadata.repository.AlbumRepository;
 import org.ultra.rcrs.metadata.repository.ArtistToAlbumRepository;
+import org.ultra.rcrs.metadata.repository.TrackRepository;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
@@ -27,6 +28,7 @@ import java.util.UUID;
 public class AlbumService {
 
     private final AlbumRepository albumRepository;
+    private final TrackRepository trackRepository;
     private final ArtistToAlbumRepository artistToAlbumRepository;
     private final ArtistService artistService;
     private final S3Utils s3Utils;
@@ -53,19 +55,25 @@ public class AlbumService {
     @Transactional
     public void markAlbumDelete(UUID albumId) {
         updateAvailability(EntityStatus.DELETED, albumId);
+        trackRepository.updateAvailabilityStatusByAlbumId(EntityStatus.DELETED, albumId);
         catalogEventProducer.albumDeleted(albumId);
+        log.info("Album {} and all related tracks marked as DELETED", albumId);
     }
 
     @Transactional
     public void hideAlbum(UUID albumId) {
         updateAvailability(EntityStatus.HIDDEN, albumId);
+        trackRepository.updateAvailabilityStatusByAlbumId(EntityStatus.HIDDEN, albumId);
         catalogEventProducer.albumHidden(albumId);
+        log.info("Album {} and all related tracks marked as HIDDEN", albumId);
     }
 
     @Transactional
     public void activeAlbum(UUID albumId) {
         updateAvailability(EntityStatus.ACTIVE, albumId);
+        trackRepository.updateAvailabilityStatusByAlbumId(EntityStatus.ACTIVE, albumId);
         catalogEventProducer.albumActivated(albumId);
+        log.info("Album {} and all related tracks marked as ACTIVE", albumId);
     }
 
     @Transactional

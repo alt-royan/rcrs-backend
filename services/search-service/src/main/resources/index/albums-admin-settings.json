@@ -1,0 +1,40 @@
+{
+  "mappings": {
+    "properties": {
+      "artists": {
+        "properties": {
+          "id": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "name": {
+            "type": "text"
+          }
+        }
+      },
+      "title": {
+        "type": "text"
+      },
+      "year": {
+        "type": "integer"
+      },
+      "availability": {
+        "type": "text"
+      },
+      "lifecycle_status": {
+        "type": "text"
+      },
+      "tracks": {
+        "properties": {
+          "id": {
+            "type": "keyword",
+            "ignore_above": 256
+          },
+          "title": {
+            "type": "text"
+          }
+        }
+      }
+    }
+  }
+}
