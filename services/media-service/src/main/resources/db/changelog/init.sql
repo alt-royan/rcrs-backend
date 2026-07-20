@@ -14,10 +14,13 @@ CREATE TABLE IF NOT EXISTS audio_upload
 
 CREATE TABLE IF NOT EXISTS audio
 (
-    guid       uuid        NOT NULL,
-    upload_uid text REFERENCES audio_upload (uid),
-    track_id   text        NOT NULL,
-    codec      varchar(20) NOT NULL,
-    container  varchar(10) NOT NULL,
-    bitrate    varchar(6)  NOT NULL
+    guid               uuid                     NOT NULL,
+    track_id           text                     NOT NULL,
+    codec              varchar(20)              NOT NULL,
+    duration_ms        bigint                   NOT NULL,
+    container          varchar(10)              NOT NULL,
+    bitrate            varchar                  NOT NULL,
+    sample_rate        int                      NOT NULL,
+    byte_size          bigint                   NOT NULL,
+    creation_timestamp timestamp with time zone NOT NULL
 );

@@ -4,6 +4,84 @@ server:
 spring:
   application:
     name: media-service
+  temporal:
+    connection:
+      target: ${SPRING_TEMPORAL_CONNECTION_TARGET:127.0.0.1:7233}
+    namespace: default
+    workers:
+      capacity:
+        max-concurrent-workflow-task-pollers: 6
+        max-concurrent-activity-task-pollers: 6
+      rate-limits:
+        max-worker-activities-per-second: 2
+        max-task-queue-activities-per-second: 2
+    workflow-cache:
+      max-instances: 10
+      max-threads: 10
+    activities:
+      validateImage:
+        start-to-close-timeout: 10s
+        retry:
+          initial-interval: 1s
+          backoff-coefficient: 2
+          maximum-interval: 10s
+          maximum-attempts: 3
+      saveOriginalImage:
+        start-to-close-timeout: 15s
+        retry:
+          initial-interval: 1s
+          backoff-coefficient: 2
+          maximum-interval: 15s
+          maximum-attempts: 3
+      saveThumbnail:
+        start-to-close-timeout: 15s
+        retry:
+          initial-interval: 1s
+          backoff-coefficient: 2
+          maximum-interval: 15s
+          maximum-attempts: 3
+      validateAudio:
+        start-to-close-timeout: 30s
+        retry:
+          initial-interval: 1s
+          backoff-coefficient: 2
+          maximum-interval: 15s
+          maximum-attempts: 3
+      probeAudioMetadata:
+        start-to-close-timeout: 30s
+        retry:
+          initial-interval: 1s
+          backoff-coefficient: 2
+          maximum-interval: 15s
+          maximum-attempts: 3
+      saveOriginalAudioToS3:
+        start-to-close-timeout: 1m
+        retry:
+          initial-interval: 1s
+          backoff-coefficient: 2
+          maximum-interval: 30s
+          maximum-attempts: 3
+      saveAudioRecord:
+        start-to-close-timeout: 10s
+        retry:
+          initial-interval: 1s
+          backoff-coefficient: 2
+          maximum-interval: 10s
+          maximum-attempts: 5
+      normalizeAudio:
+        start-to-close-timeout: 5m
+        retry:
+          initial-interval: 1s
+          backoff-coefficient: 2
+          maximum-interval: 30s
+          maximum-attempts: 1
+      transcodingStatus:
+        start-to-close-timeout: 10s
+        retry:
+          initial-interval: 1s
+          backoff-coefficient: 2
+          maximum-interval: 10s
+          maximum-attempts: 3
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
     user: ${SPRING_LIQUIBASE_USER:postgres}
@@ -33,7 +111,7 @@ cdn:
     thumbnails: ${CDN_IMAGES_THUMBNAILS:64,300,640}
   audios:
     bucket: ${CDN_AUDIOS_BUCKET:rcrs-audio}
-    qualities: ${CDN_AUDIOS_QUALITIES:3,5,7}
+    bitrates: ${CDN_AUDIOS_BITRATES:"128k", "192k", "320k"}
   uploads:
     bucket: ${CDN_UPLOADS_BUCKET:rcrs-upload}
     signature-duration: ${CDN_UPLOADS_SIGNATURE_DURATION:24h}

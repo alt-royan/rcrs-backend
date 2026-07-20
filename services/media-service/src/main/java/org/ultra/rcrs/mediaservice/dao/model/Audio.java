@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.ultra.rcrs.enums.FileStatus;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Data
@@ -21,9 +22,6 @@ public class Audio {
     @Id
     private UUID guid;
 
-    @Column(name = "upload_uid")
-    private String upload_uid;
-
     @Column(name = "track_id")
     private String trackId;
 
@@ -31,5 +29,17 @@ public class Audio {
 
     private String container;
 
+    @Column(name = "duration_ms")
+    private Long durationMs;
+
     private String bitrate;
+
+    @Column(name = "sample_rate")
+    private Integer sampleRate;
+
+    @Column(name = "byte_size")
+    private Long byteSize;
+
+    @Column(name = "creation_timestamp")
+    private OffsetDateTime creationTimestamp;
 }
