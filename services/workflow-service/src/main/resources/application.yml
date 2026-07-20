@@ -67,6 +67,13 @@ spring:
           backoff-coefficient: 2
           maximum-interval: 30s
           maximum-attempts: 5
+      purge:
+        start-to-close-timeout: 1m
+        retry:
+          initial-interval: 1s
+          backoff-coefficient: 2
+          maximum-interval: 30s
+          maximum-attempts: 3
 
 feign:
   metadata-service:

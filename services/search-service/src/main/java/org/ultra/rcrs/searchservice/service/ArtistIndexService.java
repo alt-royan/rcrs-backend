@@ -93,6 +93,12 @@ public class ArtistIndexService {
         return publicDoc;
     }
 
+    public void handleArtistTrueDeleted(String id) {
+        artistIndexRepository.delete(id, ArtistAdminDoc.class);
+        artistIndexRepository.delete(id, ArtistPublicDoc.class);
+        log.info("Artist permanently deleted: id={}", id);
+    }
+
     private boolean isPublic(EntityStatus availability) {
         return availability == EntityStatus.ACTIVE || availability == EntityStatus.HIDDEN;
     }

@@ -8,6 +8,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.workflow.activity.impl.AlbumActivityImpl;
 import org.ultra.rcrs.workflow.activity.impl.ArtistActivityImpl;
+import org.ultra.rcrs.workflow.activity.impl.PurgeActivityImpl;
 import org.ultra.rcrs.workflow.activity.impl.TrackActivityImpl;
 import org.ultra.rcrs.workflow.activity.impl.TranscodingActivityImpl;
 import org.ultra.rcrs.workflow.converter.UploadRequestConverter;
@@ -29,6 +30,7 @@ public class TemporalWorker implements CommandLineRunner {
     private final AlbumActivityImpl albumActivityImpl;
     private final TrackActivityImpl trackActivityImpl;
     private final TranscodingActivityImpl transcodingActivityImpl;
+    private final PurgeActivityImpl purgeActivityImpl;
 
     @Override
     public void run(String... args) {
@@ -59,11 +61,16 @@ public class TemporalWorker implements CommandLineRunner {
                 TrackChangeAvailabilityStatusWorkflow.class,
                 TrackChangeAvailabilityStatusWorkflowImpl::new
         );
+        worker.registerWorkflowImplementationFactory(
+                PurgeDeletedWorkflow.class,
+                PurgeDeletedWorkflowImpl::new
+        );
 
         worker.registerActivitiesImplementations(artistActivityImpl);
         worker.registerActivitiesImplementations(albumActivityImpl);
         worker.registerActivitiesImplementations(trackActivityImpl);
         worker.registerActivitiesImplementations(transcodingActivityImpl);
+        worker.registerActivitiesImplementations(purgeActivityImpl);
 
         factory.start();
     }

@@ -234,6 +234,12 @@ public class TrackIndexService {
         log.info("Track published to public index: id={}", adminDoc.getId());
     }
 
+    public void handleTrackTrueDeleted(String id) {
+        trackIndexRepository.delete(id, TrackAdminDoc.class);
+        trackIndexRepository.delete(id, TrackPublicDoc.class);
+        log.info("Track permanently deleted: id={}", id);
+    }
+
     private TrackPublicDoc toPublicDoc(TrackAdminDoc adminDoc) {
         TrackPublicDoc publicDoc = new TrackPublicDoc();
         publicDoc.setId(adminDoc.getId());

@@ -107,4 +107,20 @@ public class WorkflowHandler {
         return future.join();
     }
 
+    public void startPurgeDeletedWorkflow() {
+        PurgeDeletedWorkflow workflow = workflowClient.newWorkflowStub(
+                PurgeDeletedWorkflow.class,
+                WorkflowOptions.newBuilder()
+                        .setTaskQueue(WORKFLOW_TASK_QUEUE)
+                        .setWorkflowId("purge-deleted-monthly")
+                        .setCronSchedule("0 0 4 1 * *")
+                        .setRetryOptions(
+                                RetryOptions.newBuilder()
+                                        .setMaximumAttempts(1)
+                                        .build())
+                        .build()
+        );
+        WorkflowClient.execute(workflow::purge);
+    }
+
 }

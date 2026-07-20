@@ -187,4 +187,11 @@ public class TrackWriteService {
                 .doOnError(e -> log.error("Failed to remove other from track: otherId={}, trackId={}, error={}", event.getOtherId(), event.getTrackId(), e.getMessage()))
                 .block();
     }
+
+    public void handleTrackTrueDeleted(String id) {
+        trackDocumentRepository.deleteById(id)
+                .doOnSuccess(v -> log.info("Permanently deleted track document: id={}", id))
+                .doOnError(e -> log.error("Failed to permanently delete track: id={}, error={}", id, e.getMessage()))
+                .block();
+    }
 }

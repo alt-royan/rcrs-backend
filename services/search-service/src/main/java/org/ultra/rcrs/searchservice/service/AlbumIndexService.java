@@ -157,6 +157,12 @@ public class AlbumIndexService {
         log.info("Album published to public index: id={}", adminDoc.getId());
     }
 
+    public void handleAlbumTrueDeleted(String id) {
+        albumIndexRepository.delete(id, AlbumAdminDoc.class);
+        albumIndexRepository.delete(id, AlbumPublicDoc.class);
+        log.info("Album permanently deleted: id={}", id);
+    }
+
     private AlbumPublicDoc toPublicDoc(AlbumAdminDoc adminDoc) {
         AlbumPublicDoc publicDoc = new AlbumPublicDoc();
         publicDoc.setId(adminDoc.getId());

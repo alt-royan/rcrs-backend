@@ -17,6 +17,9 @@ import org.ultra.rcrs.events.artist.ArtistCreatedEventOuterClass;
 import org.ultra.rcrs.events.artist.ArtistDeletedEventOuterClass;
 import org.ultra.rcrs.events.artist.ArtistHiddenEventOuterClass;
 import org.ultra.rcrs.events.artist.ArtistActivatedEventOuterClass;
+import org.ultra.rcrs.events.artist.ArtistTrueDeletedEventOuterClass;
+import org.ultra.rcrs.events.album.AlbumTrueDeletedEventOuterClass;
+import org.ultra.rcrs.events.track.TrackTrueDeletedEventOuterClass;
 import org.ultra.rcrs.events.common.DomainEventOuterClass;
 import org.ultra.rcrs.events.track.ArtistAddedToTrackEventOuterClass;
 import org.ultra.rcrs.events.track.ArtistDeletedFromTrackEventOuterClass;
@@ -70,6 +73,9 @@ public class CdcEventListener {
                 case ARTIST_ACTIVATED -> onArtistActivated(event.getPayload());
                 case ALBUM_ACTIVATED -> onAlbumActivated(event.getPayload());
                 case TRACK_ACTIVATED -> onTrackActivated(event.getPayload());
+                case ARTIST_TRUE_DELETED -> onArtistTrueDeleted(event.getPayload());
+                case ALBUM_TRUE_DELETED -> onAlbumTrueDeleted(event.getPayload());
+                case TRACK_TRUE_DELETED -> onTrackTrueDeleted(event.getPayload());
                 default -> log.warn("Unknown event type: {}", event.getEventType());
             }
         } catch (Exception e) {
@@ -263,6 +269,33 @@ public class CdcEventListener {
             trackWriteService.handleTrackActivated(event.getId());
         } catch (Exception e) {
             log.error("Failed to unpack TrackActivatedEvent: {}", e.getMessage(), e);
+        }
+    }
+
+    private void onArtistTrueDeleted(Any payload) {
+        try {
+            ArtistTrueDeletedEventOuterClass.ArtistTrueDeletedEvent event = payload.unpack(ArtistTrueDeletedEventOuterClass.ArtistTrueDeletedEvent.class);
+            artistWriteService.handleArtistTrueDeleted(event.getId());
+        } catch (Exception e) {
+            log.error("Failed to unpack ArtistTrueDeletedEvent: {}", e.getMessage(), e);
+        }
+    }
+
+    private void onAlbumTrueDeleted(Any payload) {
+        try {
+            AlbumTrueDeletedEventOuterClass.AlbumTrueDeletedEvent event = payload.unpack(AlbumTrueDeletedEventOuterClass.AlbumTrueDeletedEvent.class);
+            albumWriteService.handleAlbumTrueDeleted(event.getId());
+        } catch (Exception e) {
+            log.error("Failed to unpack AlbumTrueDeletedEvent: {}", e.getMessage(), e);
+        }
+    }
+
+    private void onTrackTrueDeleted(Any payload) {
+        try {
+            TrackTrueDeletedEventOuterClass.TrackTrueDeletedEvent event = payload.unpack(TrackTrueDeletedEventOuterClass.TrackTrueDeletedEvent.class);
+            trackWriteService.handleTrackTrueDeleted(event.getId());
+        } catch (Exception e) {
+            log.error("Failed to unpack TrackTrueDeletedEvent: {}", e.getMessage(), e);
         }
     }
 }

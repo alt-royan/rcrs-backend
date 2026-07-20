@@ -50,6 +50,10 @@ public class ActivityFactory {
         return Workflow.newActivityStub(TranscodingActivity.class, buildOptions("transcoding"));
     }
 
+    public PurgeActivity purgeActivity() {
+        return Workflow.newActivityStub(PurgeActivity.class, buildOptions("purge"));
+    }
+
     private ActivityOptions buildOptions(String serviceName) {
         TemporalProperties.ActivityConfig config = properties.activities().get(serviceName);
         return ActivityOptions.newBuilder()

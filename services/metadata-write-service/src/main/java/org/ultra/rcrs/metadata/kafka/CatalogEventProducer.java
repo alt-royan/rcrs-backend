@@ -13,6 +13,7 @@ import org.ultra.rcrs.events.artist.ArtistActivatedEventOuterClass;
 import org.ultra.rcrs.events.artist.ArtistCreatedEventOuterClass;
 import org.ultra.rcrs.events.artist.ArtistDeletedEventOuterClass;
 import org.ultra.rcrs.events.artist.ArtistHiddenEventOuterClass;
+import org.ultra.rcrs.events.artist.ArtistTrueDeletedEventOuterClass;
 import org.ultra.rcrs.events.common.*;
 import org.ultra.rcrs.events.track.*;
 import org.ultra.rcrs.kafka.ProtobufEventProducer;
@@ -500,6 +501,66 @@ public class CatalogEventProducer extends ProtobufEventProducer {
         var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
                 .setEventId(UUID.randomUUID().toString())
                 .setEventType(DomainEventOuterClass.EventType.TRACK_ACTIVATED)
+                .setAggregateType(DomainEventOuterClass.AggregateType.TRACK)
+                .setAggregateId(stringId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(event))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
+    }
+
+    public void artistTrueDeleted(UUID artistId) {
+        String stringId = Url62.encode(artistId);
+        var event = ArtistTrueDeletedEventOuterClass.ArtistTrueDeletedEvent.newBuilder()
+                .setId(stringId)
+                .build();
+
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.ARTIST_TRUE_DELETED)
+                .setAggregateType(DomainEventOuterClass.AggregateType.ARTIST)
+                .setAggregateId(stringId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(event))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
+    }
+
+    public void albumTrueDeleted(UUID albumId) {
+        String stringId = Url62.encode(albumId);
+        var event = AlbumTrueDeletedEventOuterClass.AlbumTrueDeletedEvent.newBuilder()
+                .setId(stringId)
+                .build();
+
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.ALBUM_TRUE_DELETED)
+                .setAggregateType(DomainEventOuterClass.AggregateType.ALBUM)
+                .setAggregateId(stringId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(event))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
+    }
+
+    public void trackTrueDeleted(UUID trackId) {
+        String stringId = Url62.encode(trackId);
+        var event = TrackTrueDeletedEventOuterClass.TrackTrueDeletedEvent.newBuilder()
+                .setId(stringId)
+                .build();
+
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.TRACK_TRUE_DELETED)
                 .setAggregateType(DomainEventOuterClass.AggregateType.TRACK)
                 .setAggregateId(stringId)
                 .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))

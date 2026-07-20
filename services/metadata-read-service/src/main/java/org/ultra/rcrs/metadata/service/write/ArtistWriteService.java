@@ -70,4 +70,11 @@ public class ArtistWriteService {
                 .doOnError(e -> log.error("Failed to activate artist: id={}, error={}", id, e.getMessage()))
                 .block();
     }
+
+    public void handleArtistTrueDeleted(String id) {
+        artistDocumentRepository.deleteById(id)
+                .doOnSuccess(v -> log.info("Permanently deleted artist document: id={}", id))
+                .doOnError(e -> log.error("Failed to permanently delete artist: id={}, error={}", id, e.getMessage()))
+                .block();
+    }
 }

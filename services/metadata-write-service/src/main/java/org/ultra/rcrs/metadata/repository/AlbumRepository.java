@@ -8,6 +8,7 @@ import org.ultra.rcrs.metadata.model.Album;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -24,4 +25,7 @@ public interface AlbumRepository extends JpaRepository<Album, UUID> {
     @Modifying
     @Query("UPDATE Album a SET a.availabilityStatus = :status WHERE a.id IN (SELECT ata.albumId FROM ArtistToAlbum ata WHERE ata.artistId = :artistId)")
     void updateAvailabilityStatusByArtistId(EntityStatus status, UUID artistId);
+
+    @Query("SELECT a.id FROM Album a WHERE a.availabilityStatus = :status")
+    List<UUID> findAllByAvailabilityStatus(EntityStatus status);
 }

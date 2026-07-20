@@ -11,12 +11,18 @@ services:
       - 5454:5432
     volumes:
       - /var/lib/postgres/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U temporal"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
     restart: unless-stopped
 
   temporal:
     container_name: temporal
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     environment:
       - DB=postgres12
       - DB_PORT=5432
@@ -35,12 +41,19 @@ services:
       - 7233:7233
     volumes:
       - ./dynamicconfig:/etc/temporal/config/dynamicconfig
+    healthcheck:
+      test: ["CMD-SHELL", "temporal operator cluster health"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 30s
     restart: unless-stopped
 
   temporal-admin-tools:
     container_name: temporal-admin-tools
     depends_on:
-      - temporal
+      temporal:
+        condition: service_healthy
     environment:
       - TEMPORAL_ADDRESS=temporal:7233
       - TEMPORAL_CLI_ADDRESS=temporal:7233
@@ -54,7 +67,8 @@ services:
   temporal-ui:
     container_name: temporal-ui
     depends_on:
-      - temporal
+      temporal:
+        condition: service_healthy
     environment:
       - TEMPORAL_ADDRESS=temporal:7233
       - TEMPORAL_CORS_ORIGINS=http://localhost:3000

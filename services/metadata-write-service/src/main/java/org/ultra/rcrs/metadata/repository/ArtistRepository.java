@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.ultra.rcrs.metadata.model.Artist;
 import org.ultra.rcrs.enums.EntityStatus;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -15,4 +16,7 @@ public interface ArtistRepository extends JpaRepository<Artist, UUID> {
     @Modifying
     @Query("UPDATE Artist a SET a.availabilityStatus = :status WHERE a.id = :id")
     void updateAvailabilityStatusById(EntityStatus status, UUID id);
+
+    @Query("SELECT a.id FROM Artist a WHERE a.availabilityStatus = :status")
+    List<UUID> findAllByAvailabilityStatus(EntityStatus status);
 }

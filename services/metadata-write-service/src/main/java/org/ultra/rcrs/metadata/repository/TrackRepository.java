@@ -8,6 +8,7 @@ import org.ultra.rcrs.metadata.model.Track;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -28,4 +29,7 @@ public interface TrackRepository extends JpaRepository<Track, UUID> {
     @Modifying
     @Query("UPDATE Track t SET t.availabilityStatus = :status WHERE t.albumId IN (SELECT ata.albumId FROM ArtistToAlbum ata WHERE ata.artistId = :artistId)")
     void updateAvailabilityStatusByArtistId(EntityStatus status, UUID artistId);
+
+    @Query("SELECT t.id FROM Track t WHERE t.availabilityStatus = :status")
+    List<UUID> findAllByAvailabilityStatus(EntityStatus status);
 }
