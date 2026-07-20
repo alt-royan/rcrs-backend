@@ -1,0 +1,2 @@
+CREATE SCHEMA IF NOT EXISTS rcrs_catalog;
+CREATE SCHEMA IF NOT EXISTS rcrs_upload;

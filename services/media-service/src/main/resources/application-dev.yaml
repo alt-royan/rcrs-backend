@@ -1,0 +1,49 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: media-service
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    user: ${SPRING_LIQUIBASE_USER:postgres}
+    password: ${SPRING_LIQUIBASE_PASSWORD:postgres}
+    default-schema: rcrs_upload
+    url: ${SPRING_LIQUIBASE_URL:jdbc:postgresql://localhost:5432/postgres?currentSchema=rcrs_upload}
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres?currentSchema=rcrs_upload}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+  cloud:
+    aws:
+      credentials:
+        access-key: ${SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY:test}
+        secret-key: ${SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY:test}
+      region:
+        static: ${SPRING_CLOUD_AWS_REGION_STATIC:eu-west-1}
+      endpoint: ${SPRING_CLOUD_AWS_ENDPOINT:http://localhost.localstack.cloud:4566}
+      s3:
+        path-style-access-enabled: true
+
+cdn:
+  images:
+    bucket: ${CDN_IMAGES_BUCKET:images}
+    thumbnails: ${CDN_IMAGES_THUMBNAILS:64,300,640}
+  audios:
+    bucket: ${CDN_AUDIOS_BUCKET:rcrs-audio}
+    qualities: ${CDN_AUDIOS_QUALITIES:3,5,7}
+  uploads:
+    bucket: ${CDN_UPLOADS_BUCKET:rcrs-upload}
+    signature-duration: ${CDN_UPLOADS_SIGNATURE_DURATION:24h}
+    file-duration: ${CDN_UPLOADS_FILE_DURATION:24h}
+    sqs:
+      queue: ${CDN_UPLOADS_SQS_QUEUE:rcrs-upload-queue}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+  instance:
+    preferIpAddress: true

@@ -1,0 +1,39 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: metadata-write-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres?currentSchema=rcrs_catalog}
+    username: ${SPRING_DATASOURCE_USERNAME:postgres}
+    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    user: ${SPRING_LIQUIBASE_USER:postgres}
+    password: ${SPRING_LIQUIBASE_PASSWORD:postgres}
+    url: ${SPRING_LIQUIBASE_URL:jdbc:postgresql://localhost:5432/postgres?currentSchema=rcrs_catalog}
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+
+cdn:
+  images:
+    endpoint: ${CDN_IMAGES_ENDPOINT:http://images.localhost:4566}
+
+logging:
+  level:
+    root: INFO
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+  instance:
+    preferIpAddress: true
