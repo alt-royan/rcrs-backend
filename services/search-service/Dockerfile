@@ -1,6 +1,6 @@
 FROM eclipse-temurin:21-jdk AS build
 
-COPY target/search-service-*.jar /app/search-service.jar
+COPY services/search-service/target/search-service-*.jar /app/search-service.jar
 WORKDIR /app
 
 EXPOSE 8083

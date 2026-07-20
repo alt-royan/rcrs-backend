@@ -1,6 +1,6 @@
 FROM eclipse-temurin:21-jdk AS build
 
-COPY target/gateway-api-*.jar /app/gateway-api.jar
+COPY gateway-api/target/gateway-api-*.jar /app/gateway-api.jar
 WORKDIR /app
 
 EXPOSE 8084

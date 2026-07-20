@@ -1,6 +1,6 @@
 FROM eclipse-temurin:21-jdk AS build
 
-COPY target/workflow-service-*.jar /app/workflow-service.jar
+COPY services/workflow-service/target/workflow-service-*.jar /app/workflow-service.jar
 WORKDIR /app
 
 EXPOSE 8082

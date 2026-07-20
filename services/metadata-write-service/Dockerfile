@@ -1,6 +1,6 @@
 FROM eclipse-temurin:21-jdk AS build
 
-COPY target/metadata-write-service-*.jar /app/metadata-write-service.jar
+COPY services/metadata-write-service/target/metadata-write-service-*.jar /app/metadata-write-service.jar
 WORKDIR /app
 
 EXPOSE 8080
