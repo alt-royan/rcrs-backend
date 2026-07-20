@@ -4,9 +4,11 @@ import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.enums.FileStatus;
+import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioUploadRepository;
 import software.amazon.awssdk.eventnotifications.s3.model.S3EventNotification;
 import software.amazon.awssdk.services.sqs.model.Message;
@@ -24,7 +26,7 @@ public class SqsS3Listener {
     @Value("${cdn.uploads.file-duration}")
     private Duration duration;
 
-    @SqsListener("${cdn.uploads.sqs.queue}")
+    @KafkaListener(topics = Topics.MEDIA_TRANSCODING_TOPIC, groupId = "media-group", containerFactory = "byteArrayContainerFactory")
     @Transactional
     public void handleEventObjectPut(Message message) {
         log.info("Received: {}", message);

@@ -12,7 +12,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgres/data
-      - ./local/postgres/init-schemas.sql:/docker-entrypoint-initdb.d/01-schemas.sql:ro
+      - ./postgres/init-schemas.sql:/docker-entrypoint-initdb.d/01-schemas.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -32,7 +32,7 @@ services:
       MONGO_INITDB_DATABASE: rcrs_catalog
     volumes:
       - mongodb_data:/data/db
-      - ./local/mongodb/init-replica.sh:/docker-entrypoint-initdb.d/init-replica.sh
+      - ./mongodb/init-replica.sh:/docker-entrypoint-initdb.d/init-replica.sh
     healthcheck:
       test: ["CMD-SHELL", "mongosh --eval 'db.adminCommand({ping:1})' --quiet"]
       interval: 10s
@@ -125,7 +125,7 @@ services:
         hard: 65536
     volumes:
       - elasticsearch_data:/usr/share/elasticsearch/data
-      - ./local/elk/init-indices.sh:/init-indices.sh:ro
+      - ./elk/init-indices.sh:/init-indices.sh:ro
       - ./services/search-service/src/main/resources/index:/index-settings:ro
     command: >
       /bin/bash -c "/usr/share/elasticsearch/bin/elasticsearch & /init-indices.sh && wait"
@@ -199,7 +199,7 @@ services:
       - TEMPORAL_NAMESPACE_DEFAULT=default
       - TEMPORAL_DEFAULT_NAMESPACE=default
     volumes:
-      - ./local/temporal/dynamicconfig:/etc/temporal/config/dynamicconfig
+      - ./temporal/dynamicconfig:/etc/temporal/config/dynamicconfig
     ports:
       - "7233:7233"
     healthcheck:
@@ -266,137 +266,40 @@ services:
     networks:
       - rcrs
 
-  s3:
-    image: scireum/s3-ninja:latest
-    container_name: s3
-    ports:
-      - "9444:9000"
-    environment:
-      JAVA_XMX: "1g"
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/ui"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 40s
-    restart: unless-stopped
-    networks:
-      - rcrs
-
-  # ==================== Application ====================
-
-#  discovery-server:
-#    build:
-#      context: .
-#      dockerfile: discovery-server/Dockerfile
-#    container_name: discovery-server
+#  s3:
+#    image: scireum/s3-ninja:latest
+#    container_name: s3
+#    restart: unless-stopped
+#    volumes:
+#      - ./s3/multipart:/home/sirius/multipart
 #    ports:
-#      - "8761:8761"
+#      - "9444:9000"
 #    environment:
-#      SPRING_PROFILES_ACTIVE: dev
-#      EUREKA_INSTANCE_HOSTNAME: discovery-server
-#    networks:
-#      - rcrs
+#      JAVA_XMX: "1g"
+#      JAVA_OPTS: >
+#        -Xmx1g -Xms512m
+#        -Djavax.net.ssl.trustStore=/etc/ssl/certs/java/cacerts
+#        -Djavax.net.ssl.trustStorePassword=changeit
 #    healthcheck:
-#      test: ["CMD-SHELL", "curl -sf http://localhost:8761/actuator/health || exit 1"]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 15
-#      start_period: 30s
-
-#  metadata-write-service:
-#    build:
-#      context: .
-#      dockerfile: services/metadata-write-service/Dockerfile
-#    container_name: metadata-write-service
-#    ports:
-#      - "8080:8080"
-#    environment:
-#      SPRING_PROFILES_ACTIVE: dev
-#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres?currentSchema=rcrs_catalog
-#      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/postgres?currentSchema=rcrs_catalog
-#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-#      CDN_IMAGES_ENDPOINT: http://s3:9000
-#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-#    depends_on:
-#      discovery-server:
-#        condition: service_healthy
-#      postgres:
-#        condition: service_healthy
-#      kafka:
-#        condition: service_healthy
-#    networks:
-#      - rcrs
+#      test: ["CMD", "curl", "-f", "http://localhost:9000/ui"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 40s
 #
-#  metadata-read-service:
-#    build:
-#      context: .
-#      dockerfile: services/metadata-read-service/Dockerfile
-#    container_name: metadata-read-service
-#    ports:
-#      - "8081:8081"
-#    environment:
-#      SPRING_PROFILES_ACTIVE: dev
-#      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/rcrs_catalog?replicaSet=rs0
-#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-#      CDN_IMAGES_ENDPOINT: http://s3:9000
-#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+#  s3-init:
+#    image: amazon/aws-cli:latest
+#    container_name: s3-init
 #    depends_on:
-#      discovery-server:
+#      s3:
 #        condition: service_healthy
-#      kafka:
-#        condition: service_healthy
-#    networks:
-#      - rcrs
-#
-#  search-service:
-#    build:
-#      context: .
-#      dockerfile: services/search-service/Dockerfile
-#    container_name: search-service
-#    ports:
-#      - "8083:8083"
+#    entrypoint: ["/bin/sh", "/scripts/init.sh"]
+#    volumes:
+#      - ./s3/init.sh:/scripts/init.sh:ro
 #    environment:
-#      SPRING_PROFILES_ACTIVE: dev
-#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-#      SPRING_DATA_ELASTICSEARCH_URL: http://elasticsearch:9200
-#      FEIGN_CATALOG-SERVICE_URL: http://metadata-write-service:8080
-#      CDN_IMAGES_ENDPOINT: http://s3:9000
-#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-#    depends_on:
-#      discovery-server:
-#        condition: service_healthy
-#      elasticsearch:
-#        condition: service_healthy
-#      kafka:
-#        condition: service_healthy
-#    networks:
-#      - rcrs
-#
-#  workflow-service:
-#    build:
-#      context: .
-#      dockerfile: services/workflow-service/Dockerfile
-#    container_name: workflow-service
-#    ports:
-#      - "8085:8082"
-#    environment:
-#      SPRING_PROFILES_ACTIVE: dev
-#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-#      SPRING_TEMPORAL_CONNECTION_TARGET: temporal:7233
-#      FEIGN_METADATA-SERVICE_URL: http://metadata-write-service:8080
-#      FEIGN_MEDIA-SERVICE_URL: http://media-service:8082
-#      FEIGN_SEARCH-SERVICE_URL: http://search-service:8083
-#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-#    depends_on:
-#      discovery-server:
-#        condition: service_healthy
-#      temporal:
-#        condition: service_healthy
-#      kafka:
-#        condition: service_healthy
-#    networks:
-#      - rcrs
+#      AWS_ACCESS_KEY_ID: AKIAIOSFODNN7EXAMPLE
+#      AWS_SECRET_ACCESS_KEY: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+#      AWS_DEFAULT_REGION: eu-west-1
 
 networks:
   rcrs:

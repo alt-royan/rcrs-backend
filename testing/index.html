@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Media Service Tester</title>
+<style>
+  body { font-family: monospace; max-width: 800px; margin: 40px auto; padding: 0 20px; background: #1a1a2e; color: #e0e0e0; }
+  h1 { color: #00d4aa; border-bottom: 2px solid #00d4aa; padding-bottom: 10px; }
+  h2 { color: #00b4d8; margin-top: 30px; }
+  section { background: #16213e; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #0f3460; }
+  input[type="file"] { display: block; margin: 10px 0; color: #e0e0e0; }
+  button { background: #00d4aa; color: #1a1a2e; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 14px; margin: 5px 0; }
+  button:hover { background: #00b894; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  button.secondary { background: #0f3460; color: #e0e0e0; }
+  pre { background: #0d1b2a; padding: 12px; border-radius: 4px; overflow-x: auto; border: 1px solid #0f3460; white-space: pre-wrap; word-break: break-all; font-size: 13px; line-height: 1.5; min-height: 40px; }
+  .label { font-size: 12px; color: #888; margin-top: 10px; }
+  .status-ok { color: #00d4aa; }
+  .status-wait { color: #ffd166; }
+  .status-fail { color: #ef476f; }
+  input { background: #0d1b2a; border: 1px solid #0f3460; color: #e0e0e0; padding: 6px; border-radius: 4px; margin: 5px 5px 5px 0; width: 200px; }
+  .flex { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin: 10px 0; }
+  .result { margin-top: 10px; }
+  .link { color: #00b4d8; cursor: pointer; text-decoration: underline; }
+  .link:hover { color: #00d4aa; }
+  details { margin: 5px 0; }
+  summary { cursor: pointer; color: #00b4d8; }
+  .advanced { margin-top: 10px; padding: 10px; background: #0d1b2a; border-radius: 4px; border: 1px dashed #0f3460; }
+  input[type="number"], input[type="text"] { width: 120px; }
+</style>
+</head>
+<body>
+<h1>🎛️ Media Service Tester</h1>
+
+<section id="image-section">
+  <h2>🖼️ Upload Image</h2>
+  <p class="label">Uploads a Base64-encoded image to <code>/upload/files/image</code></p>
+  <input type="file" id="imageInput" accept="image/*">
+  <div class="flex">
+    <button id="uploadImageBtn">Upload Image</button>
+  </div>
+  <div class="result">
+    <pre id="imageResult">Waiting for image upload...</pre>
+  </div>
+</section>
+
+<section id="audio-section">
+  <h2>🎵 Upload Audio</h2>
+  <p class="label">Gets a presigned URL from <code>/upload/audio/pre-sign</code>, then uploads the file directly to S3</p>
+  <input type="file" id="audioInput" accept="audio/*">
+  <div class="flex">
+    <button id="getPresignBtn" disabled>1. Get Presigned URL</button>
+    <span id="uidDisplay" class="label" style="display:none;">UID: <strong id="uidValue"></strong></span>
+  </div>
+  <div class="flex">
+    <button id="uploadAudioBtn" disabled class="secondary">2. Upload to Presigned URL</button>
+  </div>
+  <div class="result">
+    <pre id="audioResult">Waiting for audio upload...</pre>
+  </div>
+  <div id="presignDetails" class="advanced" style="display:none;">
+    <details>
+      <summary>Presigned URL Details</summary>
+      <pre id="presignRaw"></pre>
+    </details>
+  </div>
+</section>
+
+<script>
+const API = 'http://localhost:8082';
+
+// Default test files hardcoded
+const DEFAULT_FILES = ['test.jpg', 'test.mp3'];
+
+async function loadAndShow(url) {
+  const r = await fetch(url);
+  const text = await r.text();
+  try { return JSON.parse(text); } catch { return text; }
+}
+
+// --- Image Upload ---
+document.getElementById('imageInput').addEventListener('change', function() {
+  document.getElementById('imageResult').textContent = `Selected: ${this.files[0]?.name || 'none'}`;
+});
+
+document.getElementById('uploadImageBtn').addEventListener('click', async function() {
+  const input = document.getElementById('imageInput');
+  const resultPre = document.getElementById('imageResult');
+  const file = input.files[0];
+  if (!file) {
+    resultPre.textContent = '⚠️ Please select an image file first.';
+    resultPre.className = 'status-fail';
+    return;
+  }
+  this.disabled = true;
+  this.textContent = 'Uploading...';
+  try {
+    const base64 = await fileToBase64DataUrl(file);
+    const body = { image: base64 };
+    const r = await fetch(API + '/upload/files/image', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    const result = await r.json();
+    resultPre.textContent = JSON.stringify(result, null, 2);
+    if (r.ok) {
+      resultPre.className = 'status-ok';
+    } else {
+      resultPre.className = 'status-fail';
+    }
+  } catch (e) {
+    resultPre.textContent = '❌ Error: ' + e.message;
+    resultPre.className = 'status-fail';
+  } finally {
+    this.disabled = false;
+    this.textContent = 'Upload Image';
+  }
+});
+
+// --- Audio Upload ---
+let presignData = null;
+
+document.getElementById('audioInput').addEventListener('change', function() {
+  const file = this.files[0];
+  document.getElementById('audioResult').textContent = `Selected: ${file?.name || 'none'}`;
+  document.getElementById('getPresignBtn').disabled = !file;
+  presignData = null;
+  document.getElementById('uploadAudioBtn').disabled = true;
+  document.getElementById('uidDisplay').style.display = 'none';
+  document.getElementById('presignDetails').style.display = 'none';
+});
+
+document.getElementById('getPresignBtn').addEventListener('click', async function() {
+  const input = document.getElementById('audioInput');
+  const resultPre = document.getElementById('audioResult');
+  const file = input.files[0];
+  if (!file) {
+    resultPre.textContent = '⚠️ Please select an audio file first.';
+    resultPre.className = 'status-fail';
+    return;
+  }
+  this.disabled = true;
+  this.textContent = 'Getting presigned URL...';
+  try {
+    const body = { name: file.name, length: file.size };
+    const r = await fetch(API + '/upload/audio/pre-sign', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    presignData = await r.json();
+    if (r.ok) {
+      resultPre.textContent = `✅ Presigned URL obtained. UID: ${presignData.uid}`;
+      resultPre.className = 'status-ok';
+      document.getElementById('uidDisplay').style.display = 'inline';
+      document.getElementById('uidValue').textContent = presignData.uid;
+      document.getElementById('presignDetails').style.display = 'block';
+      document.getElementById('presignRaw').textContent = JSON.stringify(presignData, null, 2);
+      document.getElementById('uploadAudioBtn').disabled = false;
+    } else {
+      resultPre.textContent = JSON.stringify(presignData, null, 2);
+      resultPre.className = 'status-fail';
+    }
+  } catch (e) {
+    resultPre.textContent = '❌ Error: ' + e.message;
+    resultPre.className = 'status-fail';
+  } finally {
+    this.disabled = false;
+    this.textContent = '1. Get Presigned URL';
+  }
+});
+
+document.getElementById('uploadAudioBtn').addEventListener('click', async function() {
+  const resultPre = document.getElementById('audioResult');
+  const input = document.getElementById('audioInput');
+  const file = input.files[0];
+  if (!presignData || !file) {
+    resultPre.textContent = '⚠️ Missing presigned URL data or file.';
+    resultPre.className = 'status-fail';
+    return;
+  }
+  this.disabled = true;
+  this.textContent = 'Uploading...';
+  try {
+    const headers = {};
+    if (presignData.headers && Array.isArray(presignData.headers)) {
+      for (const h of presignData.headers) {
+        if (h.key) headers[h.key] = h.value;
+        else headers[h[0]] = h[1];
+      }
+    }
+    const r = await fetch(presignData.url, {
+      method: presignData.method || 'PUT',
+      headers: headers || { 'Content-Type': file.type || 'audio/mpeg' },
+      body: file
+    });
+    if (r.ok) {
+      resultPre.textContent = `✅ File uploaded successfully to S3 via presigned URL! HTTP ${r.status} ${r.statusText}`;
+      resultPre.className = 'status-ok';
+      document.getElementById('uploadAudioBtn').textContent = '✅ Uploaded';
+      document.getElementById('uploadAudioBtn').disabled = true;
+    } else {
+      const errText = await r.text();
+      resultPre.textContent = `❌ Upload failed. HTTP ${r.status}: ${errText.substring(0, 500)}`;
+      resultPre.className = 'status-fail';
+      this.disabled = false;
+      this.textContent = '2. Upload to Presigned URL';
+    }
+  } catch (e) {
+    resultPre.textContent = '❌ Error: ' + e.message;
+    resultPre.className = 'status-fail';
+    this.disabled = false;
+    if (!this.disabled) this.textContent = '2. Upload to Presigned URL';
+  }
+});
+
+function fileToBase64DataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = e => reject(e.target.error);
+    reader.readAsDataURL(file);
+  });
+}
+</script>
+</body>
+</html>
