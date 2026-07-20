@@ -38,6 +38,9 @@ public class AudioUpload {
     @Column(name = "expires_at")
     private Instant expiresAt;
 
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt;
+
     private String error;
 
 }

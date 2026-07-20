@@ -84,7 +84,7 @@ public class AudioService {
                 .originalFileName(request.getName())
                 .contentLength(request.getLength())
                 .contentType(contentType)
-                .expiresAt(Instant.now().plusSeconds(duration.toSeconds()))
+                .createdAt(Instant.now())
                 .error(null)
                 .build());
 

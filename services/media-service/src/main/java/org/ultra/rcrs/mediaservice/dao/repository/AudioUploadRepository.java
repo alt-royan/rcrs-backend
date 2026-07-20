@@ -21,8 +21,8 @@ public interface AudioUploadRepository extends JpaRepository<AudioUpload, String
 
     @Transactional
     @Modifying
-    @Query("UPDATE AudioUpload SET expiredAt=:expiredAt WHERE uid = :uid")
-    void updateExpiredAtByUid(Instant expiredAt, String uid);
+    @Query("UPDATE AudioUpload SET expiresAt=:expiresAt WHERE uid = :uid")
+    void updateExpiredAtByUid(Instant expiresAt, String uid);
 
     @Transactional
     @Modifying
@@ -41,4 +41,21 @@ public interface AudioUploadRepository extends JpaRepository<AudioUpload, String
               AND a.expiresAt < :now
             """)
     List<String> findAllExpired(Instant now);
+
+    @Query("""
+            SELECT a.uid
+            FROM AudioUpload a
+            WHERE a.status = :status
+              AND a.expiresAt IS NOT NULL
+              AND a.expiresAt < :now
+            """)
+    List<String> findExpiredByStatus(FileStatus status, Instant now);
+
+    @Query("""
+            SELECT a.uid
+            FROM AudioUpload a
+            WHERE a.status = :status
+              AND a.createdAt < :threshold
+            """)
+    List<String> findStaleByStatus(FileStatus status, Instant threshold);
 }
