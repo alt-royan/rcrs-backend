@@ -1,34 +1,55 @@
 {
+  "settings": {
+    "analysis": {
+      "filter": {
+        "edge_ngram": {
+          "type": "edge_ngram",
+          "min_gram": 2,
+          "max_gram": 20
+        },
+        "russian_stemmer": {
+          "type": "stemmer",
+          "language": "russian"
+        }
+      },
+      "analyzer": {
+        "tokens": {
+          "type": "custom",
+          "tokenizer": "standard",
+          "filter": ["lowercase", "russian_stemmer", "edge_ngram"]
+        }
+      }
+    }
+  },
   "mappings": {
     "properties": {
+      "title": {
+        "type": "text",
+        "analyzer": "tokens"
+      },
+      "availability": {
+        "type": "keyword"
+      },
+      "lifecycleStatus": {
+        "type": "keyword"
+      },
       "artists": {
+        "type": "nested",
         "properties": {
-          "id": {
-            "type": "keyword",
-            "ignore_above": 256
-          },
+          "id": { "type": "keyword" },
           "name": {
-            "type": "text"
+            "type": "text",
+            "analyzer": "tokens"
           }
         }
       },
-      "title": {
-        "type": "text"
-      },
-      "availability": {
-        "type": "text"
-      },
-      "lifecycle_status": {
-        "type": "text"
-      },
       "album": {
+        "type": "nested",
         "properties": {
-          "id": {
-            "type": "keyword",
-            "ignore_above": 256
-          },
+          "id": { "type": "keyword" },
           "title": {
-            "type": "text"
+            "type": "text",
+            "analyzer": "tokens"
           }
         }
       }

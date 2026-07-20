@@ -21,10 +21,8 @@ for file in "$SETTINGS_DIR"/*-settings.json; do
     continue
   fi
 
-  payload=$(sed '1s/^{/{"settings":{"number_of_shards":1,"number_of_replicas":1},/' "$file")
-
   response=$(curl -s -w "\n%{http_code}" -X PUT "$ES_URL/$index_name" \
-    -H "Content-Type: application/json" -d "$payload")
+    -H "Content-Type: application/json" -d @"$file")
 
   http_code=$(echo "$response" | tail -1)
   body_resp=$(echo "$response" | sed '$d')
