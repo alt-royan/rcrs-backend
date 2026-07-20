@@ -1,5 +1,6 @@
 package org.ultra.rcrs.metadata.repository;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -17,8 +18,8 @@ public interface TrackDocumentRepository extends ReactiveMongoRepository<TrackPu
     Mono<TrackPublicDocument> findByIdForPublic(String id);
 
     @Query("{ 'album.id': ?0 }")
-    Flux<TrackPublicDocument> findAllByAlbumIdForAdmin(String albumId);
+    Flux<TrackPublicDocument> findAllByAlbumIdForAdmin(String albumId, Sort sort);
 
     @Query("{ 'album.id': ?0, 'lifecycleStatus': 'PUBLISHED', 'availabilityStatus': { '$in': [ 'ACTIVE', 'HIDDEN' ] } }")
-    Flux<TrackPublicDocument> findAllByAlbumIdForPublic(String albumId);
+    Flux<TrackPublicDocument> findAllByAlbumIdForPublic(String albumId, Sort sort);
 }

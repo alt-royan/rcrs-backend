@@ -9,6 +9,7 @@ import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -22,7 +23,7 @@ public class AlbumAdminViewDto {
     private EntityStatus availabilityStatus;
     private String title;
     private AlbumType type;
-    private String releaseDate;
+    private LocalDateTime releaseDate;
     private Integer year;
     private Integer totalTracks;
     private Integer totalDurationMs;

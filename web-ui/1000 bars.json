@@ -1,0 +1,267 @@
+{
+  "title": "1000 BARS",
+  "type": "FULL",
+  "releaseDate": "2025-11-28T00:00:00.000Z",
+  "coverUri": "",
+  "artists": [
+    {
+      "id": "string",
+      "name": "Heronwater",
+      "role": "MAIN_ARTIST"
+    }
+  ],
+  "tracks": [
+    {
+      "uid": "test-uid",
+      "title": "WANT SOME MORE",
+      "trackNumber": 1,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "I LOVE MY OPPS",
+      "trackNumber": 2,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "CASPIAN LOVE",
+      "trackNumber": 3,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "FANTASY",
+      "trackNumber": 4,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "INTERLUDE BARS",
+      "trackNumber": 5,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "ВЕЧНО МОЛОДОЙ",
+      "trackNumber": 6,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "ЛУЧШИЕ ГОДЫ",
+      "trackNumber": 7,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "ВЫПЕЙ ЗА МЕНЯ",
+      "trackNumber": 8,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "VOGUE WATER",
+      "trackNumber": 9,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "Я ЛЮБЛЮ",
+      "trackNumber": 10,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "DJ",
+      "trackNumber": 11,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "ЦАРИЦУ",
+      "trackNumber": 12,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "ТАХО",
+      "trackNumber": 13,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "ЖАН ПОЛЬ ГОТЬЕ",
+      "trackNumber": 14,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "НА ПЕРВОМ СВИДАНИИ",
+      "trackNumber": 15,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "SEX IN THE CLUB",
+      "trackNumber": 16,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "DARK NIGHT",
+      "trackNumber": 17,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    },
+    {
+      "uid": "test-uid",
+      "title": "АМР АУТРО",
+      "trackNumber": 18,
+      "explicit": true,
+      "artists": [
+        {
+          "id": "string",
+          "name": "Heronwater",
+          "role": "MAIN_ARTIST"
+        }
+      ],
+      "others": []
+    }
+  ]
+}

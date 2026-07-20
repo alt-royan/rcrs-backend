@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.ultra.rcrs.enums.AlbumType;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
 @Data
@@ -16,7 +17,7 @@ public class AlbumUploadRequest {
     private AlbumType type;
 
     @NotNull
-    private OffsetDateTime releaseDate;
+    private LocalDateTime releaseDate;
 
     private OffsetDateTime publishTimestamp;
 

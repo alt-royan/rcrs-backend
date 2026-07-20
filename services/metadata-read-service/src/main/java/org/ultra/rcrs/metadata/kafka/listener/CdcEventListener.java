@@ -80,7 +80,7 @@ public class CdcEventListener {
     private void onArtistCreated(Any payload) {
         try {
             ArtistCreatedEventOuterClass.ArtistCreatedEvent event = payload.unpack(ArtistCreatedEventOuterClass.ArtistCreatedEvent.class);
-            artistWriteService.handleArtistCreated(event).subscribe();
+            artistWriteService.handleArtistCreated(event);
         } catch (Exception e) {
             log.error("Failed to unpack ArtistCreatedEvent: {}", e.getMessage(), e);
         }
@@ -89,7 +89,7 @@ public class CdcEventListener {
     private void onArtistDeleted(Any payload) {
         try {
             ArtistDeletedEventOuterClass.ArtistDeletedEvent event = payload.unpack(ArtistDeletedEventOuterClass.ArtistDeletedEvent.class);
-            artistWriteService.handleArtistDeleted(event.getId()).subscribe();
+            artistWriteService.handleArtistDeleted(event.getId());
         } catch (Exception e) {
             log.error("Failed to unpack ArtistDeletedEvent: {}", e.getMessage(), e);
         }
@@ -98,7 +98,7 @@ public class CdcEventListener {
     private void onArtistHidden(Any payload) {
         try {
             ArtistHiddenEventOuterClass.ArtistHiddenEvent event = payload.unpack(ArtistHiddenEventOuterClass.ArtistHiddenEvent.class);
-            artistWriteService.handleArtistHidden(event.getId()).subscribe();
+            artistWriteService.handleArtistHidden(event.getId());
         } catch (Exception e) {
             log.error("Failed to unpack ArtistHiddenEvent: {}", e.getMessage(), e);
         }
@@ -107,7 +107,7 @@ public class CdcEventListener {
     private void onAlbumCreated(Any payload) {
         try {
             AlbumCreatedEventOuterClass.AlbumCreatedEvent event = payload.unpack(AlbumCreatedEventOuterClass.AlbumCreatedEvent.class);
-            albumWriteService.handleAlbumCreated(event).subscribe();
+            albumWriteService.handleAlbumCreated(event);
         } catch (Exception e) {
             log.error("Failed to unpack AlbumCreatedEvent: {}", e.getMessage(), e);
         }
@@ -116,7 +116,7 @@ public class CdcEventListener {
     private void onAlbumDeleted(Any payload) {
         try {
             AlbumDeletedEventOuterClass.AlbumDeletedEvent event = payload.unpack(AlbumDeletedEventOuterClass.AlbumDeletedEvent.class);
-            albumWriteService.handleAlbumDeleted(event.getId()).subscribe();
+            albumWriteService.handleAlbumDeleted(event.getId());
         } catch (Exception e) {
             log.error("Failed to unpack AlbumDeletedEvent: {}", e.getMessage(), e);
         }
@@ -125,7 +125,7 @@ public class CdcEventListener {
     private void onAlbumHidden(Any payload) {
         try {
             AlbumHiddenEventOuterClass.AlbumHiddenEvent event = payload.unpack(AlbumHiddenEventOuterClass.AlbumHiddenEvent.class);
-            albumWriteService.handleAlbumHidden(event.getId()).subscribe();
+            albumWriteService.handleAlbumHidden(event.getId());
         } catch (Exception e) {
             log.error("Failed to unpack AlbumHiddenEvent: {}", e.getMessage(), e);
         }
@@ -134,7 +134,7 @@ public class CdcEventListener {
     private void onTrackCreated(Any payload) {
         try {
             TrackCreatedEventOuterClass.TrackCreatedEvent event = payload.unpack(TrackCreatedEventOuterClass.TrackCreatedEvent.class);
-            trackWriteService.handleTrackCreated(event).subscribe();
+            trackWriteService.handleTrackCreated(event);
         } catch (Exception e) {
             log.error("Failed to unpack TrackCreatedEvent: {}", e.getMessage(), e);
         }
@@ -143,7 +143,7 @@ public class CdcEventListener {
     private void onTrackDeleted(Any payload) {
         try {
             TrackDeletedEventOuterClass.TrackDeletedEvent event = payload.unpack(TrackDeletedEventOuterClass.TrackDeletedEvent.class);
-            trackWriteService.handleTrackDeleted(event.getId()).subscribe();
+            trackWriteService.handleTrackDeleted(event.getId());
         } catch (Exception e) {
             log.error("Failed to unpack TrackDeletedEvent: {}", e.getMessage(), e);
         }
@@ -152,7 +152,7 @@ public class CdcEventListener {
     private void onTrackHidden(Any payload) {
         try {
             TrackHiddenEventOuterClass.TrackHiddenEvent event = payload.unpack(TrackHiddenEventOuterClass.TrackHiddenEvent.class);
-            trackWriteService.handleTrackHidden(event.getId()).subscribe();
+            trackWriteService.handleTrackHidden(event.getId());
         } catch (Exception e) {
             log.error("Failed to unpack TrackHiddenEvent: {}", e.getMessage(), e);
         }
@@ -161,7 +161,7 @@ public class CdcEventListener {
     private void onArtistAddedToTrack(Any payload) {
         try {
             ArtistAddedToTrackEventOuterClass.ArtistAddedToTrackEvent event = payload.unpack(ArtistAddedToTrackEventOuterClass.ArtistAddedToTrackEvent.class);
-            trackWriteService.handleArtistAddedToTrack(event).subscribe();
+            trackWriteService.handleArtistAddedToTrack(event);
         } catch (Exception e) {
             log.error("Failed to unpack ArtistAddedToTrackEvent: {}", e.getMessage(), e);
         }
@@ -170,7 +170,7 @@ public class CdcEventListener {
     private void onArtistAddedToAlbum(Any payload) {
         try {
             ArtistAddedToAlbumEventOuterClass.ArtistAddedToAlbumEvent event = payload.unpack(ArtistAddedToAlbumEventOuterClass.ArtistAddedToAlbumEvent.class);
-            albumWriteService.handleArtistAddedToAlbum(event).subscribe();
+            albumWriteService.handleArtistAddedToAlbum(event);
         } catch (Exception e) {
             log.error("Failed to unpack ArtistAddedToAlbumEvent: {}", e.getMessage(), e);
         }
@@ -179,7 +179,7 @@ public class CdcEventListener {
     private void onOtherAddedToTrack(Any payload) {
         try {
             OtherAddedToTrackEventOuterClass.OtherAddedToTrackEvent event = payload.unpack(OtherAddedToTrackEventOuterClass.OtherAddedToTrackEvent.class);
-            trackWriteService.handleOtherAddedToTrack(event).subscribe();
+            trackWriteService.handleOtherAddedToTrack(event);
         } catch (Exception e) {
             log.error("Failed to unpack OtherAddedToTrackEvent: {}", e.getMessage(), e);
         }
@@ -188,7 +188,7 @@ public class CdcEventListener {
     private void onOtherDeletedFromTrack(Any payload) {
         try {
             OtherDeletedFromTrackEventOuterClass.OtherDeletedFromTrackEvent event = payload.unpack(OtherDeletedFromTrackEventOuterClass.OtherDeletedFromTrackEvent.class);
-            trackWriteService.handleOtherDeletedFromTrack(event).subscribe();
+            trackWriteService.handleOtherDeletedFromTrack(event);
         } catch (Exception e) {
             log.error("Failed to unpack OtherDeletedFromTrackEvent: {}", e.getMessage(), e);
         }
@@ -197,7 +197,7 @@ public class CdcEventListener {
     private void onArtistDeletedFromAlbum(Any payload) {
         try {
             ArtistDeletedFromAlbumEventOuterClass.ArtistDeletedFromAlbumEvent event = payload.unpack(ArtistDeletedFromAlbumEventOuterClass.ArtistDeletedFromAlbumEvent.class);
-            albumWriteService.handleArtistDeletedFromAlbum(event).subscribe();
+            albumWriteService.handleArtistDeletedFromAlbum(event);
         } catch (Exception e) {
             log.error("Failed to unpack ArtistDeletedFromAlbumEvent: {}", e.getMessage(), e);
         }
@@ -206,7 +206,7 @@ public class CdcEventListener {
     private void onArtistDeletedFromTrack(Any payload) {
         try {
             ArtistDeletedFromTrackEventOuterClass.ArtistDeletedFromTrackEvent event = payload.unpack(ArtistDeletedFromTrackEventOuterClass.ArtistDeletedFromTrackEvent.class);
-            trackWriteService.handleArtistDeletedFromTrack(event).subscribe();
+            trackWriteService.handleArtistDeletedFromTrack(event);
         } catch (Exception e) {
             log.error("Failed to unpack ArtistDeletedFromTrackEvent: {}", e.getMessage(), e);
         }
@@ -215,7 +215,7 @@ public class CdcEventListener {
     private void onAlbumLifecycleStatusUpdated(Any payload) {
         try {
             AlbumUpdateLifecycleStatusEventOuterClass.AlbumUpdateLifecycleStatusEvent event = payload.unpack(AlbumUpdateLifecycleStatusEventOuterClass.AlbumUpdateLifecycleStatusEvent.class);
-            albumWriteService.handleAlbumLifecycleStatusUpdated(event).subscribe();
+            albumWriteService.handleAlbumLifecycleStatusUpdated(event);
         } catch (Exception e) {
             log.error("Failed to unpack AlbumUpdateLifecycleStatusEvent: {}", e.getMessage(), e);
         }
@@ -224,7 +224,7 @@ public class CdcEventListener {
     private void onTrackLifecycleStatusUpdated(Any payload) {
         try {
             TrackUpdateLifecycleStatusEventOuterClass.TrackUpdateLifecycleStatusEvent event = payload.unpack(TrackUpdateLifecycleStatusEventOuterClass.TrackUpdateLifecycleStatusEvent.class);
-            trackWriteService.handleTrackLifecycleStatusUpdated(event).subscribe();
+            trackWriteService.handleTrackLifecycleStatusUpdated(event);
         } catch (Exception e) {
             log.error("Failed to unpack TrackUpdateLifecycleStatusEvent: {}", e.getMessage(), e);
         }
@@ -233,7 +233,7 @@ public class CdcEventListener {
     private void onTrackAddedToAlbum(Any payload) {
         try {
             TrackAddedToAlbumEventOuterClass.TrackAddedToAlbumEvent event = payload.unpack(TrackAddedToAlbumEventOuterClass.TrackAddedToAlbumEvent.class);
-            trackWriteService.handleTrackAddedToAlbum(event).subscribe();
+            trackWriteService.handleTrackAddedToAlbum(event);
         } catch (Exception e) {
             log.error("Failed to unpack TrackAddedToAlbumEvent: {}", e.getMessage(), e);
         }
@@ -242,7 +242,7 @@ public class CdcEventListener {
     private void onArtistActivated(Any payload) {
         try {
             ArtistActivatedEventOuterClass.ArtistActivatedEvent event = payload.unpack(ArtistActivatedEventOuterClass.ArtistActivatedEvent.class);
-            artistWriteService.handleArtistActivated(event.getId()).subscribe();
+            artistWriteService.handleArtistActivated(event.getId());
         } catch (Exception e) {
             log.error("Failed to unpack ArtistActivatedEvent: {}", e.getMessage(), e);
         }
@@ -251,7 +251,7 @@ public class CdcEventListener {
     private void onAlbumActivated(Any payload) {
         try {
             AlbumActivatedEventOuterClass.AlbumActivatedEvent event = payload.unpack(AlbumActivatedEventOuterClass.AlbumActivatedEvent.class);
-            albumWriteService.handleAlbumActivated(event.getId()).subscribe();
+            albumWriteService.handleAlbumActivated(event.getId());
         } catch (Exception e) {
             log.error("Failed to unpack AlbumActivatedEvent: {}", e.getMessage(), e);
         }
@@ -260,7 +260,7 @@ public class CdcEventListener {
     private void onTrackActivated(Any payload) {
         try {
             TrackActivatedEventOuterClass.TrackActivatedEvent event = payload.unpack(TrackActivatedEventOuterClass.TrackActivatedEvent.class);
-            trackWriteService.handleTrackActivated(event.getId()).subscribe();
+            trackWriteService.handleTrackActivated(event.getId());
         } catch (Exception e) {
             log.error("Failed to unpack TrackActivatedEvent: {}", e.getMessage(), e);
         }

@@ -6,44 +6,25 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
+import org.ultra.rcrs.enums.ArtistRole;
+import org.ultra.rcrs.enums.LifecycleStatus;
+import org.ultra.rcrs.events.album.*;
+import org.ultra.rcrs.events.artist.ArtistActivatedEventOuterClass;
+import org.ultra.rcrs.events.artist.ArtistCreatedEventOuterClass;
+import org.ultra.rcrs.events.artist.ArtistDeletedEventOuterClass;
+import org.ultra.rcrs.events.artist.ArtistHiddenEventOuterClass;
+import org.ultra.rcrs.events.common.*;
+import org.ultra.rcrs.events.track.*;
+import org.ultra.rcrs.kafka.ProtobufEventProducer;
+import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.metadata.model.Album;
 import org.ultra.rcrs.metadata.model.Artist;
 import org.ultra.rcrs.metadata.model.OtherArtist;
 import org.ultra.rcrs.metadata.model.Track;
-import org.ultra.rcrs.enums.ArtistRole;
-import org.ultra.rcrs.enums.LifecycleStatus;
-import org.ultra.rcrs.events.album.AlbumCreatedEventOuterClass;
-import org.ultra.rcrs.events.album.AlbumDeletedEventOuterClass;
-import org.ultra.rcrs.events.album.AlbumHiddenEventOuterClass;
-import org.ultra.rcrs.events.album.ArtistAddedToAlbumEventOuterClass;
-import org.ultra.rcrs.events.album.ArtistDeletedFromAlbumEventOuterClass;
-import org.ultra.rcrs.events.artist.ArtistCreatedEventOuterClass;
-import org.ultra.rcrs.events.artist.ArtistDeletedEventOuterClass;
-import org.ultra.rcrs.events.artist.ArtistHiddenEventOuterClass;
-import org.ultra.rcrs.events.common.AlbumTypeOuterClass;
-import org.ultra.rcrs.events.common.ArtistRoleOuterClass;
-import org.ultra.rcrs.events.common.AvailabilityStatusOuterClass;
-import org.ultra.rcrs.events.common.DomainEventOuterClass;
-import org.ultra.rcrs.events.common.LifecycleStatusOuterClass;
-import org.ultra.rcrs.events.common.SocialLinkOuterClass;
-import org.ultra.rcrs.events.track.ArtistAddedToTrackEventOuterClass;
-import org.ultra.rcrs.events.track.ArtistDeletedFromTrackEventOuterClass;
-import org.ultra.rcrs.events.track.OtherAddedToTrackEventOuterClass;
-import org.ultra.rcrs.events.track.OtherDeletedFromTrackEventOuterClass;
-import org.ultra.rcrs.events.track.TrackCreatedEventOuterClass;
-import org.ultra.rcrs.events.track.TrackDeletedEventOuterClass;
-import org.ultra.rcrs.events.track.TrackHiddenEventOuterClass;
-import org.ultra.rcrs.events.track.TrackActivatedEventOuterClass;
-import org.ultra.rcrs.events.track.TrackAddedToAlbumEventOuterClass;
-import org.ultra.rcrs.events.album.AlbumUpdateLifecycleStatusEventOuterClass;
-import org.ultra.rcrs.events.track.TrackUpdateLifecycleStatusEventOuterClass;
-import org.ultra.rcrs.events.artist.ArtistActivatedEventOuterClass;
-import org.ultra.rcrs.events.album.AlbumActivatedEventOuterClass;
-import org.ultra.rcrs.kafka.ProtobufEventProducer;
-import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.utils.Url62;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 @Component
@@ -135,7 +116,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setLifecycleStatus(LifecycleStatusOuterClass.LifecycleStatus.valueOf(album.getLifecycleStatus().name()));
 
         if (album.getReleaseDate() != null) {
-            Instant instant = album.getReleaseDate().toInstant();
+            Instant instant = album.getReleaseDate().toInstant(ZoneOffset.UTC);
             eventBuilder.setReleaseDate(Timestamp.newBuilder()
                     .setSeconds(instant.getEpochSecond())
                     .setNanos(instant.getNano()));

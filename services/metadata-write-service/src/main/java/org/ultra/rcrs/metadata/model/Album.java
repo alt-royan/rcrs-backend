@@ -10,6 +10,7 @@ import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -38,7 +39,7 @@ public class Album {
     private AlbumType type;
 
     @Column(name = "release_date")
-    private OffsetDateTime releaseDate;
+    private LocalDateTime releaseDate;
 
     @Column(name = "publish_timestamp")
     private OffsetDateTime publishTimestamp;

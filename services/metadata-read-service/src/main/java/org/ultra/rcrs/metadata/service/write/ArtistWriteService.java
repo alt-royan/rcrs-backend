@@ -7,7 +7,6 @@ import org.ultra.rcrs.metadata.model.ArtistPublicDocument;
 import org.ultra.rcrs.metadata.repository.ArtistDocumentRepository;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.events.artist.ArtistCreatedEventOuterClass;
-import reactor.core.publisher.Mono;
 
 import java.util.stream.Collectors;
 
@@ -18,7 +17,7 @@ public class ArtistWriteService {
 
     private final ArtistDocumentRepository artistDocumentRepository;
 
-    public Mono<ArtistPublicDocument> handleArtistCreated(ArtistCreatedEventOuterClass.ArtistCreatedEvent event) {
+    public void handleArtistCreated(ArtistCreatedEventOuterClass.ArtistCreatedEvent event) {
         ArtistPublicDocument doc = ArtistPublicDocument.builder()
                 .id(event.getId())
                 .name(event.getName())
@@ -33,41 +32,42 @@ public class ArtistWriteService {
                 .availabilityStatus(EntityStatus.valueOf(event.getAvailabilityStatus().name()))
                 .build();
 
-        return artistDocumentRepository.save(doc)
+        artistDocumentRepository.save(doc)
                 .doOnSuccess(d -> log.info("Saved artist document: id={}", d.getId()))
-                .doOnError(e -> log.error("Failed to save artist document: id={}, error={}", event.getId(), e.getMessage()));
+                .doOnError(e -> log.error("Failed to save artist document: id={}, error={}", event.getId(), e.getMessage()))
+                .block();
     }
 
-    public Mono<Void> handleArtistDeleted(String id) {
-        return artistDocumentRepository.findById(id)
+    public void handleArtistDeleted(String id) {
+        artistDocumentRepository.findById(id)
                 .flatMap(doc -> {
                     doc.setAvailabilityStatus(EntityStatus.DELETED);
                     return artistDocumentRepository.save(doc);
                 })
                 .doOnSuccess(d -> log.info("Marked artist as deleted: id={}", id))
                 .doOnError(e -> log.error("Failed to delete artist: id={}, error={}", id, e.getMessage()))
-                .then();
+                .block();
     }
 
-    public Mono<Void> handleArtistHidden(String id) {
-        return artistDocumentRepository.findById(id)
+    public void handleArtistHidden(String id) {
+        artistDocumentRepository.findById(id)
                 .flatMap(doc -> {
                     doc.setAvailabilityStatus(EntityStatus.HIDDEN);
                     return artistDocumentRepository.save(doc);
                 })
                 .doOnSuccess(d -> log.info("Marked artist as hidden: id={}", id))
                 .doOnError(e -> log.error("Failed to hide artist: id={}, error={}", id, e.getMessage()))
-                .then();
+                .block();
     }
 
-    public Mono<Void> handleArtistActivated(String id) {
-        return artistDocumentRepository.findById(id)
+    public void handleArtistActivated(String id) {
+        artistDocumentRepository.findById(id)
                 .flatMap(doc -> {
                     doc.setAvailabilityStatus(EntityStatus.ACTIVE);
                     return artistDocumentRepository.save(doc);
                 })
                 .doOnSuccess(d -> log.info("Marked artist as active: id={}", id))
                 .doOnError(e -> log.error("Failed to activate artist: id={}, error={}", id, e.getMessage()))
-                .then();
+                .block();
     }
 }

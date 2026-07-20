@@ -2,6 +2,7 @@ package org.ultra.rcrs.metadata.service.publ;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.metadata.dto.TrackPublicStandaloneDto;
 import org.ultra.rcrs.metadata.dto.TrackPublicViewDto;
@@ -28,7 +29,7 @@ public class TrackPublicService {
 
     @Cacheable("tracks-by-album-public")
     public Flux<TrackPublicStandaloneDto> getAllByAlbumId(String albumId) {
-        return trackDocumentRepository.findAllByAlbumIdForPublic(albumId)
+        return trackDocumentRepository.findAllByAlbumIdForPublic(albumId, Sort.by("trackNumber"))
                 .map(this::toStandaloneDto);
     }
 

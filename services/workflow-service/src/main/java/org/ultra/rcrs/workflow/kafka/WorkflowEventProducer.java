@@ -40,6 +40,6 @@ public class WorkflowEventProducer extends ProtobufEventProducer {
                 .setProducer(serviceName)
                 .setPayload(Any.pack(event))
                 .build();
-        sendEvent(domainEvent, Topics.MEDIA_TRANSCODING_TOPIC);
+        sendEventAsync(domainEvent, Topics.MEDIA_TRANSCODING_TOPIC);
     }
 }

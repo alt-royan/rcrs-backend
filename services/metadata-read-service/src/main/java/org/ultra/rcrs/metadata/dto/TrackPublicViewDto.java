@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -18,7 +19,7 @@ public class TrackPublicViewDto {
     private String id;
     private EntityStatus availabilityStatus;
     private String title;
-    private String releaseDate;
+    private LocalDateTime releaseDate;
     private Integer durationMs;
     private Integer trackNumber;
     private Boolean explicit;

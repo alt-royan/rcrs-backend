@@ -2,6 +2,7 @@ package org.ultra.rcrs.metadata.service.admin;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.metadata.dto.TrackAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.TrackAdminViewDto;
@@ -28,7 +29,7 @@ public class TrackAdminService {
 
     @Cacheable("tracks-by-album-admin")
     public Flux<TrackAdminStandaloneDto> getAllByAlbumId(String albumId) {
-        return trackDocumentRepository.findAllByAlbumIdForAdmin(albumId)
+        return trackDocumentRepository.findAllByAlbumIdForAdmin(albumId, Sort.by("trackNumber"))
                 .map(this::toStandaloneDto);
     }
 
