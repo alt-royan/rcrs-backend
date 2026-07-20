@@ -3,35 +3,39 @@ package org.ultra.rcrs.workflow.activity;
 import io.temporal.activity.ActivityInterface;
 import io.temporal.activity.ActivityMethod;
 import org.springframework.http.ResponseEntity;
+import org.ultra.rcrs.workflow.client.model.ArtistsToEntityModel;
+import org.ultra.rcrs.workflow.client.model.OthersToTrackModel;
+import org.ultra.rcrs.workflow.client.model.TrackUploadModel;
 import org.ultra.rcrs.workflow.dto.*;
+import org.ultra.rcrs.workflow.dto.response.CreateResponse;
 
 @ActivityInterface
 public interface TrackActivity {
 
     @ActivityMethod
-    ResponseEntity<CreateResponse> createTrack(TrackUploadRequest request);
+    CreateResponse createTrack(TrackUploadModel request);
 
     @ActivityMethod
-    ResponseEntity<Void> addArtistsToTrack(ArtistsToEntityRequest request, String trackId);
+    void addArtistsToTrack(ArtistsToEntityModel request, String trackId);
 
     @ActivityMethod
-    ResponseEntity<Void> deleteArtistsFromTrack(ArtistsToEntityRequest request, String trackId);
+    void deleteArtistsFromTrack(ArtistsToEntityModel request, String trackId);
 
     @ActivityMethod
-    ResponseEntity<Void> addOthersToTrack(OthersToTrackRequest request, String trackId);
+    void addOthersToTrack(OthersToTrackModel request, String trackId);
 
     @ActivityMethod
-    ResponseEntity<Void> deleteOthersFromTrack(OthersToTrackRequest request, String trackId);
+    void deleteOthersFromTrack(OthersToTrackModel request, String trackId);
 
     @ActivityMethod
-    ResponseEntity<Void> updateTrackStatus(StatusDto statusDto, String trackId);
+    void updateTrackStatus(StatusDto statusDto, String trackId);
 
     @ActivityMethod
-    ResponseEntity<Void> hideTrack(String trackId);
+    void hideTrack(String trackId);
 
     @ActivityMethod
-    ResponseEntity<Void> activeTrack(String trackId);
+    void activeTrack(String trackId);
 
     @ActivityMethod
-    ResponseEntity<Void> markTrackDeleted(String trackId);
+    void markTrackDeleted(String trackId);
 }

@@ -4,9 +4,9 @@ server:
 spring:
   application:
     name: metadata-read-service
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/rcrs_catalog
+  mongodb:
+    uri: mongodb://localhost:27017/rcrs_catalog
+
   kafka:
     bootstrap-servers: localhost:9092
 

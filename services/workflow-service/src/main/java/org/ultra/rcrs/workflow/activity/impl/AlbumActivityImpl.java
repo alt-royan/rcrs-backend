@@ -1,14 +1,13 @@
 package org.ultra.rcrs.workflow.activity.impl;
 
 import io.temporal.spring.boot.ActivityImpl;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.workflow.activity.AlbumActivity;
 import org.ultra.rcrs.workflow.client.AlbumClient;
-import org.ultra.rcrs.workflow.dto.AlbumUploadRequest;
-import org.ultra.rcrs.workflow.dto.ArtistsToEntityRequest;
-import org.ultra.rcrs.workflow.dto.CreateResponse;
+import org.ultra.rcrs.workflow.client.model.AlbumUploadModel;
+import org.ultra.rcrs.workflow.client.model.ArtistsToEntityModel;
 import org.ultra.rcrs.workflow.dto.StatusDto;
+import org.ultra.rcrs.workflow.dto.response.CreateResponse;
 
 
 @Component
@@ -22,37 +21,41 @@ public class AlbumActivityImpl implements AlbumActivity {
     }
 
     @Override
-    public ResponseEntity<CreateResponse> createAlbum(AlbumUploadRequest request) {
-        return albumClient.createAlbum(request);
+    public CreateResponse createAlbum(AlbumUploadModel request) {
+        var res = albumClient.createAlbum(request);
+        if (!res.getStatusCode().is2xxSuccessful() || res.getBody() == null) {
+            throw new RuntimeException("Unsupported behavior: response is not 2xx");
+        }
+        return res.getBody();
     }
 
     @Override
-    public ResponseEntity<Void> addArtistsToAlbum(ArtistsToEntityRequest request, String albumId) {
-        return albumClient.addArtistsToAlbum(request, albumId);
+    public void addArtistsToAlbum(ArtistsToEntityModel request, String albumId) {
+        albumClient.addArtistsToAlbum(request, albumId);
     }
 
     @Override
-    public ResponseEntity<Void> deleteArtistsFromAlbum(ArtistsToEntityRequest request, String albumId) {
-        return albumClient.deleteArtistsFromAlbum(request, albumId);
+    public void deleteArtistsFromAlbum(ArtistsToEntityModel request, String albumId) {
+        albumClient.deleteArtistsFromAlbum(request, albumId);
     }
 
     @Override
-    public ResponseEntity<Void> updateAlbumStatus(StatusDto statusDto, String albumId) {
-        return albumClient.updateAlbumStatus(statusDto, albumId);
+    public void updateAlbumStatus(StatusDto statusDto, String albumId) {
+        albumClient.updateAlbumStatus(statusDto, albumId);
     }
 
     @Override
-    public ResponseEntity<Void> hideAlbum(String albumId) {
-        return albumClient.hideAlbum(albumId);
+    public void hideAlbum(String albumId) {
+        albumClient.hideAlbum(albumId);
     }
 
     @Override
-    public ResponseEntity<Void> activeAlbum(String albumId) {
-        return albumClient.activeAlbum(albumId);
+    public void activeAlbum(String albumId) {
+        albumClient.activeAlbum(albumId);
     }
 
     @Override
-    public ResponseEntity<Void> markAlbumDeleted(String albumId) {
-        return albumClient.markAlbumDeleted(albumId);
+    public void markAlbumDeleted(String albumId) {
+        albumClient.markAlbumDeleted(albumId);
     }
 }

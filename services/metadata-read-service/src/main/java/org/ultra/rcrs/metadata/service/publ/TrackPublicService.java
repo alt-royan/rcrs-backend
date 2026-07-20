@@ -27,8 +27,8 @@ public class TrackPublicService {
     }
 
     @Cacheable("tracks-by-album-public")
-    public Flux<TrackPublicStandaloneDto> getByAlbumId(String albumId) {
-        return trackDocumentRepository.findByAlbumIdForPublic(albumId)
+    public Flux<TrackPublicStandaloneDto> getAllByAlbumId(String albumId) {
+        return trackDocumentRepository.findAllByAlbumIdForPublic(albumId)
                 .map(this::toStandaloneDto);
     }
 

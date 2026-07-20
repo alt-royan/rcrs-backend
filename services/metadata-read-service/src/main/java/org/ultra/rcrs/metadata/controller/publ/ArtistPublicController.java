@@ -1,7 +1,6 @@
 package org.ultra.rcrs.metadata.controller.publ;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.metadata.dto.ArtistPublicViewDto;
 import org.ultra.rcrs.metadata.service.publ.ArtistPublicService;
@@ -15,8 +14,7 @@ public class ArtistPublicController {
     private final ArtistPublicService artistPublicService;
 
     @GetMapping("/{artistId}")
-    public Mono<ResponseEntity<ArtistPublicViewDto>> getArtist(@PathVariable("artistId") String artistId) {
-        return artistPublicService.getById(artistId)
-                .map(ResponseEntity::ok);
+    public Mono<ArtistPublicViewDto> getArtist(@PathVariable("artistId") String artistId) {
+        return artistPublicService.getById(artistId);
     }
 }

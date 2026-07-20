@@ -27,8 +27,8 @@ public class TrackAdminService {
     }
 
     @Cacheable("tracks-by-album-admin")
-    public Flux<TrackAdminStandaloneDto> getByAlbumId(String albumId) {
-        return trackDocumentRepository.findByAlbumIdForAdmin(albumId)
+    public Flux<TrackAdminStandaloneDto> getAllByAlbumId(String albumId) {
+        return trackDocumentRepository.findAllByAlbumIdForAdmin(albumId)
                 .map(this::toStandaloneDto);
     }
 

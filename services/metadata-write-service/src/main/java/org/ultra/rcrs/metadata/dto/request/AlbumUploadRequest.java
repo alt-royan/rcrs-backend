@@ -15,6 +15,7 @@ public class AlbumUploadRequest {
     @NotNull
     private AlbumType type;
 
+    @NotNull
     private OffsetDateTime releaseDate;
 
     private OffsetDateTime publishTimestamp;

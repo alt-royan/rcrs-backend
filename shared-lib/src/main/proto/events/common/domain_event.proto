@@ -30,6 +30,7 @@ enum EventType{
   ARTIST_ACTIVATED = 19;
   ALBUM_ACTIVATED = 20;
   TRACK_ACTIVATED = 21;
+  TRACK_TRANSCODING = 22;
 }
 
 enum AggregateType{

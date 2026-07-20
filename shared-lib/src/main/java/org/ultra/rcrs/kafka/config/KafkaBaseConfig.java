@@ -63,22 +63,21 @@ public class KafkaBaseConfig {
         return new DefaultKafkaConsumerFactory<>(consumerProps);
     }
 
-/*    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory(
-            ConsumerFactory<String, String> consumerFactory,
-            KafkaTemplate<String, String> stringTemplate) {
+    @Bean("stringContainerFactory")
+    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactoryString() {
 
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(consumerFactory);
-
-        DeadLetterPublishingRecoverer recoverer = new DeadLetterPublishingRecoverer(stringTemplate,
-                (cr, e) -> new TopicPartition(Topics.CATALOG_DLT_TOPIC, cr.partition()));
-
-        DefaultErrorHandler errorHandler = new DefaultErrorHandler(recoverer, new FixedBackOff(1000L, 5));
-        factory.setCommonErrorHandler(errorHandler);
-
+        factory.setConsumerFactory(consumerFactoryString());
         return factory;
-    }*/
+    }
+
+    @Bean("byteArrayContainerFactory")
+    public ConcurrentKafkaListenerContainerFactory<String, byte[]> kafkaListenerContainerFactoryByteArray() {
+
+        ConcurrentKafkaListenerContainerFactory<String, byte[]> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(consumerFactoryByteArray());
+        return factory;
+    }
 
     @Bean
     public KafkaAdmin admin() {

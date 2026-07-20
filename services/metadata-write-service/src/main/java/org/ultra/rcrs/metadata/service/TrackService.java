@@ -53,6 +53,7 @@ public class TrackService {
                 .build());
         log.info("Track {} saved with UUID: {}, public Id {}", track.getTitle(), track.getId(), Url62.encode(track.getId()));
         catalogEventProducer.trackCreated(track);
+        catalogEventProducer.trackAddedToAlbum(track.getId(), albumId);
 
         return track.getId();
     }

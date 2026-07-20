@@ -16,6 +16,8 @@ spring:
   temporal:
     connection:
       target: 127.0.0.1:7233
+    workflow:
+
     workers:
         capacity:
           max-concurrent-workflow-task-pollers: 6
@@ -31,6 +33,34 @@ spring:
     namespace: default
     activities:
       artist:
+        start-to-close-timeout: 30s
+        retry:
+          initial-interval: 1s
+          backoff-coefficient: 2
+          maximum-interval: 30s
+          maximum-attempts: 5
+      album:
+        start-to-close-timeout: 30s
+        retry:
+          initial-interval: 1s
+          backoff-coefficient: 2
+          maximum-interval: 30s
+          maximum-attempts: 5
+      track:
+        start-to-close-timeout: 30s
+        retry:
+          initial-interval: 1s
+          backoff-coefficient: 2
+          maximum-interval: 30s
+          maximum-attempts: 5
+      audio:
+        start-to-close-timeout: 30s
+        retry:
+          initial-interval: 1s
+          backoff-coefficient: 2
+          maximum-interval: 30s
+          maximum-attempts: 5
+      transcoding:
         start-to-close-timeout: 30s
         retry:
           initial-interval: 1s

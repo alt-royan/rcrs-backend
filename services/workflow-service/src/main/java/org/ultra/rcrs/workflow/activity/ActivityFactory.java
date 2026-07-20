@@ -4,6 +4,7 @@ import io.temporal.activity.ActivityOptions;
 import io.temporal.common.RetryOptions;
 import io.temporal.workflow.Workflow;
 import org.ultra.rcrs.workflow.config.TemporalProperties;
+import org.ultra.rcrs.workflow.kafka.WorkflowEventProducer;
 
 public class ActivityFactory {
 
@@ -43,6 +44,10 @@ public class ActivityFactory {
 
     public AudioActivity audioActivity() {
         return Workflow.newActivityStub(AudioActivity.class, buildOptions("audio"));
+    }
+
+    public TranscodingActivity transcodingActivity() {
+        return Workflow.newActivityStub(TranscodingActivity.class, buildOptions("transcoding"));
     }
 
     private ActivityOptions buildOptions(String serviceName) {

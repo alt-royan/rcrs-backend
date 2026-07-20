@@ -1,6 +1,6 @@
-package org.ultra.rcrs.workflow.dto;
+package org.ultra.rcrs.workflow.client.model;
 
-public record TrackUploadRequest(
+public record TrackUploadModel(
         String albumId,
         String title,
         Integer trackNumber,

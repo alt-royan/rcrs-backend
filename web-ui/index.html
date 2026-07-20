@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RCRS Metadata Browser</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #232733;
+    --border: #2e3345;
+    --text: #e1e4ed;
+    --text2: #8b90a0;
+    --accent: #6c8cff;
+    --accent2: #4c6ef5;
+    --green: #4ade80;
+    --red: #f87171;
+    --yellow: #fbbf24;
+    --radius: 10px;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  header h1 { font-size: 18px; font-weight: 600; }
+  header .subtitle { color: var(--text2); font-size: 13px; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 24px; }
+
+  .search-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .search-bar select, .search-bar input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 14px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    outline: none;
+  }
+  .search-bar select { width: 140px; cursor: pointer; }
+  .search-bar input { flex: 1; font-family: monospace; }
+  .search-bar input:focus, .search-bar select:focus {
+    border-color: var(--accent);
+  }
+  .search-bar button {
+    background: var(--accent2);
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: var(--radius);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .search-bar button:hover { background: var(--accent); }
+  .search-bar button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  .breadcrumb {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: var(--text2);
+    flex-wrap: wrap;
+  }
+  .breadcrumb a {
+    color: var(--accent);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .breadcrumb a:hover { text-decoration: underline; }
+  .breadcrumb .sep { color: var(--border); }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 20px 24px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  .card-header img {
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--surface2);
+  }
+  .card-header .info { flex: 1; }
+  .card-header .info h2 { font-size: 22px; font-weight: 600; margin-bottom: 4px; }
+  .card-header .info .type-badge {
+    display: inline-block;
+    background: var(--accent2);
+    color: #fff;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .card-header .info .meta {
+    color: var(--text2);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .card-body { padding: 0 24px 20px; }
+  .card-body h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 16px 0 10px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+  .card-body h3:first-child { border-top: none; padding-top: 0; margin-top: 0; }
+
+  .field-grid {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 6px 12px;
+    font-size: 13px;
+  }
+  .field-grid .label { color: var(--text2); }
+  .field-grid .value { word-break: break-all; }
+  .field-grid .value a {
+    color: var(--accent);
+    text-decoration: none;
+    cursor: pointer;
+    font-family: monospace;
+  }
+  .field-grid .value a:hover { text-decoration: underline; }
+
+  .tag {
+    display: inline-block;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    margin: 2px 4px 2px 0;
+  }
+
+  .track-list { list-style: none; }
+  .track-list li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .track-list li:hover { background: var(--surface2); }
+  .track-list .num {
+    color: var(--text2);
+    font-size: 13px;
+    min-width: 24px;
+    text-align: right;
+  }
+  .track-list .title { flex: 1; font-size: 14px; }
+  .track-list .duration { color: var(--text2); font-size: 13px; font-family: monospace; }
+  .track-list .explicit {
+    background: var(--red);
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 3px;
+  }
+
+  .artist-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 8px;
+    margin: 4px 0;
+    cursor: pointer;
+    transition: border-color 0.15s;
+  }
+  .artist-chip:hover { border-color: var(--accent); }
+  .artist-chip img {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--border);
+  }
+  .artist-chip .name { font-size: 13px; }
+  .artist-chip .role {
+    font-size: 11px;
+    color: var(--text2);
+  }
+
+  .social-links { display: flex; flex-wrap: wrap; gap: 8px; }
+  .social-links a {
+    display: inline-block;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    text-decoration: none;
+    transition: border-color 0.15s;
+  }
+  .social-links a:hover { border-color: var(--accent); color: var(--accent); }
+
+  .status { display: inline-block; padding: 2px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .status-ACTIVE { background: rgba(74,222,128,0.15); color: var(--green); }
+  .status-HIDDEN { background: rgba(251,191,36,0.15); color: var(--yellow); }
+  .status-DELETED { background: rgba(248,113,113,0.15); color: var(--red); }
+  .status-CREATED { background: rgba(139,144,160,0.15); color: var(--text2); }
+  .status-TRANSCODING { background: rgba(108,140,255,0.15); color: var(--accent); }
+  .status-FAILED { background: rgba(248,113,113,0.15); color: var(--red); }
+  .status-READY { background: rgba(74,222,128,0.15); color: var(--green); }
+  .status-PUBLISHED { background: rgba(74,222,128,0.15); color: var(--green); }
+
+  .error-box {
+    background: rgba(248,113,113,0.1);
+    border: 1px solid rgba(248,113,113,0.3);
+    color: var(--red);
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    font-size: 14px;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text2);
+  }
+  .empty-state .icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+
+  #result { min-height: 200px; }
+
+  .json-toggle { margin-top: 12px; }
+  .json-toggle summary {
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 13px;
+    user-select: none;
+  }
+  .json-toggle pre {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+    margin-top: 8px;
+    font-size: 12px;
+    overflow-x: auto;
+    max-height: 500px;
+    overflow-y: auto;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>RCRS Metadata Browser</h1>
+  <span class="subtitle">localhost:8081</span>
+</header>
+
+<div class="container">
+  <div class="search-bar">
+    <select id="entityType">
+      <option value="artist">Artist</option>
+      <option value="album">Album</option>
+      <option value="track">Track</option>
+    </select>
+    <input type="text" id="entityId" placeholder="Enter Base62 ID..." spellcheck="false">
+    <button id="fetchBtn" onclick="fetchEntity()">Fetch</button>
+  </div>
+
+  <div class="breadcrumb" id="breadcrumb"></div>
+  <div id="result">
+    <div class="empty-state">
+      <div class="icon">&#9834;</div>
+      <p>Select an entity type and enter an ID to begin</p>
+    </div>
+  </div>
+</div>
+
+<script>
+var BASE = 'http://localhost:8081';
+var navStack = [];
+
+document.getElementById('entityId').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') fetchEntity();
+});
+
+function fmtDuration(ms) {
+  if (!ms) return '--:--';
+  var s = Math.floor(ms / 1000);
+  var m = Math.floor(s / 60);
+  var sec = s % 60;
+  return m + ':' + String(sec).padStart(2, '0');
+}
+
+function statusBadge(status) {
+  return '<span class="status status-' + status + '">' + status + '</span>';
+}
+
+function esc(s) {
+  if (s == null) return '';
+  var d = document.createElement('div');
+  d.textContent = String(s);
+  return d.innerHTML;
+}
+
+function navigate(type, id) {
+  document.getElementById('entityType').value = type;
+  document.getElementById('entityId').value = id;
+  fetchEntity();
+}
+
+function renderBreadcrumb() {
+  var bc = document.getElementById('breadcrumb');
+  var html = '';
+  for (var i = 0; i < navStack.length; i++) {
+    var h = navStack[i];
+    var label = h.type.charAt(0).toUpperCase() + h.type.slice(1) + ' ' + h.id.substring(0, 12) + '...';
+    if (i > 0) html += '<span class="sep">/</span>';
+    html += '<a onclick="goBack(' + i + ')">' + label + '</a>';
+  }
+  bc.innerHTML = html;
+}
+
+function goBack(idx) {
+  navStack = navStack.slice(0, idx + 1);
+  var h = navStack[idx];
+  renderBreadcrumb();
+  document.getElementById('entityType').value = h.type;
+  document.getElementById('entityId').value = h.id;
+  fetchEntityDirect(h.type, h.id);
+}
+
+function jsonDetails(d) {
+  var formatted = JSON.stringify(d, null, 2);
+  return '<details class="json-toggle"><summary>Raw JSON</summary><pre>' + esc(formatted) + '</pre></details>';
+}
+
+async function fetchEntity() {
+  var type = document.getElementById('entityType').value;
+  var id = document.getElementById('entityId').value.trim();
+  if (!id) return;
+
+  var btn = document.getElementById('fetchBtn');
+  btn.disabled = true;
+  btn.textContent = 'Loading...';
+
+  navStack.push({ type: type, id: id });
+  renderBreadcrumb();
+
+  try {
+    if (type === 'artist') {
+      var resp = await fetch(BASE + '/admin/artists/' + id);
+      if (!resp.ok) throw resp;
+      var data = await resp.json();
+      renderArtist(data);
+    } else if (type === 'album') {
+      var resp = await fetch(BASE + '/admin/albums/' + id);
+      if (!resp.ok) throw resp;
+      var data = await resp.json();
+      var tracks = [];
+      try {
+        var trResp = await fetch(BASE + '/admin/albums/' + id + '/tracks');
+        if (trResp.ok) {
+          tracks = await trResp.json();
+          if (!Array.isArray(tracks)) tracks = [];
+        }
+      } catch (_) {}
+      renderAlbum(data, tracks);
+    } else if (type === 'track') {
+      var resp = await fetch(BASE + '/admin/tracks/' + id);
+      if (!resp.ok) throw resp;
+      var data = await resp.json();
+      renderTrack(data);
+    }
+  } catch (err) {
+    var msg = 'Unknown error';
+    if (err instanceof Response) {
+      try {
+        var body = await err.json();
+        msg = err.status + ' - ' + (body.message || err.statusText);
+      } catch (_) {
+        msg = err.status + ' - ' + err.statusText;
+      }
+    } else {
+      msg = err.message || String(err);
+    }
+    document.getElementById('result').innerHTML = '<div class="error-box">Failed to fetch: ' + esc(msg) + '</div>';
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Fetch';
+  }
+}
+
+async function fetchEntityDirect(type, id) {
+  var btn = document.getElementById('fetchBtn');
+  btn.disabled = true;
+  try {
+    if (type === 'artist') {
+      var r = await fetch(BASE + '/admin/artists/' + id);
+      if (!r.ok) throw r;
+      renderArtist(await r.json());
+    } else if (type === 'album') {
+      var r = await fetch(BASE + '/admin/albums/' + id);
+      if (!r.ok) throw r;
+      var data = await r.json();
+      var tracks = [];
+      try {
+        var tr = await fetch(BASE + '/admin/albums/' + id + '/tracks');
+        if (tr.ok) {
+          tracks = await tr.json();
+          if (!Array.isArray(tracks)) tracks = [];
+        }
+      } catch (_) {}
+      renderAlbum(data, tracks);
+    } else {
+      var r = await fetch(BASE + '/admin/tracks/' + id);
+      if (!r.ok) throw r;
+      renderTrack(await r.json());
+    }
+  } catch(e) {
+    document.getElementById('result').innerHTML = '<div class="error-box">Failed to load entity</div>';
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function renderArtist(d) {
+  var socials = (d.socialLinks || []).map(function(l) {
+    return '<a href="' + esc(l.url) + '" target="_blank">' + esc(l.resourceName) + '</a>';
+  }).join('');
+
+  var tags = (d.tags || []).map(function(t) {
+    return '<span class="tag">' + esc(t) + '</span>';
+  }).join('');
+
+  var html = '<div class="card">';
+  html += '<div class="card-header">';
+  if (d.avatarUrl) html += '<img src="' + esc(d.avatarUrl) + '" alt="">';
+  html += '<div class="info">';
+  html += '<span class="type-badge">Artist</span>';
+  html += '<h2>' + esc(d.name) + '</h2>';
+  html += '<div class="meta">' + statusBadge(d.availabilityStatus) + ' &nbsp; ID: <code>' + esc(d.id) + '</code></div>';
+  html += '</div></div>';
+  html += '<div class="card-body">';
+  if (tags) html += '<h3>Tags</h3><div>' + tags + '</div>';
+  if (socials) html += '<h3>Social Links</h3><div class="social-links">' + socials + '</div>';
+  html += '</div></div>';
+  html += jsonDetails(d);
+
+  document.getElementById('result').innerHTML = html;
+}
+
+function renderAlbum(d, tracks) {
+  var artistChips = (d.artists || []).map(function(a) {
+    var img = a.avatarUrl ? '<img src="' + esc(a.avatarUrl) + '" alt="">' : '';
+    return '<div class="artist-chip" onclick="navigate(\'artist\',\'' + esc(a.id) + '\')">' +
+      img + '<div><div class="name">' + esc(a.name) + '</div>' +
+      '<div class="role">' + esc(a.role) + '</div></div></div>';
+  }).join('');
+
+  var trackItems = tracks.map(function(t) {
+    var exp = t.explicit ? '<span class="explicit">E</span>' : '';
+    return '<li onclick="navigate(\'track\',\'' + esc(t.id) + '\')">' +
+      '<span class="num">' + (t.trackNumber || '') + '</span>' +
+      '<span class="title">' + esc(t.title) + ' ' + exp + '</span>' +
+      '<span class="duration">' + fmtDuration(t.durationMs) + '</span></li>';
+  }).join('');
+
+  var lifecycle = d.lifecycleStatus ? ' &nbsp; ' + statusBadge(d.lifecycleStatus) : '';
+
+  var html = '<div class="card">';
+  html += '<div class="card-header">';
+  if (d.coverUrl) html += '<img src="' + esc(d.coverUrl) + '" alt="">';
+  html += '<div class="info">';
+  html += '<span class="type-badge">' + esc(d.type || 'Album') + '</span>';
+  html += '<h2>' + esc(d.title) + '</h2>';
+  html += '<div class="meta">' + statusBadge(d.availabilityStatus) + lifecycle + ' &nbsp; ID: <code>' + esc(d.id) + '</code></div>';
+  html += '</div></div>';
+  html += '<div class="card-body">';
+  html += '<div class="field-grid">';
+  html += '<span class="label">Release Date</span><span class="value">' + esc(d.releaseDate || '--') + '</span>';
+  html += '<span class="label">Year</span><span class="value">' + (d.year || '--') + '</span>';
+  html += '<span class="label">Tracks</span><span class="value">' + (d.totalTracks || tracks.length) + '</span>';
+  html += '<span class="label">Duration</span><span class="value">' + fmtDuration(d.totalDurationMs) + '</span>';
+  html += '<span class="label">Explicit</span><span class="value">' + (d.explicit ? 'Yes' : 'No') + '</span>';
+  html += '</div>';
+  if (artistChips) html += '<h3>Artists</h3><div>' + artistChips + '</div>';
+  if (trackItems) html += '<h3>Tracklist</h3><ul class="track-list">' + trackItems + '</ul>';
+  html += '</div></div>';
+  html += jsonDetails(d);
+
+  document.getElementById('result').innerHTML = html;
+}
+
+function renderTrack(d) {
+  var artistChips = (d.artists || []).map(function(a) {
+    var img = a.avatarUrl ? '<img src="' + esc(a.avatarUrl) + '" alt="">' : '';
+    return '<div class="artist-chip" onclick="navigate(\'artist\',\'' + esc(a.id) + '\')">' +
+      img + '<div><div class="name">' + esc(a.name) + '</div>' +
+      '<div class="role">' + esc(a.role) + '</div></div></div>';
+  }).join('');
+
+  var others = (d.others || []).map(function(o) {
+    return '<div class="artist-chip" onclick="navigate(\'artist\',\'' + esc(o.id) + '\')">' +
+      '<div><div class="name">' + esc(o.name) + '</div>' +
+      '<div class="role">' + (o.roles || []).join(', ') + '</div></div></div>';
+  }).join('');
+
+  var albumHtml = '--';
+  if (d.album) {
+    albumHtml = '<a onclick="navigate(\'album\',\'' + esc(d.album.id) + '\')">' + esc(d.album.title) + '</a>';
+  }
+
+  var lifecycle = d.lifecycleStatus ? ' &nbsp; ' + statusBadge(d.lifecycleStatus) : '';
+  var exp = d.explicit ? ' <span class="explicit" style="font-size:12px;padding:2px 8px;vertical-align:middle">EXPLICIT</span>' : '';
+
+  var html = '<div class="card">';
+  html += '<div class="card-header">';
+  if (d.album && d.album.coverUrl) html += '<img src="' + esc(d.album.coverUrl) + '" alt="">';
+  html += '<div class="info">';
+  html += '<span class="type-badge">Track</span>';
+  html += '<h2>' + esc(d.title) + exp + '</h2>';
+  html += '<div class="meta">' + statusBadge(d.availabilityStatus) + lifecycle + ' &nbsp; ID: <code>' + esc(d.id) + '</code></div>';
+  html += '</div></div>';
+  html += '<div class="card-body">';
+  html += '<div class="field-grid">';
+  html += '<span class="label">Track Number</span><span class="value">' + (d.trackNumber || '--') + '</span>';
+  html += '<span class="label">Duration</span><span class="value">' + fmtDuration(d.durationMs) + '</span>';
+  html += '<span class="label">Release Date</span><span class="value">' + esc(d.releaseDate || '--') + '</span>';
+  html += '<span class="label">Album</span><span class="value">' + albumHtml + '</span>';
+  html += '</div>';
+  if (artistChips) html += '<h3>Artists</h3><div>' + artistChips + '</div>';
+  if (others) html += '<h3>Credits</h3><div>' + others + '</div>';
+  html += '</div></div>';
+  html += jsonDetails(d);
+
+  document.getElementById('result').innerHTML = html;
+}
+</script>
+</body>
+</html>

@@ -7,7 +7,7 @@ public class Url62Test {
 
     @Test
     void convert(){
-        System.out.println(Url62.encode(UUID.fromString("0f54397e-fa6b-43cb-ab71-3147b6c4f55d")));
+        System.out.println(Url62.encode(UUID.fromString("8428f981-c55d-47fc-8f80-e68daa311dcb")));
     }
 
 }

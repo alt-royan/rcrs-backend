@@ -1,4 +1,4 @@
-package org.ultra.rcrs.workflow.dto;
+package org.ultra.rcrs.workflow.dto.request;
 
 import jakarta.validation.constraints.NotNull;
 import org.ultra.rcrs.enums.EntityStatus;

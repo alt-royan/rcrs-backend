@@ -1,7 +1,6 @@
 package org.ultra.rcrs.metadata.controller.publ;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.metadata.dto.TrackPublicViewDto;
 import org.ultra.rcrs.metadata.service.publ.TrackPublicService;
@@ -15,8 +14,7 @@ public class TrackPublicController {
     private final TrackPublicService trackPublicService;
 
     @GetMapping("/{trackId}")
-    public Mono<ResponseEntity<TrackPublicViewDto>> getTrack(@PathVariable("trackId") String trackId) {
-        return trackPublicService.getById(trackId)
-                .map(ResponseEntity::ok);
+    public Mono<TrackPublicViewDto> getTrack(@PathVariable("trackId") String trackId) {
+        return trackPublicService.getById(trackId);
     }
 }

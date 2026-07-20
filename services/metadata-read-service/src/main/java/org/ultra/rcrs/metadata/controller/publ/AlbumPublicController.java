@@ -1,7 +1,6 @@
 package org.ultra.rcrs.metadata.controller.publ;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.metadata.dto.AlbumPublicViewDto;
 import org.ultra.rcrs.metadata.dto.TrackPublicStandaloneDto;
@@ -19,14 +18,12 @@ public class AlbumPublicController {
     private final TrackPublicService trackPublicService;
 
     @GetMapping("/{albumId}")
-    public Mono<ResponseEntity<AlbumPublicViewDto>> getAlbum(@PathVariable("albumId") String albumId) {
-        return albumPublicService.getById(albumId)
-                .map(ResponseEntity::ok);
+    public Mono<AlbumPublicViewDto> getAlbum(@PathVariable("albumId") String albumId) {
+        return albumPublicService.getById(albumId);
     }
 
     @GetMapping("/{albumId}/tracks")
-    public Flux<ResponseEntity<TrackPublicStandaloneDto>> getTracksByAlbum(@PathVariable("albumId") String albumId) {
-        return trackPublicService.getByAlbumId(albumId)
-                .map(ResponseEntity::ok);
+    public Flux<TrackPublicStandaloneDto> getTracksByAlbum(@PathVariable("albumId") String albumId) {
+        return trackPublicService.getAllByAlbumId(albumId);
     }
 }

@@ -6,10 +6,10 @@ import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
 @SpringBootApplication
 @EnableDiscoveryClient
-public class CatalogWriteServiceApplication {
+public class MetadataReadServiceApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CatalogWriteServiceApplication.class, args);
+        SpringApplication.run(MetadataReadServiceApplication.class, args);
     }
 
 }

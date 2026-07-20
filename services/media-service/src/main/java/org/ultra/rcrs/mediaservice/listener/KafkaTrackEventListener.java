@@ -18,7 +18,7 @@ public class KafkaTrackEventListener {
     private final ObjectMapper objectMapper;
     private final TranscodingService transcodingService;
 
-    @KafkaListener(topics = Topics.MEDIA_START_TRACK_TRANSCODING_TOPIC, groupId = "my-group")
+    @KafkaListener(topics = Topics.MEDIA_TRANSCODING_TOPIC, groupId = "my-group")
     public void handleTrackEvent(String message) {
         log.info("Received message {}", message);
         StartTrackTranscodingEvent event = objectMapper.readValue(message, StartTrackTranscodingEvent.class);

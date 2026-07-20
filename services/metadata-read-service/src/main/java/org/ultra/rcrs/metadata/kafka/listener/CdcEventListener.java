@@ -3,6 +3,7 @@ package org.ultra.rcrs.metadata.kafka.listener;
 import com.google.protobuf.Any;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.events.album.AlbumCreatedEventOuterClass;
@@ -41,10 +42,10 @@ public class CdcEventListener {
     private final AlbumWriteService albumWriteService;
     private final TrackWriteService trackWriteService;
 
-    @KafkaListener(topics = Topics.CATALOG_CDC_TOPIC, groupId = "catalog-read-group")
-    public void handleCdcEvent(byte[] message) {
+    @KafkaListener(topics = Topics.CATALOG_CDC_TOPIC, groupId = "catalog-read-group", containerFactory = "byteArrayContainerFactory")
+    public void handleCdcEvent(ConsumerRecord<String, byte[]> record) {
         try {
-            DomainEventOuterClass.DomainEvent event = DomainEventOuterClass.DomainEvent.parseFrom(message);
+            DomainEventOuterClass.DomainEvent event = DomainEventOuterClass.DomainEvent.parseFrom(record.value());
             log.info("Received CDC event: type={} aggregate={} id={}", event.getEventType(), event.getAggregateType(), event.getAggregateId());
 
             switch (event.getEventType()) {
