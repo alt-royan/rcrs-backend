@@ -6,6 +6,7 @@ import io.temporal.spring.boot.WorkflowImpl;
 import io.temporal.workflow.Async;
 import io.temporal.workflow.ChildWorkflowOptions;
 import io.temporal.workflow.Promise;
+import io.temporal.workflow.Saga;
 import io.temporal.workflow.Workflow;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -32,43 +33,52 @@ public class AlbumUploadWorkflowImpl extends BaseWorkflow implements AlbumUpload
 
     private final UploadRequestConverter converter;
 
-    //можно добавить saga
     @Override
     public CreateResponse uploadAlbum(AlbumUploadRequest request) {
         List<TrackUploadRequest> tracks = request.tracks() == null ? new ArrayList<>() : request.tracks();
         List<ArtistDto> artists = request.artists() == null ? new ArrayList<>() : request.artists();
-        //проверить  что все аудио дошли до s3
 
-        var albumModel = converter.toAlbumCreateModel(request);
-        var albumRes = activityFactory.albumActivity().createAlbum(albumModel);
+        Saga saga = new Saga(new Saga.Options.Builder().build());
 
-        String albumId = albumRes.id();
-        if (!artists.isEmpty()) {
-            activityFactory.albumActivity().addArtistsToAlbum(new ArtistsToEntityModel(artists), albumId);
+        try {
+            var albumModel = converter.toAlbumCreateModel(request);
+            var albumRes = activityFactory.albumActivity().createAlbum(albumModel);
+            String albumId = albumRes.id();
+            saga.addCompensation(() -> activityFactory.albumActivity().markAlbumDeleted(albumId));
+
+            if (!artists.isEmpty()) {
+                saga.addCompensation(() -> activityFactory.albumActivity().deleteArtistsFromAlbum(new ArtistsToEntityModel(artists), albumId));
+                activityFactory.albumActivity().addArtistsToAlbum(new ArtistsToEntityModel(artists), albumId);
+            }
+
+            List<Promise<CreateResponse>> trackPromises = new ArrayList<>();
+            for (TrackUploadRequest track : tracks) {
+                TrackUploadWorkflow child = Workflow.newChildWorkflowStub(
+                        TrackUploadWorkflow.class,
+                        ChildWorkflowOptions.newBuilder()
+                                .setTaskQueue(WORKFLOW_TASK_QUEUE)
+                                .setWorkflowId(UUID.randomUUID().toString())
+                                .setParentClosePolicy(ParentClosePolicy.PARENT_CLOSE_POLICY_ABANDON)
+                                .setRetryOptions(
+                                        RetryOptions.newBuilder()
+                                                .setMaximumAttempts(1)
+                                                .build())
+                                .build());
+
+                Promise<CreateResponse> promise = Async.function(child::uploadTrack, track, albumId);
+                trackPromises.add(promise);
+            }
+
+            for (Promise<CreateResponse> promise : trackPromises) {
+                CreateResponse trackRes = promise.get();
+                saga.addCompensation(() -> activityFactory.trackActivity().markTrackDeleted(trackRes.id()));
+            }
+
+            return new CreateResponse(albumId);
+
+        } catch (Exception e) {
+            saga.compensate();
+            throw Workflow.wrap(e);
         }
-
-        List<Promise<Void>> starts = new ArrayList<>();
-        for (TrackUploadRequest track : tracks) {
-            TrackUploadWorkflow child = Workflow.newChildWorkflowStub(
-                    TrackUploadWorkflow.class,
-                    ChildWorkflowOptions.newBuilder()
-                            .setTaskQueue(WORKFLOW_TASK_QUEUE)
-                            .setWorkflowId(UUID.randomUUID().toString())
-                            .setParentClosePolicy(ParentClosePolicy.PARENT_CLOSE_POLICY_ABANDON)
-                            .setRetryOptions(
-                                    RetryOptions.newBuilder()
-                                            .setMaximumAttempts(1)
-                                            .build())
-                            .build());
-
-            Promise<Void> promise = Async.procedure(child::uploadTrack, track, albumId);
-            starts.add(promise);
-        }
-
-        Workflow.await(() ->
-                starts.stream().allMatch(Promise::isCompleted)
-        );
-
-        return new CreateResponse(albumId);
     }
 }
