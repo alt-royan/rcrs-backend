@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.enums.AlbumType;
+import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.AlbumPublicStandaloneDto;
 import org.ultra.rcrs.metadata.dto.AlbumPublicViewDto;
 import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
@@ -29,6 +30,7 @@ public class AlbumPublicService {
     @Cacheable("albums-public")
     public Mono<AlbumPublicViewDto> getById(String id) {
         return albumDocumentRepository.findByIdForPublic(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("Album", id)))
                 .map(this::toDto);
     }
 

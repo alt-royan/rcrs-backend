@@ -38,6 +38,12 @@ public class User {
     @Column(name = "last_name")
     private String lastName;
 
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled;
+
+    @Column(name = "email_verified", nullable = false)
+    private boolean emailVerified;
+
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 

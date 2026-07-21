@@ -253,7 +253,9 @@ services:
       - rcrs
 
   keycloak:
-    image: quay.io/keycloak/keycloak:latest
+    build:
+      context: ./keycloak
+      dockerfile: Dockerfile
     container_name: keycloak
     command: start-dev
     ports:
@@ -261,6 +263,13 @@ services:
     environment:
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
+      KAFKA_TOPIC: identity.events
+      KAFKA_CLIENT_ID: keycloak
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_EVENTS: REGISTER,UPDATE_PROFILE,UPDATE_EMAIL,DELETE_ACCOUNT,LOGIN
+    depends_on:
+      kafka:
+        condition: service_healthy
     volumes:
       - keycloak_data:/opt/keycloak/data
     healthcheck:

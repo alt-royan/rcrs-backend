@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.enums.AlbumType;
+import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.AlbumAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.AlbumAdminViewDto;
 import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
@@ -29,6 +30,7 @@ public class AlbumAdminService {
     @Cacheable("albums-admin")
     public Mono<AlbumAdminViewDto> getById(String id) {
         return albumDocumentRepository.findByIdForAdmin(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("Album", id)))
                 .map(this::toDto);
     }
 
@@ -58,11 +60,11 @@ public class AlbumAdminService {
                 .explicit(doc.getExplicit())
                 .artists(doc.getArtists() != null
                         ? doc.getArtists().stream().map(a -> AlbumAdminViewDto.ArtistEmbed.builder()
-                                .id(a.getId())
-                                .name(a.getName())
-                                .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
-                                .role(a.getRole())
-                                .build()).collect(Collectors.toList())
+                        .id(a.getId())
+                        .name(a.getName())
+                        .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
+                        .role(a.getRole())
+                        .build()).collect(Collectors.toList())
                         : null)
                 .build();
     }
@@ -82,11 +84,11 @@ public class AlbumAdminService {
                 .explicit(doc.getExplicit())
                 .artists(doc.getArtists() != null
                         ? doc.getArtists().stream().map(a -> AlbumAdminStandaloneDto.ArtistEmbed.builder()
-                                .id(a.getId())
-                                .name(a.getName())
-                                .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
-                                .role(a.getRole())
-                                .build()).collect(Collectors.toList())
+                        .id(a.getId())
+                        .name(a.getName())
+                        .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
+                        .role(a.getRole())
+                        .build()).collect(Collectors.toList())
                         : null)
                 .build();
     }

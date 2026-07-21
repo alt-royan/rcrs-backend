@@ -1,6 +1,7 @@
 package org.ultra.rcrs.kafka.config;
 
 import org.apache.kafka.clients.admin.AdminClientConfig;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.TopicPartition;
@@ -11,6 +12,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
+import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
 import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
@@ -86,6 +88,11 @@ public class KafkaBaseConfig {
         Map<String, Object> configs = new HashMap<>();
         configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         return new KafkaAdmin(configs);
+    }
+
+    @Bean
+    public NewTopic identityEventsTopic() {
+        return TopicBuilder.name(Topics.IDENTITY_EVENTS_TOPIC).partitions(1).replicas(1).build();
     }
 
     private DefaultErrorHandler dlqErrorHandler(KafkaTemplate<?, ?> template) {

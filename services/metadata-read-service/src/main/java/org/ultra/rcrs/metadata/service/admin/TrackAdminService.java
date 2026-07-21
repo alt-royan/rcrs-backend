@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.TrackAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.TrackAdminViewDto;
 import org.ultra.rcrs.metadata.model.TrackPublicDocument;
@@ -24,6 +25,7 @@ public class TrackAdminService {
     @Cacheable("tracks-admin")
     public Mono<TrackAdminViewDto> getById(String id) {
         return trackDocumentRepository.findByIdForAdmin(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("Track", id)))
                 .map(this::toDto);
     }
 

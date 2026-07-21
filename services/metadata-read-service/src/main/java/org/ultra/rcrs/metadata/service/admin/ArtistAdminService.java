@@ -3,6 +3,7 @@ package org.ultra.rcrs.metadata.service.admin;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.ArtistAdminViewDto;
 import org.ultra.rcrs.metadata.model.ArtistPublicDocument;
 import org.ultra.rcrs.metadata.repository.ArtistDocumentRepository;
@@ -21,6 +22,7 @@ public class ArtistAdminService {
     @Cacheable("artists-admin")
     public Mono<ArtistAdminViewDto> getById(String id) {
         return artistDocumentRepository.findByIdForAdmin(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("Artist", id)))
                 .map(this::toDto);
     }
 

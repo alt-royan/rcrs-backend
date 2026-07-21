@@ -23,6 +23,10 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
 
+identity:
+  events:
+    topic: identity.events
+
 logging:
   level:
     root: INFO

@@ -123,10 +123,11 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres?currentSchema=rcrs_user
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/postgres?currentSchema=rcrs_user
+      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/postgres
       SPRING_LIQUIBASE_USER: postgres
       SPRING_LIQUIBASE_PASSWORD: postgres
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      IDENTITY_EVENTS_TOPIC: identity.events
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
     depends_on:
       discovery-server:

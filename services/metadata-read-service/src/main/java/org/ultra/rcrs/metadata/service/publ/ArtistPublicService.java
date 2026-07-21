@@ -3,6 +3,7 @@ package org.ultra.rcrs.metadata.service.publ;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.ArtistPublicViewDto;
 import org.ultra.rcrs.metadata.model.ArtistPublicDocument;
 import org.ultra.rcrs.metadata.repository.ArtistDocumentRepository;
@@ -21,6 +22,7 @@ public class ArtistPublicService {
     @Cacheable("artists-public")
     public Mono<ArtistPublicViewDto> getById(String id) {
         return artistDocumentRepository.findByIdForPublic(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("Artist", id)))
                 .map(this::toDto);
     }
 

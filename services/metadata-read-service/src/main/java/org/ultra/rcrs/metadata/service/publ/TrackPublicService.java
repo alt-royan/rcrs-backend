@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.TrackPublicStandaloneDto;
 import org.ultra.rcrs.metadata.dto.TrackPublicViewDto;
 import org.ultra.rcrs.metadata.model.TrackPublicDocument;
@@ -24,6 +25,7 @@ public class TrackPublicService {
     @Cacheable("tracks-public")
     public Mono<TrackPublicViewDto> getById(String id) {
         return trackDocumentRepository.findByIdForPublic(id)
+                .switchIfEmpty(Mono.error(new NotFoundException("Track", id)))
                 .map(this::toDto);
     }
 
