@@ -25,12 +25,13 @@ public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
     public void transcode(String uid, String trackId) {
         log.info("Starting audio transcoding workflow for uid={}, trackId={}", uid, trackId);
         ActivityFactory activities = ActivityFactory.getInstance();
+        AudioMetadata originalMeta;
         try {
             activities.transcodingStatusActivity().updateStatusToTranscoding(uid, trackId);
             activities.transcodingStatusActivity().notifyTranscodingStarted(trackId);
 
             activities.validateAudioActivity().validate(uid);
-            AudioMetadata originalMeta = activities.probeAudioMetadataActivity().probe(uid, true);
+            originalMeta = activities.probeAudioMetadataActivity().probe(uid, true);
 
             String guid = UUID.randomUUID().toString();
 
@@ -51,7 +52,7 @@ public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
         }
 
         activities.transcodingStatusActivity().updateStatusToComplete(uid);
-        activities.transcodingStatusActivity().notifyTranscodingSuccess(trackId);
+        activities.transcodingStatusActivity().notifyTranscodingSuccess(trackId, originalMeta.durationMs());
         log.info("Audio transcoding workflow completed for uid={}", uid);
     }
 }

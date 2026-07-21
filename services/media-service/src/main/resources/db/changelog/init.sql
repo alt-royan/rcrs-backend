@@ -17,7 +17,7 @@ CREATE TABLE IF NOT EXISTS audio
     guid               uuid                     NOT NULL,
     track_id           text                     NOT NULL,
     codec              varchar(20)              NOT NULL,
-    duration_ms        bigint                   NOT NULL,
+    duration_ms        int                      NOT NULL,
     container          varchar(10)              NOT NULL,
     bitrate            varchar                  NOT NULL,
     sample_rate        int                      NOT NULL,

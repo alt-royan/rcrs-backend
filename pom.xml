@@ -31,6 +31,7 @@
         <protobuf.version>4.35.1</protobuf.version>
         <ffmpeg-platform.version>8.0.1-1.5.13</ffmpeg-platform.version>
         <temporal-spring.version>1.37.0</temporal-spring.version>
+        <testcontainers.version>1.21.4</testcontainers.version>
     </properties>
 
     <modules>
@@ -42,6 +43,7 @@
         <module>services/media-service</module>
         <module>services/search-service</module>
         <module>services/workflow-service</module>
+        <module>resource-server</module>
     </modules>
 
     <dependencyManagement>
@@ -123,7 +125,27 @@
                 <artifactId>protobuf-java</artifactId>
                 <version>${protobuf.version}</version>
             </dependency>
+
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>mongodb</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${testcontainers.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
+
     </dependencyManagement>
 
     <build>

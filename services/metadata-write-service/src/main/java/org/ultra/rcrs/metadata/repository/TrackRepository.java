@@ -19,6 +19,10 @@ public interface TrackRepository extends JpaRepository<Track, UUID> {
     void updateLifecycleStatusById(LifecycleStatus status, UUID id);
 
     @Modifying
+    @Query("UPDATE Track t SET t.lifecycleStatus = :status, t.durationMs = :durationMs WHERE t.id = :id")
+    void updateLifecycleStatusAndDurationById(LifecycleStatus status, Integer durationMs, UUID id);
+
+    @Modifying
     @Query("UPDATE Track t SET t.availabilityStatus = :status WHERE t.id = :id")
     void updateAvailabilityStatusById(EntityStatus status, UUID id);
 
@@ -27,7 +31,7 @@ public interface TrackRepository extends JpaRepository<Track, UUID> {
     void updateAvailabilityStatusByAlbumId(EntityStatus status, UUID albumId);
 
     @Modifying
-    @Query("UPDATE Track t SET t.availabilityStatus = :status WHERE t.albumId IN (SELECT ata.albumId FROM ArtistToAlbum ata WHERE ata.artistId = :artistId)")
+    @Query("UPDATE Track t SET t.availabilityStatus = :status WHERE t.id IN (SELECT att.trackId FROM ArtistToTrack att WHERE att.artistId = :artistId)")
     void updateAvailabilityStatusByArtistId(EntityStatus status, UUID artistId);
 
     @Query("SELECT t.id FROM Track t WHERE t.availabilityStatus = :status")

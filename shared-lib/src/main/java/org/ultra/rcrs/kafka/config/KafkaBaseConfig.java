@@ -64,18 +64,20 @@ public class KafkaBaseConfig {
     }
 
     @Bean("stringContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactoryString() {
-
+    public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactoryString(
+            KafkaTemplate<String, String> stringTemplate) {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryString());
+        factory.setCommonErrorHandler(dlqErrorHandler(stringTemplate));
         return factory;
     }
 
     @Bean("byteArrayContainerFactory")
-    public ConcurrentKafkaListenerContainerFactory<String, byte[]> kafkaListenerContainerFactoryByteArray() {
-
+    public ConcurrentKafkaListenerContainerFactory<String, byte[]> kafkaListenerContainerFactoryByteArray(
+            KafkaTemplate<String, byte[]> byteArrayTemplate) {
         ConcurrentKafkaListenerContainerFactory<String, byte[]> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactoryByteArray());
+        factory.setCommonErrorHandler(dlqErrorHandler(byteArrayTemplate));
         return factory;
     }
 
@@ -84,6 +86,12 @@ public class KafkaBaseConfig {
         Map<String, Object> configs = new HashMap<>();
         configs.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
         return new KafkaAdmin(configs);
+    }
+
+    private DefaultErrorHandler dlqErrorHandler(KafkaTemplate<?, ?> template) {
+        var recoverer = new DeadLetterPublishingRecoverer(template,
+                (record, ex) -> new TopicPartition(Topics.DLQ_TOPIC, record.partition()));
+        return new DefaultErrorHandler(recoverer, new FixedBackOff(1000L, 2L));
     }
 
     private Map<String, Object> producerProps() {

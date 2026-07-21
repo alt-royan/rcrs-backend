@@ -30,7 +30,7 @@ public class Audio {
     private String container;
 
     @Column(name = "duration_ms")
-    private Long durationMs;
+    private Integer durationMs;
 
     private String bitrate;
 

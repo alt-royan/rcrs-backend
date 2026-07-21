@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.track";
+
+import "events/common/lifecycle_status.proto";
+
+message TrackTranscodingCompletedEvent {
+  string track_id = 1;
+  LifecycleStatus status = 2;
+  int32 duration_ms = 3;
+}

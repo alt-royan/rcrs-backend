@@ -38,6 +38,13 @@ public class AlbumUploadWorkflowImpl extends BaseWorkflow implements AlbumUpload
         List<TrackUploadRequest> tracks = request.tracks() == null ? new ArrayList<>() : request.tracks();
         List<ArtistDto> artists = request.artists() == null ? new ArrayList<>() : request.artists();
 
+        List<String> audioUids = tracks.stream()
+                .map(TrackUploadRequest::uid)
+                .toList();
+        if (!audioUids.isEmpty()) {
+            activityFactory.audioActivity().checkAllAudiosUploaded(audioUids);
+        }
+
         Saga saga = new Saga(new Saga.Options.Builder().build());
 
         try {

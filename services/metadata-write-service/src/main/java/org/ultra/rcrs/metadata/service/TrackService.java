@@ -84,6 +84,12 @@ public class TrackService {
     }
 
     @Transactional
+    public void handleTranscodingCompleted(UUID trackId, LifecycleStatus status, Integer durationMs) {
+        trackRepository.updateLifecycleStatusAndDurationById(status, durationMs, trackId);
+        log.info("Track {} transcoding completed: status={}, durationMs={}", trackId, status, durationMs);
+    }
+
+    @Transactional
     public void addAllArtistToTrack(List<ArtistDto> artists, UUID trackId) {
         artists.forEach(a -> addArtistToTrack(a, trackId));
     }

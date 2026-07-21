@@ -1,4 +1,4 @@
-package ru.ultra.rcrs.discovery;
+package org.ultra.rcrs.discovery;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

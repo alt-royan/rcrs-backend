@@ -8,6 +8,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.events.common.DomainEventOuterClass;
 import org.ultra.rcrs.events.common.LifecycleStatusOuterClass;
+import org.ultra.rcrs.events.track.TrackTranscodingCompletedEventOuterClass;
 import org.ultra.rcrs.events.track.TrackUpdateLifecycleStatusEventOuterClass;
 import org.ultra.rcrs.kafka.ProtobufEventProducer;
 import org.ultra.rcrs.kafka.Topics;
@@ -33,8 +34,16 @@ public class MediaEventProducer extends ProtobufEventProducer {
         sendLifecycleStatus(trackId, LifecycleStatusOuterClass.LifecycleStatus.TRANSCODING);
     }
 
-    public void successTranscoding(String trackId) {
-        sendLifecycleStatus(trackId, LifecycleStatusOuterClass.LifecycleStatus.READY);
+    public void successTranscoding(String trackId, int durationMs) {
+        var event = TrackTranscodingCompletedEventOuterClass.TrackTranscodingCompletedEvent.newBuilder()
+                .setTrackId(trackId)
+                .setStatus(LifecycleStatusOuterClass.LifecycleStatus.READY)
+                .setDurationMs(durationMs)
+                .build();
+
+        sendDomainEvent(DomainEventOuterClass.EventType.TRACK_TRANSCODING_COMPLETED,
+                DomainEventOuterClass.AggregateType.TRACK, trackId,
+                Any.pack(event), Topics.CATALOG_UPDATE_STATUS_TOPIC);
     }
 
     private void sendLifecycleStatus(String trackId, LifecycleStatusOuterClass.LifecycleStatus status) {
@@ -43,16 +52,26 @@ public class MediaEventProducer extends ProtobufEventProducer {
                 .setLifecycleStatus(status)
                 .build();
 
+        sendDomainEvent(DomainEventOuterClass.EventType.TRACK_LIFECYCLE_STATUS_UPDATED,
+                DomainEventOuterClass.AggregateType.TRACK, trackId,
+                Any.pack(event), Topics.CATALOG_UPDATE_STATUS_TOPIC);
+    }
+
+    private void sendDomainEvent(DomainEventOuterClass.EventType eventType,
+                                 DomainEventOuterClass.AggregateType aggregateType,
+                                 String aggregateId,
+                                 Any payload,
+                                 String topic) {
         var now = Instant.now();
         var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
                 .setEventId(UUID.randomUUID().toString())
-                .setEventType(DomainEventOuterClass.EventType.TRACK_LIFECYCLE_STATUS_UPDATED)
-                .setAggregateType(DomainEventOuterClass.AggregateType.TRACK)
-                .setAggregateId(trackId)
+                .setEventType(eventType)
+                .setAggregateType(aggregateType)
+                .setAggregateId(aggregateId)
                 .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
                 .setProducer(serviceName)
-                .setPayload(Any.pack(event))
+                .setPayload(payload)
                 .build();
-        sendEvent(domainEvent, Topics.CATALOG_UPDATE_STATUS_TOPIC);
+        sendEvent(domainEvent, topic);
     }
 }

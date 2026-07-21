@@ -53,7 +53,7 @@ public class TranscodingStatusActivityImpl implements TranscodingStatusActivity 
     }
 
     @Override
-    public void notifyTranscodingSuccess(String trackId) {
-        mediaEventProducer.successTranscoding(trackId);
+    public void notifyTranscodingSuccess(String trackId, int durationMs) {
+        mediaEventProducer.successTranscoding(trackId, durationMs);
     }
 }

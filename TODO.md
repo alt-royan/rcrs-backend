@@ -36,6 +36,8 @@
   │  │    ├── Postgres (rcrs_catalog schema)           │
   │  │    ├── Kafka Producer → catalog.cdc.topic       │
   │  │    │               → search.index.topic         │
+  │  │    ├── Kafka Consumer: catalog.update.status.topic│
+  │  │    │   (CatalogUpdateStatusListener)            │
   │  │    ├── REST: /albums, /tracks, /artists, /purge │
   │  │    └── S3 (images via S3Utils)                  │
   │  │                                                 │
@@ -45,6 +47,8 @@
   │  │    ├── Temporal Worker (upload/transcode)       │
   │  │    ├── Kafka Consumer: media.tracnscoding.topic │
   │  │    ├── Kafka Producer: catalog.update.status.topic│
+  │  │    │   (TrackUpdateLifecycleStatusEvent,        │
+  │  │    │    TrackTranscodingCompletedEvent)          │
   │  │    ├── SQS Listener (S3 events)                 │
   │  │    ├── REST: /upload/files, /upload/audio       │
   │  │    └── ffmpeg external process                  │
@@ -89,7 +93,7 @@
   │  │    ├── Exceptions (BadRequest, NotFound, etc.)   │
   │  │    ├── Kafka (Topics, ProtobufEventProducer,     │
   │  │    │         KafkaBaseConfig)                    │
-  │  │    ├── Proto definitions (30 .proto files)       │
+  │  │    ├── Proto definitions (31 .proto files)       │
   │  │    ├── Pipeline (Handler, Pipeline)              │
   │  │    └── Utils (Base62, Url62, S3Utils,            │
   │  │               UuidConverter, BigIntegerPairing)  │
@@ -138,43 +142,33 @@ Services register as `metadata-write-service` and `metadata-read-service`. The r
 
 ### HIGH
 
-#### B5. Track duration always null
+#### B5. Track duration always null ✅
 **File:** `services/metadata-write-service/src/main/java/org/ultra/rcrs/metadata/service/TrackService.java`
-```java
-.durationMs(null)  // Hardcoded null, never probed
-```
-Track duration is never set. The `TrackCreatedEvent` proto also doesn't carry duration. Should be set after audio transcoding probes the file.
+Track duration is now set after audio transcoding completes. `MediaEventProducer` sends `TrackTranscodingCompletedEvent` (with `duration_ms`) to `catalog.update.status.topic`. `CatalogUpdateStatusListener` in metadata-write-service consumes it and calls `TrackService.handleTranscodingCompleted()` which updates `lifecycle_status` and `duration_ms` in a single query.
 
 #### B6. Docker compose references non-existent services
 **File:** `services/docker-compose.yml` (from AGENTS.md — needs confirmation)
 References `catalog-service/` and `upload-service/` directories that don't exist.
 
-#### B7. No Dead Letter Topic configuration
-**File:** `shared-lib/src/main/java/org/ultra/rcrs/kafka/config/KafkaBaseConfig.java`
-`DeadLetterPublishingRecoverer` is imported but never configured as a bean. `FixedBackOff` is also imported but unused. Failed Kafka messages will be silently dropped after the default retry behavior.
+#### B7. No Dead Letter Topic configuration ✅
+Fixed: single `global.dlq` topic. `DeadLetterPublishingRecoverer` configured in `KafkaBaseConfig`, retries 3 times (1s interval, backoff 2) then sends to DLQ. Applied to both `byteArrayContainerFactory` and `stringContainerFactory`.
 
 ### MEDIUM
 
-#### B8. Topic names in AGENTS.md don't match code
-The `Topics.java` constants differ from what AGENTS.md documents:
-| Code (Topics.java) | AGENTS.md |
-|---|---|
-| `media.tracnscoding.topic` | `media-start-track-tracnscoding-topic` |
-| `catalog.update.status.topic` | `catalog-update-entity-status-topic` |
-| (not defined) | `search-start-reindex-topic` |
-| (not defined) | `catalog-dlt-topic`, `search-dlt-topic` |
+#### B8. Topic names in AGENTS.md don't match code ✅
+Fixed: AGENTS.md topics section updated to match `Topics.java` constants and current event flow.
 
-#### B9. Port conflict: media-service and workflow-service both use port 8082
-Cannot run both services simultaneously on the same host without changing one.
+#### B9. Port conflict: media-service and workflow-service both use port 8082 ✅
+Fixed: workflow-service now runs on port 8090.
 
-#### B10. Package naming inconsistency
-`discovery-server` uses `ru.ultra.rcrs.discovery` while all other modules use `org.ultra.rcrs`. This causes issues with component scanning and shared-lib usage (discovery-server doesn't depend on shared-lib but if it did, package mismatch would cause issues).
+#### B10. Package naming inconsistency ✅
+Fixed: `discovery-server` now uses `org.ultra.rcrs.discovery`.
 
-#### B11. Media-service Temporal config references non-existent MEDIA_TASK_QUEUE config
-**File:** `services/media-service/src/main/java/org/ultra/rcrs/mediaservice/temporal/config/TemporalConfig.java` needs checking — ensure the task queue constants match between workflow-service and media-service Temporal workers.
+#### B11. Media-service Temporal config references non-existent MEDIA_TASK_QUEUE config ✅
+`MEDIA_TASK_QUEUE` is a Java constant in `TemporalConfig.java`, not YAML config. Used consistently across all workflows, worker, listener, and controller.
 
-#### B12. web-ui is static HTML with no backend connection
-The `web-ui/` directory contains static HTML files. The `upload/index.html` is a simple upload page. These have no API integration, auth, or dynamic behavior.
+#### B12. web-ui is static HTML with no backend connection ✅
+Intentional — static HTML, no API integration planned for now.
 
 ---
 
@@ -230,7 +224,6 @@ The `web-ui/` directory contains static HTML files. The `upload/index.html` is a
 ## Test Improvement Suggestions
 
 ### Current State
-- 5 tests total: 4 context-load smoke tests + 1 unit test (Url62Test)
 - metadata-read-service has **zero tests**
 - No integration tests, no Testcontainers, no H2
 - Tests require full infrastructure stack
@@ -301,6 +294,7 @@ shared-lib/src/test/java/org/ultra/rcrs/utils/UuidConverterTest.java
 metadata-write-service/src/test/java/org/ultra/rcrs/metadata/service/AlbumServiceTest.java
 metadata-write-service/src/test/java/org/ultra/rcrs/metadata/service/TrackServiceTest.java
 metadata-write-service/src/test/java/org/ultra/rcrs/metadata/kafka/CatalogEventProducerTest.java
+metadata-write-service/src/test/java/org/ultra/rcrs/metadata/kafka/CatalogUpdateStatusListenerTest.java
 metadata-read-service/src/test/java/org/ultra/rcrs/metadata/service/write/AlbumWriteServiceTest.java
 metadata-read-service/src/test/java/org/ultra/rcrs/metadata/kafka/listener/CdcEventListenerTest.java
 media-service/src/test/java/org/ultra/rcrs/mediaservice/service/AudioServiceTest.java

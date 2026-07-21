@@ -15,9 +15,7 @@ Maven multi-module Spring Boot 4.0.3 project (Java 21). Eight modules: shared li
 | `services/metadata-read-service` | 8081 | WebFlux, MongoDB Reactive, Kafka consumer (CDC), Caffeine cache — reads |
 | `services/media-service` | 8082 | WebMVC, JPA + Postgres (`rcrs_upload`), S3, Temporal worker, ffmpeg — file uploads/transcoding |
 | `services/search-service` | 8083 | WebMVC, Elasticsearch, Kafka consumer, OpenFeign → metadata-write |
-| `services/workflow-service` | 8082 | Temporal orchestration, OpenFeign clients, Kafka, REST — coordinates upload flows |
-
-**Port conflict**: media-service and workflow-service both use port **8082** — cannot run simultaneously on same host.
+| `services/workflow-service` | 8090 | Temporal orchestration, OpenFeign clients, Kafka, REST — coordinates upload flows |
 
 ## Build Commands
 ```bash
@@ -40,12 +38,13 @@ mvn install -pl shared-lib -DskipTests          # rebuild shared-lib after chang
 
 ## Kafka Topics (defined in `shared-lib/.../kafka/Topics.java`)
 ```
-catalog.cdc.topic                 # CQRS: write → read (Protobuf) — also search.index duplicate
-search.index.topic                 # write → search (index entities)
-media.tracnscoding.topic          # write → media (trigger transcoding) — typo is in code
-catalog.update.status.topic       # media → write (transcoding results) + write self-consumer
+catalog.cdc.topic                 # metadata-write → metadata-read + search (Protobuf DomainEvent)
+search.index.topic                # metadata-write → search (Protobuf DomainEvent)
+media.tracnscoding.topic          # metadata-write → media (trigger transcoding) — typo is in code
+catalog.update.status.topic       # media → metadata-write (TrackTranscodingCompletedEvent,
+                                  #   TrackUpdateLifecycleStatusEvent) + metadata-write self-consumer
+global.dlq                        # dead letter queue for all failed messages (3 retries → DLQ)
 ```
-No DLT topics are currently configured despite `DeadLetterPublishingRecoverer` being imported.
 
 ## Gateway Routes (defined in `GatewayConfig.java`)
 ```
@@ -71,7 +70,6 @@ All infra is Docker-based in `local/`. Start required services before running ap
 | Temporal Postgres | 5454 | `local/temporal/` | workflow-service |
 
 ## Testing
-- 5 tests total: 4 context-load smoke tests + 1 unit test (Url62Test)
 - `metadata-read-service` has **zero tests**
 - No integration tests, no Testcontainers, no H2, no test profiles
 - Tests require the full infrastructure stack running
@@ -83,11 +81,10 @@ All infra is Docker-based in `local/`. Start required services before running ap
 - **B4**: Gateway routes `lb://catalog-service` — no service registers with that name
 
 ## Gotchas
-- **Package namespace**: discovery-server uses `ru.ultra.rcrs.discovery` while all others use `org.ultra.rcrs`
+- **Package namespace**: all modules use `org.ultra.rcrs`
 - **workflow-service Feign URLs** (from `application.yml`): metadata-service→`localhost:8080`, media-service→`localhost:8081` **(BUG)**, search-service→`localhost:8083`
 - **FFmpeg**: media-service invokes `ffmpeg` as external process via `ProcessBuilder`
 - **No CI/CD, no linting/formatting config** exists
 - **workflow-service task queue**: `WORKFLOW_TASK_QUEUE` constant — all workflows and activities share this single queue
-- **Track duration** is hardcoded `null` at creation — never probed from audio metadata
 - **web-ui/** is static HTML with no API integration
 - **Topic name typo**: `media.tracnscoding.topic` ("tracnscoding") — typo is in `Topics.java` constant and actual topic name

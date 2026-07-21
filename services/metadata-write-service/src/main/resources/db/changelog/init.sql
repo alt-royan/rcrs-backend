@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS rcrs_catalog;
+
 SET search_path TO rcrs_catalog;
 
 CREATE TABLE IF NOT EXISTS artists

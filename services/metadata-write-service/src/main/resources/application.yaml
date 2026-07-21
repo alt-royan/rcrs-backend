@@ -19,7 +19,7 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
     user: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=rcrs_catalog
+    url: jdbc:postgresql://localhost:5432/postgres
   kafka:
     bootstrap-servers: localhost:9092
 

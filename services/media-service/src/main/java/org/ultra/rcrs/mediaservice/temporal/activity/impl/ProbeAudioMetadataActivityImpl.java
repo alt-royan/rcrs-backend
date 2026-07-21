@@ -74,7 +74,7 @@ public class ProbeAudioMetadataActivityImpl implements ProbeAudioMetadataActivit
             String container = format.get("name").asText();
             long sizeInBytes = format.get("size").asLong();
             double duration = format.get("duration").asDouble();
-            long durationMs = (long) (duration * 1000);
+            int durationMs = (int) (duration * 1000);
 
             String codec = "";
             String bitrate = "0";

@@ -22,5 +22,5 @@ public interface TranscodingStatusActivity {
     void notifyTranscodingFailed(String trackId);
 
     @ActivityMethod
-    void notifyTranscodingSuccess(String trackId);
+    void notifyTranscodingSuccess(String trackId, int durationMs);
 }
