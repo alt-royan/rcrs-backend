@@ -26,14 +26,9 @@ public interface TrackRepository extends JpaRepository<Track, UUID> {
     @Query("UPDATE Track t SET t.availabilityStatus = :status WHERE t.id = :id")
     void updateAvailabilityStatusById(EntityStatus status, UUID id);
 
-    @Modifying
-    @Query("UPDATE Track t SET t.availabilityStatus = :status WHERE t.albumId = :albumId")
-    void updateAvailabilityStatusByAlbumId(EntityStatus status, UUID albumId);
-
-    @Modifying
-    @Query("UPDATE Track t SET t.availabilityStatus = :status WHERE t.id IN (SELECT att.trackId FROM ArtistToTrack att WHERE att.artistId = :artistId)")
-    void updateAvailabilityStatusByArtistId(EntityStatus status, UUID artistId);
-
     @Query("SELECT t.id FROM Track t WHERE t.availabilityStatus = :status")
     List<UUID> findAllByAvailabilityStatus(EntityStatus status);
+
+    @Query("SELECT t.id FROM Track t WHERE t.albumId = :albumId")
+    List<UUID> findAllIdsByAlbumId(UUID albumId);
 }

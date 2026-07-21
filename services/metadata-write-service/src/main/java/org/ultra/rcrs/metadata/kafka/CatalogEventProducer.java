@@ -9,11 +9,7 @@ import org.springframework.stereotype.Component;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.events.album.*;
-import org.ultra.rcrs.events.artist.ArtistActivatedEventOuterClass;
-import org.ultra.rcrs.events.artist.ArtistCreatedEventOuterClass;
-import org.ultra.rcrs.events.artist.ArtistDeletedEventOuterClass;
-import org.ultra.rcrs.events.artist.ArtistHiddenEventOuterClass;
-import org.ultra.rcrs.events.artist.ArtistTrueDeletedEventOuterClass;
+import org.ultra.rcrs.events.artist.*;
 import org.ultra.rcrs.events.common.*;
 import org.ultra.rcrs.events.track.*;
 import org.ultra.rcrs.kafka.ProtobufEventProducer;
@@ -26,6 +22,8 @@ import org.ultra.rcrs.utils.Url62;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Component
@@ -317,17 +315,20 @@ public class CatalogEventProducer extends ProtobufEventProducer {
     public void otherAddedToTrack(OtherArtist other, UUID trackUuid) {
         String stringOtherId = Url62.encode(other.getId());
         String stringTrackId = Url62.encode(trackUuid);
-        var event = OtherAddedToTrackEventOuterClass.OtherAddedToTrackEvent.newBuilder()
+        Set<ArtistRole> roles = other.getRoles() != null ? other.getRoles() : new HashSet<>();
+        var builder = OtherAddedToTrackEventOuterClass.OtherAddedToTrackEvent.newBuilder()
                 .setOtherId(stringOtherId)
                 .setTrackId(stringTrackId)
                 .setName(other.getName())
-                .addAllRoles(other.getRoles().stream()
-                        .map(r -> ArtistRoleOuterClass.ArtistRole.valueOf(r.name())).toList())
-                .addAllSocialLinks(other.getSocialLinks().getItems().stream()
-                        .map(link -> SocialLinkOuterClass.SocialLink.newBuilder()
-                                .setResourceName(link.getResourceName())
-                                .setUrl(link.getUrl()).build()).toList())
-                .build();
+                .addAllRoles(roles.stream()
+                        .map(r -> ArtistRoleOuterClass.ArtistRole.valueOf(r.name())).toList());
+        if (other.getSocialLinks() != null) {
+            builder.addAllSocialLinks(other.getSocialLinks().getItems().stream()
+                    .map(link -> SocialLinkOuterClass.SocialLink.newBuilder()
+                            .setResourceName(link.getResourceName())
+                            .setUrl(link.getUrl()).build()).toList());
+        }
+        var event  = builder.build();
 
         var now = Instant.now();
         var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()

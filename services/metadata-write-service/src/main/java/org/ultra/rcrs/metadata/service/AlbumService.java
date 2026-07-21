@@ -4,18 +4,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.ultra.rcrs.metadata.dto.request.AlbumUploadRequest;
+import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
+import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.ArtistDto;
+import org.ultra.rcrs.metadata.dto.request.AlbumUploadRequest;
 import org.ultra.rcrs.metadata.kafka.CatalogEventProducer;
 import org.ultra.rcrs.metadata.model.Album;
 import org.ultra.rcrs.metadata.model.ArtistToAlbum;
 import org.ultra.rcrs.metadata.model.ArtistToAlbumPK;
 import org.ultra.rcrs.metadata.repository.AlbumRepository;
+import org.ultra.rcrs.metadata.repository.ArtistRepository;
 import org.ultra.rcrs.metadata.repository.ArtistToAlbumRepository;
-import org.ultra.rcrs.metadata.repository.TrackRepository;
-import org.ultra.rcrs.enums.EntityStatus;
-import org.ultra.rcrs.enums.LifecycleStatus;
-import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.utils.S3Utils;
 import org.ultra.rcrs.utils.Url62;
 
@@ -28,9 +28,9 @@ import java.util.UUID;
 public class AlbumService {
 
     private final AlbumRepository albumRepository;
-    private final TrackRepository trackRepository;
+    private final ArtistRepository artistRepository;
+    private final TrackService trackService;
     private final ArtistToAlbumRepository artistToAlbumRepository;
-    private final ArtistService artistService;
     private final S3Utils s3Utils;
     private final CatalogEventProducer catalogEventProducer;
 
@@ -53,26 +53,34 @@ public class AlbumService {
     }
 
     @Transactional
+    public List<UUID> findAllIdsByArtist(UUID artistId) {
+        return albumRepository.findAllIdsByArtist(artistId);
+    }
+
+    @Transactional
     public void markAlbumDelete(UUID albumId) {
+        var tracks = trackService.findAllIdsByAlbum(albumId);
+        tracks.forEach(trackService::markTrackDelete);
+
         updateAvailability(EntityStatus.DELETED, albumId);
-        trackRepository.updateAvailabilityStatusByAlbumId(EntityStatus.DELETED, albumId);
-        catalogEventProducer.albumDeleted(albumId);
         log.info("Album {} and all related tracks marked as DELETED", albumId);
     }
 
     @Transactional
     public void hideAlbum(UUID albumId) {
+        var tracks = trackService.findAllIdsByAlbum(albumId);
+        tracks.forEach(trackService::hideTrack);
+
         updateAvailability(EntityStatus.HIDDEN, albumId);
-        trackRepository.updateAvailabilityStatusByAlbumId(EntityStatus.HIDDEN, albumId);
-        catalogEventProducer.albumHidden(albumId);
         log.info("Album {} and all related tracks marked as HIDDEN", albumId);
     }
 
     @Transactional
     public void activeAlbum(UUID albumId) {
+        var tracks = trackService.findAllIdsByAlbum(albumId);
+        tracks.forEach(trackService::activeTrack);
+
         updateAvailability(EntityStatus.ACTIVE, albumId);
-        trackRepository.updateAvailabilityStatusByAlbumId(EntityStatus.ACTIVE, albumId);
-        catalogEventProducer.albumActivated(albumId);
         log.info("Album {} and all related tracks marked as ACTIVE", albumId);
     }
 
@@ -94,7 +102,7 @@ public class AlbumService {
         }
 
         UUID artistUuid = Url62.decode(artistDto.getId());
-        if (!artistService.artistExists(artistUuid)) {
+        if (!artistRepository.existsById(artistUuid)) {
             throw new NotFoundException("Artist", artistUuid);
         }
 
@@ -124,6 +132,11 @@ public class AlbumService {
 
     private void updateAvailability(EntityStatus status, UUID albumId) {
         albumRepository.updateAvailabilityStatusById(status, albumId);
+        switch (status) {
+            case ACTIVE -> catalogEventProducer.albumActivated(albumId);
+            case HIDDEN -> catalogEventProducer.albumHidden(albumId);
+            case DELETED -> catalogEventProducer.albumDeleted(albumId);
+        }
         log.info("Album {} availability_status updated to {}", albumId, status);
     }
 

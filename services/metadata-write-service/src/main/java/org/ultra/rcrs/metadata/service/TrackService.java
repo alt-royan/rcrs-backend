@@ -15,9 +15,7 @@ import org.ultra.rcrs.metadata.model.ArtistToTrack;
 import org.ultra.rcrs.metadata.model.ArtistToTrackPK;
 import org.ultra.rcrs.metadata.model.OtherArtist;
 import org.ultra.rcrs.metadata.model.Track;
-import org.ultra.rcrs.metadata.repository.ArtistToTrackRepository;
-import org.ultra.rcrs.metadata.repository.OtherArtistRepository;
-import org.ultra.rcrs.metadata.repository.TrackRepository;
+import org.ultra.rcrs.metadata.repository.*;
 import org.ultra.rcrs.utils.Url62;
 
 import java.util.List;
@@ -29,16 +27,16 @@ import java.util.UUID;
 public class TrackService {
 
     private final TrackRepository trackRepository;
+    private final AlbumRepository albumRepository;
+    private final ArtistRepository artistRepository;
     private final ArtistToTrackRepository artistToTrackRepository;
     private final OtherArtistRepository otherArtistRepository;
-    private final ArtistService artistService;
-    private final AlbumService albumService;
     private final CatalogEventProducer catalogEventProducer;
 
     @Transactional
     public UUID createTrack(TrackUploadRequest uploadRequest) {
         UUID albumId = Url62.decode(uploadRequest.getAlbumId());
-        if (!albumService.albumExists(albumId)) {
+        if (!albumRepository.existsById(albumId)) {
             throw new NotFoundException("Album", albumId);
         }
 
@@ -59,21 +57,23 @@ public class TrackService {
     }
 
     @Transactional
+    public List<UUID> findAllIdsByAlbum(UUID albumId) {
+        return trackRepository.findAllIdsByAlbumId(albumId);
+    }
+
+    @Transactional
     public void markTrackDelete(UUID trackId) {
         updateAvailability(EntityStatus.DELETED, trackId);
-        catalogEventProducer.trackDeleted(trackId);
     }
 
     @Transactional
     public void hideTrack(UUID trackId) {
         updateAvailability(EntityStatus.HIDDEN, trackId);
-        catalogEventProducer.trackHidden(trackId);
     }
 
     @Transactional
     public void activeTrack(UUID trackId) {
         updateAvailability(EntityStatus.ACTIVE, trackId);
-        catalogEventProducer.trackActivated(trackId);
     }
 
     @Transactional
@@ -100,7 +100,7 @@ public class TrackService {
         }
 
         UUID artistUuid = Url62.decode(artistDto.getId());
-        if (!artistService.artistExists(artistUuid)) {
+        if (!artistRepository.existsById(artistUuid)) {
             throw new NotFoundException("Artist", artistUuid);
         }
         var artist = artistToTrackRepository.save(ArtistToTrack.builder()
@@ -159,6 +159,11 @@ public class TrackService {
 
     private void updateAvailability(EntityStatus status, UUID trackId) {
         trackRepository.updateAvailabilityStatusById(status, trackId);
+        switch (status) {
+            case ACTIVE -> catalogEventProducer.trackActivated(trackId);
+            case HIDDEN -> catalogEventProducer.trackHidden(trackId);
+            case DELETED -> catalogEventProducer.trackDeleted(trackId);
+        }
         log.info("Track {} availability_status updated to {}", trackId, status);
     }
 }

@@ -1,3 +1,4 @@
+CREATE SCHEMA IF NOT EXISTS rcrs_upload;
 SET search_path TO rcrs_upload;
 
 CREATE TABLE IF NOT EXISTS audio_upload

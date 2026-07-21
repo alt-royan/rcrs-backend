@@ -302,3 +302,288 @@ search-service/src/test/java/org/ultra/rcrs/searchservice/service/PublicSearchSe
 workflow-service/src/test/java/org/ultra/rcrs/workflow/workflow/impl/AlbumUploadWorkflowImplTest.java
 workflow-service/src/test/java/org/ultra/rcrs/workflow/workflow/impl/SagaCompensationTest.java
 ```
+
+---
+
+## Development Roadmap (20 Tasks)
+
+### Phase 1: Critical Fixes
+
+#### 5. Add Gateway-Level Authentication and Rate Limiting
+**Category:** Security | **Priority:** Critical | **Difficulty:** Medium
+
+**Problem:** Gateway has no auth or rate limiting. Internal services are exposed to unauthenticated requests.
+
+**Goal:** Authenticate all requests at gateway, add rate limiting via Redis.
+
+**Implementation Steps:**
+1. Add `spring-cloud-starter-security` + `oauth2-resource-server` to gateway
+2. Configure JWT bearer token validation
+3. Add `RequestRateLimiter` filter using Redis (already deployed)
+4. Propagate user context via headers
+
+**Affected Files:** `gateway-api/pom.xml`, new `GatewaySecurityConfig.java`, `GatewayConfig.java`
+
+---
+
+### Phase 2: Product Improvements
+
+#### 6. Implement Playlist CRUD Service
+**Category:** Feature | **Priority:** High | **Difficulty:** Hard
+
+**Problem:** Zero playlist functionality in a music streaming service.
+
+**Goal:** Full playlist CRUD with tracks.
+
+**Implementation Steps:**
+1. Create `Playlist` and `PlaylistTrack` entities in metadata-write-service
+2. Create `PlaylistService` and `PlaylistWriteController`
+3. Create Protobuf events for CDC
+4. Create `PlaylistPublicDocument` in metadata-read-service
+
+**Affected Files:** New entities, service, controller, proto files, read-model
+
+---
+
+#### 7. Implement Audio Streaming Endpoint
+**Category:** Feature | **Priority:** High | **Difficulty:** Hard
+
+**Problem:** No way to play audio tracks. Media-service stores transcoded audio but no streaming endpoint.
+
+**Goal:** HTTP range-request streaming for audio playback.
+
+**Implementation Steps:**
+1. Add `GET /audio/stream/{trackId}` with S3 streaming
+2. Support HTTP `Range` headers for seeking
+3. Return proper `Content-Type`, `Accept-Ranges`, `Content-Range` headers
+
+**Affected Files:** `services/media-service/.../AudioController.java`, `services/media-service/.../AudioService.java`
+
+---
+
+#### 8. Implement Favorites/Likes System
+**Category:** Feature | **Priority:** High | **Difficulty:** Medium
+
+**Problem:** Users cannot like tracks, albums, or artists.
+
+**Goal:** Like/unlike entities and view library.
+
+**Implementation Steps:**
+1. Create `UserFavorite` entity in user-service
+2. Create REST endpoints: `POST/DELETE /users/favorites`, `GET /users/favorites`
+3. Publish like/unlike events for read-side updates
+
+**Affected Files:** `services/user-service/.../model/UserFavorite.java`, new controller and service
+
+---
+
+#### 9. Implement Recently Played and Listening History
+**Category:** Feature | **Priority:** Medium | **Difficulty:** Medium
+
+**Problem:** No recently played tracks, no playback resume support.
+
+**Goal:** Track listening history with position.
+
+**Implementation Steps:**
+1. Create `ListeningHistory` entity
+2. Endpoints: `POST /users/history`, `GET /users/history/recently-played`, `PUT /users/history/{id}/position`
+3. Add TTL cleanup (90 days)
+
+**Affected Files:** New controller and service in user-service
+
+---
+
+#### 10. Add User Profile and Settings Service
+**Category:** Feature | **Priority:** Medium | **Difficulty:** Medium
+
+**Problem:** User entity has only basic fields. No profile/avatar/settings REST API.
+
+**Goal:** Comprehensive user profile and settings.
+
+**Implementation Steps:**
+1. Extend `User` with `displayName`, `avatarS3Key`, `bio`, `country`, `locale`
+2. Add `UserSettings` entity
+3. Add REST endpoints for profile and settings CRUD
+
+**Affected Files:** `services/user-service/.../model/User.java`, new `UserSettings.java`, new controller
+
+---
+
+#### 11. Implement Audio Transcoding Progress
+**Category:** UX | **Priority:** Medium | **Difficulty:** Medium
+
+**Problem:** No way to track transcoding progress. Files just appear as completed.
+
+**Goal:** Real-time upload/transcoding status.
+
+**Implementation Steps:**
+1. Add `GET /upload/audio/{uid}/status` endpoint
+2. Publish intermediate status events via Kafka
+3. Add SSE/WebSocket streaming for real-time updates
+
+**Affected Files:** `services/media-service/.../AudioController.java`, `services/media-service/.../AudioService.java`
+
+---
+
+### Phase 3: Scaling and Production Readiness
+
+#### 12. Implement CI/CD Pipeline
+**Category:** DevOps | **Priority:** High | **Difficulty:** Medium
+
+**Problem:** Zero CI/CD. Manual builds. Docker Compose has commented services.
+
+**Goal:** Automated build, test, and deploy pipeline.
+
+**Implementation Steps:**
+1. Create `.github/workflows/ci.yml` (build + unit tests + Docker images)
+2. Create `.github/workflows/deploy.yml` (tag-based deploy)
+3. Create missing Dockerfiles
+4. Fix `docker-compose.yml` — uncomment services, fix port mappings
+
+**Affected Files:** `.github/workflows/*.yml`, Dockerfiles for all services, `local/docker-compose.yml`
+
+---
+
+#### 13. Add Distributed Tracing
+**Category:** Performance | **Priority:** Medium | **Difficulty:** Medium
+
+**Problem:** No request tracing across 10 microservices. Debugging requires manual log correlation.
+
+**Goal:** End-to-end tracing with Zipkin.
+
+**Implementation Steps:**
+1. Add `micrometer-tracing-bridge-brave` + `zipkin-reporter-brave` to all services
+2. Add Zipkin container to Docker Compose
+3. Configure tracing sampling in each service
+
+**Affected Files:** Root `pom.xml`, all service POMs and `application.yml`, `local/infra/docker-compose.yml`
+
+---
+
+#### 14. Implement API Versioning
+**Category:** Architecture | **Priority:** Medium | **Difficulty:** Easy
+
+**Problem:** No API versioning. Breaking changes break all clients.
+
+**Goal:** URL-based versioning (`/api/v1/...`).
+
+**Implementation Steps:**
+1. Add version prefix to all controllers
+2. Update gateway routes
+3. Update Feign client URLs
+
+**Affected Files:** All controllers, gateway routes, Feign configs
+
+---
+
+#### 15. Add Global Exception Handling
+**Category:** Backend | **Priority:** High | **Difficulty:** Easy
+
+**Problem:** Inconsistent error formats across services.
+
+**Goal:** Standardized `ErrorResponse` across all APIs.
+
+**Implementation Steps:**
+1. Create shared `ErrorResponse` DTO in shared-lib
+2. Create shared `@ControllerAdvice` base
+3. Each service extends/imports shared handler
+
+**Affected Files:** `shared-lib/.../exceptions/ErrorResponse.java`, `shared-lib/.../exceptions/GlobalExceptionHandler.java`, all controllers
+
+---
+
+#### 16. Standardize Pagination
+**Category:** Backend | **Priority:** Medium | **Difficulty:** Easy
+
+**Problem:** Inconsistent pagination: `Page`, `SearchCollection`, raw lists.
+
+**Goal:** Unified `PageResponse<T>` across all endpoints.
+
+**Implementation Steps:**
+1. Create shared `PageResponse` in shared-lib
+2. Add `PageRequest` validation helper
+3. Update all list endpoints
+
+**Affected Files:** `shared-lib/.../dto/PageResponse.java`, all list-returning controllers
+
+---
+
+#### 17. Cache Search Results with Caffeine
+**Category:** Performance | **Priority:** Medium | **Difficulty:** Easy
+
+**Problem:** Elasticsearch queried for every request with no caching.
+
+**Goal:** Cache popular searches with 5-minute TTL.
+
+**Implementation Steps:**
+1. Add `spring-boot-starter-cache` to search-service
+2. Configure Caffeine cache: max 1000 entries, 5-min expiry
+3. Annotate search methods with `@Cacheable`
+4. Evict cache on entity reindex
+
+**Affected Files:** `services/search-service/pom.xml`, new `SearchServiceConfig.java`, `PublicSearchService.java`, `AdminSearchService.java`
+
+---
+
+#### 18. Implement CDN Strategy for Media
+**Category:** Performance | **Priority:** High | **Difficulty:** Hard
+
+**Problem:** All media served directly from S3 — slow for global users, expensive.
+
+**Goal:** CDN-based media delivery with caching.
+
+**Implementation Steps:**
+1. Configure CloudFront distributions for audio and image buckets
+2. Add cache headers (`Cache-Control`, `ETag`)
+3. Implement cache invalidation on asset changes
+
+**Affected Files:** `services/media-service/.../AudioService.java`, CDN config
+
+---
+
+### Phase 4: Advanced Spotify-Level Features
+
+#### 19. Integrate Kafka Schema Registry
+**Category:** Architecture | **Priority:** Medium | **Difficulty:** Hard
+
+**Problem:** No schema registry. Schema evolution breaks consumers.
+
+**Goal:** Confluent Schema Registry for Protobuf event governance.
+
+**Implementation Steps:**
+1. Add Schema Registry container
+2. Add `kafka-protobuf-serializer` dependency
+3. Update producer/consumer factories
+4. Replace manual parsing with registry deserialization
+
+**Affected Files:** `local/infra/docker-compose.yml`, `shared-lib/pom.xml`, `KafkaBaseConfig.java`, `ProtobufEventProducer.java`, all listeners
+
+---
+
+#### 20. Add Elasticsearch ILM and Health Management
+**Category:** DevOps | **Priority:** Medium | **Difficulty:** Medium
+
+**Problem:** 4GB ES heap for dev, no index lifecycle, fragile init script.
+
+**Goal:** Optimized ES with proper index lifecycle.
+
+**Implementation Steps:**
+1. Reduce ES heap to 1GB for dev
+2. Create ILM policy (30GB/30d rollover, 90d delete)
+3. Convert `init-indices.sh` to Spring Boot `ApplicationRunner`
+4. Add custom health indicator for ES
+5. Add reindex trigger endpoint
+
+**Affected Files:** `local/infra/docker-compose.yml`, `services/search-service/.../config/IndexInitializer.java`, `services/search-service/.../controller/SearchController.java`, `local/elk/init-indices.sh`
+
+---
+
+## Roadmap
+
+| Phase | Tasks | Focus |
+|-------|-------|-------|
+| **Phase 1: Critical Fixes** | 1–5 | Bug fixes and security — deployable baseline |
+| **Phase 2: Product Improvements** | 6–11 | Core music features — playlists, streaming, likes, profiles |
+| **Phase 3: Scaling & Production** | 12–18 | CI/CD, tracing, caching, CDN — production readiness |
+| **Phase 4: Advanced Features** | 19–20 | Schema registry, ES management — enterprise features |
+```

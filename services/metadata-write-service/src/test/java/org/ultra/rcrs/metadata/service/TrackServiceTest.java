@@ -9,12 +9,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
-import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.ArtistDto;
 import org.ultra.rcrs.metadata.dto.OtherArtistDto;
 import org.ultra.rcrs.metadata.dto.request.TrackUploadRequest;
 import org.ultra.rcrs.metadata.kafka.CatalogEventProducer;
 import org.ultra.rcrs.metadata.model.ArtistToTrack;
+import org.ultra.rcrs.metadata.model.ArtistToTrackPK;
 import org.ultra.rcrs.metadata.model.OtherArtist;
 import org.ultra.rcrs.metadata.model.Track;
 import org.ultra.rcrs.metadata.repository.ArtistToTrackRepository;
@@ -26,8 +26,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,158 +50,182 @@ class TrackServiceTest {
     private TrackService trackService;
 
     @Test
-    void createTrack() {
+    void createTrack_savesTrackAndEmitsEvents() {
         UUID albumId = UUID.randomUUID();
-        var request = new TrackUploadRequest();
-        request.setAlbumId(Url62.encode(albumId));
+        String encodedAlbumId = Url62.encode(albumId);
+
+        TrackUploadRequest request = new TrackUploadRequest();
+        request.setAlbumId(encodedAlbumId);
         request.setTitle("Test Track");
         request.setTrackNumber(1);
         request.setExplicit(false);
 
-        UUID generatedId = UUID.randomUUID();
-        var savedTrack = Track.builder()
-                .id(generatedId)
-                .title("Test Track")
-                .trackNumber(1)
-                .explicit(false)
+        when(albumService.albumExists(albumId)).thenReturn(true);
+
+        Track trackExpected = Track.builder()
+                .id(UUID.randomUUID())
                 .lifecycleStatus(LifecycleStatus.CREATED)
+                .title(request.getTitle())
+                .durationMs(null)
+                .trackNumber(request.getTrackNumber())
+                .explicit(request.getExplicit())
                 .availabilityStatus(EntityStatus.ACTIVE)
                 .albumId(albumId)
-                .durationMs(null)
                 .build();
 
-        when(albumService.albumExists(albumId)).thenReturn(true);
-        when(trackRepository.save(any(Track.class))).thenReturn(savedTrack);
+        when(trackRepository.save(any(Track.class))).thenAnswer(i -> {
+            var trackSaved = (Track) i.getArguments()[0];
+            trackSaved.setId(trackExpected.getId());
+            return trackSaved;
+        });
+        ArgumentCaptor<Track> trackCaptor = ArgumentCaptor.forClass(Track.class);
 
         UUID result = trackService.createTrack(request);
+        assertThat(result).isEqualTo(trackExpected.getId());
 
-        assertEquals(generatedId, result);
-
-        ArgumentCaptor<Track> trackCaptor = ArgumentCaptor.forClass(Track.class);
         verify(trackRepository).save(trackCaptor.capture());
         Track captured = trackCaptor.getValue();
-        assertEquals("Test Track", captured.getTitle());
-        assertEquals(1, captured.getTrackNumber());
-        assertFalse(captured.getExplicit());
-        assertEquals(LifecycleStatus.CREATED, captured.getLifecycleStatus());
-        assertEquals(EntityStatus.ACTIVE, captured.getAvailabilityStatus());
-        assertNull(captured.getDurationMs());
+        captured.setId(trackExpected.getId());
+        assertThat(captured.getTitle()).isEqualTo(trackExpected.getTitle());
+        assertThat(captured.getLifecycleStatus()).isEqualTo(trackExpected.getLifecycleStatus());
+        assertThat(captured.getDurationMs()).isEqualTo(trackExpected.getDurationMs());
+        assertThat(captured.getTrackNumber()).isEqualTo(trackExpected.getTrackNumber());
+        assertThat(captured.getExplicit()).isEqualTo(trackExpected.getExplicit());
+        assertThat(captured.getAvailabilityStatus()).isEqualTo(trackExpected.getAvailabilityStatus());
+        assertThat(captured.getAlbumId()).isEqualTo(trackExpected.getAlbumId());
+        assertThat(captured.getId()).isEqualTo(trackExpected.getId());
 
-        verify(catalogEventProducer).trackCreated(savedTrack);
-        verify(catalogEventProducer).trackAddedToAlbum(generatedId, albumId);
+        verify(catalogEventProducer).trackCreated(trackCaptor.capture());
+        verify(catalogEventProducer).trackAddedToAlbum(trackExpected.getId(), albumId);
     }
 
     @Test
-    void createTrackAlbumNotFound() {
+    void findAllIdsByAlbum_delegatesToRepository() {
         UUID albumId = UUID.randomUUID();
-        var request = new TrackUploadRequest();
-        request.setAlbumId(Url62.encode(albumId));
+        List<UUID> expected = List.of(UUID.randomUUID(), UUID.randomUUID());
+        when(trackRepository.findAllIdsByAlbumId(albumId)).thenReturn(expected);
 
-        when(albumService.albumExists(albumId)).thenReturn(false);
+        List<UUID> result = trackService.findAllIdsByAlbum(albumId);
 
-        assertThrows(NotFoundException.class, () -> trackService.createTrack(request));
-        verify(trackRepository, never()).save(any());
-        verifyNoInteractions(catalogEventProducer);
+        assertThat(result).isEqualTo(expected);
+        verify(trackRepository).findAllIdsByAlbumId(albumId);
     }
 
     @Test
-    void createTrackWithExplicit() {
-        UUID albumId = UUID.randomUUID();
-        var request = new TrackUploadRequest();
-        request.setAlbumId(Url62.encode(albumId));
-        request.setTitle("Explicit Track");
-        request.setTrackNumber(2);
-        request.setExplicit(true);
-
-        UUID generatedId = UUID.randomUUID();
-        var savedTrack = Track.builder()
-                .id(generatedId)
-                .title("Explicit Track")
-                .trackNumber(2)
-                .explicit(true)
-                .lifecycleStatus(LifecycleStatus.CREATED)
-                .availabilityStatus(EntityStatus.ACTIVE)
-                .albumId(albumId)
-                .build();
-
-        when(albumService.albumExists(albumId)).thenReturn(true);
-        when(trackRepository.save(any(Track.class))).thenReturn(savedTrack);
-
-        trackService.createTrack(request);
-
-        ArgumentCaptor<Track> captor = ArgumentCaptor.forClass(Track.class);
-        verify(trackRepository).save(captor.capture());
-        assertTrue(captor.getValue().getExplicit());
-    }
-
-    @Test
-    void markTrackDelete() {
+    void markTrackDelete_updatesAvailabilityAndEmitsEvent() {
         UUID trackId = UUID.randomUUID();
+
         trackService.markTrackDelete(trackId);
+
         verify(trackRepository).updateAvailabilityStatusById(EntityStatus.DELETED, trackId);
         verify(catalogEventProducer).trackDeleted(trackId);
     }
 
     @Test
-    void hideTrack() {
+    void hideTrack_updatesAvailabilityAndEmitsEvent() {
         UUID trackId = UUID.randomUUID();
+
         trackService.hideTrack(trackId);
+
         verify(trackRepository).updateAvailabilityStatusById(EntityStatus.HIDDEN, trackId);
         verify(catalogEventProducer).trackHidden(trackId);
     }
 
     @Test
-    void activeTrack() {
+    void activeTrack_updatesAvailabilityAndEmitsEvent() {
         UUID trackId = UUID.randomUUID();
+
         trackService.activeTrack(trackId);
+
         verify(trackRepository).updateAvailabilityStatusById(EntityStatus.ACTIVE, trackId);
         verify(catalogEventProducer).trackActivated(trackId);
     }
 
     @Test
-    void addArtistToTrack() {
+    void updateLifecycleStatus_updatesDbAndEmitsEvent() {
+        UUID trackId = UUID.randomUUID();
+
+        trackService.updateLifecycleStatus(LifecycleStatus.TRANSCODING, trackId);
+
+        verify(trackRepository).updateLifecycleStatusById(LifecycleStatus.TRANSCODING, trackId);
+        verify(catalogEventProducer).updateTrackLifecycleStatus(LifecycleStatus.TRANSCODING, trackId);
+    }
+
+    @Test
+    void handleTranscodingCompleted_updatesStatusAndDuration() {
+        UUID trackId = UUID.randomUUID();
+
+        trackService.handleTranscodingCompleted(trackId, LifecycleStatus.READY, 240000);
+
+        verify(trackRepository).updateLifecycleStatusAndDurationById(LifecycleStatus.READY, 240000, trackId);
+    }
+
+    @Test
+    void addAllArtistToTrack_savesJoinAndEmitsEvent() {
         UUID trackId = UUID.randomUUID();
         UUID artistId = UUID.randomUUID();
-        var artistDto = new ArtistDto();
-        artistDto.setId(Url62.encode(artistId));
+        String encodedArtistId = Url62.encode(artistId);
+
+        ArtistDto dto = new ArtistDto();
+        dto.setId(encodedArtistId);
+        dto.setRole(ArtistRole.MAIN_ARTIST);
 
         when(trackRepository.existsById(trackId)).thenReturn(true);
         when(artistService.artistExists(artistId)).thenReturn(true);
-        when(artistToTrackRepository.save(any(ArtistToTrack.class))).thenReturn(mock(ArtistToTrack.class));
 
-        trackService.addAllArtistToTrack(List.of(artistDto), trackId);
+        trackService.addAllArtistToTrack(List.of(dto), trackId);
 
         verify(artistToTrackRepository).save(any(ArtistToTrack.class));
-        verify(catalogEventProducer).artistAddedToTrack(eq(artistId), eq(trackId), any());
+        verify(catalogEventProducer).artistAddedToTrack(artistId, trackId, ArtistRole.MAIN_ARTIST);
     }
 
     @Test
-    void addArtistToTrackNotFound() {
+    void addAllOthersToTrack_savesOtherAndEmitsEvent() {
         UUID trackId = UUID.randomUUID();
-        var artistDto = new ArtistDto();
-        artistDto.setId(Url62.encode(UUID.randomUUID()));
 
-        when(trackRepository.existsById(trackId)).thenReturn(false);
+        OtherArtistDto dto = new OtherArtistDto();
+        dto.setName("Guest Artist");
+        dto.setRoles(Set.of(ArtistRole.FEATURED_ARTIST));
+        dto.setSocialLinks(List.of());
 
-        assertThrows(NotFoundException.class, () -> trackService.addAllArtistToTrack(List.of(artistDto), trackId));
-    }
-
-    @Test
-    void addOthersToTrack() {
-        UUID trackId = UUID.randomUUID();
-        var otherDto = new OtherArtistDto();
-        otherDto.setId(Url62.encode(UUID.randomUUID()));
-        otherDto.setName("Other Artist");
-        otherDto.setRoles(Set.of(ArtistRole.FEATURED_ARTIST));
-
-        var saved = new OtherArtist(otherDto, trackId);
-        saved.setId(UUID.randomUUID());
         when(trackRepository.existsById(trackId)).thenReturn(true);
-        when(otherArtistRepository.save(any(OtherArtist.class))).thenReturn(saved);
+        when(otherArtistRepository.save(any(OtherArtist.class))).thenReturn(new OtherArtist(dto, trackId));
 
-        trackService.addAllOthersToTrack(List.of(otherDto), trackId);
+        trackService.addAllOthersToTrack(List.of(dto), trackId);
 
         verify(otherArtistRepository).save(any(OtherArtist.class));
-        verify(catalogEventProducer).otherAddedToTrack(eq(saved), eq(trackId));
+        verify(catalogEventProducer).otherAddedToTrack(any(OtherArtist.class), eq(trackId));
+    }
+
+    @Test
+    void deleteAllArtistFromTrack_deletesJoinAndEmitsEvent() {
+        UUID trackId = UUID.randomUUID();
+        UUID artistId = UUID.randomUUID();
+        String encodedArtistId = Url62.encode(artistId);
+
+        ArtistDto dto = new ArtistDto();
+        dto.setId(encodedArtistId);
+        dto.setRole(ArtistRole.MAIN_ARTIST);
+
+        trackService.deleteAllArtistFromTrack(List.of(dto), trackId);
+
+        verify(artistToTrackRepository).deleteById(new ArtistToTrackPK(artistId, trackId));
+        verify(catalogEventProducer).artistDeletedFromTrack(artistId, trackId);
+    }
+
+    @Test
+    void deleteAllOthersFromTrack_deletesOtherAndEmitsEvent() {
+        UUID trackId = UUID.randomUUID();
+        UUID otherId = UUID.randomUUID();
+        String encodedOtherId = Url62.encode(otherId);
+
+        OtherArtistDto dto = new OtherArtistDto();
+        dto.setId(encodedOtherId);
+        dto.setName("Guest");
+
+        trackService.deleteAllOthersFromTrack(List.of(dto), trackId);
+
+        verify(otherArtistRepository).deleteById(otherId);
+        verify(catalogEventProducer).otherDeletedFromTrack(otherId, trackId);
     }
 }

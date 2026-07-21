@@ -86,8 +86,7 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
     user: postgres
     password: postgres
-    default-schema: rcrs_upload
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=rcrs_upload
+    url: jdbc:postgresql://localhost:5432/postgres
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres?currentSchema=rcrs_upload
     username: postgres

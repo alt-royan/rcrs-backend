@@ -43,6 +43,7 @@
         <module>services/media-service</module>
         <module>services/search-service</module>
         <module>services/workflow-service</module>
+        <module>services/user-service</module>
         <module>resource-server</module>
     </modules>
 

@@ -22,10 +22,9 @@ public interface AlbumRepository extends JpaRepository<Album, UUID> {
     @Query("UPDATE Album a SET a.availabilityStatus = :status WHERE a.id = :id")
     void updateAvailabilityStatusById(EntityStatus status, UUID id);
 
-    @Modifying
-    @Query("UPDATE Album a SET a.availabilityStatus = :status WHERE a.id IN (SELECT ata.albumId FROM ArtistToAlbum ata WHERE ata.artistId = :artistId)")
-    void updateAvailabilityStatusByArtistId(EntityStatus status, UUID artistId);
-
     @Query("SELECT a.id FROM Album a WHERE a.availabilityStatus = :status")
     List<UUID> findAllByAvailabilityStatus(EntityStatus status);
+
+    @Query("SELECT a.id FROM Album a JOIN ArtistToAlbum ata ON a.id = ata.albumId WHERE ata.artistId = :artistId")
+    List<UUID> findAllIdsByArtist(UUID artistId);
 }
