@@ -16,9 +16,9 @@ public class TrackChangeAvailabilityStatusWorkflowImpl extends BaseWorkflow impl
     @Override
     public void changeAvailabilityStatus(EntityStatus status, String id) {
          switch (status) {
-            case ACTIVE -> activityFactory.artistActivity().activeArtist(id);
-            case HIDDEN -> activityFactory.artistActivity().hideArtist(id);
-            case DELETED -> activityFactory.artistActivity().markArtistDeleted(id);
+            case ACTIVE -> activityFactory.trackActivity().activeTrack(id);
+            case HIDDEN -> activityFactory.trackActivity().hideTrack(id);
+            case DELETED -> activityFactory.trackActivity().markTrackDeleted(id);
         };
     }
 }

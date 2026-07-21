@@ -157,22 +157,22 @@ public class PublicSearchService {
 
     private ArtistSearchResult toArtistResult(ArtistPublicDoc doc) {
         var albums = doc.getAlbums() != null
-                ? doc.getAlbums().stream().map(a -> new ArtistSearchResult.NestedAlbumDto(a.getId(), a.getTitle())).toList()
-                : Collections.<ArtistSearchResult.NestedAlbumDto>emptyList();
+                ? doc.getAlbums().stream().map(a -> new NestedAlbumDto(a.getId(), a.getTitle())).toList()
+                : Collections.<NestedAlbumDto>emptyList();
         var tracks = doc.getTracks() != null
-                ? doc.getTracks().stream().map(t -> new ArtistSearchResult.NestedTrackDto(t.getId(), t.getTitle())).toList()
-                : Collections.<ArtistSearchResult.NestedTrackDto>emptyList();
+                ? doc.getTracks().stream().map(t -> new NestedTrackDto(t.getId(), t.getTitle())).toList()
+                : Collections.<NestedTrackDto>emptyList();
         return new ArtistSearchResult(doc.getId(), doc.getName(), doc.getTags(),
                 doc.getAvailability() != null ? doc.getAvailability().name() : null, albums, tracks);
     }
 
     private AlbumSearchResult toAlbumResult(AlbumPublicDoc doc) {
         var artists = doc.getArtists() != null
-                ? doc.getArtists().stream().map(a -> new AlbumSearchResult.NestedArtistDto(a.getId(), a.getName())).toList()
-                : Collections.<AlbumSearchResult.NestedArtistDto>emptyList();
+                ? doc.getArtists().stream().map(a -> new NestedArtistDto(a.getId(), a.getName())).toList()
+                : Collections.<NestedArtistDto>emptyList();
         var tracks = doc.getTracks() != null
-                ? doc.getTracks().stream().map(t -> new AlbumSearchResult.NestedTrackDto(t.getId(), t.getTitle())).toList()
-                : Collections.<AlbumSearchResult.NestedTrackDto>emptyList();
+                ? doc.getTracks().stream().map(t -> new NestedTrackDto(t.getId(), t.getTitle())).toList()
+                : Collections.<NestedTrackDto>emptyList();
         return new AlbumSearchResult(doc.getId(), doc.getTitle(), doc.getYear(),
                 doc.getAvailability() != null ? doc.getAvailability().name() : null,
                 null, artists, tracks);
@@ -180,11 +180,11 @@ public class PublicSearchService {
 
     private TrackSearchResult toTrackResult(TrackPublicDoc doc) {
         var artists = doc.getArtists() != null
-                ? doc.getArtists().stream().map(a -> new TrackSearchResult.NestedArtistDto(a.getId(), a.getName())).toList()
-                : Collections.<TrackSearchResult.NestedArtistDto>emptyList();
-        TrackSearchResult.NestedAlbumDto albumDto = null;
+                ? doc.getArtists().stream().map(a -> new NestedArtistDto(a.getId(), a.getName())).toList()
+                : Collections.<NestedArtistDto>emptyList();
+        NestedAlbumDto albumDto = null;
         if (doc.getAlbum() != null) {
-            albumDto = new TrackSearchResult.NestedAlbumDto(doc.getAlbum().getId(), doc.getAlbum().getTitle());
+            albumDto = new NestedAlbumDto(doc.getAlbum().getId(), doc.getAlbum().getTitle());
         }
         return new TrackSearchResult(doc.getId(), doc.getTitle(),
                 doc.getAvailability() != null ? doc.getAvailability().name() : null,

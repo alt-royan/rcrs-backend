@@ -79,7 +79,7 @@ feign:
   metadata-service:
     url: ${FEIGN_METADATA-SERVICE_URL:http://localhost:8080}
   media-service:
-    url: ${FEIGN_MEDIA-SERVICE_URL:http://localhost:8081}
+    url: ${FEIGN_MEDIA-SERVICE_URL:http://localhost:8082}
   search-service:
     url: ${FEIGN_SEARCH-SERVICE_URL:http://localhost:8083}
 

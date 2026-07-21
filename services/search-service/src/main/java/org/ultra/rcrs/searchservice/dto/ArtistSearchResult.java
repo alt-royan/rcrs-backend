@@ -18,20 +18,4 @@ public class ArtistSearchResult {
     private String availability;
     private List<NestedAlbumDto> albums;
     private List<NestedTrackDto> tracks;
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class NestedAlbumDto {
-        private String id;
-        private String title;
-    }
-
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class NestedTrackDto {
-        private String id;
-        private String title;
-    }
 }

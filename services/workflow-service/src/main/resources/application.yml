@@ -79,7 +79,7 @@ feign:
   metadata-service:
     url: http://localhost:8080
   media-service:
-    url: http://localhost:8081
+    url: http://localhost:8082
   search-service:
     url: http://localhost:8083
 

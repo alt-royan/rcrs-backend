@@ -15,9 +15,9 @@ public class AlbumChangeAvailabilityStatusWorkflowImpl extends BaseWorkflow impl
     @Override
     public void changeAvailabilityStatus(EntityStatus status, String id) {
         switch (status) {
-            case ACTIVE -> activityFactory.artistActivity().activeArtist(id);
-            case HIDDEN -> activityFactory.artistActivity().hideArtist(id);
-            case DELETED -> activityFactory.artistActivity().markArtistDeleted(id);
+            case ACTIVE -> activityFactory.albumActivity().activeAlbum(id);
+            case HIDDEN -> activityFactory.albumActivity().hideAlbum(id);
+            case DELETED -> activityFactory.albumActivity().markAlbumDeleted(id);
         }
         ;
     }
