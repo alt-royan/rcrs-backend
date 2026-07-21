@@ -90,11 +90,6 @@ public class KafkaBaseConfig {
         return new KafkaAdmin(configs);
     }
 
-    @Bean
-    public NewTopic identityEventsTopic() {
-        return TopicBuilder.name(Topics.IDENTITY_EVENTS_TOPIC).partitions(1).replicas(1).build();
-    }
-
     private DefaultErrorHandler dlqErrorHandler(KafkaTemplate<?, ?> template) {
         var recoverer = new DeadLetterPublishingRecoverer(template,
                 (record, ex) -> new TopicPartition(Topics.DLQ_TOPIC, record.partition()));
