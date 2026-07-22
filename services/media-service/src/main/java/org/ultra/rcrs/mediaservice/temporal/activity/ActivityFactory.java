@@ -29,36 +29,28 @@ public class ActivityFactory {
         return instance;
     }
 
-    public ValidateImageActivity validateImageActivity() {
-        return Workflow.newActivityStub(ValidateImageActivity.class, buildOptions("validateImage"));
+    public ValidateActivity validateActivity() {
+        return Workflow.newActivityStub(ValidateActivity.class, buildOptions("validate"));
     }
 
-    public SaveOriginalImageActivity saveOriginalImageActivity() {
-        return Workflow.newActivityStub(SaveOriginalImageActivity.class, buildOptions("saveOriginalImage"));
-    }
-
-    public SaveThumbnailActivity saveThumbnailActivity() {
-        return Workflow.newActivityStub(SaveThumbnailActivity.class, buildOptions("saveThumbnail"));
-    }
-
-    public ValidateAudioActivity validateAudioActivity() {
-        return Workflow.newActivityStub(ValidateAudioActivity.class, buildOptions("validateAudio"));
+    public ThumbnailActivity thumbnailActivity() {
+        return Workflow.newActivityStub(ThumbnailActivity.class, buildOptions("thumbnail"));
     }
 
     public ProbeAudioMetadataActivity probeAudioMetadataActivity() {
         return Workflow.newActivityStub(ProbeAudioMetadataActivity.class, buildOptions("probeAudioMetadata"));
     }
 
-    public SaveOriginalAudioToS3Activity saveOriginalAudioToS3Activity() {
-        return Workflow.newActivityStub(SaveOriginalAudioToS3Activity.class, buildOptions("saveOriginalAudioToS3"));
+    public S3Activity s3Activity() {
+        return Workflow.newActivityStub(S3Activity.class, buildOptions("s3Activity"));
     }
 
-    public SaveAudioRecordActivity saveAudioRecordActivity() {
-        return Workflow.newActivityStub(SaveAudioRecordActivity.class, buildOptions("saveAudioRecord"));
+    public DbActivity dbActivity() {
+        return Workflow.newActivityStub(DbActivity.class, buildOptions("dbActivity"));
     }
 
-    public NormalizeAudioActivity normalizeAudioActivity() {
-        return Workflow.newActivityStub(NormalizeAudioActivity.class, buildOptions("normalizeAudio"));
+    public TranscodeAudioActivity transcodeAudioActivity() {
+        return Workflow.newActivityStub(TranscodeAudioActivity.class, buildOptions("transcodeAudioActivity"));
     }
 
     public TranscodingStatusActivity transcodingStatusActivity() {

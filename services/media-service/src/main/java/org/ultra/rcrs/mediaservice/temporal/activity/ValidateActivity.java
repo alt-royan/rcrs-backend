@@ -5,8 +5,8 @@ import io.temporal.activity.ActivityMethod;
 import org.ultra.rcrs.mediaservice.temporal.activity.model.ValidatedImage;
 
 @ActivityInterface
-public interface ValidateImageActivity {
+public interface ValidateActivity {
 
     @ActivityMethod
-    ValidatedImage validate(String dataUrl);
+    ValidatedImage validateImage(String dataUrl);
 }

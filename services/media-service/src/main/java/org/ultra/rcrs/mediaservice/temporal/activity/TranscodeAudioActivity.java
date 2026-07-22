@@ -3,9 +3,11 @@ package org.ultra.rcrs.mediaservice.temporal.activity;
 import io.temporal.activity.ActivityInterface;
 import io.temporal.activity.ActivityMethod;
 
+import java.io.File;
+
 @ActivityInterface
-public interface SaveOriginalAudioToS3Activity {
+public interface TranscodeAudioActivity {
 
     @ActivityMethod
-    String save(String trackId, String guid, String uid, String contentType);
+    File transcode(File inputFile, String bitrate);
 }

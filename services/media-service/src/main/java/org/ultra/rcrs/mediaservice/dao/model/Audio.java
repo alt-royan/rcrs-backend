@@ -25,6 +25,8 @@ public class Audio {
     @Column(name = "track_id")
     private String trackId;
 
+    private String key;
+
     private String codec;
 
     private String container;
@@ -35,7 +37,7 @@ public class Audio {
     private String bitrate;
 
     @Column(name = "sample_rate")
-    private Integer sampleRate;
+    private String sampleRate;
 
     @Column(name = "byte_size")
     private Long byteSize;

@@ -4,9 +4,9 @@ import io.temporal.client.WorkflowClient;
 import io.temporal.worker.Worker;
 import io.temporal.worker.WorkerFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.ultra.rcrs.mediaservice.config.AudioConfigurationProperties;
 import org.ultra.rcrs.mediaservice.temporal.activity.impl.*;
 import org.ultra.rcrs.mediaservice.temporal.workflow.AudioTranscodingWorkflow;
 import org.ultra.rcrs.mediaservice.temporal.workflow.ImageUploadWorkflow;
@@ -20,18 +20,15 @@ import static org.ultra.rcrs.mediaservice.temporal.config.TemporalConfig.MEDIA_T
 public class TemporalWorker implements CommandLineRunner {
 
     private final WorkflowClient workflowClient;
-    private final ValidateImageActivityImpl validateImageActivityImpl;
-    private final SaveOriginalImageActivityImpl saveOriginalImageActivityImpl;
-    private final SaveThumbnailActivityImpl saveThumbnailActivityImpl;
-    private final ValidateAudioActivityImpl validateAudioActivityImpl;
-    private final ProbeAudioMetadataActivityImpl probeAudioMetadataActivityImpl;
-    private final SaveOriginalAudioToS3ActivityImpl saveOriginalAudioToS3ActivityImpl;
-    private final SaveAudioRecordActivityImpl saveAudioRecordActivityImpl;
-    private final NormalizeAudioActivityImpl normalizeAudioActivityImpl;
-    private final TranscodingStatusActivityImpl transcodingStatusActivityImpl;
+    private final DbActivityImpl dbActivity;
+    private final ProbeAudioMetadataActivityImpl probeAudioMetadataActivity;
+    private final S3ActivityImpl s3Activity;
+    private final ThumbnailActivityImpl thumbnailActivity;
+    private final TranscodeAudioActivityImpl transcodeAudioActivity;
+    private final TranscodingStatusActivityImpl transcodingStatusActivity;
+    private final ValidateActivityImpl validateActivity;
 
-    @Value("${cdn.audios.bitrates}")
-    private final String[] bitrates;
+    private final AudioConfigurationProperties properties;
 
     @Override
     public void run(String... args) {
@@ -44,18 +41,16 @@ public class TemporalWorker implements CommandLineRunner {
         );
         worker.registerWorkflowImplementationFactory(
                 AudioTranscodingWorkflow.class,
-                () -> new AudioTranscodingWorkflowImpl(bitrates)
+                () -> new AudioTranscodingWorkflowImpl(properties.getBitrates())
         );
 
-        worker.registerActivitiesImplementations(validateImageActivityImpl);
-        worker.registerActivitiesImplementations(saveOriginalImageActivityImpl);
-        worker.registerActivitiesImplementations(saveThumbnailActivityImpl);
-        worker.registerActivitiesImplementations(validateAudioActivityImpl);
-        worker.registerActivitiesImplementations(probeAudioMetadataActivityImpl);
-        worker.registerActivitiesImplementations(saveOriginalAudioToS3ActivityImpl);
-        worker.registerActivitiesImplementations(saveAudioRecordActivityImpl);
-        worker.registerActivitiesImplementations(normalizeAudioActivityImpl);
-        worker.registerActivitiesImplementations(transcodingStatusActivityImpl);
+        worker.registerActivitiesImplementations(dbActivity);
+        worker.registerActivitiesImplementations(probeAudioMetadataActivity);
+        worker.registerActivitiesImplementations(s3Activity);
+        worker.registerActivitiesImplementations(thumbnailActivity);
+        worker.registerActivitiesImplementations(transcodeAudioActivity);
+        worker.registerActivitiesImplementations(transcodingStatusActivity);
+        worker.registerActivitiesImplementations(validateActivity);
 
         factory.start();
     }

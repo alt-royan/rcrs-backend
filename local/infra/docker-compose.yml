@@ -307,6 +307,9 @@ services:
       DATA_DIR: /var/lib/localstack
       DOCKER_HOST: unix:///var/run/docker.sock
       LOCALSTACK_AUTH_TOKEN: ls-hUtAmODE-HAME-rEMA-4794-KOSA1443feca
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
+      AWS_REGION: eu-west-1
     volumes:
       - s3_data:/var/lib/localstack
       - /var/run/docker.sock:/var/run/docker.sock

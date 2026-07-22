@@ -8,7 +8,6 @@ public record AudioMetadata(
         String bitrate,
         String sampleRate,
         int durationMs,
-        long byteSize,
-        String contentType
+        long byteSize
 ) implements Serializable {
 }

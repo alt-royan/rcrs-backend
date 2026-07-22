@@ -4,8 +4,8 @@ import io.temporal.activity.ActivityInterface;
 import io.temporal.activity.ActivityMethod;
 
 @ActivityInterface
-public interface SaveThumbnailActivity {
+public interface ThumbnailActivity {
 
     @ActivityMethod
-    void saveThumbnail(String key, byte[] imageData, String format, String contentType, int size);
+    byte[] createThumbnail(byte[] imageData, String format, int size);
 }
