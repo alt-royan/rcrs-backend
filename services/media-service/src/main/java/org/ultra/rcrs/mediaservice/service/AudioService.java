@@ -1,5 +1,6 @@
 package org.ultra.rcrs.mediaservice.service;
 
+import jakarta.activation.MimeType;
 import jakarta.activation.MimetypesFileTypeMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -7,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MimeTypeUtils;
 import org.ultra.rcrs.enums.FileStatus;
 import org.ultra.rcrs.mediaservice.dao.model.AudioUpload;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioUploadRepository;
@@ -47,7 +49,7 @@ public class AudioService {
     @Transactional
     public S3PresignUrlResponse getPreSignUrl(PreloadFileRequest request) {
         String key = Hash.sha1Base64(request.getName() + "_" + LocalDateTime.now());
-        String contentType = MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(request.getName());
+        String contentType = (new MimetypesFileTypeMap()).getContentType(request.getName());
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(s3UploadBucket)

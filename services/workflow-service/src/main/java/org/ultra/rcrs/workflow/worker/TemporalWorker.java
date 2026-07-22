@@ -6,11 +6,7 @@ import io.temporal.worker.WorkerFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-import org.ultra.rcrs.workflow.activity.impl.AlbumActivityImpl;
-import org.ultra.rcrs.workflow.activity.impl.ArtistActivityImpl;
-import org.ultra.rcrs.workflow.activity.impl.PurgeActivityImpl;
-import org.ultra.rcrs.workflow.activity.impl.TrackActivityImpl;
-import org.ultra.rcrs.workflow.activity.impl.TranscodingActivityImpl;
+import org.ultra.rcrs.workflow.activity.impl.*;
 import org.ultra.rcrs.workflow.converter.UploadRequestConverter;
 import org.ultra.rcrs.workflow.kafka.WorkflowEventProducer;
 import org.ultra.rcrs.workflow.workflow.*;
@@ -24,10 +20,10 @@ public class TemporalWorker implements CommandLineRunner {
 
     private final WorkflowClient workflowClient;
     private final UploadRequestConverter converter;
-    private final WorkflowEventProducer eventProducer;
 
     private final ArtistActivityImpl artistActivityImpl;
     private final AlbumActivityImpl albumActivityImpl;
+    private final AudioActivityImpl audioActivity;
     private final TrackActivityImpl trackActivityImpl;
     private final TranscodingActivityImpl transcodingActivityImpl;
     private final PurgeActivityImpl purgeActivityImpl;
@@ -67,6 +63,7 @@ public class TemporalWorker implements CommandLineRunner {
         );
 
         worker.registerActivitiesImplementations(artistActivityImpl);
+        worker.registerActivitiesImplementations(audioActivity);
         worker.registerActivitiesImplementations(albumActivityImpl);
         worker.registerActivitiesImplementations(trackActivityImpl);
         worker.registerActivitiesImplementations(transcodingActivityImpl);

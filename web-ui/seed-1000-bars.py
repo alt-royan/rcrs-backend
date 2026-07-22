@@ -4,8 +4,10 @@ import os
 import urllib.request
 import urllib.error
 from pathlib import Path
+from urllib.parse import urlparse, urlunparse
 
-API = "http://localhost:8082"
+UPLOAD_API = "http://localhost:8082"
+CATALOG_API = "http://localhost:8090"
 DIR = Path(__file__).resolve().parent
 AUDIO_DIR = DIR / "1000 bars"
 
@@ -13,36 +15,61 @@ AUDIO_DIR = DIR / "1000 bars"
 def log(msg):
     print(f"[SEED] {msg}")
 
+def normalize_presign_url(url):
+    return url.replace("http://s3:4566", "http://localhost:4566")
 
-def post_json(path, data):
-    url = f"{API}{path}"
+
+def post_json(base_url, path, data):
+    url = f"{base_url}{path}"
     body = json.dumps(data).encode()
+
     log(f"POST {url} body={data}")
+
     req = urllib.request.Request(
         url,
         data=body,
-        headers={"Content-Type": "application/json"},
+        headers={
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+        },
+        method="POST",
     )
+
     try:
         with urllib.request.urlopen(req) as resp:
             result = json.loads(resp.read())
             log(f"  -> {resp.status} {result}")
             return result
+
     except urllib.error.HTTPError as e:
         log(f"  -> ERROR {e.code} {e.read().decode()}")
         raise
 
-
 def put_file(url, headers, file_path):
-    data = file_path.read_bytes()
-    log(f"PUT {url} size={len(data)}")
-    req = urllib.request.Request(url, data=data, method="PUT")
+    size = file_path.stat().st_size
+
+    log(f"PUT {url} size={size}")
+
+    req = urllib.request.Request(
+        url,
+        method="PUT",
+    )
+
+    # ВАЖНО:
+    # presigned URL подписывает эти headers,
+    # поэтому передаем их как есть
     for h in headers:
-        req.add_header(h["key"], h["value"])
+        for key, value in h.items():
+            req.add_header(key, value)
+
+    req.add_header("Content-Length", str(size))
+
     try:
-        with urllib.request.urlopen(req) as resp:
-            log(f"  -> {resp.status}")
-            return resp.status
+        with open(file_path, "rb") as f:
+            with urllib.request.urlopen(req, data=f) as resp:
+                log(f"  -> {resp.status}")
+                return resp.status
+
     except urllib.error.HTTPError as e:
         log(f"  -> ERROR {e.code} {e.read().decode()}")
         raise
@@ -57,7 +84,7 @@ def load_json(name):
 def get_presign(file_path):
     size = os.path.getsize(file_path)
     log(f"Pre-sign: {file_path.name} ({size} bytes)")
-    return post_json("/upload/audio/pre-sign", {
+    return post_json(UPLOAD_API, "/upload/audio/pre-sign", {
         "name": file_path.name,
         "length": size,
     })
@@ -85,7 +112,13 @@ def upload_files(presign_map):
     for audio_file, presign in presign_map.items():
         title = audio_file.stem
         try:
-            put_file(presign["url"], presign["headers"], audio_file)
+            upload_url = normalize_presign_url(presign["url"])
+
+            put_file(
+                upload_url,
+                presign["headers"],
+                audio_file
+            )
             ok += 1
         except Exception as e:
             log(f"  FAILED upload {title}: {e}")
@@ -111,7 +144,6 @@ def wait_for_complete(uids, poll_interval=3):
 
 
 log("Starting seed script")
-log(f"API={API}")
 log(f"AUDIO_DIR={AUDIO_DIR}")
 
 log("\n=== Step 1: Pre-sign audio files ===")
@@ -123,6 +155,7 @@ presign_map = {}
 for audio_file in audio_files:
     title = audio_file.stem
     presign = get_presign(audio_file)
+    presign["url"] = normalize_presign_url(presign["url"])
     uid = presign["uid"]
     uid_map[title] = uid
     presign_map[audio_file] = presign
@@ -136,7 +169,11 @@ log("\n=== Step 2: Upload audio files ===")
 upload_files(presign_map)
 
 log("\n=== Step 3: Create artist ===")
-artist_resp = post_json("/artists", load_json("heronwater.json"))
+artist_resp = post_json(
+    CATALOG_API,
+    "/artists",
+    load_json("heronwater.json")
+)
 artist_id = artist_resp["id"]
 log(f"Artist ID: {artist_id}")
 
@@ -148,7 +185,11 @@ for track in album["tracks"]:
         a["id"] = artist_id
 
 log("\n=== Step 5: Create album ===")
-album_resp = post_json("/albums", album)
+album_resp = post_json(
+    CATALOG_API,
+    "/albums",
+    album
+)
 album_id = album_resp["id"]
 log(f"Album ID: {album_id}")
 

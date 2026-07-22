@@ -73,6 +73,8 @@ spring:
     user: postgres
     password: postgres
     url: jdbc:postgresql://localhost:5432/postgres
+    database-change-log-table: media_databasechangelog
+    database-change-log-lock-table: media_databasechangeloglock
   datasource:
     url: jdbc:postgresql://localhost:5432/postgres
     username: postgres

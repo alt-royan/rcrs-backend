@@ -10,6 +10,7 @@ CREATE TABLE IF NOT EXISTS audio_upload
     content_length     bigint      NOT NULL,
     content_type       varchar(20) NOT NULL,
     expires_at         timestamp,
+    created_at         timestamp   NOT NULL DEFAULT now(),
     error              text
 );
 

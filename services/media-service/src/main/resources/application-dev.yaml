@@ -73,6 +73,8 @@ spring:
     user: ${SPRING_LIQUIBASE_USER}
     password: ${SPRING_LIQUIBASE_PASSWORD}
     url: ${SPRING_LIQUIBASE_URL}
+    database-change-log-table: media_databasechangelog
+    database-change-log-lock-table: media_databasechangeloglock
   datasource:
     url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}

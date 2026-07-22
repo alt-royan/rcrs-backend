@@ -5,7 +5,6 @@ services:
     build:
       context: ..
       dockerfile: discovery-server/Dockerfile
-      no_cache: true
     container_name: discovery-server
     ports:
       - "8761:8761"
@@ -20,31 +19,30 @@ services:
       retries: 15
       start_period: 30s
 
-#  metadata-write-service:
-#    build:
-#      context: ..
-#      dockerfile: services/metadata-write-service/Dockerfile
-#      no_cache: true
-#    container_name: metadata-write-service
-#    ports:
-#      - "8080:8080"
-#    environment:
-#      SPRING_PROFILES_ACTIVE: dev
-#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
-#      SPRING_HIBERNATE_DEFAUT_SCHEMA: rcrs_catalog
-#      SPRING_DATASOURCE_USERNAME: postgres
-#      SPRING_DATASOURCE_PASSWORD: postgres
-#      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/postgres
-#      SPRING_LIQUIBASE_USER: postgres
-#      SPRING_LIQUIBASE_PASSWORD: postgres
-#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-#      CDN_IMAGES_ENDPOINT: http://images.localhost:9000
-#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-#    depends_on:
-#      discovery-server:
-#        condition: service_healthy
-#    networks:
-#      - rcrs
+  metadata-write-service:
+    build:
+      context: ..
+      dockerfile: services/metadata-write-service/Dockerfile
+    container_name: metadata-write-service
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
+      SPRING_HIBERNATE_DEFAUT_SCHEMA: rcrs_catalog
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/postgres
+      SPRING_LIQUIBASE_USER: postgres
+      SPRING_LIQUIBASE_PASSWORD: postgres
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      CDN_IMAGES_ENDPOINT: http://images.localhost:9000
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - rcrs
 #
 #  metadata-read-service:
 #    build:
@@ -90,7 +88,6 @@ services:
     build:
       context: ..
       dockerfile: services/media-service/Dockerfile
-      no_cache: true
     container_name: media-service
     ports:
       - "8082:8082"
@@ -142,28 +139,27 @@ services:
 #    networks:
 #      - rcrs
 #
-#  workflow-service:
-#    build:
-#      context: ..
-#      dockerfile: services/workflow-service/Dockerfile
-#      no_cache: true
-#    container_name: workflow-service
-#    ports:
-#      - "8090:8090"
-#    environment:
-#      SPRING_PROFILES_ACTIVE: dev
-#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-#      SPRING_TEMPORAL_CONNECTION_TARGET: temporal:7233
-#      FEIGN_METADATA-SERVICE_URL: http://metadata-write-service:8080
-#      FEIGN_MEDIA-SERVICE_URL: http://media-service:8082
-#      FEIGN_SEARCH-SERVICE_URL: http://search-service:8083
-#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-#    depends_on:
-#      discovery-server:
-#        condition: service_healthy
-#    networks:
-#      - rcrs
-#
+  workflow-service:
+    build:
+      context: ..
+      dockerfile: services/workflow-service/Dockerfile
+    container_name: workflow-service
+    ports:
+      - "8090:8090"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      SPRING_TEMPORAL_CONNECTION_TARGET: temporal:7233
+      FEIGN_METADATA-SERVICE_URL: http://metadata-write-service:8080
+      FEIGN_MEDIA-SERVICE_URL: http://media-service:8082
+      FEIGN_SEARCH-SERVICE_URL: http://search-service:8083
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - rcrs
+
 networks:
   rcrs:
     external: true
