@@ -3,3 +3,5 @@ databaseChangeLog:
       file: classpath:db/changelog/init.sql
   - include:
       file: classpath:db/changelog/002-add-created-at.sql
+  - include:
+      file: classpath:db/changelog/003-alter-content-type.sql

@@ -120,8 +120,8 @@ audio:
   rate: 44100
   format: ogg
   loudnorm:
-    I: -16
-    LRA: 11
+    I: -18
+    LRA: 18
     TP: -1
 
 
