@@ -1,90 +1,36 @@
-# RCRS — Agent Instructions
+# RCRS Backend
 
-## Project Overview
-Maven multi-module Spring Boot 4.0.3 project (Java 21). Eight modules: shared library, two infrastructure services, and five microservices. Spotify-like music catalog system with CQRS, event-driven CDC, Temporal orchestration, and media processing.
+## Build & Run
 
-## DO NOT build after completing tasks. The developer handles builds and verification.
-
-## Modules
-| Module | Port | Description |
-|--------|------|-------------|
-| `shared-lib` | — | DTOs, Protobuf events, enums, exceptions, Base62 utils, Kafka config |
-| `discovery-server` | 8761 | Netflix Eureka server |
-| `gateway-api` | 8084 | Spring Cloud Gateway (WebFlux) — routes: `/api/metadata/**`, `/api/upload/**`, `/api/search/**` |
-| `services/metadata-write-service` | 8080 | WebMVC, JPA + Postgres (`rcrs_catalog`), Kafka producer — writes |
-| `services/metadata-read-service` | 8081 | WebFlux, MongoDB Reactive, Kafka consumer (CDC), Caffeine cache — reads |
-| `services/media-service` | 8082 | WebMVC, JPA + Postgres (`rcrs_upload`), S3, Temporal worker, ffmpeg — file uploads/transcoding |
-| `services/search-service` | 8083 | WebMVC, Elasticsearch, Kafka consumer, OpenFeign → metadata-write |
-| `services/workflow-service` | 8090 | Temporal orchestration, OpenFeign clients, Kafka, REST — coordinates upload flows |
-
-## Build Commands
-```bash
-mvn clean install          # build all
-mvn test                   # test all
-mvn test -pl services/metadata-write-service    # test single module
-mvn install -pl shared-lib -DskipTests          # rebuild shared-lib after changes
-```
+- **Java 21**, Spring Boot 4.0.3, multi-module Maven
+- Build all: `./mvnw clean install -DskipTests`
+- Build single module: `./mvnw clean install -pl services/media-service -am -DskipTests`
+- Run tests: `./mvnw test` (or `-pl <module>` for focused testing)
+- Local infra: `local/start.sh` creates Docker network, starts infra + services
 
 ## Architecture
-- **CQRS pattern**: `metadata-write-service` writes to Postgres (schema `rcrs_catalog`), publishes **Protobuf** `DomainEvent` messages to both `catalog.cdc.topic` AND `search.index.topic`; `metadata-read-service` consumes `catalog.cdc.topic` and upserts denormalized documents in MongoDB
-- `search-service` calls `metadata-write-service` via OpenFeign (hardcoded URL `localhost:8080`)
-- All services register with Eureka; gateway routes via `lb://` URIs
-- `media-service` generates thumbnails at **64, 300, 640**px, transcodes audio via external `ffmpeg` process
-- Jackson 3.x (`tools.jackson.databind`) is used throughout (Spring Boot 4)
-- MapStruct is declared in root POM but **no mappers exist yet**
-- `workflow-service` orchestrates via Temporal (Spring Boot Starter 1.37.0) — 6 workflows, 7 activity interfaces, Feign clients, no database
-- Entity IDs are UUIDs in Postgres, encoded as Base62 strings (`Url62`) for APIs and Kafka payloads
-- CDC events use **Protobuf** serialization (`ProtobufEventProducer`, `DomainEventOuterClass`)
 
-## Kafka Topics (defined in `shared-lib/.../kafka/Topics.java`)
-```
-catalog.cdc.topic                 # metadata-write → metadata-read + search (Protobuf DomainEvent)
-search.index.topic                # metadata-write → search (Protobuf DomainEvent)
-media.tracnscoding.topic          # metadata-write → media (trigger transcoding) — typo is in code
-catalog.update.status.topic       # media → metadata-write (TrackTranscodingCompletedEvent,
-                                  #   TrackUpdateLifecycleStatusEvent) + metadata-write self-consumer
-global.dlq                        # dead letter queue for all failed messages (3 retries → DLQ)
-```
+- **Services**: discovery (Eureka), gateway (Spring Cloud Gateway), media, metadata-write (Postgres + MongoDB CQRS), metadata-read (MongoDB), search (Elasticsearch), user (Postgres), workflow (Temporal)
+- **Communication**: Kafka (protobuf domain events), SQS (S3 upload events), Eureka discovery, Feign clients
+- **Orchestration**: Temporal.io for media processing workflows (media-service, workflow-service)
+- **Infra**: LocalStack (S3+SQS), Kafka, Postgres, MongoDB, Elasticsearch, Temporal, Keycloak, Redis
 
-## Gateway Routes (defined in `GatewayConfig.java`)
-```
-/api/metadata/**  → lb://catalog-service         # BUG: should be metadata-write-service (no service registered as catalog-service)
-/api/upload/**    → lb://media-service           # OK
-/api/search/**    → lb://search-service          # OK
-```
+## Key Configs
 
-## Infrastructure (local/)
-All infra is Docker-based in `local/`. Start required services before running apps.
+- S3/SQS LocalStack init: `local/infra/s3/init.sh` + `queue-policy.json` + `notification.json`
+- Application configs: `services/*/src/main/resources/application*.yaml`
+- Media upload pipeline: `s3:ObjectCreated:Put` → SQS → `SqsS3Listener` → DB status update
+- Queue name: `rcrs-upload-event-queue`, Buckets: `images`, `rcrs-audio`, `rcrs-upload`
+- Region: `eu-west-1` (LocalStack), AWS endpoint: `http://localhost.localstack.cloud:4566`
 
-| Service | Port | Directory | Required By |
-|---------|------|-----------|-------------|
-| PostgreSQL | 5432 | `local/postgres/` | metadata-write, media |
-| MongoDB | 27017 | `local/mongodb/` | metadata-read |
-| Elasticsearch | 9200 | `local/elk/` | search |
-| Kafka + Zookeeper | 9092/2181 | `local/kafka/` | all services |
-| Kafka UI | 9091 | `local/kafka/` | — |
-| S3 Ninja | 9444 | `local/s3/` | metadata-write, media |
-| Redis | 6379 | `local/redis/` | **unused** |
-| Temporal Server | 7233 | `local/temporal/` | workflow-service |
-| Temporal UI | 8888 | `local/temporal/` | — |
-| Temporal Postgres | 5454 | `local/temporal/` | workflow-service |
+## Noteworthy
 
-## Testing
-- `metadata-read-service` has **zero tests**
-- No integration tests, no Testcontainers, no H2, no test profiles
-- Tests require the full infrastructure stack running
+- MapStruct + Lombok — annotation processor must be configured in compiler plugin (parent POM already does this)
+- shared-lib provides protobuf event schemas (`src/main/proto/`), Kafka producer base, shared enums/exceptions/utils
+- Liquibase for schema migration (media-service, user-service)
+- MongoDB replica set required (MongoDB 7, `rs0`)
 
-## Known Bugs (see TODO.md for details)
-- **B1**: `AlbumChangeAvailabilityStatusWorkflowImpl` calls `artistActivity()` instead of `albumActivity()` on all 3 branches
-- **B2**: Workflow-service Feign URL for media-service points to `localhost:8081` instead of `:8082`
-- **B3**: `SqsS3Listener` annotated `@KafkaListener` but expects SQS `Message` parameter type
-- **B4**: Gateway routes `lb://catalog-service` — no service registers with that name
+## Verify
 
-## Gotchas
-- **Package namespace**: all modules use `org.ultra.rcrs`
-- **workflow-service Feign URLs** (from `application.yml`): metadata-service→`localhost:8080`, media-service→`localhost:8081` **(BUG)**, search-service→`localhost:8083`
-- **FFmpeg**: media-service invokes `ffmpeg` as external process via `ProcessBuilder`
-- **No CI/CD, no linting/formatting config** exists
-- **workflow-service task queue**: `WORKFLOW_TASK_QUEUE` constant — all workflows and activities share this single queue
-- **web-ui/** is static HTML with no API integration
-- **Topic name typo**: `media.tracnscoding.topic` ("tracnscoding") — typo is in `Topics.java` constant and actual topic name
+- Check service health: `curl http://localhost:<port>/actuator/health`
+- Check LocalStack: `curl http://localhost:4566/_localstack/health`

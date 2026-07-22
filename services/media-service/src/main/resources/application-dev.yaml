@@ -117,7 +117,7 @@ cdn:
     signature-duration: ${CDN_UPLOADS_SIGNATURE_DURATION:24h}
     file-duration: ${CDN_UPLOADS_FILE_DURATION:24h}
     sqs:
-      queue: ${CDN_UPLOADS_SQS_QUEUE:rcrs-upload-queue}
+      queue: ${CDN_UPLOADS_SQS_QUEUE:rcrs-upload-event-queue}
 
 eureka:
   client:

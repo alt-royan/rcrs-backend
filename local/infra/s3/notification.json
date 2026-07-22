@@ -1,7 +1,6 @@
 {
   "QueueConfigurations": [
     {
-      "Id": "s3-to-sqs",
       "QueueArn": "arn:aws:sqs:eu-west-1:000000000000:rcrs-upload-event-queue",
       "Events": [
         "s3:ObjectCreated:*"

@@ -1,12 +1,12 @@
 {
-  "Version": "08-04-2026",
+  "Version": "2012-10-17",
   "Statement": [
     {
       "Sid": "AllowS3SendMessage",
       "Effect": "Allow",
       "Principal": "*",
       "Action": "sqs:SendMessage",
-      "Resource": "arn:aws:sqs:eu-west-1:000000000000:rcrs-upload-queue",
+      "Resource": "arn:aws:sqs:eu-west-1:000000000000:rcrs-upload-event-queue",
       "Condition": {
         "ArnEquals": {
           "aws:SourceArn": "arn:aws:s3:::rcrs-upload"
