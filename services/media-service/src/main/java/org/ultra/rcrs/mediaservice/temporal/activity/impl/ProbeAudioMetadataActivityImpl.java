@@ -35,7 +35,7 @@ public class ProbeAudioMetadataActivityImpl implements ProbeAudioMetadataActivit
                     "-show_streams",
                     tempFile.getAbsolutePath());
 
-            pb.redirectErrorStream(true);
+            pb.redirectError(ProcessBuilder.Redirect.DISCARD);;
             Process process = pb.start();
             String output = new String(process.getInputStream().readAllBytes());
             int exitCode = process.waitFor();

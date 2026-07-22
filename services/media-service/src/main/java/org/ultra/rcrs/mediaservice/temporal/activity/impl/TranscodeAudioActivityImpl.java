@@ -58,7 +58,7 @@ public class TranscodeAudioActivityImpl implements TranscodeAudioActivity {
                 "-y",
                 "-f", properties.getFormat(),
                 outputFile.getAbsolutePath());
-        pb.redirectErrorStream(false);
+        pb.redirectError(ProcessBuilder.Redirect.DISCARD);
         return pb.start();
     }
 }

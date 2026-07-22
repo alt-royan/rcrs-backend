@@ -10,11 +10,11 @@ spring:
     namespace: default
     workers:
       capacity:
-        max-concurrent-workflow-task-pollers: 6
-        max-concurrent-activity-task-pollers: 6
+        max-concurrent-workflow-task-pollers: 50
+        max-concurrent-activity-task-pollers: 50
       rate-limits:
-        max-worker-activities-per-second: 2
-        max-task-queue-activities-per-second: 2
+        max-worker-activities-per-second: 10
+        max-task-queue-activities-per-second: 10
     workflow-cache:
       max-instances: 10
       max-threads: 10
