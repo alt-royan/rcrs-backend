@@ -5,21 +5,26 @@ spring:
   application:
     name: metadata-read-service
   mongodb:
-    uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/rcrs_catalog}
+    uri: ${SPRING_DATA_MONGODB_URI}
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
 
 cdn:
   images:
-    endpoint: ${CDN_IMAGES_ENDPOINT:http://images.localhost:4566}
-
-logging:
-  level:
-    root: INFO
+    endpoint: ${CDN_IMAGES_ENDPOINT}
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
   instance:
     preferIpAddress: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized

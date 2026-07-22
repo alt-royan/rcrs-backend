@@ -24,17 +24,18 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
 
-identity:
-  events:
-    topic: identity.events
-
-logging:
-  level:
-    root: INFO
-
 eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
   instance:
     preferIpAddress: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized

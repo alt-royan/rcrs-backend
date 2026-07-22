@@ -116,7 +116,7 @@ cdn:
     signature-duration: 24h
     file-duration: 24h
     sqs:
-      queue: rcrs-upload-queue
+      queue: rcrs-upload-event-queue
 
 eureka:
   client:
@@ -125,3 +125,11 @@ eureka:
   instance:
     preferIpAddress: true
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
