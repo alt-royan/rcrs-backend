@@ -8,9 +8,8 @@ spring:
     reindex:
       batch:
         size: 1000
-  data:
-    elasticsearch:
-      url: localhost:9200
+  elasticsearch:
+    uris: localhost:9200
 
 cdn:
   images:
@@ -22,7 +21,3 @@ eureka:
       defaultZone: http://localhost:8761/eureka/
   instance:
     preferIpAddress: true
-
-logging:
-  level:
-    root: info

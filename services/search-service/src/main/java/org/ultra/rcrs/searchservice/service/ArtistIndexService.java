@@ -90,6 +90,7 @@ public class ArtistIndexService {
         publicDoc.setTags(adminDoc.getTags());
         publicDoc.setAlbums(adminDoc.getAlbums());
         publicDoc.setTracks(adminDoc.getTracks());
+        publicDoc.setAvailability(adminDoc.getAvailability());
         return publicDoc;
     }
 

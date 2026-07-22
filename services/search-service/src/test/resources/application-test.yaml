@@ -1,24 +1,8 @@
+
 spring:
   application:
-    name: search-service-test
-  cloud:
-    discovery:
-      client:
-        enabled: false
-  kafka:
-    bootstrap-servers: localhost:9092
-  data:
-    elasticsearch:
-      url: localhost:9200
-
-cdn:
-  images:
-    endpoint: "http://test.localhost:4566"
+    name: search-service
 
 eureka:
   client:
     enabled: false
-
-logging:
-  level:
-    root: INFO

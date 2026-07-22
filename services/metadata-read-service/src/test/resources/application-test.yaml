@@ -1,19 +1,8 @@
 spring:
   application:
     name: metadata-read-service-test
-  cloud:
-    discovery:
-      client:
-        enabled: false
 
 eureka:
   client:
     enabled: false
 
-cdn:
-  images:
-    endpoint: "http://test.localhost:4566"
-
-logging:
-  level:
-    root: INFO

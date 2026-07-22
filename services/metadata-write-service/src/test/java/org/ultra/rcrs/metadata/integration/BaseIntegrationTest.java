@@ -51,8 +51,7 @@ import java.util.UUID;
         Topics.CATALOG_UPDATE_STATUS_TOPIC
 })
 @TestPropertySource(properties = {
-        "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}",
-        "spring.datasource.url=${spring.embedded.kafka.brokers}",
+        "spring.kafka.bootstrap-servers=${spring.embedded.kafka.brokers}"
 })
 @DirtiesContext
 public abstract class BaseIntegrationTest {

@@ -13,10 +13,6 @@ cdn:
   images:
     endpoint: "http://images.localhost:4566"
 
-logging:
-  level:
-    root: INFO
-
 eureka:
   client:
     serviceUrl:

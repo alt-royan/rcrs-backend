@@ -67,7 +67,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.avatarUrl").value(url -> {
-                    assert url.toString().startsWith("http://test.localhost:4566/");
+                    assert url.toString().startsWith("http://images.localhost:4566/");
                 });
     }
 
@@ -202,6 +202,6 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                         .build(artist.getId()))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Object.class).isEmpty();
+                .expectBodyList(Object.class).hasSize(0);
     }
 }

@@ -87,7 +87,7 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.coverUrl").value(url -> {
-                    assert url.toString().startsWith("http://test.localhost:4566/");
+                    assert url.toString().startsWith("http://images.localhost:4566/");
                 });
     }
 

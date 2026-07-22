@@ -1,0 +1,16 @@
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+  liquibase:
+    enabled: true
+  eureka:
+    client:
+      enabled: false
+      fetchRegistry: false
+      registerWithEureka: false
+
+logging:
+  level:
+    root: INFO
+    org.ultra.rcrs.userservice: DEBUG
