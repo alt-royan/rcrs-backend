@@ -6,7 +6,7 @@ spring:
     name: media-service
   temporal:
     connection:
-      target: ${SPRING_TEMPORAL_CONNECTION_TARGET:127.0.0.1:7233}
+      target: ${SPRING_TEMPORAL_CONNECTION_TARGET}
     namespace: default
     workers:
       capacity:
@@ -19,29 +19,15 @@ spring:
       max-instances: 10
       max-threads: 10
     activities:
-      validateImage:
+      validate:
         start-to-close-timeout: 10s
         retry:
           initial-interval: 1s
           backoff-coefficient: 2
           maximum-interval: 10s
           maximum-attempts: 3
-      saveOriginalImage:
+      thumbnail:
         start-to-close-timeout: 15s
-        retry:
-          initial-interval: 1s
-          backoff-coefficient: 2
-          maximum-interval: 15s
-          maximum-attempts: 3
-      saveThumbnail:
-        start-to-close-timeout: 15s
-        retry:
-          initial-interval: 1s
-          backoff-coefficient: 2
-          maximum-interval: 15s
-          maximum-attempts: 3
-      validateAudio:
-        start-to-close-timeout: 30s
         retry:
           initial-interval: 1s
           backoff-coefficient: 2
@@ -54,27 +40,27 @@ spring:
           backoff-coefficient: 2
           maximum-interval: 15s
           maximum-attempts: 3
-      saveOriginalAudioToS3:
-        start-to-close-timeout: 1m
+      s3Activity:
+        start-to-close-timeout: 15s
         retry:
           initial-interval: 1s
           backoff-coefficient: 2
-          maximum-interval: 30s
+          maximum-interval: 15s
           maximum-attempts: 3
-      saveAudioRecord:
+      dbActivity:
         start-to-close-timeout: 10s
         retry:
           initial-interval: 1s
           backoff-coefficient: 2
           maximum-interval: 10s
-          maximum-attempts: 5
-      normalizeAudio:
+          maximum-attempts: 3
+      transcodeAudioActivity:
         start-to-close-timeout: 5m
         retry:
           initial-interval: 1s
           backoff-coefficient: 2
-          maximum-interval: 30s
-          maximum-attempts: 1
+          maximum-interval: 1m
+          maximum-attempts: 3
       transcodingStatus:
         start-to-close-timeout: 10s
         retry:
@@ -84,45 +70,65 @@ spring:
           maximum-attempts: 3
   liquibase:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
-    user: ${SPRING_LIQUIBASE_USER:postgres}
-    password: ${SPRING_LIQUIBASE_PASSWORD:postgres}
-    default-schema: rcrs_upload
-    url: ${SPRING_LIQUIBASE_URL:jdbc:postgresql://localhost:5432/postgres?currentSchema=rcrs_upload}
+    user: ${SPRING_LIQUIBASE_USER}
+    password: ${SPRING_LIQUIBASE_PASSWORD}
+    url: ${SPRING_LIQUIBASE_URL}
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/postgres?currentSchema=rcrs_upload}
-    username: ${SPRING_DATASOURCE_USERNAME:postgres}
-    password: ${SPRING_DATASOURCE_PASSWORD:postgres}
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: ${SPRING_HIBERNATE_DEFAUT_SCHEMA}
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
   cloud:
     aws:
       credentials:
-        access-key: ${SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY:test}
-        secret-key: ${SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY:test}
+        access-key: ${SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY}
+        secret-key: ${SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY}
       region:
-        static: ${SPRING_CLOUD_AWS_REGION_STATIC:eu-west-1}
-      endpoint: ${SPRING_CLOUD_AWS_ENDPOINT:http://localhost.localstack.cloud:4566}
+        static: ${SPRING_CLOUD_AWS_REGION_STATIC}
+      endpoint: ${SPRING_CLOUD_AWS_ENDPOINT}
       s3:
         path-style-access-enabled: true
 
 cdn:
   images:
-    bucket: ${CDN_IMAGES_BUCKET:images}
-    thumbnails: ${CDN_IMAGES_THUMBNAILS:64,300,640}
+    bucket: images
+    thumbnails: 64,300,640
   audios:
-    bucket: ${CDN_AUDIOS_BUCKET:rcrs-audio}
-    bitrates: ${CDN_AUDIOS_BITRATES:"128k", "192k", "320k"}
+    bucket: rcrs-audio
   uploads:
-    bucket: ${CDN_UPLOADS_BUCKET:rcrs-upload}
-    signature-duration: ${CDN_UPLOADS_SIGNATURE_DURATION:24h}
-    file-duration: ${CDN_UPLOADS_FILE_DURATION:24h}
+    bucket: rcrs-upload
+    signature-duration: 24h
+    file-duration: 24h
     sqs:
-      queue: ${CDN_UPLOADS_SQS_QUEUE:rcrs-upload-event-queue}
+      queue: rcrs-upload-event-queue
+audio:
+  validation:
+    formats: mp3, wav, ogg, flac
+    duration:
+      min: 1s
+      max: 2h
+  bitrates: 128k, 192k, 320k
+  codec: libvorbis
+  rate: 44100
+  format: ogg
+  loudnorm:
+    I: -16
+    LRA: 11
+    TP: -1
+
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
   instance:
     preferIpAddress: true
 
