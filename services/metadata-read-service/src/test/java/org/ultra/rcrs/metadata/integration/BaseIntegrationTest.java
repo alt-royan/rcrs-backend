@@ -37,6 +37,7 @@ import org.ultra.rcrs.metadata.repository.TrackDocumentRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
@@ -159,7 +160,7 @@ public abstract class BaseIntegrationTest {
     protected void sendEvent(DomainEventOuterClass.EventType eventType,
                              DomainEventOuterClass.AggregateType aggregateType,
                              String aggregateId,
-                             GeneratedMessage payload) {
+                             GeneratedMessage payload) throws ExecutionException, InterruptedException {
         DomainEventOuterClass.DomainEvent event = DomainEventOuterClass.DomainEvent.newBuilder()
                 .setEventId(UUID.randomUUID().toString())
                 .setEventType(eventType)
@@ -171,10 +172,11 @@ public abstract class BaseIntegrationTest {
                 .setProducer("metadata-read-service-test")
                 .setPayload(Any.pack(payload))
                 .build();
-        kafkaTemplate.send(Topics.CATALOG_CDC_TOPIC, event.toByteArray()).join();
+        kafkaTemplate.send(Topics.CATALOG_CDC_TOPIC, event.toByteArray()).get();
+        Thread.sleep(2000);
     }
 
-    protected void sendArtistCreated(String id, String name, EntityStatus status) {
+    protected void sendArtistCreated(String id, String name, EntityStatus status) throws ExecutionException, InterruptedException {
         var event = ArtistCreatedEventOuterClass.ArtistCreatedEvent.newBuilder()
                 .setId(id)
                 .setName(name)
@@ -186,7 +188,7 @@ public abstract class BaseIntegrationTest {
                 DomainEventOuterClass.AggregateType.ARTIST, id, event);
     }
 
-    protected void sendArtistDeleted(String id) {
+    protected void sendArtistDeleted(String id) throws ExecutionException, InterruptedException {
         var event = org.ultra.rcrs.events.artist.ArtistDeletedEventOuterClass.ArtistDeletedEvent.newBuilder()
                 .setId(id).build();
         sendEvent(DomainEventOuterClass.EventType.ARTIST_DELETED,

@@ -1,6 +1,9 @@
 package org.ultra.rcrs.metadata.integration;
 
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
@@ -9,10 +12,13 @@ import org.ultra.rcrs.metadata.model.TrackPublicDocument;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class TrackCdcIntegrationTest extends BaseIntegrationTest {
 
     @Test
+    @Order(1)
     void trackCreated_createsDocumentInMongo() throws Exception {
+        Thread.sleep(5000);
         String id = randomId();
         sendTrackCreated(id, "CDC Track");
         
@@ -25,6 +31,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(2)
     void trackDeleted_setsAvailabilityToDeleted() throws Exception {
         String id = randomId();
         sendTrackCreated(id, "Delete Track");
@@ -37,6 +44,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(3)
     void trackHidden_setsAvailabilityToHidden() throws Exception {
         String id = randomId();
         sendTrackCreated(id, "Hidden Track");
@@ -49,6 +57,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(4)
     void trackActivated_setsAvailabilityToActive() throws Exception {
         String id = randomId();
         sendTrackCreated(id, "Activate Track");
@@ -63,6 +72,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(5)
     void trackLifecycleStatusUpdated_changesLifecycle() throws Exception {
         String id = randomId();
         sendTrackCreated(id, "Lifecycle Track");
@@ -75,6 +85,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(6)
     void trackTrueDeleted_removesDocumentFromMongo() throws Exception {
         String id = randomId();
         sendTrackCreated(id, "True Delete Track");
@@ -86,6 +97,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(7)
     void trackAddedToAlbum_setsAlbumEmbedAndIncrementsTotalTracks() throws Exception {
         String trackId = randomId();
         String albumId = randomId();
@@ -108,6 +120,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(8)
     void trackAddedToAlbum_whenAlbumDoesNotExist_noError() throws Exception {
         String trackId = randomId();
         String albumId = randomId();
@@ -122,6 +135,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(9)
     void artistAddedToTrack_addsEmbed() throws Exception {
         String artistId = randomId();
         String trackId = randomId();
@@ -141,6 +155,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(10)
     void artistDeletedFromTrack_removesEmbed() throws Exception {
         String artistId = randomId();
         String trackId = randomId();
@@ -159,6 +174,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(11)
     void otherAddedToTrack_addsOtherEmbed() throws Exception {
         String trackId = randomId();
         String otherId = randomId();
@@ -175,6 +191,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(12)
     void otherDeletedFromTrack_removesOtherEmbed() throws Exception {
         String trackId = randomId();
         String otherId = randomId();
@@ -191,6 +208,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(13)
     void artistAddedToTrack_whenTrackDoesNotExist_noError() throws Exception {
         String artistId = randomId();
         String trackId = randomId();
@@ -204,6 +222,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(14)
     void artistAddedToTrack_whenArtistDoesNotExist_noError() throws Exception {
         String trackId = randomId();
         String artistId = randomId();
@@ -218,6 +237,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(15)
     void otherAddedToTrack_whenTrackDoesNotExist_noError() throws Exception {
         String trackId = randomId();
         String otherId = randomId();
@@ -229,6 +249,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(16)
     void artistAddedToTrack_multipleArtists() throws Exception {
         String artist1Id = randomId();
         String artist2Id = randomId();
@@ -254,6 +275,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(17)
     void artistDeletedFromTrack_onlyRemovesSpecificArtist() throws Exception {
         String artist1Id = randomId();
         String artist2Id = randomId();
@@ -278,6 +300,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(18)
     void otherAddedToTrack_multipleOthers() throws Exception {
         String trackId = randomId();
         String other1Id = randomId();

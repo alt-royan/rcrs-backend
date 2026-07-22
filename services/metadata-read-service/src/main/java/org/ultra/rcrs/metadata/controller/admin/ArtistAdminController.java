@@ -27,8 +27,8 @@ public class ArtistAdminController {
     @GetMapping("/{artistId}/albums")
     public Flux<AlbumAdminStandaloneDto> getAlbumsByArtist(
             @PathVariable("artistId") String artistId,
-            @RequestParam(required = false) AlbumType albumType,
-            @RequestParam(required = false, defaultValue = "asc") String sortDirection) {
-        return albumAdminService.getAllByArtistId(artistId, albumType, sortDirection);
+            @RequestParam(required = false) AlbumType type,
+            @RequestParam(required = false, defaultValue = "asc") String sort) {
+        return albumAdminService.getAllByArtistId(artistId, type, sort);
     }
 }

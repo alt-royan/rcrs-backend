@@ -108,7 +108,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/admin/artists/{id}/albums")
-                        .queryParam("albumType", "FULL")
+                        .queryParam("type", "FULL")
                         .build(artist.getId()))
                 .exchange()
                 .expectStatus().isOk()

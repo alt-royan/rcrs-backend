@@ -129,7 +129,6 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/api/artists/{id}/albums")
-                        .queryParam("sortDirection", "asc")
                         .build(artist.getId()))
                 .exchange()
                 .expectStatus().isOk()
@@ -183,8 +182,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/api/artists/{id}/albums")
-                        .queryParam("albumType", "FULL")
-                        .queryParam("sortDirection", "asc")
+                        .queryParam("type", "FULL")
                         .build(artist.getId()))
                 .exchange()
                 .expectStatus().isOk()
@@ -198,7 +196,6 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
                         .path("/api/artists/{id}/albums")
-                        .queryParam("sortDirection", "asc")
                         .build(artist.getId()))
                 .exchange()
                 .expectStatus().isOk()

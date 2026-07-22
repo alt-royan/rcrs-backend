@@ -1,6 +1,9 @@
 package org.ultra.rcrs.metadata.integration;
 
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.LifecycleStatus;
@@ -13,10 +16,13 @@ import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class ArtistCdcIntegrationTest extends BaseIntegrationTest {
 
     @Test
+    @Order(1)
     void artistCreated_createsDocumentInMongo() throws Exception {
+        Thread.sleep(5000);
         String id = randomId();
         sendArtistCreated(id, "CDC Artist", EntityStatus.ACTIVE);
         
@@ -27,6 +33,7 @@ class ArtistCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(2)
     void artistCreated_withHiddenStatus_persistsCorrectly() throws Exception {
         String id = randomId();
         sendEvent(DomainEventOuterClass.EventType.ARTIST_CREATED,
@@ -43,6 +50,7 @@ class ArtistCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(3)
     void artistDeleted_setsAvailabilityToDeleted() throws Exception {
         String id = randomId();
         sendArtistCreated(id, "Delete Me", EntityStatus.ACTIVE);
@@ -55,6 +63,7 @@ class ArtistCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(4)
     void artistHidden_setsAvailabilityToHidden() throws Exception {
         String id = randomId();
         sendArtistCreated(id, "Hide Me", EntityStatus.ACTIVE);
@@ -67,6 +76,7 @@ class ArtistCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(5)
     void artistActivated_setsAvailabilityToActive() throws Exception {
         String id = randomId();
         sendArtistCreated(id, "Activate Me", EntityStatus.HIDDEN);
@@ -79,6 +89,7 @@ class ArtistCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(6)
     void artistTrueDeleted_removesDocumentFromMongo() throws Exception {
         String id = randomId();
         sendArtistCreated(id, "True Delete Me", EntityStatus.ACTIVE);
@@ -90,6 +101,7 @@ class ArtistCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(7)
     void artistAddedToAlbum_addsArtistEmbedToAlbum() throws Exception {
         String artistId = randomId();
         String albumId = randomId();
@@ -109,6 +121,7 @@ class ArtistCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(8)
     void artistDeletedFromAlbum_removesArtistEmbedFromAlbum() throws Exception {
         String artistId = randomId();
         String albumId = randomId();

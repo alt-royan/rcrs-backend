@@ -1,6 +1,9 @@
 package org.ultra.rcrs.metadata.integration;
 
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
@@ -9,10 +12,13 @@ import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AlbumCdcIntegrationTest extends BaseIntegrationTest {
 
     @Test
+    @Order(1)
     void albumCreated_createsDocumentInMongo() throws Exception {
+        Thread.sleep(5000);
         String id = randomId();
         sendAlbumCreated(id, "CDC Album");
         
@@ -25,6 +31,7 @@ class AlbumCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(2)
     void albumDeleted_setsAvailabilityToDeleted() throws Exception {
         String id = randomId();
         sendAlbumCreated(id, "Delete Album");
@@ -37,6 +44,7 @@ class AlbumCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(3)
     void albumHidden_setsAvailabilityToHidden() throws Exception {
         String id = randomId();
         sendAlbumCreated(id, "Hidden Album");
@@ -49,6 +57,7 @@ class AlbumCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(4)
     void albumActivated_setsAvailabilityToActive() throws Exception {
         String id = randomId();
         sendAlbumCreated(id, "Activate Album");
@@ -63,6 +72,7 @@ class AlbumCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(5)
     void albumLifecycleStatusUpdated_changesLifecycle() throws Exception {
         String id = randomId();
         sendAlbumCreated(id, "Lifecycle Album");
@@ -75,6 +85,7 @@ class AlbumCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(6)
     void albumTrueDeleted_removesDocumentFromMongo() throws Exception {
         String id = randomId();
         sendAlbumCreated(id, "True Delete Album");
@@ -86,6 +97,7 @@ class AlbumCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(7)
     void artistAddedToAlbum_addsEmbed() throws Exception {
         String artistId = randomId();
         String albumId = randomId();
@@ -105,6 +117,7 @@ class AlbumCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(8)
     void artistDeletedFromAlbum_removesEmbed() throws Exception {
         String artistId = randomId();
         String albumId = randomId();
@@ -123,6 +136,7 @@ class AlbumCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(9)
     void artistAddedToAlbum_multipleArtists() throws Exception {
         String artist1Id = randomId();
         String artist2Id = randomId();
@@ -147,6 +161,7 @@ class AlbumCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(10)
     void artistDeletedFromAlbum_onlyRemovesSpecificArtist() throws Exception {
         String artist1Id = randomId();
         String artist2Id = randomId();
@@ -171,6 +186,7 @@ class AlbumCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(11)
     void artistAddedToAlbum_whenAlbumDoesNotExist_noError() throws Exception {
         String artistId = randomId();
         String albumId = randomId();
@@ -184,6 +200,7 @@ class AlbumCdcIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
+    @Order(12)
     void artistAddedToAlbum_whenArtistDoesNotExist_noError() throws Exception {
         String artistId = randomId();
         String albumId = randomId();
