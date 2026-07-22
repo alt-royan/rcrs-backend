@@ -15,6 +15,7 @@ CREATE TABLE IF NOT EXISTS audio_upload
 
 CREATE TABLE IF NOT EXISTS audio
 (
+    id                 uuid PRIMARY KEY,
     guid               uuid                     NOT NULL,
     track_id           text                     NOT NULL,
     key                text                     NOT NULL,

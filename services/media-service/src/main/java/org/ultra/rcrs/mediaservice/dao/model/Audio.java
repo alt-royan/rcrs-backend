@@ -20,6 +20,9 @@ import java.util.UUID;
 public class Audio {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
     private UUID guid;
 
     @Column(name = "track_id")

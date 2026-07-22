@@ -55,7 +55,7 @@ public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
                 AudioMetadata metadata = activities.probeAudioMetadataActivity().probe(outputFile);
                 key = String.format("%s/%s/%s_%s", trackId, guid, metadata.container(), bitrate);
 
-                activities.s3Activity().putAudio(key, tempFile, metadata.byteSize(), "audio/ogg");
+                activities.s3Activity().putAudio(key, outputFile, metadata.byteSize(), "audio/ogg");
 
                 activities.dbActivity().saveAudio(trackId, guid, key, metadata);
 
