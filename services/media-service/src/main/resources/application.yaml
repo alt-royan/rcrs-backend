@@ -10,38 +10,24 @@ spring:
     namespace: default
     workers:
       capacity:
-        max-concurrent-workflow-task-pollers: 6
-        max-concurrent-activity-task-pollers: 6
+        max-concurrent-workflow-task-pollers: 50
+        max-concurrent-activity-task-pollers: 50
       rate-limits:
-        max-worker-activities-per-second: 2
-        max-task-queue-activities-per-second: 2
+        max-worker-activities-per-second: 10
+        max-task-queue-activities-per-second: 10
     workflow-cache:
       max-instances: 10
       max-threads: 10
     activities:
-      validateImage:
+      validate:
         start-to-close-timeout: 10s
         retry:
           initial-interval: 1s
           backoff-coefficient: 2
           maximum-interval: 10s
           maximum-attempts: 3
-      saveOriginalImage:
+      thumbnail:
         start-to-close-timeout: 15s
-        retry:
-          initial-interval: 1s
-          backoff-coefficient: 2
-          maximum-interval: 15s
-          maximum-attempts: 3
-      saveThumbnail:
-        start-to-close-timeout: 15s
-        retry:
-          initial-interval: 1s
-          backoff-coefficient: 2
-          maximum-interval: 15s
-          maximum-attempts: 3
-      validateAudio:
-        start-to-close-timeout: 30s
         retry:
           initial-interval: 1s
           backoff-coefficient: 2
@@ -54,27 +40,27 @@ spring:
           backoff-coefficient: 2
           maximum-interval: 15s
           maximum-attempts: 3
-      saveOriginalAudioToS3:
-        start-to-close-timeout: 1m
+      s3Activity:
+        start-to-close-timeout: 15s
         retry:
           initial-interval: 1s
           backoff-coefficient: 2
-          maximum-interval: 30s
+          maximum-interval: 15s
           maximum-attempts: 3
-      saveAudioRecord:
+      dbActivity:
         start-to-close-timeout: 10s
         retry:
           initial-interval: 1s
           backoff-coefficient: 2
           maximum-interval: 10s
-          maximum-attempts: 5
-      normalizeAudio:
+          maximum-attempts: 3
+      transcodeAudioActivity:
         start-to-close-timeout: 5m
         retry:
           initial-interval: 1s
           backoff-coefficient: 2
-          maximum-interval: 30s
-          maximum-attempts: 1
+          maximum-interval: 1m
+          maximum-attempts: 3
       transcodingStatus:
         start-to-close-timeout: 10s
         retry:
@@ -87,10 +73,19 @@ spring:
     user: postgres
     password: postgres
     url: jdbc:postgresql://localhost:5432/postgres
+    database-change-log-table: media_databasechangelog
+    database-change-log-lock-table: media_databasechangeloglock
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres?currentSchema=rcrs_upload
+    url: jdbc:postgresql://localhost:5432/postgres
     username: postgres
     password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: rcrs_media
+        dialect: org.hibernate.dialect.PostgreSQLDialect
   kafka:
     bootstrap-servers: localhost:9092
   cloud:
@@ -110,13 +105,27 @@ cdn:
     thumbnails: 64,300,640
   audios:
     bucket: rcrs-audio
-    bitrates: "128k", "192k", "320k"
   uploads:
     bucket: rcrs-upload
     signature-duration: 24h
     file-duration: 24h
     sqs:
       queue: rcrs-upload-event-queue
+audio:
+  validation:
+    formats: mp3, wav, ogg, flac
+    duration:
+      min: 1s
+      max: 2h
+  bitrates: 128k, 192k, 320k
+  codec: libvorbis
+  rate: 44100
+  format: ogg
+  loudnorm:
+    I: -18
+    LRA: 18
+    TP: -1
+
 
 eureka:
   client:

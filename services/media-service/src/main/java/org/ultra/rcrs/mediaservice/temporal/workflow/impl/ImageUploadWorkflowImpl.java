@@ -21,15 +21,17 @@ public class ImageUploadWorkflowImpl implements ImageUploadWorkflow {
 
         log.info("Starting image upload workflow");
 
-        ValidatedImage validated = activities.validateImageActivity().validate(dataUrl);
+        ValidatedImage validated = activities.validateActivity().validateImage(dataUrl);
+        String key = validated.key();
+        byte[] imageData = validated.imageData();
+        String contentType = validated.contentType();
 
-        String uri = activities.saveOriginalImageActivity().saveOriginal(
-                validated.key(), validated.imageData(), validated.contentType());
+        String uri = activities.s3Activity().putImage(key, imageData, contentType);
 
         for (int size : thumbnailSizes) {
-            activities.saveThumbnailActivity().saveThumbnail(
-                    validated.key(), validated.imageData(), validated.format(),
-                    validated.contentType(), size);
+            String thumbnailKey = key + String.format("/%sx%s", size, size);
+            byte[] thumbnail = activities.thumbnailActivity().createThumbnail(imageData, validated.format(), size);
+            activities.s3Activity().putImage(thumbnailKey, thumbnail, contentType);
         }
 
         log.info("Image upload workflow completed, uri={}", uri);

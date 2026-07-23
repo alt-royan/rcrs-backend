@@ -17,9 +17,7 @@ import org.ultra.rcrs.metadata.model.ArtistToTrack;
 import org.ultra.rcrs.metadata.model.ArtistToTrackPK;
 import org.ultra.rcrs.metadata.model.OtherArtist;
 import org.ultra.rcrs.metadata.model.Track;
-import org.ultra.rcrs.metadata.repository.ArtistToTrackRepository;
-import org.ultra.rcrs.metadata.repository.OtherArtistRepository;
-import org.ultra.rcrs.metadata.repository.TrackRepository;
+import org.ultra.rcrs.metadata.repository.*;
 import org.ultra.rcrs.utils.Url62;
 
 import java.util.List;
@@ -40,9 +38,9 @@ class TrackServiceTest {
     @Mock
     private OtherArtistRepository otherArtistRepository;
     @Mock
-    private ArtistService artistService;
+    private ArtistRepository artistRepository;
     @Mock
-    private AlbumService albumService;
+    private AlbumRepository albumRepository;
     @Mock
     private CatalogEventProducer catalogEventProducer;
 
@@ -60,7 +58,7 @@ class TrackServiceTest {
         request.setTrackNumber(1);
         request.setExplicit(false);
 
-        when(albumService.albumExists(albumId)).thenReturn(true);
+        when(albumRepository.existsById(albumId)).thenReturn(true);
 
         Track trackExpected = Track.builder()
                 .id(UUID.randomUUID())
@@ -171,7 +169,7 @@ class TrackServiceTest {
         dto.setRole(ArtistRole.MAIN_ARTIST);
 
         when(trackRepository.existsById(trackId)).thenReturn(true);
-        when(artistService.artistExists(artistId)).thenReturn(true);
+        when(artistRepository.existsById(artistId)).thenReturn(true);
 
         trackService.addAllArtistToTrack(List.of(dto), trackId);
 

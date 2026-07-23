@@ -4,7 +4,6 @@ package events;
 
 option java_package = "org.ultra.rcrs.events.track";
 
-import "google/protobuf/timestamp.proto";
 import "events/common/availability_status.proto";
 import "events/common/lifecycle_status.proto";
 

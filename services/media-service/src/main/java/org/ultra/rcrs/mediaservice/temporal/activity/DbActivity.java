@@ -2,11 +2,17 @@ package org.ultra.rcrs.mediaservice.temporal.activity;
 
 import io.temporal.activity.ActivityInterface;
 import io.temporal.activity.ActivityMethod;
+import org.ultra.rcrs.mediaservice.dao.model.AudioUpload;
 import org.ultra.rcrs.mediaservice.temporal.activity.model.AudioMetadata;
 
+import java.util.UUID;
+
 @ActivityInterface
-public interface SaveAudioRecordActivity {
+public interface DbActivity {
 
     @ActivityMethod
-    void save(String guid, String uploadUid, String trackId, AudioMetadata metadata);
+    void saveAudio(String trackId, UUID guid, String key, AudioMetadata metadata);
+
+    @ActivityMethod
+    AudioUpload getAudioUpload(String uid);
 }

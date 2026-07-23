@@ -17,6 +17,7 @@ import org.ultra.rcrs.metadata.model.Album;
 import org.ultra.rcrs.metadata.model.ArtistToAlbum;
 import org.ultra.rcrs.metadata.model.ArtistToAlbumPK;
 import org.ultra.rcrs.metadata.repository.AlbumRepository;
+import org.ultra.rcrs.metadata.repository.ArtistRepository;
 import org.ultra.rcrs.metadata.repository.ArtistToAlbumRepository;
 import org.ultra.rcrs.utils.S3Utils;
 import org.ultra.rcrs.utils.Url62;
@@ -26,7 +27,6 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static org.assertj.core.api.Assertions.anyOf;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
@@ -42,7 +42,7 @@ class AlbumServiceTest {
     @Mock
     private ArtistToAlbumRepository artistToAlbumRepository;
     @Mock
-    private ArtistService artistService;
+    private ArtistRepository artistRepository;
     @Mock
     private S3Utils s3Utils;
     @Mock
@@ -173,7 +173,7 @@ class AlbumServiceTest {
         dto.setRole(ArtistRole.MAIN_ARTIST);
 
         when(albumRepository.existsById(albumId)).thenReturn(true);
-        when(artistService.artistExists(artistId)).thenReturn(true);
+        when(artistRepository.existsById(artistId)).thenReturn(true);
 
         albumService.addAllArtistToAlbum(List.of(dto), albumId);
 

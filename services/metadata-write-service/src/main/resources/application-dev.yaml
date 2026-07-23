@@ -21,6 +21,8 @@ spring:
     user: ${SPRING_LIQUIBASE_USER}
     password: ${SPRING_LIQUIBASE_PASSWORD}
     url: ${SPRING_LIQUIBASE_URL}
+    database-change-log-table: metadata_databasechangelog
+    database-change-log-lock-table: metadata_databasechangeloglock
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
 

@@ -1,30 +1,36 @@
 package org.ultra.rcrs.mediaservice.temporal.activity.impl;
 
 import io.temporal.spring.boot.ActivityImpl;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 import org.ultra.rcrs.exceptions.BadRequestException;
-import org.ultra.rcrs.mediaservice.temporal.activity.ValidateImageActivity;
+import org.ultra.rcrs.mediaservice.temporal.activity.ValidateActivity;
 import org.ultra.rcrs.mediaservice.temporal.activity.model.ValidatedImage;
 import org.ultra.rcrs.mediaservice.utils.Hash;
+import software.amazon.awssdk.services.s3.S3Client;
+import tools.jackson.databind.ObjectMapper;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.util.Base64;
+import java.util.Set;
 
 @Component
 @ActivityImpl
 @Slf4j
-public class ValidateImageActivityImpl implements ValidateImageActivity {
+@RequiredArgsConstructor
+public class ValidateActivityImpl implements ValidateActivity {
 
     private static final String CONTENT_TYPE_PREFIX = "data:";
     private static final String ENCODING_PREFIX = ";base64,";
     private static final String[] MIME_TYPES = {"image/jpeg", "image/png"};
 
     @Override
-    public ValidatedImage validate(String dataUrl) {
+    public ValidatedImage validateImage(String dataUrl) {
         if (!dataUrl.startsWith(CONTENT_TYPE_PREFIX) || !dataUrl.contains(ENCODING_PREFIX)) {
             throw new BadRequestException("It is not data url string");
         }
@@ -56,7 +62,9 @@ public class ValidateImageActivityImpl implements ValidateImageActivity {
         }
 
         String key = Hash.sha1(imageData);
+
         log.info("Image validated: format={}, key={}", format, key);
         return new ValidatedImage(format, contentType, key, imageData);
     }
+
 }

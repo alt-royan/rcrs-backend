@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 import org.ultra.rcrs.events.common.DomainEventOuterClass;
 import org.ultra.rcrs.events.track.TrackTranscodingEventOuterClass;
 import org.ultra.rcrs.kafka.Topics;
+import org.ultra.rcrs.mediaservice.dto.TranscodingWorkflowInput;
 import org.ultra.rcrs.mediaservice.temporal.workflow.AudioTranscodingWorkflow;
-import tools.jackson.databind.ObjectMapper;
 
 import java.util.UUID;
 
@@ -52,7 +52,7 @@ public class MediaEventListener {
                                 .setWorkflowId(UUID.randomUUID().toString())
                                 .build()
                 );
-                WorkflowClient.execute(workflow::transcode, event.getUid(), event.getTrackId());
+                WorkflowClient.execute(workflow::transcode, new TranscodingWorkflowInput(event.getUid(), event.getTrackId()));
             }
         } catch (Exception e) {
             log.error("Failed to unpack ArtistCreatedEvent: {}", e.getMessage(), e);

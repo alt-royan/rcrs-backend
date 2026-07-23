@@ -173,7 +173,7 @@ public abstract class BaseIntegrationTest {
                 .setPayload(Any.pack(payload))
                 .build();
         kafkaTemplate.send(Topics.CATALOG_CDC_TOPIC, event.toByteArray()).get();
-        Thread.sleep(2000);
+        Thread.sleep(1000);
     }
 
     protected void sendArtistCreated(String id, String name, EntityStatus status) throws ExecutionException, InterruptedException {

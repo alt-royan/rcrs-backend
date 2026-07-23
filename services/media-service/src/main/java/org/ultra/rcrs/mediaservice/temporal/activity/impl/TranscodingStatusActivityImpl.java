@@ -6,8 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.ultra.rcrs.enums.FileStatus;
-import org.ultra.rcrs.exceptions.NotFoundException;
-import org.ultra.rcrs.mediaservice.dao.model.AudioUpload;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioUploadRepository;
 import org.ultra.rcrs.mediaservice.producer.MediaEventProducer;
 import org.ultra.rcrs.mediaservice.temporal.activity.TranscodingStatusActivity;
@@ -24,10 +22,8 @@ public class TranscodingStatusActivityImpl implements TranscodingStatusActivity 
 
     @Override
     public void updateStatusToTranscoding(String uid, String trackId) {
-        AudioUpload audioUpload = audioUploadRepository.findById(uid)
-                .orElseThrow(() -> new NotFoundException("Audio file", uid));
         transactionTemplate.executeWithoutResult(status -> {
-            audioUploadRepository.updateStatusByUid(FileStatus.TRANSCODING, uid);
+            audioUploadRepository.updateStatusAndErrorByUid(FileStatus.TRANSCODING, null, uid);
             audioUploadRepository.updateExpiredAtByUid(null, uid);
             audioUploadRepository.updateTrackIdAtByUid(trackId, uid);
         });
