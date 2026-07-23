@@ -4,7 +4,6 @@ import com.google.protobuf.Any;
 import com.google.protobuf.GeneratedMessage;
 import com.google.protobuf.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
@@ -27,9 +26,9 @@ import org.ultra.rcrs.events.artist.ArtistCreatedEventOuterClass;
 import org.ultra.rcrs.events.common.*;
 import org.ultra.rcrs.events.track.*;
 import org.ultra.rcrs.kafka.Topics;
-import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
-import org.ultra.rcrs.metadata.model.ArtistPublicDocument;
-import org.ultra.rcrs.metadata.model.TrackPublicDocument;
+import org.ultra.rcrs.metadata.model.AlbumDocument;
+import org.ultra.rcrs.metadata.model.ArtistDocument;
+import org.ultra.rcrs.metadata.model.TrackDocument;
 import org.ultra.rcrs.metadata.repository.AlbumDocumentRepository;
 import org.ultra.rcrs.metadata.repository.ArtistDocumentRepository;
 import org.ultra.rcrs.metadata.repository.TrackDocumentRepository;
@@ -79,8 +78,8 @@ public abstract class BaseIntegrationTest {
         trackRepository.deleteAll().block();
     }
 
-    protected ArtistPublicDocument createArtistDoc(String name, EntityStatus status) {
-        return artistRepository.save(ArtistPublicDocument.builder()
+    protected ArtistDocument createArtistDoc(String name, EntityStatus status) {
+        return artistRepository.save(ArtistDocument.builder()
                 .id(randomId())
                 .name(name)
                 .avatarS3Key("avatars/" + name.toLowerCase().replace(" ", "-") + ".jpg")
@@ -90,9 +89,9 @@ public abstract class BaseIntegrationTest {
                 .build()).block();
     }
 
-    protected AlbumPublicDocument createAlbumDoc(String title, LifecycleStatus lifecycle,
-                                                 EntityStatus availability) {
-        return albumRepository.save(AlbumPublicDocument.builder()
+    protected AlbumDocument createAlbumDoc(String title, LifecycleStatus lifecycle,
+                                           EntityStatus availability) {
+        return albumRepository.save(AlbumDocument.builder()
                 .id(randomId())
                 .title(title)
                 .type(AlbumType.FULL)
@@ -108,11 +107,11 @@ public abstract class BaseIntegrationTest {
                 .build()).block();
     }
 
-    protected AlbumPublicDocument createAlbumDocWithArtist(String title, LifecycleStatus lifecycle,
-                                                           EntityStatus availability,
-                                                           String artistId, String artistName,
-                                                           ArtistRole role) {
-        return albumRepository.save(AlbumPublicDocument.builder()
+    protected AlbumDocument createAlbumDocWithArtist(String title, LifecycleStatus lifecycle,
+                                                     EntityStatus availability,
+                                                     String artistId, String artistName,
+                                                     ArtistRole role) {
+        return albumRepository.save(AlbumDocument.builder()
                 .id(randomId())
                 .title(title)
                 .type(AlbumType.FULL)
@@ -124,7 +123,7 @@ public abstract class BaseIntegrationTest {
                 .totalDurationMs(300000)
                 .coverS3Key("covers/" + title.toLowerCase().replace(" ", "-") + ".jpg")
                 .explicit(false)
-                .artists(List.of(AlbumPublicDocument.ArtistEmbed.builder()
+                .artists(List.of(AlbumDocument.ArtistEmbed.builder()
                         .id(artistId)
                         .name(artistName)
                         .avatarS3Key("avatars/" + artistId + ".jpg")
@@ -133,9 +132,9 @@ public abstract class BaseIntegrationTest {
                 .build()).block();
     }
 
-    protected TrackPublicDocument createTrackDoc(String title, String albumId, String albumTitle,
-                                                 LifecycleStatus lifecycle, EntityStatus availability) {
-        return trackRepository.save(TrackPublicDocument.builder()
+    protected TrackDocument createTrackDoc(String title, String albumId, String albumTitle,
+                                           LifecycleStatus lifecycle, EntityStatus availability) {
+        return trackRepository.save(TrackDocument.builder()
                 .id(randomId())
                 .title(title)
                 .trackNumber(1)
@@ -143,7 +142,7 @@ public abstract class BaseIntegrationTest {
                 .explicit(false)
                 .lifecycleStatus(lifecycle)
                 .availabilityStatus(availability)
-                .album(TrackPublicDocument.AlbumEmbed.builder()
+                .album(TrackDocument.AlbumEmbed.builder()
                         .id(albumId)
                         .title(albumTitle)
                         .coverS3Key("covers/" + albumId + ".jpg")

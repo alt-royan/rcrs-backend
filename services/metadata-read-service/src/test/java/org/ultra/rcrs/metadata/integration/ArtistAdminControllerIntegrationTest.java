@@ -3,7 +3,8 @@ package org.ultra.rcrs.metadata.integration;
 import org.junit.jupiter.api.Test;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
-import org.ultra.rcrs.metadata.model.ArtistPublicDocument;
+import org.ultra.rcrs.metadata.model.AlbumDocument;
+import org.ultra.rcrs.metadata.model.ArtistDocument;
 
 import java.util.List;
 
@@ -11,7 +12,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getArtist_activeArtist_200ReturnsData() {
-        ArtistPublicDocument artist = createArtistDoc("Active Artist", EntityStatus.ACTIVE);
+        ArtistDocument artist = createArtistDoc("Active Artist", EntityStatus.ACTIVE);
 
         webTestClient.get()
                 .uri("/admin/artists/{id}", artist.getId())
@@ -24,7 +25,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getArtist_deletedArtist_200ReturnsData() {
-        ArtistPublicDocument artist = createArtistDoc("Deleted Artist", EntityStatus.DELETED);
+        ArtistDocument artist = createArtistDoc("Deleted Artist", EntityStatus.DELETED);
 
         webTestClient.get()
                 .uri("/admin/artists/{id}", artist.getId())
@@ -45,7 +46,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getAlbumsByArtist_returnsAllAlbumsRegardlessOfStatus() {
-        ArtistPublicDocument artist = createArtistDoc("Album Artist", EntityStatus.ACTIVE);
+        ArtistDocument artist = createArtistDoc("Album Artist", EntityStatus.ACTIVE);
         createAlbumDocWithArtist("Published Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE,
                 artist.getId(), "Album Artist", org.ultra.rcrs.enums.ArtistRole.MAIN_ARTIST);
         createAlbumDocWithArtist("Created Album", LifecycleStatus.CREATED, EntityStatus.ACTIVE,
@@ -62,10 +63,10 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getAlbumsByArtist_filtersByType() {
-        ArtistPublicDocument artist = createArtistDoc("Type Artist", EntityStatus.ACTIVE);
+        ArtistDocument artist = createArtistDoc("Type Artist", EntityStatus.ACTIVE);
 
         var albumRepo = albumRepository;
-        albumRepo.save(org.ultra.rcrs.metadata.model.AlbumPublicDocument.builder()
+        albumRepo.save(AlbumDocument.builder()
                 .id(randomId())
                 .title("Full Album")
                 .type(org.ultra.rcrs.enums.AlbumType.FULL)
@@ -77,7 +78,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
                 .totalDurationMs(300000)
                 .coverS3Key("covers/full.jpg")
                 .explicit(false)
-                .artists(List.of(org.ultra.rcrs.metadata.model.AlbumPublicDocument.ArtistEmbed.builder()
+                .artists(List.of(AlbumDocument.ArtistEmbed.builder()
                         .id(artist.getId())
                         .name("Type Artist")
                         .avatarS3Key("avatars/type-artist.jpg")
@@ -85,7 +86,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
                         .build()))
                 .build()).block();
 
-        albumRepo.save(org.ultra.rcrs.metadata.model.AlbumPublicDocument.builder()
+        albumRepo.save(AlbumDocument.builder()
                 .id(randomId())
                 .title("Single Album")
                 .type(org.ultra.rcrs.enums.AlbumType.SINGLE)
@@ -97,7 +98,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
                 .totalDurationMs(200000)
                 .coverS3Key("covers/single.jpg")
                 .explicit(false)
-                .artists(List.of(org.ultra.rcrs.metadata.model.AlbumPublicDocument.ArtistEmbed.builder()
+                .artists(List.of(AlbumDocument.ArtistEmbed.builder()
                         .id(artist.getId())
                         .name("Type Artist")
                         .avatarS3Key("avatars/type-artist.jpg")

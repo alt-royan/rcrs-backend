@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.TrackPublicStandaloneDto;
 import org.ultra.rcrs.metadata.dto.TrackPublicViewDto;
-import org.ultra.rcrs.metadata.model.TrackPublicDocument;
+import org.ultra.rcrs.metadata.model.TrackDocument;
 import org.ultra.rcrs.metadata.repository.TrackDocumentRepository;
 import org.ultra.rcrs.utils.S3Utils;
 import reactor.core.publisher.Flux;
@@ -35,7 +35,7 @@ public class TrackPublicService {
                 .map(this::toStandaloneDto);
     }
 
-    private TrackPublicViewDto toDto(TrackPublicDocument doc) {
+    private TrackPublicViewDto toDto(TrackDocument doc) {
         return TrackPublicViewDto.builder()
                 .id(doc.getId())
                 .availabilityStatus(doc.getAvailabilityStatus())
@@ -75,7 +75,7 @@ public class TrackPublicService {
                 .build();
     }
 
-    private TrackPublicStandaloneDto toStandaloneDto(TrackPublicDocument doc) {
+    private TrackPublicStandaloneDto toStandaloneDto(TrackDocument doc) {
         return TrackPublicStandaloneDto.builder()
                 .id(doc.getId())
                 .availabilityStatus(doc.getAvailabilityStatus())

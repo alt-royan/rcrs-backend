@@ -7,8 +7,7 @@ import org.junit.jupiter.api.TestMethodOrder;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
-import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
-import org.ultra.rcrs.metadata.model.TrackPublicDocument;
+import org.ultra.rcrs.metadata.model.TrackDocument;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -270,7 +269,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         assertThat(doc.getArtists()).hasSize(2);
 
         var ids = doc.getArtists().stream()
-                .map(TrackPublicDocument.ArtistEmbed::getId).toList();
+                .map(TrackDocument.ArtistEmbed::getId).toList();
         assertThat(ids).containsExactlyInAnyOrder(artist1Id, artist2Id);
     }
 
@@ -317,7 +316,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         assertThat(doc.getOthers()).hasSize(2);
 
         var ids = doc.getOthers().stream()
-                .map(TrackPublicDocument.OtherArtistEmbed::getId).toList();
+                .map(TrackDocument.OtherArtistEmbed::getId).toList();
         assertThat(ids).containsExactlyInAnyOrder(other1Id, other2Id);
     }
 }

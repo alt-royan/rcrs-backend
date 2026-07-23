@@ -11,7 +11,7 @@ import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.ArtistAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.ArtistAdminViewDto;
-import org.ultra.rcrs.metadata.model.ArtistPublicDocument;
+import org.ultra.rcrs.metadata.model.ArtistDocument;
 import org.ultra.rcrs.metadata.repository.ArtistDocumentRepository;
 import org.ultra.rcrs.utils.S3Utils;
 import reactor.core.publisher.Flux;
@@ -43,7 +43,7 @@ public class ArtistAdminService {
         }
 
         query.with(sort).skip(offset).limit(limit);
-        return mongoTemplate.find(query, ArtistPublicDocument.class, "artists")
+        return mongoTemplate.find(query, ArtistDocument.class, "artists")
                 .map(this::toStandaloneDto);
     }
 
@@ -52,21 +52,30 @@ public class ArtistAdminService {
         if (availabilityStatus != null) {
             query.addCriteria(Criteria.where("availabilityStatus").is(availabilityStatus));
         }
-        return mongoTemplate.count(query, ArtistPublicDocument.class, "artists");
+        return mongoTemplate.count(query, ArtistDocument.class, "artists");
     }
 
-    private ArtistAdminViewDto toDto(ArtistPublicDocument doc) {
+    private ArtistAdminViewDto toDto(ArtistDocument doc) {
         return ArtistAdminViewDto.builder()
                 .id(doc.getId())
                 .name(doc.getName())
                 .avatarUrl(s3Utils.parseUrl(doc.getAvatarS3Key()))
                 .socialLinks(doc.getSocialLinks() != null
                         ? doc.getSocialLinks().stream().map(s -> ArtistAdminViewDto.SocialLinkEmbed.builder()
-                                .resourceName(s.getResourceName())
-                                .url(s.getUrl())
-                                .build()).collect(Collectors.toList())
+                        .resourceName(s.getResourceName())
+                        .url(s.getUrl())
+                        .build()).collect(Collectors.toList())
                         : null)
                 .tags(doc.getTags())
+                .availabilityStatus(doc.getAvailabilityStatus())
+                .build();
+    }
+
+    private ArtistAdminStandaloneDto toStandaloneDto(ArtistDocument doc) {
+        return ArtistAdminStandaloneDto.builder()
+                .id(doc.getId())
+                .name(doc.getName())
+                .avatarUrl(s3Utils.parseUrl(doc.getAvatarS3Key()))
                 .availabilityStatus(doc.getAvailabilityStatus())
                 .build();
     }

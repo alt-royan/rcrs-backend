@@ -5,7 +5,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.ArtistPublicViewDto;
-import org.ultra.rcrs.metadata.model.ArtistPublicDocument;
+import org.ultra.rcrs.metadata.model.ArtistDocument;
 import org.ultra.rcrs.metadata.repository.ArtistDocumentRepository;
 import org.ultra.rcrs.utils.S3Utils;
 import reactor.core.publisher.Mono;
@@ -26,7 +26,7 @@ public class ArtistPublicService {
                 .map(this::toDto);
     }
 
-    private ArtistPublicViewDto toDto(ArtistPublicDocument doc) {
+    private ArtistPublicViewDto toDto(ArtistDocument doc) {
         return ArtistPublicViewDto.builder()
                 .id(doc.getId())
                 .name(doc.getName())

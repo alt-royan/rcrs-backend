@@ -15,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Document(collection = "artists")
-public class ArtistPublicDocument {
+public class ArtistDocument {
 
     @Id
     private String id;

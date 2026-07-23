@@ -3,15 +3,13 @@ package org.ultra.rcrs.metadata.integration;
 import org.junit.jupiter.api.Test;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
-import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
-
-import java.util.List;
+import org.ultra.rcrs.metadata.model.AlbumDocument;
 
 class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getAlbum_createdLifecycleStatus_200ReturnsData() {
-        AlbumPublicDocument album = createAlbumDoc("Draft Album", LifecycleStatus.CREATED, EntityStatus.ACTIVE);
+        AlbumDocument album = createAlbumDoc("Draft Album", LifecycleStatus.CREATED, EntityStatus.ACTIVE);
 
         webTestClient.get()
                 .uri("/admin/albums/{id}", album.getId())
@@ -25,7 +23,7 @@ class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getAlbum_deletedAvailability_200ReturnsData() {
-        AlbumPublicDocument album = createAlbumDoc("Deleted Album", LifecycleStatus.PUBLISHED, EntityStatus.DELETED);
+        AlbumDocument album = createAlbumDoc("Deleted Album", LifecycleStatus.PUBLISHED, EntityStatus.DELETED);
 
         webTestClient.get()
                 .uri("/admin/albums/{id}", album.getId())
@@ -46,7 +44,7 @@ class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getAlbum_lifecycleStatusFieldExposed() {
-        AlbumPublicDocument album = createAlbumDoc("Lifecycle Album", LifecycleStatus.TRANSCODING, EntityStatus.ACTIVE);
+        AlbumDocument album = createAlbumDoc("Lifecycle Album", LifecycleStatus.TRANSCODING, EntityStatus.ACTIVE);
 
         webTestClient.get()
                 .uri("/admin/albums/{id}", album.getId())
@@ -58,7 +56,7 @@ class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getTracksByAlbum_returnsAllTracksRegardlessOfStatus() {
-        AlbumPublicDocument album = createAlbumDoc("Admin Tracks Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        AlbumDocument album = createAlbumDoc("Admin Tracks Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
         createTrackDoc("Published Track", album.getId(), "Admin Tracks Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
         createTrackDoc("Created Track", album.getId(), "Admin Tracks Album", LifecycleStatus.CREATED, EntityStatus.ACTIVE);
         createTrackDoc("Deleted Track", album.getId(), "Admin Tracks Album", LifecycleStatus.PUBLISHED, EntityStatus.DELETED);
@@ -72,7 +70,7 @@ class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getTracksByAlbum_noTracks_200ReturnsEmpty() {
-        AlbumPublicDocument album = createAlbumDoc("Empty Admin Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        AlbumDocument album = createAlbumDoc("Empty Admin Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
 
         webTestClient.get()
                 .uri("/admin/albums/{id}/tracks", album.getId())
@@ -83,7 +81,7 @@ class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getTracksByAlbum_lifecycleStatusFieldExposed() {
-        AlbumPublicDocument album = createAlbumDoc("Status Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        AlbumDocument album = createAlbumDoc("Status Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
         createTrackDoc("Track With Status", album.getId(), "Status Album", LifecycleStatus.TRANSCODING, EntityStatus.ACTIVE);
 
         webTestClient.get()
@@ -99,8 +97,8 @@ class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void countAlbums_filtersByExplicit() {
-        AlbumPublicDocument explicitAlbum = createAlbumDoc("Explicit Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
-        AlbumPublicDocument cleanAlbum = createAlbumDoc("Clean Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        AlbumDocument explicitAlbum = createAlbumDoc("Explicit Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        AlbumDocument cleanAlbum = createAlbumDoc("Clean Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
         explicitAlbum.setExplicit(true);
         albumRepository.save(explicitAlbum).block();
         cleanAlbum.setExplicit(false);

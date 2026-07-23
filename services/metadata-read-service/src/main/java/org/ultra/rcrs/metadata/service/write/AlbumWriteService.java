@@ -10,8 +10,8 @@ import org.ultra.rcrs.events.album.AlbumCreatedEventOuterClass;
 import org.ultra.rcrs.events.album.AlbumUpdateLifecycleStatusEventOuterClass;
 import org.ultra.rcrs.events.album.ArtistAddedToAlbumEventOuterClass;
 import org.ultra.rcrs.events.album.ArtistDeletedFromAlbumEventOuterClass;
-import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
-import org.ultra.rcrs.metadata.model.ArtistPublicDocument;
+import org.ultra.rcrs.metadata.model.AlbumDocument;
+import org.ultra.rcrs.metadata.model.ArtistDocument;
 import org.ultra.rcrs.metadata.repository.AlbumDocumentRepository;
 import org.ultra.rcrs.metadata.repository.ArtistDocumentRepository;
 
@@ -31,7 +31,7 @@ public class AlbumWriteService {
         LocalDateTime releaseDate = event.hasReleaseDate()
                 ? LocalDateTime.ofEpochSecond(event.getReleaseDate().getSeconds(), event.getReleaseDate().getNanos(), ZoneOffset.UTC)
                 : LocalDateTime.now();
-        AlbumPublicDocument doc = AlbumPublicDocument.builder()
+        AlbumDocument doc = AlbumDocument.builder()
                 .id(event.getId())
                 .title(event.getTitle())
                 .type(org.ultra.rcrs.enums.AlbumType.valueOf(event.getType().name()))
@@ -98,12 +98,12 @@ public class AlbumWriteService {
         albumDocumentRepository.findById(event.getAlbumId())
                 .zipWith(artistDocumentRepository.findById(event.getArtistId()))
                 .flatMap(tuple -> {
-                    AlbumPublicDocument albumDoc = tuple.getT1();
-                    ArtistPublicDocument artistDoc = tuple.getT2();
+                    AlbumDocument albumDoc = tuple.getT1();
+                    ArtistDocument artistDoc = tuple.getT2();
                     if (albumDoc.getArtists() == null) {
                         albumDoc.setArtists(new ArrayList<>());
                     }
-                    albumDoc.getArtists().add(AlbumPublicDocument.ArtistEmbed.builder()
+                    albumDoc.getArtists().add(AlbumDocument.ArtistEmbed.builder()
                             .id(artistDoc.getId())
                             .name(artistDoc.getName())
                             .avatarS3Key(artistDoc.getAvatarS3Key())

@@ -6,11 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.ArtistRole;
-import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.events.artist.ArtistCreatedEventOuterClass;
 import org.ultra.rcrs.events.common.AvailabilityStatusOuterClass;
 import org.ultra.rcrs.events.common.DomainEventOuterClass;
-import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
 
 import java.util.Objects;
 

@@ -13,7 +13,7 @@ import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.AlbumAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.AlbumAdminViewDto;
-import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
+import org.ultra.rcrs.metadata.model.AlbumDocument;
 import org.ultra.rcrs.metadata.repository.AlbumDocumentRepository;
 import org.ultra.rcrs.utils.S3Utils;
 import reactor.core.publisher.Flux;
@@ -43,17 +43,17 @@ public class AlbumAdminService {
             query.addCriteria(Criteria.where("type").is(albumType));
         }
         query.with(sort);
-        return mongoTemplate.find(query, AlbumPublicDocument.class, "albums")
+        return mongoTemplate.find(query, AlbumDocument.class, "albums")
                 .map(this::toStandaloneDto);
     }
 
     public Flux<AlbumAdminStandaloneDto> getAll(EntityStatus availabilityStatus,
-                                               LifecycleStatus lifecycleStatus,
-                                               AlbumType type,
-                                               Boolean explicit,
-                                               int offset,
-                                               int limit,
-                                               String sortDirection) {
+                                                LifecycleStatus lifecycleStatus,
+                                                AlbumType type,
+                                                Boolean explicit,
+                                                int offset,
+                                                int limit,
+                                                String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "releaseDate");
         Query query = new Query();
 
@@ -71,7 +71,7 @@ public class AlbumAdminService {
         }
 
         query.with(sort).skip(offset).limit(limit);
-        return mongoTemplate.find(query, AlbumPublicDocument.class, "albums")
+        return mongoTemplate.find(query, AlbumDocument.class, "albums")
                 .map(this::toStandaloneDto);
     }
 
@@ -94,10 +94,10 @@ public class AlbumAdminService {
             query.addCriteria(Criteria.where("explicit").is(explicit));
         }
 
-        return mongoTemplate.count(query, AlbumPublicDocument.class, "albums");
+        return mongoTemplate.count(query, AlbumDocument.class, "albums");
     }
 
-    private AlbumAdminViewDto toDto(AlbumPublicDocument doc) {
+    private AlbumAdminViewDto toDto(AlbumDocument doc) {
         return AlbumAdminViewDto.builder()
                 .id(doc.getId())
                 .lifecycleStatus(doc.getLifecycleStatus())
@@ -121,7 +121,7 @@ public class AlbumAdminService {
                 .build();
     }
 
-    private AlbumAdminStandaloneDto toStandaloneDto(AlbumPublicDocument doc) {
+    private AlbumAdminStandaloneDto toStandaloneDto(AlbumDocument doc) {
         return AlbumAdminStandaloneDto.builder()
                 .id(doc.getId())
                 .lifecycleStatus(doc.getLifecycleStatus())
