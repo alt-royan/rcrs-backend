@@ -18,7 +18,6 @@ CREATE TABLE IF NOT EXISTS audio
 (
     id                 uuid PRIMARY KEY,
     guid               uuid                     NOT NULL,
-    track_id           text                     NOT NULL,
     key                text                     NOT NULL,
     codec              varchar(20)              NOT NULL,
     duration_ms        int                      NOT NULL,

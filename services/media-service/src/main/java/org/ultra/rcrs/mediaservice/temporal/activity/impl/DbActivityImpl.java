@@ -4,11 +4,14 @@ import io.temporal.spring.boot.ActivityImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.mediaservice.dao.model.Audio;
 import org.ultra.rcrs.mediaservice.dao.model.AudioUpload;
+import org.ultra.rcrs.mediaservice.dao.model.TrackToAudio;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioRepository;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioUploadRepository;
+import org.ultra.rcrs.mediaservice.dao.repository.TrackToAudioRepository;
 import org.ultra.rcrs.mediaservice.temporal.activity.DbActivity;
 import org.ultra.rcrs.mediaservice.temporal.activity.model.AudioMetadata;
 
@@ -22,13 +25,14 @@ import java.util.UUID;
 public class DbActivityImpl implements DbActivity {
 
     private final AudioRepository audioRepository;
+    private final TrackToAudioRepository trackToAudioRepository;
     private final AudioUploadRepository audioUploadRepository;
 
     @Override
-    public void saveAudio(String trackId, UUID guid, String key, AudioMetadata metadata) {
+    @Transactional
+    public void saveAudio(String trackId, UUID guid, Boolean main, String key, AudioMetadata metadata) {
         Audio audio = Audio.builder()
                 .guid(guid)
-                .trackId(trackId)
                 .key(key)
                 .codec(metadata.codec())
                 .container(metadata.container())
@@ -39,7 +43,14 @@ public class DbActivityImpl implements DbActivity {
                 .creationTimestamp(OffsetDateTime.now())
                 .build();
 
+        TrackToAudio trackToAudio = TrackToAudio.builder()
+                .trackId(trackId)
+                .guid(guid)
+                .main(main)
+                .build();
+
         audioRepository.save(audio);
+        trackToAudioRepository.save(trackToAudio);
         log.info("Audio record saved: guid={}, trackId={}, container={}, bitrate={}",
                 guid, trackId, metadata.container(), metadata.bitrate());
     }

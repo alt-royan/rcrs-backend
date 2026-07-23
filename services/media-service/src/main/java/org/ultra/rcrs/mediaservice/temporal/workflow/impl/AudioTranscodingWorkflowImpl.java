@@ -47,7 +47,7 @@ public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
 
             activities.s3Activity().putAudio(key, tempFile, originalMeta.byteSize(), audioUpload.getContentType());
 
-            activities.dbActivity().saveAudio(trackId, guid, key, originalMeta);
+            activities.dbActivity().saveAudio(trackId, guid, true, key, originalMeta);
 
             for (String bitrate : bitrates) {
                 File outputFile = activities.transcodeAudioActivity().transcode(tempFile, bitrate);
@@ -57,7 +57,7 @@ public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
 
                 activities.s3Activity().putAudio(key, outputFile, metadata.byteSize(), "audio/ogg");
 
-                activities.dbActivity().saveAudio(trackId, guid, key, metadata);
+                activities.dbActivity().saveAudio(trackId, guid, true, key, metadata);
 
                 if (outputFile != null) {
                     try {

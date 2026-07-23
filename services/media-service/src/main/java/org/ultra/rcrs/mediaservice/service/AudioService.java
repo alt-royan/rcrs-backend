@@ -1,6 +1,5 @@
 package org.ultra.rcrs.mediaservice.service;
 
-import jakarta.activation.MimeType;
 import jakarta.activation.MimetypesFileTypeMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,10 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.MimeTypeUtils;
 import org.ultra.rcrs.enums.FileStatus;
 import org.ultra.rcrs.mediaservice.dao.model.AudioUpload;
+import org.ultra.rcrs.mediaservice.dao.model.AudioWithTrack;
+import org.ultra.rcrs.mediaservice.dao.repository.AudioRepository;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioUploadRepository;
+import org.ultra.rcrs.mediaservice.dto.AudioItem;
 import org.ultra.rcrs.mediaservice.dto.FileStatusResponse;
 import org.ultra.rcrs.mediaservice.dto.PreloadFileRequest;
 import org.ultra.rcrs.mediaservice.dto.S3PresignUrlResponse;
@@ -30,6 +31,8 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -38,9 +41,10 @@ public class AudioService {
 
 
     private final AudioUploadRepository audioUploadRepository;
+    private final AudioRepository audioRepository;
     private final S3Presigner s3Presigner;
 
-    @Value("${cdn.uploads.bucket}")
+    @Value("${cdn.uploads.bucket.name}")
     private String s3UploadBucket;
 
     @Value("${cdn.uploads.signature-duration}")
@@ -102,6 +106,14 @@ public class AudioService {
         List<AudioUpload> files = audioUploadRepository.findAllById(uids);
         return files.stream().map(file -> new FileStatusResponse(file.getUid(), file.getStatus(), file.getError()))
                 .toList();
+    }
+
+    public Map<UUID, List<AudioItem>> getAudiosByTrackId(String trackId) {
+        List<AudioWithTrack> audios = audioRepository.findAllByTrackId(trackId);
+        return audios.stream()
+                .map(a -> new AudioItem(a.getId(), a.getGuid(), a.getKey(), a.getCodec(), a.getContainer(),
+                        a.getDurationMs(), a.getBitrate(), a.getSampleRate(), a.getByteSize(), a.getMain()))
+                .collect(Collectors.groupingBy(AudioItem::getGuid));
     }
 
 }

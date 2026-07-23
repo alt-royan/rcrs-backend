@@ -32,6 +32,7 @@
         <ffmpeg-platform.version>8.0.1-1.5.13</ffmpeg-platform.version>
         <temporal-spring.version>1.37.0</temporal-spring.version>
         <testcontainers.version>1.21.4</testcontainers.version>
+        <keycloak-admin-client.version>26.0.10</keycloak-admin-client.version>
     </properties>
 
     <modules>
@@ -81,6 +82,12 @@
                 <groupId>org.imgscalr</groupId>
                 <artifactId>imgscalr-lib</artifactId>
                 <version>${imgscalr.version}</version>
+                <scope>compile</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.keycloak</groupId>
+                <artifactId>keycloak-admin-client</artifactId>
+                <version>${keycloak-admin-client.version}</version>
                 <scope>compile</scope>
             </dependency>
             <dependency>

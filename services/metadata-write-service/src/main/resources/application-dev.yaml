@@ -37,6 +37,8 @@ eureka:
   instance:
     preferIpAddress: true
 
+spring.security.oauth2.resourceserver.jwt.issuer-uri: ${OAUTH2_ISSUER_URI}
+
 management:
   endpoints:
     web:
