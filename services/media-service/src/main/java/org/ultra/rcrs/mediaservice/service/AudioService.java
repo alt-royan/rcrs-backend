@@ -44,7 +44,7 @@ public class AudioService {
     private final AudioRepository audioRepository;
     private final S3Presigner s3Presigner;
 
-    @Value("${cdn.uploads.bucket}")
+    @Value("${cdn.uploads.bucket.name}")
     private String s3UploadBucket;
 
     @Value("${cdn.uploads.signature-duration}")

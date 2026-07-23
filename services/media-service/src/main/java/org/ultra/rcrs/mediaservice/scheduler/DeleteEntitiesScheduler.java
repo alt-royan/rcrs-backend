@@ -26,7 +26,7 @@ public class DeleteEntitiesScheduler {
     private final AudioUploadRepository audioUploadRepository;
     private final S3Client s3Client;
 
-    @Value("${cdn.uploads.bucket}")
+    @Value("${cdn.uploads.bucket.name}")
     private String s3UploadBucket;
 
     @Scheduled(fixedRate = 3600000)

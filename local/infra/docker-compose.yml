@@ -253,35 +253,35 @@ services:
     networks:
       - rcrs
 
-#  keycloak:
-#    build:
-#      context: ./keycloak
-#      dockerfile: Dockerfile
-#    container_name: keycloak
-#    command: start-dev
-#    ports:
-#      - "8180:8080"
-#    environment:
-#      KEYCLOAK_ADMIN: admin
-#      KEYCLOAK_ADMIN_PASSWORD: admin
-#      KAFKA_TOPIC: identity.events
-#      KAFKA_CLIENT_ID: keycloak
-#      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-#      KAFKA_EVENTS: REGISTER,UPDATE_PROFILE,UPDATE_EMAIL,DELETE_ACCOUNT,LOGIN
-#    depends_on:
-#      kafka:
-#        condition: service_healthy
-#    volumes:
-#      - keycloak_data:/opt/keycloak/data
-#    healthcheck:
-#      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200'"]
-#      interval: 10s
-#      timeout: 5s
-#      retries: 15
-#      start_period: 30s
-#    restart: unless-stopped
-#    networks:
-#      - rcrs
+  keycloak:
+    build:
+      context: ./keycloak
+      dockerfile: Dockerfile
+    container_name: keycloak
+    command: start-dev
+    ports:
+      - "8180:8080"
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KAFKA_TOPIC: identity.events
+      KAFKA_CLIENT_ID: keycloak
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_EVENTS: REGISTER,UPDATE_PROFILE,UPDATE_EMAIL,DELETE_ACCOUNT,LOGIN
+    depends_on:
+      kafka:
+        condition: service_healthy
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\\r\\nHost: localhost\\r\\nConnection: close\\r\\n\\r\\n' >&3 && cat <&3 | grep -q '200'"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 30s
+    restart: unless-stopped
+    networks:
+      - rcrs
 
 #  redis:
 #    image: redis:latest

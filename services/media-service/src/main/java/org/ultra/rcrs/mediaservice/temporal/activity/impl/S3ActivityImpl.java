@@ -23,13 +23,13 @@ public class S3ActivityImpl implements S3Activity {
 
     private final S3Client s3Client;
 
-    @Value("${cdn.images.bucket}")
+    @Value("${cdn.images.bucket.name}")
     private String s3ImageBucket;
 
-    @Value("${cdn.audios.bucket}")
+    @Value("${cdn.audios.bucket.name}")
     private String s3AudioBucket;
 
-    @Value("${cdn.uploads.bucket}")
+    @Value("${cdn.uploads.bucket.name}")
     private String s3UploadsBucket;
 
     @Override

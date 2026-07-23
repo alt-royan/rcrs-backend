@@ -101,16 +101,23 @@ spring:
 
 cdn:
   images:
-    bucket: images
+    bucket:
+      name: images
+      public-url:  http://images.localhost:4566
     thumbnails: 64,300,640
   audios:
-    bucket: rcrs-audio
+    bucket:
+      name: rcrs-audio
+      public-url:  http://audio.localhost:4566
   uploads:
-    bucket: rcrs-upload
+    bucket:
+      name: rcrs-upload
+      public-url:  http://upload.localhost:4566
     signature-duration: 24h
     file-duration: 24h
     sqs:
       queue: rcrs-upload-event-queue
+
 audio:
   validation:
     formats: mp3, wav, ogg, flac
