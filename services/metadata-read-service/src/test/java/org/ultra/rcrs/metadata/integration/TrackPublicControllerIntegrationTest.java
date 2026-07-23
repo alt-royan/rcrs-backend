@@ -3,8 +3,8 @@ package org.ultra.rcrs.metadata.integration;
 import org.junit.jupiter.api.Test;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
-import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
-import org.ultra.rcrs.metadata.model.TrackPublicDocument;
+import org.ultra.rcrs.metadata.model.AlbumDocument;
+import org.ultra.rcrs.metadata.model.TrackDocument;
 
 import java.util.List;
 
@@ -12,8 +12,8 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getTrack_publishedActiveTrack_200ReturnsData() {
-        AlbumPublicDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
-        TrackPublicDocument track = createTrackDoc("Published Track", album.getId(), "Track Album",
+        AlbumDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        TrackDocument track = createTrackDoc("Published Track", album.getId(), "Track Album",
                 LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
 
         webTestClient.get()
@@ -29,8 +29,8 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getTrack_publishedHiddenTrack_200ReturnsData() {
-        AlbumPublicDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
-        TrackPublicDocument track = createTrackDoc("Hidden Track", album.getId(), "Track Album",
+        AlbumDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        TrackDocument track = createTrackDoc("Hidden Track", album.getId(), "Track Album",
                 LifecycleStatus.PUBLISHED, EntityStatus.HIDDEN);
 
         webTestClient.get()
@@ -44,8 +44,8 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getTrack_createdLifecycleStatus_404NotFound() {
-        AlbumPublicDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
-        TrackPublicDocument track = createTrackDoc("Draft Track", album.getId(), "Track Album",
+        AlbumDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        TrackDocument track = createTrackDoc("Draft Track", album.getId(), "Track Album",
                 LifecycleStatus.CREATED, EntityStatus.ACTIVE);
 
         webTestClient.get()
@@ -56,8 +56,8 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getTrack_transcodingLifecycleStatus_404NotFound() {
-        AlbumPublicDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
-        TrackPublicDocument track = createTrackDoc("Transcoding Track", album.getId(), "Track Album",
+        AlbumDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        TrackDocument track = createTrackDoc("Transcoding Track", album.getId(), "Track Album",
                 LifecycleStatus.TRANSCODING, EntityStatus.ACTIVE);
 
         webTestClient.get()
@@ -68,8 +68,8 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getTrack_deletedAvailability_404NotFound() {
-        AlbumPublicDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
-        TrackPublicDocument track = createTrackDoc("Deleted Track", album.getId(), "Track Album",
+        AlbumDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        TrackDocument track = createTrackDoc("Deleted Track", album.getId(), "Track Album",
                 LifecycleStatus.PUBLISHED, EntityStatus.DELETED);
 
         webTestClient.get()
@@ -88,8 +88,8 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getTrack_albumEmbedIncluded() {
-        AlbumPublicDocument album = createAlbumDoc("Embed Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
-        TrackPublicDocument track = createTrackDoc("Embed Track", album.getId(), "Embed Album",
+        AlbumDocument album = createAlbumDoc("Embed Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        TrackDocument track = createTrackDoc("Embed Track", album.getId(), "Embed Album",
                 LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
 
         webTestClient.get()
@@ -104,8 +104,8 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getTrack_explicitFieldReturned() {
-        AlbumPublicDocument album = createAlbumDoc("Explicit Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
-        TrackPublicDocument track = trackRepository.save(TrackPublicDocument.builder()
+        AlbumDocument album = createAlbumDoc("Explicit Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        TrackDocument track = trackRepository.save(TrackDocument.builder()
                 .id(randomId())
                 .title("Explicit Track")
                 .trackNumber(1)
@@ -113,7 +113,7 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .explicit(true)
                 .lifecycleStatus(LifecycleStatus.PUBLISHED)
                 .availabilityStatus(EntityStatus.ACTIVE)
-                .album(TrackPublicDocument.AlbumEmbed.builder()
+                .album(TrackDocument.AlbumEmbed.builder()
                         .id(album.getId())
                         .title("Explicit Album")
                         .coverS3Key("covers/explicit.jpg")

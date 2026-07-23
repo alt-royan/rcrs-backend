@@ -3,15 +3,15 @@ package org.ultra.rcrs.metadata.integration;
 import org.junit.jupiter.api.Test;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
-import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
-import org.ultra.rcrs.metadata.model.TrackPublicDocument;
+import org.ultra.rcrs.metadata.model.AlbumDocument;
+import org.ultra.rcrs.metadata.model.TrackDocument;
 
 class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getTrack_createdLifecycleStatus_200ReturnsData() {
-        AlbumPublicDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
-        TrackPublicDocument track = createTrackDoc("Draft Track", album.getId(), "Track Album",
+        AlbumDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        TrackDocument track = createTrackDoc("Draft Track", album.getId(), "Track Album",
                 LifecycleStatus.CREATED, EntityStatus.ACTIVE);
 
         webTestClient.get()
@@ -26,8 +26,8 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getTrack_deletedAvailability_200ReturnsData() {
-        AlbumPublicDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
-        TrackPublicDocument track = createTrackDoc("Deleted Track", album.getId(), "Track Album",
+        AlbumDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        TrackDocument track = createTrackDoc("Deleted Track", album.getId(), "Track Album",
                 LifecycleStatus.PUBLISHED, EntityStatus.DELETED);
 
         webTestClient.get()
@@ -49,8 +49,8 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getTrack_lifecycleStatusFieldExposed() {
-        AlbumPublicDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
-        TrackPublicDocument track = createTrackDoc("Lifecycle Track", album.getId(), "Track Album",
+        AlbumDocument album = createAlbumDoc("Track Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        TrackDocument track = createTrackDoc("Lifecycle Track", album.getId(), "Track Album",
                 LifecycleStatus.TRANSCODING, EntityStatus.ACTIVE);
 
         webTestClient.get()
@@ -63,8 +63,8 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getTrack_albumEmbedIncluded() {
-        AlbumPublicDocument album = createAlbumDoc("Embed Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
-        TrackPublicDocument track = createTrackDoc("Embed Track", album.getId(), "Embed Album",
+        AlbumDocument album = createAlbumDoc("Embed Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        TrackDocument track = createTrackDoc("Embed Track", album.getId(), "Embed Album",
                 LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
 
         webTestClient.get()
@@ -74,5 +74,24 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
                 .expectBody()
                 .jsonPath("$.album.id").isEqualTo(album.getId())
                 .jsonPath("$.album.title").isEqualTo("Embed Album");
+    }
+
+    @Test
+    void countTracks_filtersByAlbumId() {
+        AlbumDocument albumA = createAlbumDoc("Album A", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        AlbumDocument albumB = createAlbumDoc("Album B", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+
+        createTrackDoc("Track A1", albumA.getId(), "Album A", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        createTrackDoc("Track A2", albumA.getId(), "Album A", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        createTrackDoc("Track B1", albumB.getId(), "Album B", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/admin/tracks/count")
+                        .queryParam("albumId", albumA.getId())
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Long.class).isEqualTo(2L);
     }
 }

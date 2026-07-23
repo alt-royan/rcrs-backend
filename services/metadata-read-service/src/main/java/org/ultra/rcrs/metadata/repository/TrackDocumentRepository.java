@@ -4,22 +4,22 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.ultra.rcrs.metadata.model.TrackPublicDocument;
+import org.ultra.rcrs.metadata.model.TrackDocument;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Repository
-public interface TrackDocumentRepository extends ReactiveMongoRepository<TrackPublicDocument, String> {
+public interface TrackDocumentRepository extends ReactiveMongoRepository<TrackDocument, String> {
 
     @Query("{ '_id': ?0 }")
-    Mono<TrackPublicDocument> findByIdForAdmin(String id);
+    Mono<TrackDocument> findByIdForAdmin(String id);
 
     @Query("{ '_id': ?0, 'lifecycleStatus': 'PUBLISHED', 'availabilityStatus': { '$in': [ 'ACTIVE', 'HIDDEN' ] } }")
-    Mono<TrackPublicDocument> findByIdForPublic(String id);
+    Mono<TrackDocument> findByIdForPublic(String id);
 
     @Query("{ 'album.id': ?0 }")
-    Flux<TrackPublicDocument> findAllByAlbumIdForAdmin(String albumId, Sort sort);
+    Flux<TrackDocument> findAllByAlbumIdForAdmin(String albumId, Sort sort);
 
     @Query("{ 'album.id': ?0, 'lifecycleStatus': 'PUBLISHED', 'availabilityStatus': { '$in': [ 'ACTIVE', 'HIDDEN' ] } }")
-    Flux<TrackPublicDocument> findAllByAlbumIdForPublic(String albumId, Sort sort);
+    Flux<TrackDocument> findAllByAlbumIdForPublic(String albumId, Sort sort);
 }

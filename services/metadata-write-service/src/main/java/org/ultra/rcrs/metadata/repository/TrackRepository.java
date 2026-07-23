@@ -4,9 +4,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-import org.ultra.rcrs.metadata.model.Track;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
+import org.ultra.rcrs.metadata.model.Track;
 
 import java.util.List;
 import java.util.UUID;
@@ -31,4 +31,10 @@ public interface TrackRepository extends JpaRepository<Track, UUID> {
 
     @Query("SELECT t.id FROM Track t WHERE t.albumId = :albumId")
     List<UUID> findAllIdsByAlbumId(UUID albumId);
+
+    @Query("SELECT COUNT(*) FROM Track t WHERE t.albumId = :albumId AND t.lifecycleStatus = :status")
+    long countByAlbumIdAndAvailabilityStatus(UUID albumId, LifecycleStatus status);
+
+    @Query("SELECT COUNT(*) FROM Track t WHERE t.albumId = :albumId")
+    long countByAlbumId(UUID albumId);
 }

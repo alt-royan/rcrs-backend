@@ -8,10 +8,12 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.enums.AlbumType;
+import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.AlbumAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.AlbumAdminViewDto;
-import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
+import org.ultra.rcrs.metadata.model.AlbumDocument;
 import org.ultra.rcrs.metadata.repository.AlbumDocumentRepository;
 import org.ultra.rcrs.utils.S3Utils;
 import reactor.core.publisher.Flux;
@@ -41,11 +43,61 @@ public class AlbumAdminService {
             query.addCriteria(Criteria.where("type").is(albumType));
         }
         query.with(sort);
-        return mongoTemplate.find(query, AlbumPublicDocument.class, "albums")
+        return mongoTemplate.find(query, AlbumDocument.class, "albums")
                 .map(this::toStandaloneDto);
     }
 
-    private AlbumAdminViewDto toDto(AlbumPublicDocument doc) {
+    public Flux<AlbumAdminStandaloneDto> getAll(EntityStatus availabilityStatus,
+                                                LifecycleStatus lifecycleStatus,
+                                                AlbumType type,
+                                                Boolean explicit,
+                                                int offset,
+                                                int limit,
+                                                String sortDirection) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "releaseDate");
+        Query query = new Query();
+
+        if (availabilityStatus != null) {
+            query.addCriteria(Criteria.where("availabilityStatus").is(availabilityStatus));
+        }
+        if (lifecycleStatus != null) {
+            query.addCriteria(Criteria.where("lifecycleStatus").is(lifecycleStatus));
+        }
+        if (type != null) {
+            query.addCriteria(Criteria.where("type").is(type));
+        }
+        if (explicit != null) {
+            query.addCriteria(Criteria.where("explicit").is(explicit));
+        }
+
+        query.with(sort).skip(offset).limit(limit);
+        return mongoTemplate.find(query, AlbumDocument.class, "albums")
+                .map(this::toStandaloneDto);
+    }
+
+    public Mono<Long> count(EntityStatus availabilityStatus,
+                            LifecycleStatus lifecycleStatus,
+                            AlbumType type,
+                            Boolean explicit) {
+        Query query = new Query();
+
+        if (availabilityStatus != null) {
+            query.addCriteria(Criteria.where("availabilityStatus").is(availabilityStatus));
+        }
+        if (lifecycleStatus != null) {
+            query.addCriteria(Criteria.where("lifecycleStatus").is(lifecycleStatus));
+        }
+        if (type != null) {
+            query.addCriteria(Criteria.where("type").is(type));
+        }
+        if (explicit != null) {
+            query.addCriteria(Criteria.where("explicit").is(explicit));
+        }
+
+        return mongoTemplate.count(query, AlbumDocument.class, "albums");
+    }
+
+    private AlbumAdminViewDto toDto(AlbumDocument doc) {
         return AlbumAdminViewDto.builder()
                 .id(doc.getId())
                 .lifecycleStatus(doc.getLifecycleStatus())
@@ -69,7 +121,7 @@ public class AlbumAdminService {
                 .build();
     }
 
-    private AlbumAdminStandaloneDto toStandaloneDto(AlbumPublicDocument doc) {
+    private AlbumAdminStandaloneDto toStandaloneDto(AlbumDocument doc) {
         return AlbumAdminStandaloneDto.builder()
                 .id(doc.getId())
                 .lifecycleStatus(doc.getLifecycleStatus())

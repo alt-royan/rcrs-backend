@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.events.track.*;
-import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
-import org.ultra.rcrs.metadata.model.ArtistPublicDocument;
-import org.ultra.rcrs.metadata.model.TrackPublicDocument;
+import org.ultra.rcrs.metadata.model.AlbumDocument;
+import org.ultra.rcrs.metadata.model.ArtistDocument;
+import org.ultra.rcrs.metadata.model.TrackDocument;
 import org.ultra.rcrs.metadata.repository.AlbumDocumentRepository;
 import org.ultra.rcrs.metadata.repository.ArtistDocumentRepository;
 import org.ultra.rcrs.metadata.repository.TrackDocumentRepository;
@@ -26,7 +26,7 @@ public class TrackWriteService {
     private final ArtistDocumentRepository artistDocumentRepository;
 
     public void handleTrackCreated(TrackCreatedEventOuterClass.TrackCreatedEvent event) {
-        TrackPublicDocument doc = TrackPublicDocument.builder()
+        TrackDocument doc = TrackDocument.builder()
                 .id(event.getId())
                 .title(event.getTitle())
                 .trackNumber(event.getTrackNumber())
@@ -47,9 +47,9 @@ public class TrackWriteService {
         trackDocumentRepository.findById(event.getTrackId())
                 .zipWith(albumDocumentRepository.findById(event.getAlbumId()))
                 .flatMap(tuple -> {
-                    TrackPublicDocument trackDoc = tuple.getT1();
-                    AlbumPublicDocument albumDoc = tuple.getT2();
-                    trackDoc.setAlbum(TrackPublicDocument.AlbumEmbed.builder()
+                    TrackDocument trackDoc = tuple.getT1();
+                    AlbumDocument albumDoc = tuple.getT2();
+                    trackDoc.setAlbum(TrackDocument.AlbumEmbed.builder()
                             .id(albumDoc.getId())
                             .title(albumDoc.getTitle())
                             .coverS3Key(albumDoc.getCoverS3Key())
@@ -118,12 +118,12 @@ public class TrackWriteService {
         trackDocumentRepository.findById(event.getTrackId())
                 .zipWith(artistDocumentRepository.findById(event.getArtistId()))
                 .flatMap(tuple -> {
-                    TrackPublicDocument trackDoc = tuple.getT1();
-                    ArtistPublicDocument artistDoc = tuple.getT2();
+                    TrackDocument trackDoc = tuple.getT1();
+                    ArtistDocument artistDoc = tuple.getT2();
                     if (trackDoc.getArtists() == null) {
                         trackDoc.setArtists(new ArrayList<>());
                     }
-                    trackDoc.getArtists().add(TrackPublicDocument.ArtistEmbed.builder()
+                    trackDoc.getArtists().add(TrackDocument.ArtistEmbed.builder()
                             .id(artistDoc.getId())
                             .name(artistDoc.getName())
                             .avatarS3Key(artistDoc.getAvatarS3Key())
@@ -155,14 +155,14 @@ public class TrackWriteService {
                     if (doc.getOthers() == null) {
                         doc.setOthers(new ArrayList<>());
                     }
-                    doc.getOthers().add(TrackPublicDocument.OtherArtistEmbed.builder()
+                    doc.getOthers().add(TrackDocument.OtherArtistEmbed.builder()
                             .id(event.getOtherId())
                             .name(event.getName())
                             .roles(event.getRolesList().stream()
                                     .map(r -> org.ultra.rcrs.enums.ArtistRole.valueOf(r.name()))
                                     .collect(Collectors.toList()))
                             .socialLinks(event.getSocialLinksList().stream()
-                                    .map(sl -> ArtistPublicDocument.SocialLinkEmbed.builder()
+                                    .map(sl -> ArtistDocument.SocialLinkEmbed.builder()
                                             .resourceName(sl.getResourceName())
                                             .url(sl.getUrl())
                                             .build())

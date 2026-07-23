@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
@@ -17,31 +18,22 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "tracks")
-public class TrackPublicDocument {
+@Document(collection = "albums")
+public class AlbumDocument {
 
     @Id
     private String id;
     private LifecycleStatus lifecycleStatus;
     private EntityStatus availabilityStatus;
     private String title;
+    private AlbumType type;
     private LocalDateTime releaseDate;
-    private Integer durationMs;
-    private Integer trackNumber;
+    private Integer year;
+    private Integer totalTracks;
+    private Integer totalDurationMs;
+    private String coverS3Key;
     private Boolean explicit;
-    private AlbumEmbed album;
     private List<ArtistEmbed> artists;
-    private List<OtherArtistEmbed> others;
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Builder
-    public static class AlbumEmbed {
-        private String id;
-        private String title;
-        private String coverS3Key;
-    }
 
     @Data
     @AllArgsConstructor
@@ -52,16 +44,5 @@ public class TrackPublicDocument {
         private String name;
         private String avatarS3Key;
         private ArtistRole role;
-    }
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    @Builder
-    public static class OtherArtistEmbed {
-        private String id;
-        private String name;
-        private List<ArtistRole> roles;
-        private List<ArtistPublicDocument.SocialLinkEmbed> socialLinks;
     }
 }

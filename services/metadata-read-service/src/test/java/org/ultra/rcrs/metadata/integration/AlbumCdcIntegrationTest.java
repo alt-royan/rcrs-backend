@@ -8,7 +8,7 @@ import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
-import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
+import org.ultra.rcrs.metadata.model.AlbumDocument;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -156,7 +156,7 @@ class AlbumCdcIntegrationTest extends BaseIntegrationTest {
         assertThat(doc).isNotNull();
         assertThat(doc.getArtists()).hasSize(2);
 
-        var ids = doc.getArtists().stream().map(AlbumPublicDocument.ArtistEmbed::getId).toList();
+        var ids = doc.getArtists().stream().map(AlbumDocument.ArtistEmbed::getId).toList();
         assertThat(ids).containsExactlyInAnyOrder(artist1Id, artist2Id);
     }
 

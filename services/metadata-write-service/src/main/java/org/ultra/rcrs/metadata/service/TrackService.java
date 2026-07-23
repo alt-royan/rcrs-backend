@@ -62,6 +62,12 @@ public class TrackService {
     }
 
     @Transactional
+    public Track findById(UUID trackId) {
+        return trackRepository.findById(trackId)
+                .orElseThrow(() -> new NotFoundException("Track", trackId));
+    }
+
+    @Transactional
     public void markTrackDelete(UUID trackId) {
         updateAvailability(EntityStatus.DELETED, trackId);
     }

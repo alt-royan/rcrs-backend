@@ -3,7 +3,7 @@ package org.ultra.rcrs.metadata.service.write;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.ultra.rcrs.metadata.model.ArtistPublicDocument;
+import org.ultra.rcrs.metadata.model.ArtistDocument;
 import org.ultra.rcrs.metadata.repository.ArtistDocumentRepository;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.events.artist.ArtistCreatedEventOuterClass;
@@ -18,12 +18,12 @@ public class ArtistWriteService {
     private final ArtistDocumentRepository artistDocumentRepository;
 
     public void handleArtistCreated(ArtistCreatedEventOuterClass.ArtistCreatedEvent event) {
-        ArtistPublicDocument doc = ArtistPublicDocument.builder()
+        ArtistDocument doc = ArtistDocument.builder()
                 .id(event.getId())
                 .name(event.getName())
                 .avatarS3Key(event.getAvatarS3Key())
                 .socialLinks(event.getSocialLinksList().stream()
-                        .map(sl -> ArtistPublicDocument.SocialLinkEmbed.builder()
+                        .map(sl -> ArtistDocument.SocialLinkEmbed.builder()
                                 .resourceName(sl.getResourceName())
                                 .url(sl.getUrl())
                                 .build())

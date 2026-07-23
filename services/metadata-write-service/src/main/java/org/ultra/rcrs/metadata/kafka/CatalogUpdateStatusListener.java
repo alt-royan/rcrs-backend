@@ -6,12 +6,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.events.common.DomainEventOuterClass;
 import org.ultra.rcrs.events.common.LifecycleStatusOuterClass;
 import org.ultra.rcrs.events.track.TrackTranscodingCompletedEventOuterClass;
 import org.ultra.rcrs.events.track.TrackUpdateLifecycleStatusEventOuterClass;
-import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.kafka.Topics;
+import org.ultra.rcrs.metadata.service.AlbumService;
 import org.ultra.rcrs.metadata.service.TrackService;
 import org.ultra.rcrs.utils.Url62;
 
@@ -23,6 +24,7 @@ import java.util.UUID;
 public class CatalogUpdateStatusListener {
 
     private final TrackService trackService;
+    private final AlbumService albumService;
 
     @KafkaListener(topics = Topics.CATALOG_UPDATE_STATUS_TOPIC, groupId = "catalog-write-group", containerFactory = "byteArrayContainerFactory")
     public void handleUpdateStatusEvent(ConsumerRecord<String, byte[]> record) {
@@ -47,6 +49,8 @@ public class CatalogUpdateStatusListener {
             UUID trackId = Url62.decode(event.getTrackId());
             LifecycleStatus status = mapLifecycleStatus(event.getStatus());
             trackService.handleTranscodingCompleted(trackId, status, event.getDurationMs());
+            var track = trackService.findById(trackId);
+            albumService.checkAlbumReady(track.getAlbumId());
         } catch (Exception e) {
             log.error("Failed to unpack TrackTranscodingCompletedEvent: {}", e.getMessage(), e);
         }

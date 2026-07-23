@@ -11,7 +11,7 @@ import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.AlbumPublicStandaloneDto;
 import org.ultra.rcrs.metadata.dto.AlbumPublicViewDto;
-import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
+import org.ultra.rcrs.metadata.model.AlbumDocument;
 import org.ultra.rcrs.metadata.repository.AlbumDocumentRepository;
 import org.ultra.rcrs.utils.S3Utils;
 import reactor.core.publisher.Flux;
@@ -43,11 +43,11 @@ public class AlbumPublicService {
             query.addCriteria(Criteria.where("type").is(albumType));
         }
         query.with(sort);
-        return mongoTemplate.find(query, AlbumPublicDocument.class, "albums")
+        return mongoTemplate.find(query, AlbumDocument.class, "albums")
                 .map(this::toStandaloneDto);
     }
 
-    private AlbumPublicViewDto toDto(AlbumPublicDocument doc) {
+    private AlbumPublicViewDto toDto(AlbumDocument doc) {
         return AlbumPublicViewDto.builder()
                 .id(doc.getId())
                 .availabilityStatus(doc.getAvailabilityStatus())
@@ -70,7 +70,7 @@ public class AlbumPublicService {
                 .build();
     }
 
-    private AlbumPublicStandaloneDto toStandaloneDto(AlbumPublicDocument doc) {
+    private AlbumPublicStandaloneDto toStandaloneDto(AlbumDocument doc) {
         return AlbumPublicStandaloneDto.builder()
                 .id(doc.getId())
                 .availabilityStatus(doc.getAvailabilityStatus())

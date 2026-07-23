@@ -5,8 +5,8 @@ import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
-import org.ultra.rcrs.metadata.model.AlbumPublicDocument;
-import org.ultra.rcrs.metadata.model.ArtistPublicDocument;
+import org.ultra.rcrs.metadata.model.AlbumDocument;
+import org.ultra.rcrs.metadata.model.ArtistDocument;
 
 import java.util.List;
 
@@ -14,7 +14,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getArtist_activeArtist_200ReturnsData() {
-        ArtistPublicDocument artist = createArtistDoc("Active Artist", EntityStatus.ACTIVE);
+        ArtistDocument artist = createArtistDoc("Active Artist", EntityStatus.ACTIVE);
 
         webTestClient.get()
                 .uri("/api/artists/{id}", artist.getId())
@@ -28,7 +28,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getArtist_hiddenArtist_200ReturnsData() {
-        ArtistPublicDocument artist = createArtistDoc("Hidden Artist", EntityStatus.HIDDEN);
+        ArtistDocument artist = createArtistDoc("Hidden Artist", EntityStatus.HIDDEN);
 
         webTestClient.get()
                 .uri("/api/artists/{id}", artist.getId())
@@ -41,7 +41,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getArtist_deletedArtist_404NotFound() {
-        ArtistPublicDocument artist = createArtistDoc("Deleted Artist", EntityStatus.DELETED);
+        ArtistDocument artist = createArtistDoc("Deleted Artist", EntityStatus.DELETED);
 
         webTestClient.get()
                 .uri("/api/artists/{id}", artist.getId())
@@ -59,7 +59,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getArtist_avatarUrlTransformedToCdnUrl() {
-        ArtistPublicDocument artist = createArtistDoc("Avatar Test", EntityStatus.ACTIVE);
+        ArtistDocument artist = createArtistDoc("Avatar Test", EntityStatus.ACTIVE);
 
         webTestClient.get()
                 .uri("/api/artists/{id}", artist.getId())
@@ -73,12 +73,12 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getArtist_socialLinksReturned() {
-        ArtistPublicDocument artist = artistRepository.save(ArtistPublicDocument.builder()
+        ArtistDocument artist = artistRepository.save(ArtistDocument.builder()
                 .id(randomId())
                 .name("Social Artist")
                 .avatarS3Key("avatars/social.jpg")
                 .socialLinks(List.of(
-                        ArtistPublicDocument.SocialLinkEmbed.builder()
+                        ArtistDocument.SocialLinkEmbed.builder()
                                 .resourceName("instagram")
                                 .url("https://instagram.com/social")
                                 .build()))
@@ -97,7 +97,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getArtist_tagsReturned() {
-        ArtistPublicDocument artist = artistRepository.save(ArtistPublicDocument.builder()
+        ArtistDocument artist = artistRepository.save(ArtistDocument.builder()
                 .id(randomId())
                 .name("Tagged Artist")
                 .avatarS3Key("avatars/tagged.jpg")
@@ -117,7 +117,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getAlbumsByArtist_onlyReturnsPublishedAndActiveAlbums() {
-        ArtistPublicDocument artist = createArtistDoc("Album Artist", EntityStatus.ACTIVE);
+        ArtistDocument artist = createArtistDoc("Album Artist", EntityStatus.ACTIVE);
 
         createAlbumDocWithArtist("Published Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE,
                 artist.getId(), "Album Artist", ArtistRole.MAIN_ARTIST);
@@ -137,9 +137,9 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getAlbumsByArtist_filtersByType() {
-        ArtistPublicDocument artist = createArtistDoc("Type Filter Artist", EntityStatus.ACTIVE);
+        ArtistDocument artist = createArtistDoc("Type Filter Artist", EntityStatus.ACTIVE);
 
-        albumRepository.save(AlbumPublicDocument.builder()
+        albumRepository.save(AlbumDocument.builder()
                 .id(randomId())
                 .title("Full Album")
                 .type(AlbumType.FULL)
@@ -151,7 +151,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .totalDurationMs(300000)
                 .coverS3Key("covers/full.jpg")
                 .explicit(false)
-                .artists(List.of(AlbumPublicDocument.ArtistEmbed.builder()
+                .artists(List.of(AlbumDocument.ArtistEmbed.builder()
                         .id(artist.getId())
                         .name("Type Filter Artist")
                         .avatarS3Key("avatars/type-artist.jpg")
@@ -159,7 +159,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                         .build()))
                 .build()).block();
 
-        albumRepository.save(AlbumPublicDocument.builder()
+        albumRepository.save(AlbumDocument.builder()
                 .id(randomId())
                 .title("Single Album")
                 .type(AlbumType.SINGLE)
@@ -171,7 +171,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .totalDurationMs(200000)
                 .coverS3Key("covers/single.jpg")
                 .explicit(false)
-                .artists(List.of(AlbumPublicDocument.ArtistEmbed.builder()
+                .artists(List.of(AlbumDocument.ArtistEmbed.builder()
                         .id(artist.getId())
                         .name("Type Filter Artist")
                         .avatarS3Key("avatars/type-artist.jpg")
@@ -191,7 +191,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void getAlbumsByArtist_noAlbumsForArtist_200ReturnsEmpty() {
-        ArtistPublicDocument artist = createArtistDoc("No Albums Artist", EntityStatus.ACTIVE);
+        ArtistDocument artist = createArtistDoc("No Albums Artist", EntityStatus.ACTIVE);
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
