@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface DbActivity {
 
     @ActivityMethod
-    void saveAudio(String trackId, UUID guid, String key, AudioMetadata metadata);
+    void saveAudio(String trackId, UUID guid, Boolean main, String key, AudioMetadata metadata);
 
     @ActivityMethod
     AudioUpload getAudioUpload(String uid);

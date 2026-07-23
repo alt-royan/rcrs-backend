@@ -11,6 +11,10 @@ public class NotFoundException extends RuntimeException {
         super(String.format("%s with id %s not found", prefix, Url62.encode(id)));
     }
 
+    public NotFoundException(String message) {
+        super(message);
+    }
+
     public NotFoundException(String prefix, String id) {
         super(String.format("%s with id %s not found", prefix, id));
     }
