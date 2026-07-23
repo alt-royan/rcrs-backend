@@ -27,6 +27,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./discovery-server/Dockerfile
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/rcrs-discover-server:latest
@@ -36,6 +37,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./services/metadata-write-service/Dockerfile
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/rcrs-metadata-write-service:latest
@@ -44,6 +46,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./services/metadata-read-service/Dockerfile
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/rcrs-metadata-read-service:latest
@@ -52,6 +55,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./services/search-service/Dockerfile
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/rcrs-search-service:latest
@@ -60,6 +64,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./services/workflow-service/Dockerfile
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/rcrs-workflow-service:latest
@@ -68,6 +73,7 @@ jobs:
 #        uses: docker/build-push-action@v6
 #        with:
 #          context: .
+#          file: ./services/media-service/Dockerfile
 #          push: true
 #          tags: |
 #            ghcr.io/${{ github.repository_owner }}/rcrs-media-service:latest
@@ -76,6 +82,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: ./services/user-service/Dockerfile
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/rcrs-user-service:latest
