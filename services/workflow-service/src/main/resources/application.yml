@@ -1,6 +1,10 @@
 server:
   port: 8090
 
+workflow:
+  purge:
+    cron: "0 0 4 1 * *"
+
 spring:
   application:
     name: workflow-service

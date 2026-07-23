@@ -16,7 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/audio")
+@RequestMapping("/audios")
 public class AudioController {
 
     private final AudioService audioService;
