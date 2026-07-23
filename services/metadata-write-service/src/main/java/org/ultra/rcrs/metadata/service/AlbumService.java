@@ -16,6 +16,7 @@ import org.ultra.rcrs.metadata.model.ArtistToAlbumPK;
 import org.ultra.rcrs.metadata.repository.AlbumRepository;
 import org.ultra.rcrs.metadata.repository.ArtistRepository;
 import org.ultra.rcrs.metadata.repository.ArtistToAlbumRepository;
+import org.ultra.rcrs.metadata.repository.TrackRepository;
 import org.ultra.rcrs.utils.S3Utils;
 import org.ultra.rcrs.utils.Url62;
 
@@ -29,6 +30,7 @@ public class AlbumService {
 
     private final AlbumRepository albumRepository;
     private final ArtistRepository artistRepository;
+    private final TrackRepository trackRepository;
     private final TrackService trackService;
     private final ArtistToAlbumRepository artistToAlbumRepository;
     private final S3Utils s3Utils;
@@ -82,6 +84,15 @@ public class AlbumService {
 
         updateAvailability(EntityStatus.ACTIVE, albumId);
         log.info("Album {} and all related tracks marked as ACTIVE", albumId);
+    }
+
+    @Transactional
+    public void checkAlbumReady(UUID albumId) {
+        long tracksInAlbum = trackRepository.countByAlbumId(albumId);
+        long readyTracksInAlbum = trackRepository.countByAlbumIdAndAvailabilityStatus(albumId, LifecycleStatus.READY);
+        if (tracksInAlbum == readyTracksInAlbum) {
+            updateLifecycleStatus(LifecycleStatus.READY, albumId);
+        }
     }
 
     @Transactional
