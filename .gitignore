@@ -35,3 +35,5 @@ build/
 /local/**/volume
 /local/**/multipart
 /local/**/elasticsearch_data
+
+*.mp3

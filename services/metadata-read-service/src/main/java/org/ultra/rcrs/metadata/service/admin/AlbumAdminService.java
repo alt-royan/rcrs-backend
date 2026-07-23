@@ -8,6 +8,8 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.enums.AlbumType;
+import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.AlbumAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.AlbumAdminViewDto;
@@ -43,6 +45,56 @@ public class AlbumAdminService {
         query.with(sort);
         return mongoTemplate.find(query, AlbumPublicDocument.class, "albums")
                 .map(this::toStandaloneDto);
+    }
+
+    public Flux<AlbumAdminStandaloneDto> getAll(EntityStatus availabilityStatus,
+                                               LifecycleStatus lifecycleStatus,
+                                               AlbumType type,
+                                               Boolean explicit,
+                                               int offset,
+                                               int limit,
+                                               String sortDirection) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "releaseDate");
+        Query query = new Query();
+
+        if (availabilityStatus != null) {
+            query.addCriteria(Criteria.where("availabilityStatus").is(availabilityStatus));
+        }
+        if (lifecycleStatus != null) {
+            query.addCriteria(Criteria.where("lifecycleStatus").is(lifecycleStatus));
+        }
+        if (type != null) {
+            query.addCriteria(Criteria.where("type").is(type));
+        }
+        if (explicit != null) {
+            query.addCriteria(Criteria.where("explicit").is(explicit));
+        }
+
+        query.with(sort).skip(offset).limit(limit);
+        return mongoTemplate.find(query, AlbumPublicDocument.class, "albums")
+                .map(this::toStandaloneDto);
+    }
+
+    public Mono<Long> count(EntityStatus availabilityStatus,
+                            LifecycleStatus lifecycleStatus,
+                            AlbumType type,
+                            Boolean explicit) {
+        Query query = new Query();
+
+        if (availabilityStatus != null) {
+            query.addCriteria(Criteria.where("availabilityStatus").is(availabilityStatus));
+        }
+        if (lifecycleStatus != null) {
+            query.addCriteria(Criteria.where("lifecycleStatus").is(lifecycleStatus));
+        }
+        if (type != null) {
+            query.addCriteria(Criteria.where("type").is(type));
+        }
+        if (explicit != null) {
+            query.addCriteria(Criteria.where("explicit").is(explicit));
+        }
+
+        return mongoTemplate.count(query, AlbumPublicDocument.class, "albums");
     }
 
     private AlbumAdminViewDto toDto(AlbumPublicDocument doc) {

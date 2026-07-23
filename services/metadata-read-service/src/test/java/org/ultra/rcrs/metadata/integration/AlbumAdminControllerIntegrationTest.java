@@ -96,4 +96,23 @@ class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
                     assert track.get("lifecycleStatus").equals("TRANSCODING");
                 });
     }
+
+    @Test
+    void countAlbums_filtersByExplicit() {
+        AlbumPublicDocument explicitAlbum = createAlbumDoc("Explicit Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        AlbumPublicDocument cleanAlbum = createAlbumDoc("Clean Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        explicitAlbum.setExplicit(true);
+        albumRepository.save(explicitAlbum).block();
+        cleanAlbum.setExplicit(false);
+        albumRepository.save(cleanAlbum).block();
+
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/admin/albums/count")
+                        .queryParam("explicit", "true")
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Long.class).isEqualTo(1L);
+    }
 }

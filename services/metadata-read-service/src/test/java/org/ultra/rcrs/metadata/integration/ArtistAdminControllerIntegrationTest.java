@@ -114,4 +114,19 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
                 .expectStatus().isOk()
                 .expectBodyList(Object.class).hasSize(1);
     }
+
+    @Test
+    void countArtists_filtersByAvailabilityStatus() {
+        createArtistDoc("Active Artist", EntityStatus.ACTIVE);
+        createArtistDoc("Deleted Artist", EntityStatus.DELETED);
+
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/admin/artists/count")
+                        .queryParam("availabilityStatus", "ACTIVE")
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Long.class).isEqualTo(1L);
+    }
 }

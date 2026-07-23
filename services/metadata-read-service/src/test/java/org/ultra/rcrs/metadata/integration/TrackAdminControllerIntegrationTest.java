@@ -75,4 +75,23 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
                 .jsonPath("$.album.id").isEqualTo(album.getId())
                 .jsonPath("$.album.title").isEqualTo("Embed Album");
     }
+
+    @Test
+    void countTracks_filtersByAlbumId() {
+        AlbumPublicDocument albumA = createAlbumDoc("Album A", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        AlbumPublicDocument albumB = createAlbumDoc("Album B", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+
+        createTrackDoc("Track A1", albumA.getId(), "Album A", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        createTrackDoc("Track A2", albumA.getId(), "Album A", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        createTrackDoc("Track B1", albumB.getId(), "Album B", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/admin/tracks/count")
+                        .queryParam("albumId", albumA.getId())
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Long.class).isEqualTo(2L);
+    }
 }
