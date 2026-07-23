@@ -3,8 +3,8 @@ package org.ultra.rcrs.workflow.client;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.ultra.rcrs.workflow.dto.response.CreateResponse;
 import org.ultra.rcrs.workflow.client.model.ArtistCreateModel;
+import org.ultra.rcrs.workflow.dto.response.CreateResponse;
 
 @FeignClient(name = "artist-write-client", url = "${feign.metadata-service.url}")
 public interface ArtistClient {

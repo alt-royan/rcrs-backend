@@ -2,10 +2,10 @@ package org.ultra.rcrs.metadata.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.metadata.dto.OtherArtistDto;
 import org.ultra.rcrs.metadata.model.converter.ArtistRolesConverter;
 import org.ultra.rcrs.metadata.model.converter.SocialLinksConverter;
-import org.ultra.rcrs.enums.ArtistRole;
 
 import java.util.Set;
 import java.util.UUID;

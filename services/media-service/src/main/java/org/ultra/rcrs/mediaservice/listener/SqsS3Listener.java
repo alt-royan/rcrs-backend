@@ -3,15 +3,14 @@ package org.ultra.rcrs.mediaservice.listener;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.enums.FileStatus;
+import org.ultra.rcrs.mediaservice.config.UploadConfigurationProperties;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioUploadRepository;
 import software.amazon.awssdk.eventnotifications.s3.model.S3EventNotification;
 import software.amazon.awssdk.services.sqs.model.Message;
 
-import java.time.Duration;
 import java.time.Instant;
 
 @Component
@@ -20,9 +19,8 @@ import java.time.Instant;
 public class SqsS3Listener {
 
     private final AudioUploadRepository audioUploadRepository;
+    private final UploadConfigurationProperties uploadProperties;
 
-    @Value("${cdn.uploads.file-duration}")
-    private Duration duration;
 
     @SqsListener("${cdn.uploads.sqs.queue}")
     @Transactional
@@ -36,7 +34,7 @@ public class SqsS3Listener {
                 if (record.getEventName().equals("ObjectCreated:Put")) {
                     String key = record.getS3().getObject().getKey();
                     audioUploadRepository.updateStatusByUid(FileStatus.UPLOADED, key);
-                    audioUploadRepository.updateExpiredAtByUid(Instant.now().plusSeconds(duration.toSeconds()), key);
+                    audioUploadRepository.updateExpiredAtByUid(Instant.now().plusSeconds(uploadProperties.getUploadDuration().toSeconds()), key);
                     log.info("Object {} was UPLOADED", key);
                 }
             });

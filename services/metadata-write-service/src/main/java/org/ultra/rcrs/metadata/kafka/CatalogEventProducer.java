@@ -328,7 +328,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                             .setResourceName(link.getResourceName())
                             .setUrl(link.getUrl()).build()).toList());
         }
-        var event  = builder.build();
+        var event = builder.build();
 
         var now = Instant.now();
         var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()

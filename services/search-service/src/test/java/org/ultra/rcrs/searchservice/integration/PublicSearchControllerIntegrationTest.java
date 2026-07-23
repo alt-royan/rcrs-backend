@@ -1,13 +1,12 @@
 package org.ultra.rcrs.searchservice.integration;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
 

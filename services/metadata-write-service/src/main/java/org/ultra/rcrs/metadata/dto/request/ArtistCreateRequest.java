@@ -7,7 +7,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.ultra.rcrs.metadata.dto.SocialLinkDto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Data

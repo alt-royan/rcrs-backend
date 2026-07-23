@@ -11,7 +11,7 @@ services:
     networks:
       - rcrs
     healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8761/actuator/health || exit 1"]
+      test: [ "CMD-SHELL", "curl -sf http://localhost:8761/actuator/health || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 15
@@ -74,56 +74,56 @@ services:
     networks:
       - rcrs
 
-#  media-service:
-#    image: ghcr.io/alt-royan/rcrs-media-service:latest
-#    container_name: media-service
-#    ports:
-#      - "8082:8082"
-#    environment:
-#      SPRING_PROFILES_ACTIVE: dev
-#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-#      SPRING_TEMPORAL_CONNECTION_TARGET: temporal:7233
-#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
-#      SPRING_HIBERNATE_DEFAUT_SCHEMA: rcrs_media
-#      SPRING_DATASOURCE_USERNAME: postgres
-#      SPRING_DATASOURCE_PASSWORD: postgres
-#      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/postgres
-#      SPRING_LIQUIBASE_USER: postgres
-#      SPRING_LIQUIBASE_PASSWORD: postgres
-#      SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY: test
-#      SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY: test
-#      SPRING_CLOUD_AWS_REGION_STATIC: eu-west-1
-#      SPRING_CLOUD_AWS_ENDPOINT: http://s3:4566
-#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-#    depends_on:
-#      discovery-server:
-#        condition: service_healthy
-#    networks:
-#      - rcrs
+  #  media-service:
+  #    image: ghcr.io/alt-royan/rcrs-media-service:latest
+  #    container_name: media-service
+  #    ports:
+  #      - "8082:8082"
+  #    environment:
+  #      SPRING_PROFILES_ACTIVE: dev
+  #      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+  #      SPRING_TEMPORAL_CONNECTION_TARGET: temporal:7233
+  #      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
+  #      SPRING_HIBERNATE_DEFAUT_SCHEMA: rcrs_media
+  #      SPRING_DATASOURCE_USERNAME: postgres
+  #      SPRING_DATASOURCE_PASSWORD: postgres
+  #      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/postgres
+  #      SPRING_LIQUIBASE_USER: postgres
+  #      SPRING_LIQUIBASE_PASSWORD: postgres
+  #      SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY: test
+  #      SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY: test
+  #      SPRING_CLOUD_AWS_REGION_STATIC: eu-west-1
+  #      SPRING_CLOUD_AWS_ENDPOINT: http://s3:4566
+  #      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+  #    depends_on:
+  #      discovery-server:
+  #        condition: service_healthy
+  #    networks:
+  #      - rcrs
 
-#  user-service:
-#    image: ghcr.io/alt-royan/rcrs-user-service:latest
-#    container_name: user-service
-#    ports:
-#      - "8085:8085"
-#    environment:
-#      SPRING_PROFILES_ACTIVE: dev
-#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
-#      SPRING_HIBERNATE_DEFAUT_SCHEMA: rcrs_user
-#      SPRING_DATASOURCE_USERNAME: postgres
-#      SPRING_DATASOURCE_PASSWORD: postgres
-#      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/postgres
-#      SPRING_LIQUIBASE_USER: postgres
-#      SPRING_LIQUIBASE_PASSWORD: postgres
-#      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-#      IDENTITY_EVENTS_TOPIC: identity.events
-#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-#    depends_on:
-#      discovery-server:
-#        condition: service_healthy
-#    networks:
-#      - rcrs
-#
+  #  user-service:
+  #    image: ghcr.io/alt-royan/rcrs-user-service:latest
+  #    container_name: user-service
+  #    ports:
+  #      - "8085:8085"
+  #    environment:
+  #      SPRING_PROFILES_ACTIVE: dev
+  #      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
+  #      SPRING_HIBERNATE_DEFAUT_SCHEMA: rcrs_user
+  #      SPRING_DATASOURCE_USERNAME: postgres
+  #      SPRING_DATASOURCE_PASSWORD: postgres
+  #      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/postgres
+  #      SPRING_LIQUIBASE_USER: postgres
+  #      SPRING_LIQUIBASE_PASSWORD: postgres
+  #      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+  #      IDENTITY_EVENTS_TOPIC: identity.events
+  #      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+  #    depends_on:
+  #      discovery-server:
+  #        condition: service_healthy
+  #    networks:
+  #      - rcrs
+  #
   workflow-service:
     image: ghcr.io/alt-royan/rcrs-workflow-service:latest
     container_name: workflow-service

@@ -20,7 +20,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         Thread.sleep(5000);
         String id = randomId();
         sendTrackCreated(id, "CDC Track");
-        
+
         var doc = trackRepository.findById(id).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getTitle()).isEqualTo("CDC Track");
@@ -34,9 +34,9 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     void trackDeleted_setsAvailabilityToDeleted() throws Exception {
         String id = randomId();
         sendTrackCreated(id, "Delete Track");
-        
+
         sendTrackDeleted(id);
-        
+
         var doc = trackRepository.findById(id).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getAvailabilityStatus()).isEqualTo(EntityStatus.DELETED);
@@ -47,9 +47,9 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     void trackHidden_setsAvailabilityToHidden() throws Exception {
         String id = randomId();
         sendTrackCreated(id, "Hidden Track");
-        
+
         sendTrackHidden(id);
-        
+
         var doc = trackRepository.findById(id).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getAvailabilityStatus()).isEqualTo(EntityStatus.HIDDEN);
@@ -60,11 +60,11 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     void trackActivated_setsAvailabilityToActive() throws Exception {
         String id = randomId();
         sendTrackCreated(id, "Activate Track");
-        
+
         sendTrackHidden(id);
-        
+
         sendTrackActivated(id);
-        
+
         var doc = trackRepository.findById(id).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getAvailabilityStatus()).isEqualTo(EntityStatus.ACTIVE);
@@ -75,9 +75,9 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     void trackLifecycleStatusUpdated_changesLifecycle() throws Exception {
         String id = randomId();
         sendTrackCreated(id, "Lifecycle Track");
-        
+
         sendTrackLifecycleStatusUpdated(id, LifecycleStatus.PUBLISHED);
-        
+
         var doc = trackRepository.findById(id).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getLifecycleStatus()).isEqualTo(LifecycleStatus.PUBLISHED);
@@ -88,9 +88,9 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
     void trackTrueDeleted_removesDocumentFromMongo() throws Exception {
         String id = randomId();
         sendTrackCreated(id, "True Delete Track");
-        
+
         sendTrackTrueDeleted(id);
-        
+
         var doc = trackRepository.findById(id).block();
         assertThat(doc).isNull();
     }
@@ -102,11 +102,11 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         String albumId = randomId();
 
         sendTrackCreated(trackId, "Track In Album");
-        
+
         sendAlbumCreated(albumId, "Album For Track");
-        
+
         sendTrackAddedToAlbum(trackId, albumId);
-        
+
         var trackDoc = trackRepository.findById(trackId).block();
         assertThat(trackDoc).isNotNull();
         assertThat(trackDoc.getAlbum()).isNotNull();
@@ -125,9 +125,9 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         String albumId = randomId();
 
         sendTrackCreated(trackId, "Orphan Track");
-        
+
         sendTrackAddedToAlbum(trackId, albumId);
-        
+
         var doc = trackRepository.findById(trackId).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getAlbum()).isNull();
@@ -140,11 +140,11 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         String trackId = randomId();
 
         sendArtistCreated(artistId, "Track Artist", EntityStatus.ACTIVE);
-        
+
         sendTrackCreated(trackId, "Track With Artist");
-        
+
         sendArtistAddedToTrack(artistId, trackId, ArtistRole.MAIN_ARTIST);
-        
+
         var doc = trackRepository.findById(trackId).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getArtists()).hasSize(1);
@@ -160,13 +160,13 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         String trackId = randomId();
 
         sendArtistCreated(artistId, "Remove Track Artist", EntityStatus.ACTIVE);
-        
+
         sendTrackCreated(trackId, "Track Remove Artist");
-        
+
         sendArtistAddedToTrack(artistId, trackId, ArtistRole.MAIN_ARTIST);
-        
+
         sendArtistDeletedFromTrack(artistId, trackId);
-        
+
         var doc = trackRepository.findById(trackId).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getArtists()).hasSize(0);
@@ -179,9 +179,9 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         String otherId = randomId();
 
         sendTrackCreated(trackId, "Track With Other");
-        
+
         sendOtherAddedToTrack(otherId, trackId, "Featured Guest");
-        
+
         var doc = trackRepository.findById(trackId).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getOthers()).hasSize(1);
@@ -196,11 +196,11 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         String otherId = randomId();
 
         sendTrackCreated(trackId, "Track Remove Other");
-        
+
         sendOtherAddedToTrack(otherId, trackId, "Remove Me");
-        
+
         sendOtherDeletedFromTrack(otherId, trackId);
-        
+
         var doc = trackRepository.findById(trackId).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getOthers()).hasSize(0);
@@ -213,9 +213,9 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         String trackId = randomId();
 
         sendArtistCreated(artistId, "Orphan Artist Track", EntityStatus.ACTIVE);
-        
+
         sendArtistAddedToTrack(artistId, trackId, ArtistRole.MAIN_ARTIST);
-        
+
         var doc = trackRepository.findById(trackId).block();
         assertThat(doc).isNull();
     }
@@ -227,9 +227,9 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         String artistId = randomId();
 
         sendTrackCreated(trackId, "Track No Artist");
-        
+
         sendArtistAddedToTrack(artistId, trackId, ArtistRole.MAIN_ARTIST);
-        
+
         var doc = trackRepository.findById(trackId).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getArtists()).isNull();
@@ -242,7 +242,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         String otherId = randomId();
 
         sendOtherAddedToTrack(otherId, trackId, "Ghost");
-        
+
         var doc = trackRepository.findById(trackId).block();
         assertThat(doc).isNull();
     }
@@ -255,15 +255,15 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         String trackId = randomId();
 
         sendArtistCreated(artist1Id, "Lead Artist", EntityStatus.ACTIVE);
-        
+
         sendArtistCreated(artist2Id, "Guest Artist", EntityStatus.ACTIVE);
-        
+
         sendTrackCreated(trackId, "Multi Artist Track");
-        
+
         sendArtistAddedToTrack(artist1Id, trackId, ArtistRole.MAIN_ARTIST);
-        
+
         sendArtistAddedToTrack(artist2Id, trackId, ArtistRole.FEATURED_ARTIST);
-        
+
         var doc = trackRepository.findById(trackId).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getArtists()).hasSize(2);
@@ -281,17 +281,17 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         String trackId = randomId();
 
         sendArtistCreated(artist1Id, "Keep Track Artist", EntityStatus.ACTIVE);
-        
+
         sendArtistCreated(artist2Id, "Remove Track Artist 2", EntityStatus.ACTIVE);
-        
+
         sendTrackCreated(trackId, "Selective Remove Track");
-        
+
         sendArtistAddedToTrack(artist1Id, trackId, ArtistRole.MAIN_ARTIST);
-        
+
         sendArtistAddedToTrack(artist2Id, trackId, ArtistRole.FEATURED_ARTIST);
-        
+
         sendArtistDeletedFromTrack(artist2Id, trackId);
-        
+
         var doc = trackRepository.findById(trackId).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getArtists()).hasSize(1);
@@ -306,11 +306,11 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         String other2Id = randomId();
 
         sendTrackCreated(trackId, "Multi Other Track");
-        
+
         sendOtherAddedToTrack(other1Id, trackId, "Guest One");
-        
+
         sendOtherAddedToTrack(other2Id, trackId, "Guest Two");
-        
+
         var doc = trackRepository.findById(trackId).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getOthers()).hasSize(2);

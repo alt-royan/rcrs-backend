@@ -19,12 +19,12 @@ spring:
     workflow:
 
     workers:
-        capacity:
-          max-concurrent-workflow-task-pollers: 6
-          max-concurrent-activity-task-pollers: 6
-        rate-limits:
-          max-worker-activities-per-second: 2
-          max-task-queue-activities-per-second: 2
+      capacity:
+        max-concurrent-workflow-task-pollers: 6
+        max-concurrent-activity-task-pollers: 6
+      rate-limits:
+        max-worker-activities-per-second: 2
+        max-task-queue-activities-per-second: 2
     workflow-cache:
       max-instances: 10
       max-threads: 10

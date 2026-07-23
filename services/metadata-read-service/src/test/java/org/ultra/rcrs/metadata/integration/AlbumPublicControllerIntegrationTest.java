@@ -1,11 +1,11 @@
 package org.ultra.rcrs.metadata.integration;
 
 import org.junit.jupiter.api.Test;
+import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.metadata.model.AlbumDocument;
 import org.ultra.rcrs.metadata.model.ArtistDocument;
-import org.ultra.rcrs.enums.ArtistRole;
 
 class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
 

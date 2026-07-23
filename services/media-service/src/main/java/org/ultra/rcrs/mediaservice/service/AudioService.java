@@ -3,11 +3,11 @@ package org.ultra.rcrs.mediaservice.service;
 import jakarta.activation.MimetypesFileTypeMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.enums.FileStatus;
+import org.ultra.rcrs.mediaservice.config.UploadConfigurationProperties;
 import org.ultra.rcrs.mediaservice.dao.model.AudioUpload;
 import org.ultra.rcrs.mediaservice.dao.model.AudioWithTrack;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioRepository;
@@ -26,7 +26,6 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 import java.nio.charset.StandardCharsets;
-import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -43,12 +42,7 @@ public class AudioService {
     private final AudioUploadRepository audioUploadRepository;
     private final AudioRepository audioRepository;
     private final S3Presigner s3Presigner;
-
-    @Value("${cdn.uploads.bucket.name}")
-    private String s3UploadBucket;
-
-    @Value("${cdn.uploads.signature-duration}")
-    private Duration duration;
+    private final UploadConfigurationProperties uploadProperties;
 
     @Transactional
     public S3PresignUrlResponse getPreSignUrl(PreloadFileRequest request) {
@@ -56,7 +50,7 @@ public class AudioService {
         String contentType = (new MimetypesFileTypeMap()).getContentType(request.getName());
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()
-                .bucket(s3UploadBucket)
+                .bucket(uploadProperties.getBucket().getName())
                 .key(key)
                 .contentLength(request.getLength())
                 .contentType(contentType)
@@ -69,7 +63,7 @@ public class AudioService {
                 .build();
 
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
-                .signatureDuration(duration)
+                .signatureDuration(uploadProperties.getSignatureDuration())
                 .putObjectRequest(objectRequest)
                 .build();
 

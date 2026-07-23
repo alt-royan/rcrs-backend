@@ -17,7 +17,6 @@ import org.ultra.rcrs.searchservice.document.TrackPublicDoc;
 import org.ultra.rcrs.searchservice.dto.*;
 
 import java.util.Collections;
-import java.util.List;
 
 @Slf4j
 @Service

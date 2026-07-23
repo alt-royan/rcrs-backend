@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.userservice.dto.IdentityEvent;
 import org.ultra.rcrs.userservice.dto.IdentityEventPayload;
-import org.ultra.rcrs.userservice.dto.IdentityEventType;
 import org.ultra.rcrs.userservice.model.User;
 import org.ultra.rcrs.userservice.repository.UserRepository;
 

@@ -8,7 +8,6 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.workflow.activity.impl.*;
 import org.ultra.rcrs.workflow.converter.UploadRequestConverter;
-import org.ultra.rcrs.workflow.kafka.WorkflowEventProducer;
 import org.ultra.rcrs.workflow.workflow.*;
 import org.ultra.rcrs.workflow.workflow.impl.*;
 

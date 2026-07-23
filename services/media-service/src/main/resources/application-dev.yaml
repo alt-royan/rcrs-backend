@@ -99,33 +99,38 @@ spring:
       s3:
         path-style-access-enabled: true
 
-cdn:
-  images:
-    bucket: images
-    thumbnails: 64,300,640
-  audios:
-    bucket: rcrs-audio
-  uploads:
-    bucket: rcrs-upload
-    signature-duration: 24h
-    file-duration: 24h
-    sqs:
-      queue: rcrs-upload-event-queue
-audio:
-  validation:
-    formats: mp3, wav, ogg, flac
-    duration:
-      min: 1s
-      max: 2h
-  bitrates: 128k, 192k, 320k
-  codec: libvorbis
-  rate: 44100
-  format: ogg
-  loudnorm:
-    I: -18
-    LRA: 18
-    TP: -2
-
+media:
+  audio:
+    bucket:
+      name: ${AUDIO_BUCKET}
+      public-url: ${AUDIO_PUBLIC_URL}
+    validation:
+      formats: ${AUDIO_VALIDATION_FORMATS}
+      duration:
+        min: ${AUDIO_VALIDATION_DURATION_MIN}
+        max: ${AUDIO_VALIDATION_DURATION_MAX}
+    bitrates: ${AUDIO_BITRATES}
+    codec: ${AUDIO_CODEC}
+    rate: ${AUDIO_RATE}
+    format: ${AUDIO_FORMAT}
+    loudnorm:
+      I: ${AUDIO_LOUDNORM_I}
+      LRA: ${AUDIO_LOUDNORM_LRA}
+      TP: ${AUDIO_LOUDNORM_TP}
+  image:
+    bucket:
+      name: ${IMAGE_BUCKET}
+      public-url: ${IMAGE_PUBLIC_URL}
+    thumbnails:
+      sizes: ${IMAGE_THUMBNAILS_SIZES}
+  upload:
+    bucket:
+      name: ${UPLOAD_BUCKET}
+      public-url: ${UPLOAD_PUBLIC_URL}
+    signature-duration: ${UPLOAD_SIGNATURE_DURATION}
+    upload-duration: ${UPLOAD_UPLOAD_DURATION}
+  sqs:
+    queue: ${SQS_QUEUE}
 
 eureka:
   client:

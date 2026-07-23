@@ -10,6 +10,7 @@ import java.util.List;
 @ConfigurationProperties(value = "audio")
 public class AudioConfigurationProperties {
 
+    private BucketProperties bucket;
     private Validation validation;
     private Loudnorm loudnorm;
     private List<String> bitrates;

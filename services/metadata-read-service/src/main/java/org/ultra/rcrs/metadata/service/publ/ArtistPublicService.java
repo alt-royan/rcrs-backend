@@ -33,9 +33,9 @@ public class ArtistPublicService {
                 .avatarUrl(s3Utils.parseUrl(doc.getAvatarS3Key()))
                 .socialLinks(doc.getSocialLinks() != null
                         ? doc.getSocialLinks().stream().map(s -> ArtistPublicViewDto.SocialLinkEmbed.builder()
-                                .resourceName(s.getResourceName())
-                                .url(s.getUrl())
-                                .build()).collect(Collectors.toList())
+                        .resourceName(s.getResourceName())
+                        .url(s.getUrl())
+                        .build()).collect(Collectors.toList())
                         : null)
                 .tags(doc.getTags())
                 .availabilityStatus(doc.getAvailabilityStatus())
