@@ -43,7 +43,7 @@ spring:
           predicates:
             - Path=/api/search/**
           filters:
-            - StripPrefix=1
+            - StripPrefix=2
 
         # metadata-read-service — no prefix
         - id: metadata-read-service
@@ -51,8 +51,7 @@ spring:
           predicates:
             - Path=/api/catalog/**
           filters:
-            - StripPrefix=1
-
+            - StripPrefix=2
         # metadata-write — NOT available via gateway
 springdoc:
   swagger-ui:

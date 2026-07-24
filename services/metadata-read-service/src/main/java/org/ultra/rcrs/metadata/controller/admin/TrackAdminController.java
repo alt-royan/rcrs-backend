@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/catalog/admin/tracks")
+@RequestMapping("/admin/tracks")
 public class TrackAdminController {
 
     private final TrackAdminService trackAdminService;
