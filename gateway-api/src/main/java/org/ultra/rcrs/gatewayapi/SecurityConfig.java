@@ -39,9 +39,9 @@ public class SecurityConfig {
                         .accessDeniedHandler(new BearerTokenServerAccessDeniedHandler())
                 )
                 .authorizeExchange(authorize -> authorize
-                        .pathMatchers("/**/swagger-ui/**", "/**/v3/api-docs/**").permitAll()
+                        .pathMatchers("/.*/swagger-ui/**", "/.*/v3/api-docs/**").permitAll()
                         .pathMatchers("/actuator/**").permitAll()
-                        .pathMatchers("/**").authenticated()
+                        .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
