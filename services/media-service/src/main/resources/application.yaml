@@ -138,7 +138,6 @@ media:
   sqs:
     queue: rcrs-upload-event-queue
 
-
 eureka:
   client:
     serviceUrl:

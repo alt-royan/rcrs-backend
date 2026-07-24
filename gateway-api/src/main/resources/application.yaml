@@ -68,6 +68,11 @@ springdoc:
       - name: user
         url: /me/v3/api-docs
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+
 management:
   endpoints:
     web:
