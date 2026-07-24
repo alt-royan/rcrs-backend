@@ -29,7 +29,8 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: dev
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://laptop-smgs968r:8180/realms/rcrs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -57,17 +58,17 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://laptop-smgs968r:5432/postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.1.3:5432/postgres
       SPRING_HIBERNATE_DEFAUT_SCHEMA: rcrs_catalog
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_LIQUIBASE_URL: jdbc:postgresql://laptop-smgs968r:5432/postgres
+      SPRING_LIQUIBASE_URL: jdbc:postgresql://192.168.1.3:5432/postgres
       SPRING_LIQUIBASE_USER: postgres
       SPRING_LIQUIBASE_PASSWORD: postgres
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: laptop-smgs968r:29092
-      CDN_IMAGES_ENDPOINT: http://laptop-smgs968r:4566/images
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
+      CDN_IMAGES_ENDPOINT: http://192.168.1.3:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://laptop-smgs968r:8180/realms/rcrs
+      OAUTH2_ISSUER_URI: http://192.168.1.3:8180/realms/master
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -83,11 +84,11 @@ services:
       - "8081:8081"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATA_MONGODB_URI: mongodb://laptop-smgs968r:27017/rcrs_catalog
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: laptop-smgs968r:29092
-      CDN_IMAGES_ENDPOINT: http://laptop-smgs968r:4566/images
+      SPRING_DATA_MONGODB_URI: mongodb://192.168.1.3:27017/rcrs_catalog
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
+      CDN_IMAGES_ENDPOINT: http://192.168.1.3:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://laptop-smgs968r:8180/realms/rcrs
+      OAUTH2_ISSUER_URI: http://192.168.1.3:8180/realms/master
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -103,11 +104,11 @@ services:
       - "8083:8083"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: laptop-smgs968r:29092
-      SPRING_ELASTICSEARCH_URIS: http://laptop-smgs968r:9200
-      CDN_IMAGES_ENDPOINT: http://laptop-smgs968r:4566/images
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
+      SPRING_ELASTICSEARCH_URIS: http://192.168.1.3:9200
+      CDN_IMAGES_ENDPOINT: http://192.168.1.3:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://laptop-smgs968r:8180/realms/rcrs
+      OAUTH2_ISSUER_URI: http://192.168.1.3:8180/realms/master
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -123,23 +124,23 @@ services:
       - "8082:8082"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: laptop-smgs968r:29092
-      SPRING_TEMPORAL_CONNECTION_TARGET: laptop-smgs968r:7233
-      SPRING_DATASOURCE_URL: jdbc:postgresql://laptop-smgs968r:5432/postgres
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
+      SPRING_TEMPORAL_CONNECTION_TARGET: 192.168.1.3:7233
+      SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.1.3:5432/postgres
       SPRING_HIBERNATE_DEFAUT_SCHEMA: rcrs_media
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_LIQUIBASE_URL: jdbc:postgresql://laptop-smgs968r:5432/postgres
+      SPRING_LIQUIBASE_URL: jdbc:postgresql://192.168.1.3:5432/postgres
       SPRING_LIQUIBASE_USER: postgres
       SPRING_LIQUIBASE_PASSWORD: postgres
       SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY: test
       SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY: test
       SPRING_CLOUD_AWS_REGION_STATIC: eu-west-1
-      SPRING_CLOUD_AWS_ENDPOINT: http://laptop-smgs968r:4566
+      SPRING_CLOUD_AWS_ENDPOINT: http://192.168.1.3:4566
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://laptop-smgs968r:8180/realms/rcrs
+      OAUTH2_ISSUER_URI: http://192.168.1.3:8180/realms/master
       AUDIO_BUCKET_NAME: rcrs-audio
-      AUDIO_BUCKET_PUBLIC_URL: http://laptop-smgs968r:4566/rcrs-audio
+      AUDIO_BUCKET_PUBLIC_URL: http://192.168.1.3:4566/rcrs-audio
       AUDIO_VALIDATION_FORMATS: mp3, wav, ogg, flac
       AUDIO_VALIDATION_DURATION_MIN: 1s
       AUDIO_VALIDATION_DURATION_MAX: 2h
@@ -151,10 +152,10 @@ services:
       AUDIO_LOUDNORM_LRA: 18
       AUDIO_LOUDNORM_TP: -1
       IMAGE_BUCKET_NAME: images
-      IMAGE_BUCKET_PUBLIC_URL: http://laptop-smgs968r:4566/images
+      IMAGE_BUCKET_PUBLIC_URL: http://192.168.1.3:4566/images
       IMAGE_THUMBNAILS_SIZES: 64,300,640
       UPLOAD_BUCKET_NAME: rcrs-upload
-      UPLOAD_BUCKET_PUBLIC_URL: http://laptop-smgs968r:4566/rcrs-upload
+      UPLOAD_BUCKET_PUBLIC_URL: http://192.168.1.3:4566/rcrs-upload
       UPLOAD_SIGNATURE_DURATION: 24h
       UPLOAD_UPLOAD_DURATION: 24h
       SQS_QUEUE: rcrs-upload-event-queue
@@ -173,16 +174,16 @@ services:
       - "8085:8085"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://laptop-smgs968r:5432/postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.1.3:5432/postgres
       SPRING_HIBERNATE_DEFAUT_SCHEMA: rcrs_user
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_LIQUIBASE_URL: jdbc:postgresql://laptop-smgs968r:5432/postgres
+      SPRING_LIQUIBASE_URL: jdbc:postgresql://192.168.1.3:5432/postgres
       SPRING_LIQUIBASE_USER: postgres
       SPRING_LIQUIBASE_PASSWORD: postgres
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: laptop-smgs968r:29092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://laptop-smgs968r:8180/realms/rcrs
+      OAUTH2_ISSUER_URI: http://192.168.1.3:8180/realms/master
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -198,14 +199,14 @@ services:
       - "8090:8090"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: laptop-smgs968r:29092
-      SPRING_TEMPORAL_CONNECTION_TARGET: laptop-smgs968r:7233
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
+      SPRING_TEMPORAL_CONNECTION_TARGET: 192.168.1.3:7233
       WORKFLOW_PURGE_CRON: "0 0 4 1 * *"
       FEIGN_METADATA-SERVICE_URL: http://metadata-write-service:8080
       FEIGN_MEDIA-SERVICE_URL: http://media-service:8082
       FEIGN_SEARCH-SERVICE_URL: http://search-service:8083
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://laptop-smgs968r:8180/realms/rcrs
+      OAUTH2_ISSUER_URI: http://192.168.1.3:8180/realms/master
     depends_on:
       discovery-server:
         condition: service_healthy

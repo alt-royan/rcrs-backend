@@ -6,12 +6,12 @@ import urllib.error
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse, urlencode
 
-UPLOAD_API = "http://localhost:8082"
-CATALOG_API = "http://localhost:8090"
+UPLOAD_API = "http://localhost:8090/media"
+CATALOG_API = "http://localhost:8090/workflow"
 DIR = Path(__file__).resolve().parent
 AUDIO_DIR = DIR / "1000 bars"
 
-KEYCLOAK_URL = "http://laptop-smgs968r:8180/realms/master/protocol/openid-connect/token"
+KEYCLOAK_URL = "http://192.168.1.3:8180/realms/master/protocol/openid-connect/token"
 KEYCLOAK_CLIENT_ID = "rcrs-app"
 KEYCLOAK_CLIENT_SECRET = "BkQy6CR09D3RrgIyvs4qg5yuoshkM7xv"
 KEYCLOAK_USERNAME = "bog"
