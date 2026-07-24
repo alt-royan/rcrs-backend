@@ -9,13 +9,13 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8180/realms/rcrs
+          issuer-uri: ${OAUTH2_ISSUER_URI}
   cloud:
     gateway:
       routes:
         # user-service — prefix /me
         - id: user-service
-          uri: http://user-service:8085
+          uri: lb://user-service
           predicates:
             - Path=/me/**
           filters:
@@ -23,7 +23,7 @@ spring:
 
         # workflow-service — prefix /workflow
         - id: workflow-service
-          uri: http://workflow-service:8090
+          uri: lb://workflow-service
           predicates:
             - Path=/workflow/**
           filters:
@@ -31,7 +31,7 @@ spring:
 
         # media-service — prefix /media
         - id: media-service
-          uri: http://media-service:8082
+          uri: lb://media-service
           predicates:
             - Path=/media/**
           filters:
@@ -39,17 +39,34 @@ spring:
 
         # search-service — no prefix
         - id: search-service
-          uri: http://search-service:8083
+          uri: lb://search-service
           predicates:
             - Path=/api/search/**
+          filters:
+            - StripPrefix=1
 
         # metadata-read-service — no prefix
         - id: metadata-read-service
-          uri: http://metadata-read-service:8081
+          uri: lb://metadata-read-service
           predicates:
             - Path=/api/catalog/**
+          filters:
+            - StripPrefix=1
 
         # metadata-write — NOT available via gateway
+springdoc:
+  swagger-ui:
+    urls:
+      - name: catalog
+        url: /api/catalog/v3/api-docs
+      - name: search
+        url: /api/search/v3/api-docs
+      - name: media
+        url: /media/v3/api-docs
+      - name: workflow
+        url: /workflow/v3/api-docs
+      - name: user
+        url: /me/v3/api-docs
 
 management:
   endpoints:
