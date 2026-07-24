@@ -4,6 +4,8 @@ spring:
       ddl-auto: none
   liquibase:
     enabled: true
+  security:
+    enabled: false
   eureka:
     client:
       enabled: false

@@ -38,7 +38,6 @@ import java.util.stream.Collectors;
 @Service
 public class AudioService {
 
-
     private final AudioUploadRepository audioUploadRepository;
     private final AudioRepository audioRepository;
     private final S3Presigner s3Presigner;

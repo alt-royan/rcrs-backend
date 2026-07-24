@@ -17,6 +17,22 @@ spring:
             readTimeout: 5000
   kafka:
     bootstrap-servers: localhost:9092
+  security:
+    enabled: true
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/rcrs
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8180/realms/rcrs
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: rcrs-app
+            client-secret: xuTR1hmVfO5ERSNdgl23JpW3vKTrACk0ampYzmmW3XoGoaJtE8h18CweFsSONWYAC6S7IJbvu7na38odNMogSC
+            scope: openid
   temporal:
     connection:
       target: 127.0.0.1:7233
