@@ -12,6 +12,8 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter;
+import org.springframework.security.oauth2.server.resource.web.access.server.BearerTokenServerAccessDeniedHandler;
+import org.springframework.security.oauth2.server.resource.web.server.BearerTokenServerAuthenticationEntryPoint;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 
@@ -33,14 +35,8 @@ public class SecurityConfig {
                         NoOpServerSecurityContextRepository.getInstance()
                 )
                 .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .authenticationEntryPoint((exchange, denied) -> {
-                            exchange.getResponse().setStatusCode(org.springframework.http.HttpStatus.UNAUTHORIZED);
-                            return exchange.getResponse().setComplete();
-                        })
-                        .accessDeniedHandler((exchange, denied) -> {
-                            exchange.getResponse().setStatusCode(org.springframework.http.HttpStatus.FORBIDDEN);
-                            return exchange.getResponse().setComplete();
-                        })
+                        .authenticationEntryPoint(new BearerTokenServerAuthenticationEntryPoint())
+                        .accessDeniedHandler(new BearerTokenServerAccessDeniedHandler())
                 )
                 .authorizeExchange(authorize -> authorize
                         .pathMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()

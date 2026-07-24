@@ -1,20 +1,64 @@
 server:
-  port: 8084
+  port: 8099
 
 spring:
   application:
     name: gateway-api
+  security:
+    enabled: true
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/rcrs
   cloud:
     gateway:
-      discovery:
-        locator:
-          enabled: true
-          lowerCaseServiceId: true
+      routes:
+        # user-service — prefix /me
+        - id: user-service
+          uri: http://user-service:8085
+          predicates:
+            - Path=/me/**
+          filters:
+            - StripPrefix=1
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+        # workflow-service — prefix /workflow
+        - id: workflow-service
+          uri: http://workflow-service:8090
+          predicates:
+            - Path=/workflow/**
+          filters:
+            - StripPrefix=1
+
+        # media-service — prefix /media
+        - id: media-service
+          uri: http://media-service:8082
+          predicates:
+            - Path=/media/**
+          filters:
+            - StripPrefix=1
+
+        # search-service — no prefix
+        - id: search-service
+          uri: http://search-service:8083
+          predicates:
+            - Path=/api/search/**
+
+        # metadata-read-service — no prefix
+        - id: metadata-read-service
+          uri: http://metadata-read-service:8081
+          predicates:
+            - Path=/api/catalog/**
+
+        # metadata-write — NOT available via gateway
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized
 
 logging:
   level:
