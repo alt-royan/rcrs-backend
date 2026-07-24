@@ -1,11 +1,7 @@
 package org.ultra.rcrs.metadata.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.ultra.rcrs.enums.ArtistRole;
 
 import java.util.UUID;

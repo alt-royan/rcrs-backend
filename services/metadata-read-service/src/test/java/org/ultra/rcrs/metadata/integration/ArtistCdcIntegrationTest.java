@@ -4,8 +4,8 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.ArtistRole;
+import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.events.artist.ArtistCreatedEventOuterClass;
 import org.ultra.rcrs.events.common.AvailabilityStatusOuterClass;
 import org.ultra.rcrs.events.common.DomainEventOuterClass;
@@ -23,7 +23,7 @@ class ArtistCdcIntegrationTest extends BaseIntegrationTest {
         Thread.sleep(5000);
         String id = randomId();
         sendArtistCreated(id, "CDC Artist", EntityStatus.ACTIVE);
-        
+
         var doc = artistRepository.findById(id).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getName()).isEqualTo("CDC Artist");
@@ -41,7 +41,7 @@ class ArtistCdcIntegrationTest extends BaseIntegrationTest {
                         .setAvatarS3Key("avatars/hidden.jpg")
                         .setAvailabilityStatus(AvailabilityStatusOuterClass.AvailabilityStatus.HIDDEN)
                         .build());
-        
+
         var doc = artistRepository.findById(id).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getAvailabilityStatus()).isEqualTo(EntityStatus.HIDDEN);
@@ -52,9 +52,9 @@ class ArtistCdcIntegrationTest extends BaseIntegrationTest {
     void artistDeleted_setsAvailabilityToDeleted() throws Exception {
         String id = randomId();
         sendArtistCreated(id, "Delete Me", EntityStatus.ACTIVE);
-        
+
         sendArtistDeleted(id);
-        
+
         var doc = artistRepository.findById(id).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getAvailabilityStatus()).isEqualTo(EntityStatus.DELETED);
@@ -65,9 +65,9 @@ class ArtistCdcIntegrationTest extends BaseIntegrationTest {
     void artistHidden_setsAvailabilityToHidden() throws Exception {
         String id = randomId();
         sendArtistCreated(id, "Hide Me", EntityStatus.ACTIVE);
-        
+
         sendArtistHidden(id);
-        
+
         var doc = artistRepository.findById(id).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getAvailabilityStatus()).isEqualTo(EntityStatus.HIDDEN);
@@ -78,9 +78,9 @@ class ArtistCdcIntegrationTest extends BaseIntegrationTest {
     void artistActivated_setsAvailabilityToActive() throws Exception {
         String id = randomId();
         sendArtistCreated(id, "Activate Me", EntityStatus.HIDDEN);
-        
+
         sendArtistActivated(id);
-        
+
         var doc = artistRepository.findById(id).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getAvailabilityStatus()).isEqualTo(EntityStatus.ACTIVE);
@@ -91,9 +91,9 @@ class ArtistCdcIntegrationTest extends BaseIntegrationTest {
     void artistTrueDeleted_removesDocumentFromMongo() throws Exception {
         String id = randomId();
         sendArtistCreated(id, "True Delete Me", EntityStatus.ACTIVE);
-        
+
         sendArtistTrueDeleted(id);
-        
+
         var doc = artistRepository.findById(id).block();
         assertThat(doc).isNull();
     }
@@ -105,11 +105,11 @@ class ArtistCdcIntegrationTest extends BaseIntegrationTest {
         String albumId = randomId();
 
         sendArtistCreated(artistId, "Embed Artist", EntityStatus.ACTIVE);
-        
+
         sendAlbumCreated(albumId, "Album For Embed");
-        
+
         sendArtistAddedToAlbum(artistId, albumId, ArtistRole.MAIN_ARTIST);
-        
+
         var album = albumRepository.findById(albumId).block();
         assertThat(album).isNotNull();
         assertThat(album.getArtists()).hasSize(1);
@@ -125,16 +125,16 @@ class ArtistCdcIntegrationTest extends BaseIntegrationTest {
         String albumId = randomId();
 
         sendArtistCreated(artistId, "Remove Artist", EntityStatus.ACTIVE);
-        
+
         sendAlbumCreated(albumId, "Album For Remove");
-        
+
         sendArtistAddedToAlbum(artistId, albumId, ArtistRole.MAIN_ARTIST);
-        
+
         var album = albumRepository.findById(albumId).block();
         assertThat(Objects.requireNonNull(album).getArtists()).hasSize(1);
 
         sendArtistDeletedFromAlbum(artistId, albumId);
-        
+
         album = albumRepository.findById(albumId).block();
         assertThat(album).isNotNull();
         assertThat(album.getArtists()).isEmpty();

@@ -9,11 +9,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.ultra.rcrs.metadata.dto.ErrorResponse;
 import org.ultra.rcrs.exceptions.BadRequestException;
 import org.ultra.rcrs.exceptions.DecodeFromBase62Exception;
 import org.ultra.rcrs.exceptions.EncodeToBase62Exception;
 import org.ultra.rcrs.exceptions.NotFoundException;
+import org.ultra.rcrs.metadata.dto.ErrorResponse;
 
 @Slf4j
 @RestControllerAdvice

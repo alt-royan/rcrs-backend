@@ -2,11 +2,10 @@ package org.ultra.rcrs.workflow.activity;
 
 import io.temporal.activity.ActivityInterface;
 import io.temporal.activity.ActivityMethod;
-import org.springframework.http.ResponseEntity;
 import org.ultra.rcrs.workflow.client.model.AlbumUploadModel;
 import org.ultra.rcrs.workflow.client.model.ArtistsToEntityModel;
-import org.ultra.rcrs.workflow.dto.response.CreateResponse;
 import org.ultra.rcrs.workflow.dto.StatusDto;
+import org.ultra.rcrs.workflow.dto.response.CreateResponse;
 
 @ActivityInterface
 public interface AlbumActivity {

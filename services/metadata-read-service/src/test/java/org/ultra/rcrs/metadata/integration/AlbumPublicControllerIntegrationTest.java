@@ -1,11 +1,11 @@
 package org.ultra.rcrs.metadata.integration;
 
 import org.junit.jupiter.api.Test;
+import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.metadata.model.AlbumDocument;
 import org.ultra.rcrs.metadata.model.ArtistDocument;
-import org.ultra.rcrs.enums.ArtistRole;
 
 class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
 
@@ -14,7 +14,7 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
         AlbumDocument album = createAlbumDoc("Published Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/api/albums/{id}", album.getId())
+                .uri("/catalog/albums/{id}", album.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -28,7 +28,7 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
         AlbumDocument album = createAlbumDoc("Hidden Album", LifecycleStatus.PUBLISHED, EntityStatus.HIDDEN);
 
         webTestClient.get()
-                .uri("/api/albums/{id}", album.getId())
+                .uri("/catalog/albums/{id}", album.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -41,7 +41,7 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
         AlbumDocument album = createAlbumDoc("Draft Album", LifecycleStatus.CREATED, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/api/albums/{id}", album.getId())
+                .uri("/catalog/albums/{id}", album.getId())
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -51,7 +51,7 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
         AlbumDocument album = createAlbumDoc("Transcoding Album", LifecycleStatus.TRANSCODING, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/api/albums/{id}", album.getId())
+                .uri("/catalog/albums/{id}", album.getId())
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -61,7 +61,7 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
         AlbumDocument album = createAlbumDoc("Deleted Album", LifecycleStatus.PUBLISHED, EntityStatus.DELETED);
 
         webTestClient.get()
-                .uri("/api/albums/{id}", album.getId())
+                .uri("/catalog/albums/{id}", album.getId())
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -69,7 +69,7 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void getAlbum_nonExistentId_404NotFound() {
         webTestClient.get()
-                .uri("/api/albums/{id}", "non-existent-id")
+                .uri("/catalog/albums/{id}", "non-existent-id")
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -79,7 +79,7 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
         AlbumDocument album = createAlbumDoc("Cover Test", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/api/albums/{id}", album.getId())
+                .uri("/catalog/albums/{id}", album.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -96,7 +96,7 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
                 artist.getId(), "Album Artist", ArtistRole.MAIN_ARTIST);
 
         webTestClient.get()
-                .uri("/api/albums/{id}", album.getId())
+                .uri("/catalog/albums/{id}", album.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -111,7 +111,7 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
         createTrackDoc("Track Two", album.getId(), "Tracks Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/api/albums/{id}/tracks", album.getId())
+                .uri("/catalog/albums/{id}/tracks", album.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Object.class).hasSize(2);
@@ -124,7 +124,7 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
         createTrackDoc("Deleted Track", album.getId(), "Filter Album", LifecycleStatus.PUBLISHED, EntityStatus.DELETED);
 
         webTestClient.get()
-                .uri("/api/albums/{id}/tracks", album.getId())
+                .uri("/catalog/albums/{id}/tracks", album.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Object.class).hasSize(1);
@@ -137,7 +137,7 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
         createTrackDoc("Draft Track", album.getId(), "Lifecycle Album", LifecycleStatus.CREATED, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/api/albums/{id}/tracks", album.getId())
+                .uri("/catalog/albums/{id}/tracks", album.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Object.class).hasSize(1);
@@ -148,7 +148,7 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
         AlbumDocument album = createAlbumDoc("Empty Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/api/albums/{id}/tracks", album.getId())
+                .uri("/catalog/albums/{id}/tracks", album.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Object.class).hasSize(0);

@@ -18,7 +18,7 @@ public class SocialLinks {
     public SocialLinks(List<SocialLinkDto> dtos) {
         if (dtos == null) {
             this.items = new ArrayList<>();
-        }else {
+        } else {
             this.items = dtos.stream().map(dto -> new Link(dto.getResourceName(), dto.getUrl().toString())).toList();
         }
     }

@@ -3,9 +3,7 @@ package org.ultra.rcrs.searchservice.dto;
 import org.junit.jupiter.api.Test;
 import org.ultra.rcrs.searchservice.enums.SearchType;
 
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class SearchCollectionTest {
 

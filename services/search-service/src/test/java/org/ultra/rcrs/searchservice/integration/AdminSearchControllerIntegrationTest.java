@@ -3,10 +3,10 @@ package org.ultra.rcrs.searchservice.integration;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class AdminSearchControllerIntegrationTest extends BaseIntegrationTest {
 
@@ -16,7 +16,8 @@ class AdminSearchControllerIntegrationTest extends BaseIntegrationTest {
         indexArtistAdminDoc("a2", "Deleted Artist", List.of("rock"), "DELETED", null, null, null);
         refreshAllIndices();
 
-        mockMvc.perform(get("/admin/search")
+        mockMvc.perform(get("/search")
+                        .param("admin", "true")
                         .param("q", "Artist")
                         .param("type", "artist"))
                 .andExpect(status().isOk())
@@ -30,7 +31,8 @@ class AdminSearchControllerIntegrationTest extends BaseIntegrationTest {
         indexAlbumAdminDoc("al3", "Draft Album", "2025", "ACTIVE", "CREATED", null, null);
         refreshAllIndices();
 
-        mockMvc.perform(get("/admin/search")
+        mockMvc.perform(get("/search")
+                        .param("admin", "true")
                         .param("q", "Album")
                         .param("type", "album"))
                 .andExpect(status().isOk())
@@ -44,7 +46,8 @@ class AdminSearchControllerIntegrationTest extends BaseIntegrationTest {
         indexTrackAdminDoc("t3", "Draft Track", "ACTIVE", "CREATED", null, null);
         refreshAllIndices();
 
-        mockMvc.perform(get("/admin/search")
+        mockMvc.perform(get("/search")
+                        .param("admin", "true")
                         .param("q", "Track")
                         .param("type", "track"))
                 .andExpect(status().isOk())
@@ -58,7 +61,8 @@ class AdminSearchControllerIntegrationTest extends BaseIntegrationTest {
         indexTrackAdminDoc("t1", "Admin Track", "ACTIVE", "PUBLISHED", null, null);
         refreshAllIndices();
 
-        mockMvc.perform(get("/admin/search")
+        mockMvc.perform(get("/search")
+                        .param("admin", "true")
                         .param("q", "Admin")
                         .param("type", "artist,album,track"))
                 .andExpect(status().isOk())
@@ -73,7 +77,8 @@ class AdminSearchControllerIntegrationTest extends BaseIntegrationTest {
         indexAlbumAdminDoc("al1", "Only Album", "2025", "ACTIVE", "PUBLISHED", null, null);
         refreshAllIndices();
 
-        mockMvc.perform(get("/admin/search")
+        mockMvc.perform(get("/search")
+                        .param("admin", "true")
                         .param("q", "Only")
                         .param("type", "artist"))
                 .andExpect(status().isOk())
@@ -84,7 +89,8 @@ class AdminSearchControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void searchAdmin_noResults_returnsEmpty() throws Exception {
-        mockMvc.perform(get("/admin/search")
+        mockMvc.perform(get("/search")
+                        .param("admin", "true")
                         .param("q", "nonexistent")
                         .param("type", "artist"))
                 .andExpect(status().isOk())
@@ -98,7 +104,8 @@ class AdminSearchControllerIntegrationTest extends BaseIntegrationTest {
         }
         refreshAllIndices();
 
-        mockMvc.perform(get("/admin/search")
+        mockMvc.perform(get("/search")
+                        .param("admin", "true")
                         .param("q", "Page")
                         .param("type", "artist")
                         .param("page", "0")
@@ -115,7 +122,8 @@ class AdminSearchControllerIntegrationTest extends BaseIntegrationTest {
                 List.of(nested("t1", "Admin Track")));
         refreshAllIndices();
 
-        mockMvc.perform(get("/admin/search")
+        mockMvc.perform(get("/search")
+                        .param("admin", "true")
                         .param("q", "Nested")
                         .param("type", "artist"))
                 .andExpect(status().isOk())
@@ -130,7 +138,8 @@ class AdminSearchControllerIntegrationTest extends BaseIntegrationTest {
                 List.of(nested("t1", "Admin Track")));
         refreshAllIndices();
 
-        mockMvc.perform(get("/admin/search")
+        mockMvc.perform(get("/search")
+                        .param("admin", "true")
                         .param("q", "Nested")
                         .param("type", "album"))
                 .andExpect(status().isOk())
@@ -145,7 +154,8 @@ class AdminSearchControllerIntegrationTest extends BaseIntegrationTest {
                 nestedAlbum("al1", "Admin Album"));
         refreshAllIndices();
 
-        mockMvc.perform(get("/admin/search")
+        mockMvc.perform(get("/search")
+                        .param("admin", "true")
                         .param("q", "Nested")
                         .param("type", "track"))
                 .andExpect(status().isOk())

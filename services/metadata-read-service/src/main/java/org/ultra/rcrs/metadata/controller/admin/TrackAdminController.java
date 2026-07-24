@@ -12,8 +12,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin/tracks")
-@CrossOrigin("*")
+@RequestMapping("/catalog/admin/tracks")
 public class TrackAdminController {
 
     private final TrackAdminService trackAdminService;

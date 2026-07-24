@@ -2,9 +2,9 @@ package org.ultra.rcrs.metadata.controller.admin;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
-import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.metadata.dto.AlbumAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.AlbumAdminViewDto;
 import org.ultra.rcrs.metadata.dto.TrackAdminStandaloneDto;
@@ -15,8 +15,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin/albums")
-@CrossOrigin("*")
+@RequestMapping("/catalog/admin/albums")
 public class AlbumAdminController {
 
     private final AlbumAdminService albumAdminService;

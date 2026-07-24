@@ -4,6 +4,7 @@ import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowOptions;
 import io.temporal.common.RetryOptions;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.workflow.dto.request.AlbumUploadRequest;
@@ -20,6 +21,9 @@ import static org.ultra.rcrs.workflow.config.TemporalConfig.WORKFLOW_TASK_QUEUE;
 public class WorkflowHandler {
 
     private final WorkflowClient workflowClient;
+
+    @Value("${workflow.purge.cron}")
+    private String purgeCronSchedule;
 
     public CreateResponse startRegisterArtistWorkflow(ArtistUploadRequest request) {
 
@@ -113,7 +117,7 @@ public class WorkflowHandler {
                 WorkflowOptions.newBuilder()
                         .setTaskQueue(WORKFLOW_TASK_QUEUE)
                         .setWorkflowId("purge-deleted-monthly")
-                        .setCronSchedule("0 0 4 1 * *")
+                        .setCronSchedule(purgeCronSchedule)
                         .setRetryOptions(
                                 RetryOptions.newBuilder()
                                         .setMaximumAttempts(1)

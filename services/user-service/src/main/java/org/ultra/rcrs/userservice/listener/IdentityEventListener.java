@@ -1,6 +1,5 @@
 package org.ultra.rcrs.userservice.listener;
 
-import tools.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -14,6 +13,7 @@ import org.ultra.rcrs.userservice.mapper.KeycloakEventMapper;
 import org.ultra.rcrs.userservice.model.ProcessedEvent;
 import org.ultra.rcrs.userservice.repository.ProcessedEventRepository;
 import org.ultra.rcrs.userservice.service.UserService;
+import tools.jackson.databind.ObjectMapper;
 
 import java.time.Instant;
 

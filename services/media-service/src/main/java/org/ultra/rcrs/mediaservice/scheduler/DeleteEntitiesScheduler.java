@@ -2,10 +2,10 @@ package org.ultra.rcrs.mediaservice.scheduler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.enums.FileStatus;
+import org.ultra.rcrs.mediaservice.config.UploadConfigurationProperties;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioUploadRepository;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.Delete;
@@ -25,9 +25,7 @@ public class DeleteEntitiesScheduler {
 
     private final AudioUploadRepository audioUploadRepository;
     private final S3Client s3Client;
-
-    @Value("${cdn.uploads.bucket.name}")
-    private String s3UploadBucket;
+    private final UploadConfigurationProperties uploadProperties;
 
     @Scheduled(fixedRate = 3600000)
     public void cleanupStaleUploads() {
@@ -53,7 +51,7 @@ public class DeleteEntitiesScheduler {
                 .map(key -> ObjectIdentifier.builder().key(key).build())
                 .toList();
         DeleteObjectsRequest request = DeleteObjectsRequest.builder()
-                .bucket(s3UploadBucket)
+                .bucket(uploadProperties.getBucket().getName())
                 .delete(Delete.builder().objects(objectIds).build())
                 .build();
         s3Client.deleteObjects(request);

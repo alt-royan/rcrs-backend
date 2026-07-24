@@ -4,7 +4,6 @@ import io.temporal.activity.ActivityOptions;
 import io.temporal.common.RetryOptions;
 import io.temporal.workflow.Workflow;
 import org.ultra.rcrs.workflow.config.TemporalProperties;
-import org.ultra.rcrs.workflow.kafka.WorkflowEventProducer;
 
 public class ActivityFactory {
 

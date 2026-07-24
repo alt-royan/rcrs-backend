@@ -19,8 +19,6 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -106,7 +104,8 @@ public abstract class BaseIntegrationTest {
         }
     }
 
-    protected record TopicEvent(String topic, DomainEventOuterClass.DomainEvent event) {}
+    protected record TopicEvent(String topic, DomainEventOuterClass.DomainEvent event) {
+    }
 
     protected List<TopicEvent> drainEvents(int expectedCount) throws InvalidProtocolBufferException {
         List<TopicEvent> events = new ArrayList<>();

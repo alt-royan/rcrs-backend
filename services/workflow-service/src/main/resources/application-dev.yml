@@ -1,6 +1,10 @@
 server:
   port: 8090
 
+workflow:
+  purge:
+    cron: ${WORKFLOW_PURGE_CRON}
+
 spring:
   application:
     name: workflow-service
@@ -13,18 +17,34 @@ spring:
             readTimeout: 5000
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+  security:
+    enabled: true
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${OAUTH2_ISSUER_URI}
+      client:
+        provider:
+          keycloak:
+            issuer-uri: ${KEYCLOAK_ISSUER_URI}
+            user-name-attribute: ${USERNAME_ATTRIBUTE}
+        registration:
+          keycloak:
+            client-id: ${CLIENT_ID}
+            client-secret: ${CLIENT_SECRET}
+            scope: ${SCOPE}
   temporal:
     connection:
       target: ${SPRING_TEMPORAL_CONNECTION_TARGET}
     workflow:
 
     workers:
-        capacity:
-          max-concurrent-workflow-task-pollers: 6
-          max-concurrent-activity-task-pollers: 6
-        rate-limits:
-          max-worker-activities-per-second: 2
-          max-task-queue-activities-per-second: 2
+      capacity:
+        max-concurrent-workflow-task-pollers: 6
+        max-concurrent-activity-task-pollers: 6
+      rate-limits:
+        max-worker-activities-per-second: 2
+        max-task-queue-activities-per-second: 2
     workflow-cache:
       max-instances: 10
       max-threads: 10

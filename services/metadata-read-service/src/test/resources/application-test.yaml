@@ -1,6 +1,8 @@
 spring:
   application:
     name: metadata-read-service-test
+  security:
+    enabled: false
 
 eureka:
   client:

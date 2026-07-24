@@ -10,7 +10,8 @@
 
 ## Architecture
 
-- **Services**: discovery (Eureka), gateway (Spring Cloud Gateway), media, metadata-write (Postgres + MongoDB CQRS), metadata-read (MongoDB), search (Elasticsearch), user (Postgres), workflow (Temporal)
+- **Services**: discovery (Eureka), gateway (Spring Cloud Gateway), media, metadata-write (Postgres + MongoDB CQRS),
+  metadata-read (MongoDB), search (Elasticsearch), user (Postgres), workflow (Temporal)
 - **Communication**: Kafka (protobuf domain events), SQS (S3 upload events), Eureka discovery, Feign clients
 - **Orchestration**: Temporal.io for media processing workflows (media-service, workflow-service)
 - **Infra**: LocalStack (S3+SQS), Kafka, Postgres, MongoDB, Elasticsearch, Temporal, Keycloak, Redis

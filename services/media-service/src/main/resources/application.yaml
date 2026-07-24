@@ -88,6 +88,22 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   kafka:
     bootstrap-servers: localhost:9092
+  security:
+    enabled: true
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/rcrs
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8180/realms/rcrs
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: rcrs-app
+            client-secret: xuTR1hmVfO5ERSNdgl23JpW3vKTrACk0ampYzmmW3XoGoaJtE8h18CweFsSONWYAC6S7IJbvu7na38odNMogSC
+            scope: openid
   cloud:
     aws:
       credentials:
@@ -99,39 +115,38 @@ spring:
       s3:
         path-style-access-enabled: true
 
-cdn:
-  images:
-    bucket:
-      name: images
-      public-url:  http://images.localhost:4566
-    thumbnails: 64,300,640
-  audios:
+media:
+  audio:
     bucket:
       name: rcrs-audio
-      public-url:  http://audio.localhost:4566
-  uploads:
+      public-url: http://audio.localhost:4566
+    validation:
+      formats: mp3, wav, ogg, flac
+      duration:
+        min: 1s
+        max: 2h
+    bitrates: 128k, 192k, 320k
+    codec: libvorbis
+    rate: 44100
+    format: ogg
+    loudnorm:
+      I: -18
+      LRA: 18
+      TP: -1
+  image:
+    bucket:
+      name: images
+      public-url: http://images.localhost:4566
+    thumbnails:
+      sizes: 64,300,640
+  upload:
     bucket:
       name: rcrs-upload
-      public-url:  http://upload.localhost:4566
+      public-url: http://upload.localhost:4566
     signature-duration: 24h
-    file-duration: 24h
-    sqs:
-      queue: rcrs-upload-event-queue
-
-audio:
-  validation:
-    formats: mp3, wav, ogg, flac
-    duration:
-      min: 1s
-      max: 2h
-  bitrates: 128k, 192k, 320k
-  codec: libvorbis
-  rate: 44100
-  format: ogg
-  loudnorm:
-    I: -18
-    LRA: 18
-    TP: -1
+    upload-duration: 24h
+  sqs:
+    queue: rcrs-upload-event-queue
 
 
 eureka:

@@ -1,6 +1,5 @@
 package org.ultra.rcrs.userservice.integration;
 
-import tools.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +15,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.userservice.repository.ProcessedEventRepository;
 import org.ultra.rcrs.userservice.repository.UserRepository;
+import tools.jackson.databind.ObjectMapper;
 
 import java.util.Map;
 import java.util.UUID;
@@ -86,7 +86,7 @@ public abstract class BaseIntegrationTest {
     }
 
     protected String buildKeycloakEvent(String id, String type, String userId,
-                                         Map<String, String> details) throws Exception {
+                                        Map<String, String> details) throws Exception {
         Map<String, Object> event = Map.of(
                 "id", id,
                 "time", System.currentTimeMillis(),
@@ -102,13 +102,13 @@ public abstract class BaseIntegrationTest {
     }
 
     protected void sendKeycloakEvent(String id, String type, String userId,
-                                      Map<String, String> details) throws Exception {
+                                     Map<String, String> details) throws Exception {
         String json = buildKeycloakEvent(id, type, userId, details);
         kafkaTemplate.send(Topics.IDENTITY_EVENTS_TOPIC, userId, json).get();
     }
 
     protected void sendRegisterEvent(String keycloakId, String username, String email,
-                                      String firstName, String lastName) throws Exception {
+                                     String firstName, String lastName) throws Exception {
         sendKeycloakEvent(UUID.randomUUID().toString(), "REGISTER", keycloakId, Map.of(
                 "preferred_username", username,
                 "email", email,
@@ -119,7 +119,7 @@ public abstract class BaseIntegrationTest {
     }
 
     protected void sendUpdateProfileEvent(String keycloakId, String username, String email,
-                                           String firstName, String lastName) throws Exception {
+                                          String firstName, String lastName) throws Exception {
         sendKeycloakEvent(UUID.randomUUID().toString(), "UPDATE_PROFILE", keycloakId, Map.of(
                 "preferred_username", username,
                 "email", email,

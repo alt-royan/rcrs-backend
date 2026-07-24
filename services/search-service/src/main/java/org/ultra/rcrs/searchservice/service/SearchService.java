@@ -5,7 +5,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.core5.net.URIBuilder;
 import org.springframework.stereotype.Service;
-import org.ultra.rcrs.searchservice.dto.*;
+import org.ultra.rcrs.searchservice.dto.ResultWrapper;
+import org.ultra.rcrs.searchservice.dto.SearchCollection;
+import org.ultra.rcrs.searchservice.dto.SearchResponse;
 import org.ultra.rcrs.searchservice.enums.SearchType;
 
 import java.net.URISyntaxException;
@@ -35,21 +37,18 @@ public class SearchService {
         SearchResponse response = new SearchResponse();
 
         var features = Arrays.stream(types).map(t -> switch (t) {
-            case artist ->
-                    CompletableFuture.supplyAsync(() -> enrichWithHref(
-                            admin ? adminSearchService.searchArtists(query, page, size)
-                                  : publicSearchService.searchArtists(query, page, size),
-                            SearchType.artist, request)).thenAccept(response::setArtists);
-            case album ->
-                    CompletableFuture.supplyAsync(() -> enrichWithHref(
-                            admin ? adminSearchService.searchAlbums(query, page, size)
-                                  : publicSearchService.searchAlbums(query, page, size),
-                            SearchType.album, request)).thenAccept(response::setAlbums);
-            case track ->
-                    CompletableFuture.supplyAsync(() -> enrichWithHref(
-                            admin ? adminSearchService.searchTracks(query, page, size)
-                                  : publicSearchService.searchTracks(query, page, size),
-                            SearchType.track, request)).thenAccept(response::setTracks);
+            case artist -> CompletableFuture.supplyAsync(() -> enrichWithHref(
+                    admin ? adminSearchService.searchArtists(query, page, size)
+                            : publicSearchService.searchArtists(query, page, size),
+                    SearchType.artist, request)).thenAccept(response::setArtists);
+            case album -> CompletableFuture.supplyAsync(() -> enrichWithHref(
+                    admin ? adminSearchService.searchAlbums(query, page, size)
+                            : publicSearchService.searchAlbums(query, page, size),
+                    SearchType.album, request)).thenAccept(response::setAlbums);
+            case track -> CompletableFuture.supplyAsync(() -> enrichWithHref(
+                    admin ? adminSearchService.searchTracks(query, page, size)
+                            : publicSearchService.searchTracks(query, page, size),
+                    SearchType.track, request)).thenAccept(response::setTracks);
         }).toArray(CompletableFuture<?>[]::new);
 
         CompletableFuture.allOf(features).join();

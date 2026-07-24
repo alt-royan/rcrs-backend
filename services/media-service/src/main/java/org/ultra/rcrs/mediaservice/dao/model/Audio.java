@@ -5,9 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.ultra.rcrs.enums.FileStatus;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 

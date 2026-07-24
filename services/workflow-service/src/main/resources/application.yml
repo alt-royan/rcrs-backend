@@ -1,6 +1,10 @@
 server:
   port: 8090
 
+workflow:
+  purge:
+    cron: "0 0 4 1 * *"
+
 spring:
   application:
     name: workflow-service
@@ -13,18 +17,34 @@ spring:
             readTimeout: 5000
   kafka:
     bootstrap-servers: localhost:9092
+  security:
+    enabled: true
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:8180/realms/rcrs
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://localhost:8180/realms/rcrs
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: rcrs-app
+            client-secret: xuTR1hmVfO5ERSNdgl23JpW3vKTrACk0ampYzmmW3XoGoaJtE8h18CweFsSONWYAC6S7IJbvu7na38odNMogSC
+            scope: openid
   temporal:
     connection:
       target: 127.0.0.1:7233
     workflow:
 
     workers:
-        capacity:
-          max-concurrent-workflow-task-pollers: 6
-          max-concurrent-activity-task-pollers: 6
-        rate-limits:
-          max-worker-activities-per-second: 2
-          max-task-queue-activities-per-second: 2
+      capacity:
+        max-concurrent-workflow-task-pollers: 6
+        max-concurrent-activity-task-pollers: 6
+      rate-limits:
+        max-worker-activities-per-second: 2
+        max-task-queue-activities-per-second: 2
     workflow-cache:
       max-instances: 10
       max-threads: 10

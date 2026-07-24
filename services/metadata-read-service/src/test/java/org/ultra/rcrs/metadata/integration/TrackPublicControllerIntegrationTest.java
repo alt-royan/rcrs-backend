@@ -17,7 +17,7 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
                 LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/api/tracks/{id}", track.getId())
+                .uri("/catalog/tracks/{id}", track.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -34,7 +34,7 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
                 LifecycleStatus.PUBLISHED, EntityStatus.HIDDEN);
 
         webTestClient.get()
-                .uri("/api/tracks/{id}", track.getId())
+                .uri("/catalog/tracks/{id}", track.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -49,7 +49,7 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
                 LifecycleStatus.CREATED, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/api/tracks/{id}", track.getId())
+                .uri("/catalog/tracks/{id}", track.getId())
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -61,7 +61,7 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
                 LifecycleStatus.TRANSCODING, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/api/tracks/{id}", track.getId())
+                .uri("/catalog/tracks/{id}", track.getId())
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -73,7 +73,7 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
                 LifecycleStatus.PUBLISHED, EntityStatus.DELETED);
 
         webTestClient.get()
-                .uri("/api/tracks/{id}", track.getId())
+                .uri("/catalog/tracks/{id}", track.getId())
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -81,7 +81,7 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void getTrack_nonExistentId_404NotFound() {
         webTestClient.get()
-                .uri("/api/tracks/{id}", "non-existent-id")
+                .uri("/catalog/tracks/{id}", "non-existent-id")
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -93,7 +93,7 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
                 LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/api/tracks/{id}", track.getId())
+                .uri("/catalog/tracks/{id}", track.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -123,7 +123,7 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .build()).block();
 
         webTestClient.get()
-                .uri("/api/tracks/{id}", track.getId())
+                .uri("/catalog/tracks/{id}", track.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()

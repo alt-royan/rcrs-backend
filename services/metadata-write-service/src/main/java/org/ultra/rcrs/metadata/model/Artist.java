@@ -1,13 +1,9 @@
 package org.ultra.rcrs.metadata.model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.ultra.rcrs.metadata.model.converter.SocialLinksConverter;
+import lombok.*;
 import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.metadata.model.converter.SocialLinksConverter;
 
 import java.util.List;
 import java.util.UUID;

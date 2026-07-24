@@ -18,7 +18,11 @@
         "tokens": {
           "type": "custom",
           "tokenizer": "standard",
-          "filter": ["lowercase", "russian_stemmer", "edge_ngram"]
+          "filter": [
+            "lowercase",
+            "russian_stemmer",
+            "edge_ngram"
+          ]
         }
       }
     }
@@ -38,7 +42,9 @@
       "artists": {
         "type": "nested",
         "properties": {
-          "id": { "type": "keyword" },
+          "id": {
+            "type": "keyword"
+          },
           "name": {
             "type": "text",
             "analyzer": "tokens"
@@ -48,7 +54,9 @@
       "tracks": {
         "type": "nested",
         "properties": {
-          "id": { "type": "keyword" },
+          "id": {
+            "type": "keyword"
+          },
           "title": {
             "type": "text",
             "analyzer": "tokens"

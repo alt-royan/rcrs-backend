@@ -3,21 +3,17 @@ package org.ultra.rcrs.mediaservice.temporal.activity.impl;
 import io.temporal.spring.boot.ActivityImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 import org.ultra.rcrs.exceptions.BadRequestException;
 import org.ultra.rcrs.mediaservice.temporal.activity.ValidateActivity;
 import org.ultra.rcrs.mediaservice.temporal.activity.model.ValidatedImage;
 import org.ultra.rcrs.mediaservice.utils.Hash;
-import software.amazon.awssdk.services.s3.S3Client;
-import tools.jackson.databind.ObjectMapper;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.util.Base64;
-import java.util.Set;
 
 @Component
 @ActivityImpl

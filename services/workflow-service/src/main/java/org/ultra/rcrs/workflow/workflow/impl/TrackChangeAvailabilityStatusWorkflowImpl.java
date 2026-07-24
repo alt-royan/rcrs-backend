@@ -1,7 +1,6 @@
 package org.ultra.rcrs.workflow.workflow.impl;
 
 import io.temporal.spring.boot.WorkflowImpl;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.workflow.workflow.BaseWorkflow;
@@ -15,10 +14,11 @@ public class TrackChangeAvailabilityStatusWorkflowImpl extends BaseWorkflow impl
 
     @Override
     public void changeAvailabilityStatus(EntityStatus status, String id) {
-         switch (status) {
+        switch (status) {
             case ACTIVE -> activityFactory.trackActivity().activeTrack(id);
             case HIDDEN -> activityFactory.trackActivity().hideTrack(id);
             case DELETED -> activityFactory.trackActivity().markTrackDeleted(id);
-        };
+        }
+        ;
     }
 }

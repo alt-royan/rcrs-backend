@@ -61,11 +61,11 @@ public class AlbumPublicService {
                 .explicit(doc.getExplicit())
                 .artists(doc.getArtists() != null
                         ? doc.getArtists().stream().map(a -> AlbumPublicViewDto.ArtistEmbed.builder()
-                                .id(a.getId())
-                                .name(a.getName())
-                                .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
-                                .role(a.getRole())
-                                .build()).collect(Collectors.toList())
+                        .id(a.getId())
+                        .name(a.getName())
+                        .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
+                        .role(a.getRole())
+                        .build()).collect(Collectors.toList())
                         : null)
                 .build();
     }
@@ -84,11 +84,11 @@ public class AlbumPublicService {
                 .explicit(doc.getExplicit())
                 .artists(doc.getArtists() != null
                         ? doc.getArtists().stream().map(a -> AlbumPublicStandaloneDto.ArtistEmbed.builder()
-                                .id(a.getId())
-                                .name(a.getName())
-                                .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
-                                .role(a.getRole())
-                                .build()).collect(Collectors.toList())
+                        .id(a.getId())
+                        .name(a.getName())
+                        .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
+                        .role(a.getRole())
+                        .build()).collect(Collectors.toList())
                         : null)
                 .build();
     }

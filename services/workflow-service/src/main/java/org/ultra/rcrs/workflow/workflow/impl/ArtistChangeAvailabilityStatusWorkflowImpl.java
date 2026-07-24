@@ -1,10 +1,8 @@
 package org.ultra.rcrs.workflow.workflow.impl;
 
 import io.temporal.spring.boot.WorkflowImpl;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.enums.EntityStatus;
-import org.ultra.rcrs.workflow.activity.ActivityFactory;
 import org.ultra.rcrs.workflow.workflow.ArtistChangeAvailabilityStatusWorkflow;
 import org.ultra.rcrs.workflow.workflow.BaseWorkflow;
 
@@ -16,10 +14,11 @@ public class ArtistChangeAvailabilityStatusWorkflowImpl extends BaseWorkflow imp
 
     @Override
     public void changeAvailabilityStatus(EntityStatus status, String id) {
-         switch (status) {
+        switch (status) {
             case ACTIVE -> activityFactory.artistActivity().activeArtist(id);
             case HIDDEN -> activityFactory.artistActivity().hideArtist(id);
             case DELETED -> activityFactory.artistActivity().markArtistDeleted(id);
-        };
+        }
+        ;
     }
 }

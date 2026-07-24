@@ -15,7 +15,7 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
                 LifecycleStatus.CREATED, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/admin/tracks/{id}", track.getId())
+                .uri("/catalog/admin/tracks/{id}", track.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -31,7 +31,7 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
                 LifecycleStatus.PUBLISHED, EntityStatus.DELETED);
 
         webTestClient.get()
-                .uri("/admin/tracks/{id}", track.getId())
+                .uri("/catalog/admin/tracks/{id}", track.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -42,7 +42,7 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void getTrack_nonExistentId_404NotFound() {
         webTestClient.get()
-                .uri("/admin/tracks/{id}", "non-existent-id")
+                .uri("/catalog/admin/tracks/{id}", "non-existent-id")
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -54,7 +54,7 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
                 LifecycleStatus.TRANSCODING, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/admin/tracks/{id}", track.getId())
+                .uri("/catalog/admin/tracks/{id}", track.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -68,7 +68,7 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
                 LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/admin/tracks/{id}", track.getId())
+                .uri("/catalog/admin/tracks/{id}", track.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -87,7 +87,7 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/admin/tracks/count")
+                        .path("/catalog/admin/tracks/count")
                         .queryParam("albumId", albumA.getId())
                         .build())
                 .exchange()

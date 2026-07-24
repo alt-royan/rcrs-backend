@@ -3,10 +3,10 @@ package org.ultra.rcrs.metadata.service.write;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.ultra.rcrs.metadata.model.ArtistDocument;
-import org.ultra.rcrs.metadata.repository.ArtistDocumentRepository;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.events.artist.ArtistCreatedEventOuterClass;
+import org.ultra.rcrs.metadata.model.ArtistDocument;
+import org.ultra.rcrs.metadata.repository.ArtistDocumentRepository;
 
 import java.util.stream.Collectors;
 
