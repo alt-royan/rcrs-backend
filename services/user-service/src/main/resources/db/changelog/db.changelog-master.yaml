@@ -5,3 +5,5 @@ databaseChangeLog:
       file: classpath:db/changelog/002-add-user-enabled-email-verified.sql
   - include:
       file: classpath:db/changelog/003-add-processed-events.sql
+  - include:
+      file: classpath:db/changelog/004-add-user-avatar.sql
