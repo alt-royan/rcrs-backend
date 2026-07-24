@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .accessDeniedHandler(new BearerTokenServerAccessDeniedHandler())
                 )
                 .authorizeExchange(authorize -> authorize
-                        .pathMatchers("/.*/swagger-ui/**", "/.*/v3/api-docs/**").permitAll()
+                        .pathMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                         .pathMatchers("/actuator/**").permitAll()
                         .anyExchange().authenticated()
                 )

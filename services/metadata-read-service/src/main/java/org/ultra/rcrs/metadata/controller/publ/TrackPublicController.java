@@ -11,7 +11,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/catalog/tracks")
+@RequestMapping("/tracks")
 public class TrackPublicController {
 
     private final TrackPublicService trackPublicService;

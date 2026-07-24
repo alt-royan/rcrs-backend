@@ -31,8 +31,8 @@ public class SecurityConfig {
                         .accessDeniedHandler(new BearerTokenServerAccessDeniedHandler())
                 )
                 .authorizeExchange(auth -> auth
-                        .pathMatchers("/.*/swagger-ui/**").permitAll()
-                        .pathMatchers("/.*/v3/api-docs/**").permitAll()
+                        .pathMatchers("/swagger-ui/**").permitAll()
+                        .pathMatchers("/v3/api-docs/**").permitAll()
                         .pathMatchers("/actuator/**").permitAll()
                         .pathMatchers("/admin/**").hasRole("ADMIN")
                         .anyExchange().authenticated()

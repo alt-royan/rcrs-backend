@@ -18,7 +18,7 @@ public class SearchController {
 
     private final SearchService searchService;
 
-    @GetMapping("/search")
+    @GetMapping
     public ResponseEntity<SearchResponse> search(
             HttpServletRequest request,
             @RequestParam(name = "admin", required = false, defaultValue = "false") boolean admin,
