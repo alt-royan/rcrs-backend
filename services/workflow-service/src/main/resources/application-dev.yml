@@ -103,13 +103,6 @@ feign:
   search-service:
     url: ${FEIGN_SEARCH-SERVICE_URL}
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
-  instance:
-    preferIpAddress: true
-
 management:
   endpoints:
     web:

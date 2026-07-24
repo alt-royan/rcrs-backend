@@ -149,13 +149,6 @@ media:
     queue: rcrs-upload-event-queue
 
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
-  instance:
-    preferIpAddress: true
-
 management:
   endpoints:
     web:

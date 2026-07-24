@@ -37,7 +37,6 @@
 
     <modules>
         <module>shared-lib</module>
-        <module>discovery-server</module>
         <module>gateway-api</module>
         <module>services/metadata-write-service</module>
         <module>services/metadata-read-service</module>

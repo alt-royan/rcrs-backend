@@ -3,7 +3,3 @@ spring:
     name: search-service
   security:
     enabled: false
-
-eureka:
-  client:
-    enabled: false

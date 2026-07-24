@@ -31,13 +31,6 @@ cdn:
   images:
     endpoint: ${CDN_IMAGES_ENDPOINT}
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
-  instance:
-    preferIpAddress: true
-
 management:
   endpoints:
     web:

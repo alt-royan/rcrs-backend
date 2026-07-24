@@ -40,13 +40,6 @@ spring:
             client-secret: ${CLIENT_SECRET}
             scope: ${SCOPE}
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
-  instance:
-    preferIpAddress: true
-
 management:
   endpoints:
     web:

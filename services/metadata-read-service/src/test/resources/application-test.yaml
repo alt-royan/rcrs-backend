@@ -4,7 +4,3 @@ spring:
   security:
     enabled: false
 
-eureka:
-  client:
-    enabled: false
-

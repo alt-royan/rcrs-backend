@@ -148,13 +148,6 @@ media:
   sqs:
     queue: ${SQS_QUEUE}
 
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
-  instance:
-    preferIpAddress: true
-
 management:
   endpoints:
     web:
