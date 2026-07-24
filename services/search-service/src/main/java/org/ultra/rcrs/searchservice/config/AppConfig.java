@@ -1,4 +1,4 @@
-package org.ultra.rcrs.userservice.config;
+package org.ultra.rcrs.searchservice.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.servers.Server;
@@ -16,12 +16,12 @@ public class AppConfig {
     OpenAPI metadataOpenAPI() {
         return new OpenAPI()
                 .servers(List.of(
-                        new Server().url("/me")
+                        new Server().url("/api/searh")
                 ));
     }
 
     @Bean
-    public S3Utils s3Utils(@Value("${cdn.images.endpoint:}") String endpoint) {
+    public S3Utils s3Utils(@Value("${cdn.images.endpoint}") String endpoint) {
         return new S3Utils(endpoint);
     }
 }

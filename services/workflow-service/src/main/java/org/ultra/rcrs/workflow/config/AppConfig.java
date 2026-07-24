@@ -1,4 +1,4 @@
-package org.ultra.rcrs.userservice.config;
+package org.ultra.rcrs.workflow.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.servers.Server;
@@ -18,10 +18,5 @@ public class AppConfig {
                 .servers(List.of(
                         new Server().url("/me")
                 ));
-    }
-
-    @Bean
-    public S3Utils s3Utils(@Value("${cdn.images.endpoint:}") String endpoint) {
-        return new S3Utils(endpoint);
     }
 }
