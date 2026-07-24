@@ -58,15 +58,15 @@ springdoc:
   swagger-ui:
     urls:
       - name: catalog
-        url: /api/catalog/v3/api-docs
+        url: lb://metadata-read-service/v3/api-docs
       - name: search
-        url: /api/search/v3/api-docs
+        url: lb://search-service/v3/api-docs
       - name: media
-        url: /media/v3/api-docs
+        url: lb://media-service/v3/api-docs
       - name: workflow
-        url: /workflow/v3/api-docs
+        url: lb://workflow-service/v3/api-docs
       - name: user
-        url: /me/v3/api-docs
+        url: lb://user-service/v3/api-docs
 
 eureka:
   client:
