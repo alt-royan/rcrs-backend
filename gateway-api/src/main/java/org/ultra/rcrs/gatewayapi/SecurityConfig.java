@@ -40,6 +40,11 @@ public class SecurityConfig {
                 )
                 .authorizeExchange(authorize -> authorize
                         .pathMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                        .pathMatchers("/media/swagger-ui/**", "/media/v3/api-docs/**").permitAll()
+                        .pathMatchers("/me/swagger-ui/**", "/me/v3/api-docs/**").permitAll()
+                        .pathMatchers("/api/search/swagger-ui/**", "/api/search/v3/api-docs/**").permitAll()
+                        .pathMatchers("/workflow/swagger-ui/**", "/workflow/v3/api-docs/**").permitAll()
+                        .pathMatchers("/api/catalog/swagger-ui/**", "/api/catalog/v3/api-docs/**").permitAll()
                         .pathMatchers("/actuator/**").permitAll()
                         .anyExchange().authenticated()
                 )

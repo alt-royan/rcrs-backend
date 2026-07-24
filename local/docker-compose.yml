@@ -29,6 +29,18 @@ services:
     depends_on:
       discovery-server:
         condition: service_healthy
+      metadata-write-service:
+        condition: service_started
+      metadata-read-service:
+        condition: service_started
+      search-service:
+        condition: service_started
+      media-service:
+        condition: service_started
+      user-service:
+        condition: service_started
+      workflow-service:
+        condition: service_started
     networks:
       - rcrs
 
