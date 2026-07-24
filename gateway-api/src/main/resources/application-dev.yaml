@@ -12,47 +12,51 @@ spring:
           issuer-uri: ${OAUTH2_ISSUER_URI}
   cloud:
     gateway:
-      routes:
-        # user-service — prefix /me
-        - id: user-service
-          uri: lb://user-service
-          predicates:
-            - Path=/me/**
-          filters:
-            - StripPrefix=1
+      server:
+        webflux:
+          discovery:
+            locator: enabled
+          routes:
+            # user-service — prefix /me
+            - id: user-service
+              uri: lb://user-service
+              predicates:
+                - Path=/me/**
+              filters:
+                - StripPrefix=1
 
-        # workflow-service — prefix /workflow
-        - id: workflow-service
-          uri: lb://workflow-service
-          predicates:
-            - Path=/workflow/**
-          filters:
-            - StripPrefix=1
+            # workflow-service — prefix /workflow
+            - id: workflow-service
+              uri: lb://workflow-service
+              predicates:
+                - Path=/workflow/**
+              filters:
+                - StripPrefix=1
 
-        # media-service — prefix /media
-        - id: media-service
-          uri: lb://media-service
-          predicates:
-            - Path=/media/**
-          filters:
-            - StripPrefix=1
+            # media-service — prefix /media
+            - id: media-service
+              uri: lb://media-service
+              predicates:
+                - Path=/media/**
+              filters:
+                - StripPrefix=1
 
-        # search-service — no prefix
-        - id: search-service
-          uri: lb://search-service
-          predicates:
-            - Path=/api/search/**
-          filters:
-            - StripPrefix=2
+            # search-service — no prefix
+            - id: search-service
+              uri: lb://search-service
+              predicates:
+                - Path=/api/search/**
+              filters:
+                - StripPrefix=2
 
-        # metadata-read-service — no prefix
-        - id: metadata-read-service
-          uri: lb://metadata-read-service
-          predicates:
-            - Path=/api/catalog/**
-          filters:
-            - StripPrefix=2
-        # metadata-write — NOT available via gateway
+            # metadata-read-service — no prefix
+            - id: metadata-read-service
+              uri: lb://metadata-read-service
+              predicates:
+                - Path=/api/catalog/**
+              filters:
+                - StripPrefix=2
+            # metadata-write — NOT available via gateway
 springdoc:
   swagger-ui:
     urls:
@@ -74,15 +78,12 @@ eureka:
   instance:
     preferIpAddress: true
 
+logging:
+  level:
+    root: info
+
 management:
   endpoints:
     web:
       exposure:
-        include: health,info
-  endpoint:
-    health:
-      show-details: when_authorized
-
-logging:
-  level:
-    root: info
+        include: "*"
