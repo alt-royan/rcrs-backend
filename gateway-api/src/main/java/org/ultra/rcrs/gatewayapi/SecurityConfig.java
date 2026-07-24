@@ -16,7 +16,7 @@ import org.springframework.security.oauth2.server.resource.web.access.server.Bea
 import org.springframework.security.oauth2.server.resource.web.server.BearerTokenServerAuthenticationEntryPoint;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
-import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
+import org.springframework.http.HttpMethod;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +32,6 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .cors(cors -> {})
                 .securityContextRepository(
                         NoOpServerSecurityContextRepository.getInstance()
                 )
