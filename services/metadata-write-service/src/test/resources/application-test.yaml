@@ -9,7 +9,15 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
   liquibase:
     enabled: true
+  cloud:
+    discovery:
+      client:
+        enabled: false
   security:
+    enabled: false
+
+eureka:
+  client:
     enabled: false
 
 cdn:

@@ -23,14 +23,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build gateway-api
+      - name: Build discovery server
         uses: docker/build-push-action@v6
         with:
           context: .
-          file: ./gateway-api/Dockerfile
+          file: ./discovery-server/Dockerfile
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/rcrs-gateway-api:latest
+            ghcr.io/${{ github.repository_owner }}/rcrs-discover-server:latest
+
 
       - name: Build metadata write service
         uses: docker/build-push-action@v6

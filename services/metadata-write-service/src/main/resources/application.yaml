@@ -46,6 +46,13 @@ cdn:
   images:
     endpoint: "http://images.localhost:4566"
 
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    preferIpAddress: true
+
 management:
   endpoints:
     web:

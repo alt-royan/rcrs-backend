@@ -5,7 +5,7 @@ spring:
   application:
     name: user-service
   datasource:
-    url: ${SPRING_DATASOURCE_URL}
+    url: ${SPRING_DATASOURCE_URL:jdbc}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
@@ -21,8 +21,6 @@ spring:
     user: ${SPRING_LIQUIBASE_USER:postgres}
     password: ${SPRING_LIQUIBASE_PASSWORD:postgres}
     url: ${SPRING_LIQUIBASE_URL}
-    database-change-log-table: user_databasechangelog
-    database-change-log-lock-table: user_databasechangeloglock
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
   security:
@@ -41,6 +39,13 @@ spring:
             client-id: ${CLIENT_ID}
             client-secret: ${CLIENT_SECRET}
             scope: ${SCOPE}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:8761/eureka/}
+  instance:
+    preferIpAddress: true
 
 management:
   endpoints:

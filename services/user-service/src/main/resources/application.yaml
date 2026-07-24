@@ -21,8 +21,6 @@ spring:
     user: postgres
     password: postgres
     url: jdbc:postgresql://localhost:5432/postgres
-    database-change-log-table: user_databasechangelog
-    database-change-log-lock-table: user_databasechangeloglock
   kafka:
     bootstrap-servers: localhost:9092
   security:
@@ -41,6 +39,13 @@ spring:
             client-id: rcrs-app
             client-secret: xuTR1hmVfO5ERSNdgl23JpW3vKTrACk0ampYzmmW3XoGoaJtE8h18CweFsSONWYAC6S7IJbvu7na38odNMogSC
             scope: openid
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    preferIpAddress: true
 
 management:
   endpoints:

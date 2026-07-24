@@ -6,6 +6,11 @@ spring:
     enabled: true
   security:
     enabled: false
+  eureka:
+    client:
+      enabled: false
+      fetchRegistry: false
+      registerWithEureka: false
 
 logging:
   level:
