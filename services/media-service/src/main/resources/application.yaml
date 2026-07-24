@@ -72,11 +72,11 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
     user: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://laptop-smgs968r:5432/postgres
     database-change-log-table: media_databasechangelog
     database-change-log-lock-table: media_databasechangeloglock
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://laptop-smgs968r:5432/postgres
     username: postgres
     password: postgres
   jpa:
@@ -137,7 +137,6 @@ media:
     upload-duration: 24h
   sqs:
     queue: rcrs-upload-event-queue
-
 
 eureka:
   client:

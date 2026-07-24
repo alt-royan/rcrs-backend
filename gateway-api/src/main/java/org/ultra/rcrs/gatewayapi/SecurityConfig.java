@@ -40,7 +40,7 @@ public class SecurityConfig {
                 )
                 .authorizeExchange(authorize -> authorize
                         .pathMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        .pathMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .pathMatchers("/actuator/**").permitAll()
                         .pathMatchers("/**").authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
