@@ -11,7 +11,6 @@ import org.ultra.rcrs.searchservice.service.SearchService;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping
-@CrossOrigin("*")
 public class SearchController {
 
     private final SearchService searchService;

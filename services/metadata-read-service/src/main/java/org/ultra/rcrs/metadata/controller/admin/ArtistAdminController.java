@@ -15,7 +15,6 @@ import reactor.core.publisher.Mono;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/admin/artists")
-@CrossOrigin("*")
 public class ArtistAdminController {
 
     private final ArtistAdminService artistAdminService;
