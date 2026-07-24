@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.server.resource.web.access.server.Bea
 import org.springframework.security.oauth2.server.resource.web.server.BearerTokenServerAuthenticationEntryPoint;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
+import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,7 @@ public class SecurityConfig {
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .cors(cors -> {})
                 .securityContextRepository(
                         NoOpServerSecurityContextRepository.getInstance()
                 )
@@ -46,6 +48,7 @@ public class SecurityConfig {
                         .pathMatchers("/workflow/swagger-ui/**", "/workflow/v3/api-docs/**").permitAll()
                         .pathMatchers("/api/catalog/swagger-ui/**", "/api/catalog/v3/api-docs/**").permitAll()
                         .pathMatchers("/actuator/**").permitAll()
+                        .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

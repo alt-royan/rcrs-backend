@@ -2,7 +2,9 @@ services:
   # ==================== Application ====================
 
   discovery-server:
-    image: ghcr.io/alt-royan/rcrs-discover-server:latest
+    build:
+      context: ..
+      dockerfile: discovery-server/Dockerfile
     container_name: discovery-server
     ports:
       - "8761:8761"
@@ -18,7 +20,9 @@ services:
       start_period: 30s
 
   gateway-api:
-    image: ghcr.io/alt-royan/rcrs-gateway-api:latest
+    build:
+      context: ..
+      dockerfile: gateway-api/Dockerfile
     container_name: gateway-api
     ports:
       - "8099:8099"
@@ -45,7 +49,9 @@ services:
       - rcrs
 
   metadata-write-service:
-    image: ghcr.io/alt-royan/rcrs-metadata-write-service:latest
+    build:
+      context: ..
+      dockerfile: services/metadata-write-service/Dockerfile
     container_name: metadata-write-service
     ports:
       - "8080:8080"
@@ -69,7 +75,9 @@ services:
       - rcrs
 
   metadata-read-service:
-    image: ghcr.io/alt-royan/rcrs-metadata-read-service:latest
+    build:
+      context: ..
+      dockerfile: services/metadata-read-service/Dockerfile
     container_name: metadata-read-service
     ports:
       - "8081:8081"
@@ -87,7 +95,9 @@ services:
       - rcrs
 
   search-service:
-    image: ghcr.io/alt-royan/rcrs-search-service:latest
+    build:
+      context: ..
+      dockerfile: services/search-service/Dockerfile
     container_name: search-service
     ports:
       - "8083:8083"
@@ -105,7 +115,9 @@ services:
       - rcrs
 
   media-service:
-    image: ghcr.io/alt-royan/rcrs-media-service:latest
+    build:
+      context: ..
+      dockerfile: services/media-service/Dockerfile
     container_name: media-service
     ports:
       - "8082:8082"
@@ -153,7 +165,9 @@ services:
       - rcrs
 
   user-service:
-    image: ghcr.io/alt-royan/rcrs-user-service:latest
+    build:
+      context: ..
+      dockerfile: services/user-service/Dockerfile
     container_name: user-service
     ports:
       - "8085:8085"
@@ -176,7 +190,9 @@ services:
       - rcrs
 
   workflow-service:
-    image: ghcr.io/alt-royan/rcrs-workflow-service:latest
+    build:
+      context: ..
+      dockerfile: services/workflow-service/Dockerfile
     container_name: workflow-service
     ports:
       - "8090:8090"

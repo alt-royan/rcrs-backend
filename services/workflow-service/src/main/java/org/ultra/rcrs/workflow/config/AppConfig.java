@@ -16,7 +16,7 @@ public class AppConfig {
     OpenAPI metadataOpenAPI() {
         return new OpenAPI()
                 .servers(List.of(
-                        new Server().url("/me")
+                        new Server().url("/workflow")
                 ));
     }
 }

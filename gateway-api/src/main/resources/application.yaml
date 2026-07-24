@@ -14,6 +14,10 @@ spring:
     gateway:
       server:
         webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: "*"
           discovery:
             locator: enabled
           routes:
