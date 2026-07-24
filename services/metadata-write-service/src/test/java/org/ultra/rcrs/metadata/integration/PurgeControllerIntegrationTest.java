@@ -21,7 +21,7 @@ class PurgeControllerIntegrationTest extends BaseIntegrationTest {
         Album album = createAlbumInDb("Deleted Album", EntityStatus.DELETED);
         Track track = createTrackInDb("Deleted Track", EntityStatus.DELETED, album.getId());
 
-        mockMvc.perform(post("/admin/purge"))
+        mockMvc.perform(post("/purge"))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
 
         assertThat(artistRepository.findById(artist.getId())).isEmpty();

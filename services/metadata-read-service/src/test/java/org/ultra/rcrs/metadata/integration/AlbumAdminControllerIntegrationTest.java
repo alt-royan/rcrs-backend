@@ -12,7 +12,7 @@ class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
         AlbumDocument album = createAlbumDoc("Draft Album", LifecycleStatus.CREATED, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/admin/albums/{id}", album.getId())
+                .uri("/catalog/admin/albums/{id}", album.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -26,7 +26,7 @@ class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
         AlbumDocument album = createAlbumDoc("Deleted Album", LifecycleStatus.PUBLISHED, EntityStatus.DELETED);
 
         webTestClient.get()
-                .uri("/admin/albums/{id}", album.getId())
+                .uri("/catalog/admin/albums/{id}", album.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -37,7 +37,7 @@ class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void getAlbum_nonExistentId_404NotFound() {
         webTestClient.get()
-                .uri("/admin/albums/{id}", "non-existent-id")
+                .uri("/catalog/admin/albums/{id}", "non-existent-id")
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -47,7 +47,7 @@ class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
         AlbumDocument album = createAlbumDoc("Lifecycle Album", LifecycleStatus.TRANSCODING, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/admin/albums/{id}", album.getId())
+                .uri("/catalog/admin/albums/{id}", album.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -62,7 +62,7 @@ class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
         createTrackDoc("Deleted Track", album.getId(), "Admin Tracks Album", LifecycleStatus.PUBLISHED, EntityStatus.DELETED);
 
         webTestClient.get()
-                .uri("/admin/albums/{id}/tracks", album.getId())
+                .uri("/catalog/admin/albums/{id}/tracks", album.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Object.class).hasSize(3);
@@ -73,7 +73,7 @@ class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
         AlbumDocument album = createAlbumDoc("Empty Admin Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/admin/albums/{id}/tracks", album.getId())
+                .uri("/catalog/admin/albums/{id}/tracks", album.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Object.class).hasSize(0);
@@ -85,7 +85,7 @@ class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
         createTrackDoc("Track With Status", album.getId(), "Status Album", LifecycleStatus.TRANSCODING, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/admin/albums/{id}/tracks", album.getId())
+                .uri("/catalog/admin/albums/{id}/tracks", album.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Object.class).hasSize(1)
@@ -106,7 +106,7 @@ class AlbumAdminControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/admin/albums/count")
+                        .path("/catalog/admin/albums/count")
                         .queryParam("explicit", "true")
                         .build())
                 .exchange()
