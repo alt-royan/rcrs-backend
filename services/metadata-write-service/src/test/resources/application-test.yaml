@@ -13,6 +13,8 @@ spring:
     discovery:
       client:
         enabled: false
+  security:
+    enabled: false
 
 eureka:
   client:

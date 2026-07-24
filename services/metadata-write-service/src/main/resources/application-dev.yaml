@@ -26,6 +26,7 @@ spring:
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
   security:
+    enabled: true
     oauth2:
       resourceserver:
         jwt:
