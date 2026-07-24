@@ -24,7 +24,7 @@ services:
       - "8099:8099"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/rcrs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://laptop-smgs968r:8180/realms/rcrs
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -38,22 +38,17 @@ services:
       - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://laptop-smgs968r:5432/postgres
       SPRING_HIBERNATE_DEFAUT_SCHEMA: rcrs_catalog
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/postgres
+      SPRING_LIQUIBASE_URL: jdbc:postgresql://laptop-smgs968r:5432/postgres
       SPRING_LIQUIBASE_USER: postgres
       SPRING_LIQUIBASE_PASSWORD: postgres
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      CDN_IMAGES_ENDPOINT: http://images.localhost:9000
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: laptop-smgs968r:29092
+      CDN_IMAGES_ENDPOINT: http://laptop-smgs968r:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://keycloak:8180/realms/rcrs
-      KEYCLOAK_ISSUER_URI: http://keycloak:8180/realms/rcrs
-      USERNAME_ATTRIBUTE: preferred_username
-      CLIENT_ID: rcrs-app
-      CLIENT_SECRET: xuTR1hmVfO5ERSNdgl23JpW3vKTrACk0ampYzmmW3XoGoaJtE8h18CweFsSONWYAC6S7IJbvu7na38odNMogSC
-      SCOPE: openid
+      OAUTH2_ISSUER_URI: http://laptop-smgs968r:8180/realms/rcrs
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -67,16 +62,11 @@ services:
       - "8081:8081"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATA_MONGODB_URI: mongodb://mongodb:27017/rcrs_catalog
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      CDN_IMAGES_ENDPOINT: http://images.localhost:9000
+      SPRING_DATA_MONGODB_URI: mongodb://laptop-smgs968r:27017/rcrs_catalog
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: laptop-smgs968r:29092
+      CDN_IMAGES_ENDPOINT: http://laptop-smgs968r:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://keycloak:8180/realms/rcrs
-      KEYCLOAK_ISSUER_URI: http://keycloak:8180/realms/rcrs
-      USERNAME_ATTRIBUTE: preferred_username
-      CLIENT_ID: rcrs-app
-      CLIENT_SECRET: xuTR1hmVfO5ERSNdgl23JpW3vKTrACk0ampYzmmW3XoGoaJtE8h18CweFsSONWYAC6S7IJbvu7na38odNMogSC
-      SCOPE: openid
+      OAUTH2_ISSUER_URI: http://laptop-smgs968r:8180/realms/rcrs
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -90,16 +80,11 @@ services:
       - "8083:8083"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      SPRING_ELASTICSEARCH_URIS: http://elasticsearch:9200
-      CDN_IMAGES_ENDPOINT: http://images.localhost:9000
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: laptop-smgs968r:29092
+      SPRING_ELASTICSEARCH_URIS: http://laptop-smgs968r:9200
+      CDN_IMAGES_ENDPOINT: http://laptop-smgs968r:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://keycloak:8180/realms/rcrs
-      KEYCLOAK_ISSUER_URI: http://keycloak:8180/realms/rcrs
-      USERNAME_ATTRIBUTE: preferred_username
-      CLIENT_ID: rcrs-app
-      CLIENT_SECRET: xuTR1hmVfO5ERSNdgl23JpW3vKTrACk0ampYzmmW3XoGoaJtE8h18CweFsSONWYAC6S7IJbvu7na38odNMogSC
-      SCOPE: openid
+      OAUTH2_ISSUER_URI: http://laptop-smgs968r:8180/realms/rcrs
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -113,28 +98,23 @@ services:
       - "8082:8082"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      SPRING_TEMPORAL_CONNECTION_TARGET: temporal:7233
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: laptop-smgs968r:29092
+      SPRING_TEMPORAL_CONNECTION_TARGET: laptop-smgs968r:7233
+      SPRING_DATASOURCE_URL: jdbc:postgresql://laptop-smgs968r:5432/postgres
       SPRING_HIBERNATE_DEFAUT_SCHEMA: rcrs_media
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/postgres
+      SPRING_LIQUIBASE_URL: jdbc:postgresql://laptop-smgs968r:5432/postgres
       SPRING_LIQUIBASE_USER: postgres
       SPRING_LIQUIBASE_PASSWORD: postgres
       SPRING_CLOUD_AWS_CREDENTIALS_ACCESS_KEY: test
       SPRING_CLOUD_AWS_CREDENTIALS_SECRET_KEY: test
       SPRING_CLOUD_AWS_REGION_STATIC: eu-west-1
-      SPRING_CLOUD_AWS_ENDPOINT: http://s3:4566
+      SPRING_CLOUD_AWS_ENDPOINT: http://laptop-smgs968r:4566
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://keycloak:8180/realms/rcrs
-      KEYCLOAK_ISSUER_URI: http://keycloak:8180/realms/rcrs
-      USERNAME_ATTRIBUTE: preferred_username
-      CLIENT_ID: rcrs-app
-      CLIENT_SECRET: xuTR1hmVfO5ERSNdgl23JpW3vKTrACk0ampYzmmW3XoGoaJtE8h18CweFsSONWYAC6S7IJbvu7na38odNMogSC
-      SCOPE: openid
+      OAUTH2_ISSUER_URI: http://laptop-smgs968r:8180/realms/rcrs
       AUDIO_BUCKET: rcrs-audio
-      AUDIO_PUBLIC_URL: http://audio.localhost:4566
+      AUDIO_PUBLIC_URL: http://laptop-smgs968r:4566/rcrs-audio
       AUDIO_VALIDATION_FORMATS: mp3, wav, ogg, flac
       AUDIO_VALIDATION_DURATION_MIN: 1s
       AUDIO_VALIDATION_DURATION_MAX: 2h
@@ -146,10 +126,10 @@ services:
       AUDIO_LOUDNORM_LRA: 18
       AUDIO_LOUDNORM_TP: -1
       IMAGE_BUCKET: images
-      IMAGE_PUBLIC_URL: http://images.localhost:4566
+      IMAGE_PUBLIC_URL: http://laptop-smgs968r:4566/images
       IMAGE_THUMBNAILS_SIZES: 64,300,640
       UPLOAD_BUCKET: rcrs-upload
-      UPLOAD_PUBLIC_URL: http://upload.localhost:4566
+      UPLOAD_PUBLIC_URL: http://laptop-smgs968r:4566/rcrs-upload
       UPLOAD_SIGNATURE_DURATION: 24h
       UPLOAD_UPLOAD_DURATION: 24h
       SQS_QUEUE: rcrs-upload-event-queue
@@ -166,21 +146,16 @@ services:
       - "8085:8085"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://laptop-smgs968r:5432/postgres
       SPRING_HIBERNATE_DEFAUT_SCHEMA: rcrs_user
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
-      SPRING_LIQUIBASE_URL: jdbc:postgresql://postgres:5432/postgres
+      SPRING_LIQUIBASE_URL: jdbc:postgresql://laptop-smgs968r:5432/postgres
       SPRING_LIQUIBASE_USER: postgres
       SPRING_LIQUIBASE_PASSWORD: postgres
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: laptop-smgs968r:29092
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://keycloak:8180/realms/rcrs
-      KEYCLOAK_ISSUER_URI: http://keycloak:8180/realms/rcrs
-      USERNAME_ATTRIBUTE: preferred_username
-      CLIENT_ID: rcrs-app
-      CLIENT_SECRET: xuTR1hmVfO5ERSNdgl23JpW3vKTrACk0ampYzmmW3XoGoaJtE8h18CweFsSONWYAC6S7IJbvu7na38odNMogSC
-      SCOPE: openid
+      OAUTH2_ISSUER_URI: http://laptop-smgs968r:8180/realms/rcrs
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -201,12 +176,7 @@ services:
       FEIGN_MEDIA-SERVICE_URL: http://media-service:8082
       FEIGN_SEARCH-SERVICE_URL: http://search-service:8083
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://keycloak:8180/realms/rcrs
-      KEYCLOAK_ISSUER_URI: http://keycloak:8180/realms/rcrs
-      USERNAME_ATTRIBUTE: preferred_username
-      CLIENT_ID: rcrs-app
-      CLIENT_SECRET: xuTR1hmVfO5ERSNdgl23JpW3vKTrACk0ampYzmmW3XoGoaJtE8h18CweFsSONWYAC6S7IJbvu7na38odNMogSC
-      SCOPE: openid
+      OAUTH2_ISSUER_URI: http://laptop-smgs968r:8180/realms/rcrs
     depends_on:
       discovery-server:
         condition: service_healthy

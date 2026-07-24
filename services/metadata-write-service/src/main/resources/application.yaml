@@ -31,16 +31,6 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: http://localhost:8180/realms/rcrs
-      client:
-        provider:
-          keycloak:
-            issuer-uri: http://localhost:8180/realms/rcrs
-            user-name-attribute: preferred_username
-        registration:
-          keycloak:
-            client-id: rcrs-app
-            client-secret: xuTR1hmVfO5ERSNdgl23JpW3vKTrACk0ampYzmmW3XoGoaJtE8h18CweFsSONWYAC6S7IJbvu7na38odNMogSC
-            scope: openid
 
 cdn:
   images:
