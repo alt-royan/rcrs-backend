@@ -108,8 +108,8 @@ spring:
 media:
   audio:
     bucket:
-      name: ${AUDIO_BUCKET}
-      public-url: ${AUDIO_PUBLIC_URL}
+      name: ${AUDIO_BUCKET_NAME}
+      public-url: ${AUDIO_BUCKET_PUBLIC_URL}
     validation:
       formats: ${AUDIO_VALIDATION_FORMATS}
       duration:
@@ -125,14 +125,14 @@ media:
       TP: ${AUDIO_LOUDNORM_TP}
   image:
     bucket:
-      name: ${IMAGE_BUCKET}
-      public-url: ${IMAGE_PUBLIC_URL}
+      name: ${IMAGE_BUCKET_NAME}
+      public-url: ${IMAGE_BUCKET_PUBLIC_URL}
     thumbnails:
       sizes: ${IMAGE_THUMBNAILS_SIZES}
   upload:
     bucket:
-      name: ${UPLOAD_BUCKET}
-      public-url: ${UPLOAD_PUBLIC_URL}
+      name: ${UPLOAD_BUCKET_NAME}
+      public-url: ${UPLOAD_BUCKET_PUBLIC_URL}
     signature-duration: ${UPLOAD_SIGNATURE_DURATION}
     upload-duration: ${UPLOAD_UPLOAD_DURATION}
   sqs:

@@ -114,8 +114,8 @@ services:
       SPRING_CLOUD_AWS_ENDPOINT: http://laptop-smgs968r:4566
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
       OAUTH2_ISSUER_URI: http://laptop-smgs968r:8180/realms/rcrs
-      AUDIO_BUCKET: rcrs-audio
-      AUDIO_PUBLIC_URL: http://laptop-smgs968r:4566/rcrs-audio
+      AUDIO_BUCKET_NAME: rcrs-audio
+      AUDIO_BUCKET_PUBLIC_URL: http://laptop-smgs968r:4566/rcrs-audio
       AUDIO_VALIDATION_FORMATS: mp3, wav, ogg, flac
       AUDIO_VALIDATION_DURATION_MIN: 1s
       AUDIO_VALIDATION_DURATION_MAX: 2h
@@ -126,11 +126,11 @@ services:
       AUDIO_LOUDNORM_I: -18
       AUDIO_LOUDNORM_LRA: 18
       AUDIO_LOUDNORM_TP: -1
-      IMAGE_BUCKET: images
-      IMAGE_PUBLIC_URL: http://laptop-smgs968r:4566/images
+      IMAGE_BUCKET_NAME: images
+      IMAGE_BUCKET_PUBLIC_URL: http://laptop-smgs968r:4566/images
       IMAGE_THUMBNAILS_SIZES: 64,300,640
-      UPLOAD_BUCKET: rcrs-upload
-      UPLOAD_PUBLIC_URL: http://laptop-smgs968r:4566/rcrs-upload
+      UPLOAD_BUCKET_NAME: rcrs-upload
+      UPLOAD_BUCKET_PUBLIC_URL: http://laptop-smgs968r:4566/rcrs-upload
       UPLOAD_SIGNATURE_DURATION: 24h
       UPLOAD_UPLOAD_DURATION: 24h
       SQS_QUEUE: rcrs-upload-event-queue
@@ -170,8 +170,8 @@ services:
       - "8090:8090"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_KAFKA_BOOTSTRAP_SERVERS: kafka:29092
-      SPRING_TEMPORAL_CONNECTION_TARGET: temporal:7233
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: laptop-smgs968r:29092
+      SPRING_TEMPORAL_CONNECTION_TARGET: laptop-smgs968r:7233
       WORKFLOW_PURGE_CRON: "0 0 4 1 * *"
       FEIGN_METADATA-SERVICE_URL: http://metadata-write-service:8080
       FEIGN_MEDIA-SERVICE_URL: http://media-service:8082
