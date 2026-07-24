@@ -1,6 +1,17 @@
 services:
   # ==================== Application ====================
 
+  gateway-api:
+    image: ghcr.io/alt-royan/rcrs-gateway-api:latest
+    container_name: gateway-api
+    ports:
+      - "8099:8099"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://keycloak:8180/realms/rcrs
+    networks:
+      - rcrs
+
   metadata-write-service:
     image: ghcr.io/alt-royan/rcrs-metadata-write-service:latest
     container_name: metadata-write-service

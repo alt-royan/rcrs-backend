@@ -33,5 +33,5 @@ COPY --from=builder /build/gateway-api/target/gateway-api-*.jar app.jar
 # Переключаемся на непривилегированного пользователя
 USER appuser
 
-EXPOSE 8083
+EXPOSE 8099
 ENTRYPOINT ["java", "-jar", "app.jar"]
