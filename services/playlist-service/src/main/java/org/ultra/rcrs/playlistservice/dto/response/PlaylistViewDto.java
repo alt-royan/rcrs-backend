@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -17,6 +18,7 @@ public class PlaylistViewDto {
     private String ownerId;
     private String title;
     private String description;
+    private List<String> tags;
     private String coverUrl;
     private Boolean isPublic;
     private Integer trackCount;

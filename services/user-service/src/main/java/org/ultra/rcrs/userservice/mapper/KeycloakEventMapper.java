@@ -16,8 +16,7 @@ public class KeycloakEventMapper {
             "REGISTER", IdentityEventType.USER_CREATED,
             "UPDATE_PROFILE", IdentityEventType.USER_UPDATED,
             "UPDATE_EMAIL", IdentityEventType.USER_UPDATED,
-            "DELETE_ACCOUNT", IdentityEventType.USER_DELETED,
-            "LOGIN", IdentityEventType.USER_UPDATED
+            "DELETE_ACCOUNT", IdentityEventType.USER_DELETED
     );
 
     public IdentityEvent toIdentityEvent(KeycloakRawEvent raw) {

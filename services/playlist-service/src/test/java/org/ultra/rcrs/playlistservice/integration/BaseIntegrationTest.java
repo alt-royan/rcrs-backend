@@ -24,16 +24,16 @@ import org.ultra.rcrs.events.playlist.DeletePlaylistEventOuterClass;
 import org.ultra.rcrs.events.playlist.DeleteTracksFromPlaylistEventOuterClass;
 import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.playlistservice.model.PlaylistDocument;
-import org.ultra.rcrs.playlistservice.model.PlaylistTrackDocument;
+import org.ultra.rcrs.playlistservice.model.PlaylistTrack;
 import org.ultra.rcrs.playlistservice.repository.PlaylistDocumentRepository;
-import org.ultra.rcrs.playlistservice.repository.PlaylistTrackDocumentRepository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureWebTestClient
 @Testcontainers
 @ActiveProfiles("test")
@@ -57,14 +57,10 @@ public abstract class BaseIntegrationTest {
     protected PlaylistDocumentRepository playlistRepository;
 
     @Autowired
-    protected PlaylistTrackDocumentRepository playlistTrackRepository;
-
-    @Autowired
     protected KafkaTemplate<String, byte[]> kafkaTemplate;
 
     @BeforeEach
     void clearCollections() {
-        playlistTrackRepository.deleteAll().block();
         playlistRepository.deleteAll().block();
     }
 
@@ -79,22 +75,29 @@ public abstract class BaseIntegrationTest {
                 .ownerId(ownerId)
                 .title(title)
                 .description("desc for " + title)
+                .tags(List.of())
                 .coverS3Key("covers/" + title.toLowerCase().replace(" ", "-") + ".jpg")
                 .isPublic(isPublic)
                 .trackCount(0)
-                .nextPosition(0)
+                .tracks(new ArrayList<>())
                 .createdAt(now)
                 .updatedAt(now)
                 .build()).block();
     }
 
-    protected PlaylistTrackDocument addTrackDoc(String playlistId, String trackId, int position) {
-        return playlistTrackRepository.save(PlaylistTrackDocument.builder()
-                .playlistId(playlistId)
+    protected PlaylistTrack addTrackDoc(String playlistId, String trackId, int position) {
+        PlaylistTrack track = PlaylistTrack.builder()
                 .trackId(trackId)
                 .position(position)
                 .addedAt(LocalDateTime.now())
-                .build()).block();
+                .build();
+        PlaylistDocument playlist = playlistRepository.findById(playlistId).block();
+        List<PlaylistTrack> tracks = new ArrayList<>(playlist.getTracks() != null ? playlist.getTracks() : List.of());
+        tracks.add(track);
+        playlist.setTracks(tracks);
+        playlist.setTrackCount(tracks.size());
+        playlistRepository.save(playlist).block();
+        return track;
     }
 
     protected void sendEvent(DomainEventOuterClass.EventType eventType,

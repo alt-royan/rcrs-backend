@@ -38,10 +38,7 @@ class PlaylistCommandIntegrationTest extends BaseIntegrationTest {
         var doc = playlistRepository.findById(id).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getTrackCount()).isEqualTo(2);
-
-        var tracks = playlistTrackRepository.findAllByPlaylistIdAndTrackIdIn(id, List.of("track-1", "track-2"))
-                .collectList().block();
-        assertThat(tracks).hasSize(2);
+        assertThat(doc.getTracks()).hasSize(2);
     }
 
     @Test
@@ -56,11 +53,8 @@ class PlaylistCommandIntegrationTest extends BaseIntegrationTest {
         var doc = playlistRepository.findById(id).block();
         assertThat(doc).isNotNull();
         assertThat(doc.getTrackCount()).isEqualTo(1);
-
-        var remaining = playlistTrackRepository.findAllByPlaylistIdAndTrackIdIn(id, List.of("track-1", "track-2"))
-                .collectList().block();
-        assertThat(remaining).hasSize(1);
-        assertThat(remaining.getFirst().getTrackId()).isEqualTo("track-2");
+        assertThat(doc.getTracks()).hasSize(1);
+        assertThat(doc.getTracks().getFirst().getTrackId()).isEqualTo("track-2");
     }
 
     @Test
@@ -73,7 +67,5 @@ class PlaylistCommandIntegrationTest extends BaseIntegrationTest {
         sendDeletePlaylist(id);
 
         assertThat(playlistRepository.findById(id).block()).isNull();
-        assertThat(playlistTrackRepository.findAllByPlaylistIdAndTrackIdIn(id, List.of("track-1"))
-                .collectList().block()).isEmpty();
     }
 }

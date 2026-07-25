@@ -1,6 +1,7 @@
 package org.ultra.rcrs.playlistservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -41,15 +42,17 @@ public class PlaylistController {
                                                                 @AuthenticationPrincipal Jwt jwt) {
         String id = Url62.encode(UUID.randomUUID());
         return playlistService.createPlaylist(id, jwt.getSubject(), request.getTitle(), request.getDescription(),
-                        s3Utils.parseKey(request.getCoverUri()), request.isPublic())
+                        request.getTags(), request.getTrackIds(), s3Utils.parseKey(request.getCoverUri()), request.isPublic())
                 .map(doc -> ResponseEntity.status(HttpStatus.CREATED).body(new CreateResponse(doc.getId())));
     }
 
     @GetMapping("/{playlistId}/tracks")
     public Flux<PlaylistTrackViewDto> getTracks(@PathVariable String playlistId,
                                                  @RequestParam(defaultValue = "0") int offset,
-                                                 @RequestParam(defaultValue = "50") int limit) {
-        return playlistService.getTracks(playlistId, offset, limit)
+                                                 @RequestParam(defaultValue = "50") int limit,
+                                                 @RequestParam(defaultValue = "position") String sortBy,
+                                                 @RequestParam(defaultValue = "DESC") Sort.Direction direction) {
+        return playlistService.getTracks(playlistId, offset, limit, sortBy, direction)
                 .map(PlaylistMapper::toTrackViewDto);
     }
 

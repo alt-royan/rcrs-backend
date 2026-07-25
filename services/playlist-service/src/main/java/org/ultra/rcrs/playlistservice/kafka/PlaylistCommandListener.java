@@ -43,7 +43,8 @@ public class PlaylistCommandListener {
         try {
             CreatePlaylistEventOuterClass.CreatePlaylistEvent event = payload.unpack(CreatePlaylistEventOuterClass.CreatePlaylistEvent.class);
             playlistService.createPlaylist(event.getId(), event.getOwnerId(), event.getTitle(),
-                    event.getDescription(), event.getCoverS3Key(), event.getIsPublic()).block();
+                    event.getDescription(), event.getTagsList(), event.getTrackIdsList(), event.getCoverS3Key(),
+                    event.getIsPublic()).block();
         } catch (Exception e) {
             log.error("Failed to unpack CreatePlaylistEvent: {}", e.getMessage(), e);
         }

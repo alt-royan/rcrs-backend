@@ -101,9 +101,6 @@ class PlaylistControllerIntegrationTest extends BaseIntegrationTest {
         PlaylistDocument playlist = createPlaylistDoc("user-1", "Remove Tracks", true);
         addTrackDoc(playlist.getId(), "track-a", 0);
         addTrackDoc(playlist.getId(), "track-b", 1);
-        playlist.setTrackCount(2);
-        playlist.setNextPosition(2);
-        playlistRepository.save(playlist).block();
 
         TrackIdsRequest request = new TrackIdsRequest();
         request.setTrackIds(List.of("track-a"));
@@ -114,13 +111,34 @@ class PlaylistControllerIntegrationTest extends BaseIntegrationTest {
                 .exchange()
                 .expectStatus().isOk();
 
-        var remaining = playlistTrackRepository.findAllByPlaylistIdAndTrackIdIn(playlist.getId(), List.of("track-a", "track-b"))
-                .collectList().block();
-        assertThat(remaining).hasSize(1);
-        assertThat(remaining.getFirst().getTrackId()).isEqualTo("track-b");
+        var doc = playlistRepository.findById(playlist.getId()).block();
+        assertThat(doc.getTracks()).hasSize(1);
+        assertThat(doc.getTracks().getFirst().getTrackId()).isEqualTo("track-b");
+        assertThat(doc.getTrackCount()).isEqualTo(1);
+    }
+
+    @Test
+    void deleteTracks_reindexesRemainingPositions() {
+        PlaylistDocument playlist = createPlaylistDoc("user-1", "Reindex Tracks", true);
+        addTrackDoc(playlist.getId(), "track-a", 0);
+        addTrackDoc(playlist.getId(), "track-b", 1);
+        addTrackDoc(playlist.getId(), "track-c", 2);
+
+        TrackIdsRequest request = new TrackIdsRequest();
+        request.setTrackIds(List.of("track-b"));
+
+        webTestClient.method(org.springframework.http.HttpMethod.DELETE)
+                .uri("/playlists/{id}/tracks", playlist.getId())
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().isOk();
 
         var doc = playlistRepository.findById(playlist.getId()).block();
-        assertThat(doc.getTrackCount()).isEqualTo(1);
+        assertThat(doc.getTracks()).hasSize(2);
+        assertThat(doc.getTracks().get(0).getTrackId()).isEqualTo("track-a");
+        assertThat(doc.getTracks().get(0).getPosition()).isZero();
+        assertThat(doc.getTracks().get(1).getTrackId()).isEqualTo("track-c");
+        assertThat(doc.getTracks().get(1).getPosition()).isEqualTo(1);
     }
 
     @Test
@@ -134,7 +152,5 @@ class PlaylistControllerIntegrationTest extends BaseIntegrationTest {
                 .expectStatus().isNoContent();
 
         assertThat(playlistRepository.findById(playlist.getId()).block()).isNull();
-        assertThat(playlistTrackRepository.findAllByPlaylistIdAndTrackIdIn(playlist.getId(), List.of("track-a"))
-                .collectList().block()).isEmpty();
     }
 }

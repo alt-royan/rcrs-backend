@@ -13,7 +13,7 @@
 
 ## Additional
 
-- [ ] Fix track and album status flow
 - [ ] Fix tests and test all functions
-- [ ] Group audios by main
-- [ ] Add user on front and fix user registration flow
+- [ ] Tests in read service
+- [ ] Tests in playlist service
+- [ ] Tests in search service

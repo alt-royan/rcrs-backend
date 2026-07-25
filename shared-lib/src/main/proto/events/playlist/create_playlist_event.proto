@@ -11,4 +11,6 @@ message CreatePlaylistEvent {
   string description = 4;
   string cover_s3_key = 5;
   bool is_public = 6;
+  repeated string tags = 7;
+  repeated string track_ids = 8;
 }

@@ -3,7 +3,7 @@ package org.ultra.rcrs.playlistservice.mapper;
 import org.ultra.rcrs.playlistservice.dto.response.PlaylistTrackViewDto;
 import org.ultra.rcrs.playlistservice.dto.response.PlaylistViewDto;
 import org.ultra.rcrs.playlistservice.model.PlaylistDocument;
-import org.ultra.rcrs.playlistservice.model.PlaylistTrackDocument;
+import org.ultra.rcrs.playlistservice.model.PlaylistTrack;
 import org.ultra.rcrs.utils.S3Utils;
 
 public final class PlaylistMapper {
@@ -17,6 +17,7 @@ public final class PlaylistMapper {
                 .ownerId(doc.getOwnerId())
                 .title(doc.getTitle())
                 .description(doc.getDescription())
+                .tags(doc.getTags())
                 .coverUrl(s3Utils.parseUrl(doc.getCoverS3Key()))
                 .isPublic(doc.getIsPublic())
                 .trackCount(doc.getTrackCount())
@@ -25,7 +26,7 @@ public final class PlaylistMapper {
                 .build();
     }
 
-    public static PlaylistTrackViewDto toTrackViewDto(PlaylistTrackDocument doc) {
+    public static PlaylistTrackViewDto toTrackViewDto(PlaylistTrack doc) {
         return PlaylistTrackViewDto.builder()
                 .trackId(doc.getTrackId())
                 .position(doc.getPosition())

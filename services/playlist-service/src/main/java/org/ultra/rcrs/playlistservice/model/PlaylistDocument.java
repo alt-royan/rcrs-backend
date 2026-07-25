@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -21,10 +22,11 @@ public class PlaylistDocument {
     private String ownerId;
     private String title;
     private String description;
+    private List<String> tags;
     private String coverS3Key;
     private Boolean isPublic;
     private Integer trackCount;
-    private Integer nextPosition;
+    private List<PlaylistTrack> tracks;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }
