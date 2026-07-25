@@ -1,9 +1,25 @@
 spring:
   application:
     name: playlist-service-test
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    enabled: true
+  cloud:
+    discovery:
+      client:
+        enabled: false
   security:
     enabled: false
 
 eureka:
   client:
     enabled: false
+
+cdn:
+  images:
+    endpoint: "http://test.localhost:4566"

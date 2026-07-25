@@ -3,11 +3,14 @@ package org.ultra.rcrs.playlistservice.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.bind.support.WebExchangeBindException;
-import org.springframework.web.reactive.resource.NoResourceFoundException;
-import org.springframework.web.server.ServerWebInputException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.ultra.rcrs.exceptions.BadRequestException;
 import org.ultra.rcrs.exceptions.DecodeFromBase62Exception;
 import org.ultra.rcrs.exceptions.EncodeToBase62Exception;
@@ -55,18 +58,36 @@ public class GlobalExceptionHandler {
                 .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
     }
 
-    @ExceptionHandler(ServerWebInputException.class)
-    public ResponseEntity<ErrorResponse> handleServerWebInputException(final ServerWebInputException ex) {
-        log.debug(ex.getMessage(), ex);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), ex.getMessage()));
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ErrorResponse> handleAuthenticationException(final AuthenticationException ex) {
+        log.debug("Authentication failed: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse(HttpStatus.UNAUTHORIZED.value(), "Unauthorized"));
     }
 
-    @ExceptionHandler(WebExchangeBindException.class)
-    public ResponseEntity<ErrorResponse> handleWebExchangeBindException(final WebExchangeBindException ex) {
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(final AccessDeniedException ex) {
+        log.debug("Access denied: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(new ErrorResponse(HttpStatus.FORBIDDEN.value(), "Forbidden"));
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(final HttpMessageNotReadableException ex) {
         log.debug(ex.getMessage(), ex);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "validation failed"));
+                .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), "malformed request body"));
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationExceptions(final MethodArgumentNotValidException ex) {
+        final BindingResult bindingResult = ex.getBindingResult();
+        final String message = bindingResult.getFieldErrors().stream()
+                .findFirst()
+                .map(fieldError -> String.format("%s %s", fieldError.getField(), fieldError.getDefaultMessage()))
+                .orElse("validation failed");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(HttpStatus.BAD_REQUEST.value(), message));
     }
 
     @ExceptionHandler(Exception.class)

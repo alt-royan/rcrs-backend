@@ -14,11 +14,10 @@ import org.ultra.rcrs.playlistservice.dto.response.CreateResponse;
 import org.ultra.rcrs.playlistservice.dto.response.PlaylistTrackViewDto;
 import org.ultra.rcrs.playlistservice.dto.response.PlaylistViewDto;
 import org.ultra.rcrs.playlistservice.mapper.PlaylistMapper;
+import org.ultra.rcrs.playlistservice.model.Playlist;
 import org.ultra.rcrs.playlistservice.service.PlaylistService;
 import org.ultra.rcrs.utils.S3Utils;
 import org.ultra.rcrs.utils.Url62;
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.UUID;
@@ -32,47 +31,50 @@ public class PlaylistController {
     private final S3Utils s3Utils;
 
     @GetMapping
-    public Flux<PlaylistViewDto> getPlaylists(@RequestParam List<String> ids) {
-        return playlistService.getPlaylistsByIds(ids)
-                .map(doc -> PlaylistMapper.toViewDto(doc, s3Utils));
+    public List<PlaylistViewDto> getPlaylists(@RequestParam List<String> ids) {
+        return playlistService.getPlaylistsByIds(ids).stream()
+                .map(playlist -> PlaylistMapper.toViewDto(playlist, s3Utils))
+                .toList();
     }
 
     @PostMapping
-    public Mono<ResponseEntity<CreateResponse>> createPlaylist(@RequestBody @Validated CreatePlaylistRequest request,
-                                                                @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<CreateResponse> createPlaylist(@RequestBody @Validated CreatePlaylistRequest request,
+                                                           @AuthenticationPrincipal Jwt jwt) {
         String id = Url62.encode(UUID.randomUUID());
-        return playlistService.createPlaylist(id, jwt.getSubject(), request.getTitle(), request.getDescription(),
-                        request.getTags(), request.getTrackIds(), s3Utils.parseKey(request.getCoverUri()), request.isPublic())
-                .map(doc -> ResponseEntity.status(HttpStatus.CREATED).body(new CreateResponse(doc.getId())));
+        Playlist playlist = playlistService.createPlaylist(id, jwt.getSubject(), request.getTitle(), request.getDescription(),
+                request.getTags(), request.getTrackIds(), s3Utils.parseKey(request.getCoverUri()), request.isPrivate(),
+                request.getType());
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CreateResponse(playlist.getId()));
     }
 
     @GetMapping("/{playlistId}/tracks")
-    public Flux<PlaylistTrackViewDto> getTracks(@PathVariable String playlistId,
+    public List<PlaylistTrackViewDto> getTracks(@PathVariable String playlistId,
                                                  @RequestParam(defaultValue = "0") int offset,
                                                  @RequestParam(defaultValue = "50") int limit,
                                                  @RequestParam(defaultValue = "position") String sortBy,
                                                  @RequestParam(defaultValue = "DESC") Sort.Direction direction) {
-        return playlistService.getTracks(playlistId, offset, limit, sortBy, direction)
-                .map(PlaylistMapper::toTrackViewDto);
+        return playlistService.getTracks(playlistId, offset, limit, sortBy, direction).stream()
+                .map(PlaylistMapper::toTrackViewDto)
+                .toList();
     }
 
     @PutMapping("/{playlistId}/tracks")
-    public Mono<ResponseEntity<Void>> addTracks(@PathVariable String playlistId,
-                                                 @RequestBody @Validated TrackIdsRequest request) {
-        return playlistService.addTracks(playlistId, request.getTrackIds())
-                .thenReturn(ResponseEntity.ok().<Void>build());
+    public ResponseEntity<Void> addTracks(@PathVariable String playlistId,
+                                           @RequestBody @Validated TrackIdsRequest request) {
+        playlistService.addTracks(playlistId, request.getTrackIds());
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{playlistId}/tracks")
-    public Mono<ResponseEntity<Void>> deleteTracks(@PathVariable String playlistId,
-                                                    @RequestBody @Validated TrackIdsRequest request) {
-        return playlistService.deleteTracks(playlistId, request.getTrackIds())
-                .thenReturn(ResponseEntity.ok().<Void>build());
+    public ResponseEntity<Void> deleteTracks(@PathVariable String playlistId,
+                                              @RequestBody @Validated TrackIdsRequest request) {
+        playlistService.deleteTracks(playlistId, request.getTrackIds());
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{playlistId}")
-    public Mono<ResponseEntity<Void>> deletePlaylist(@PathVariable String playlistId) {
-        return playlistService.deletePlaylist(playlistId)
-                .thenReturn(ResponseEntity.noContent().<Void>build());
+    public ResponseEntity<Void> deletePlaylist(@PathVariable String playlistId) {
+        playlistService.deletePlaylist(playlistId);
+        return ResponseEntity.noContent().build();
     }
 }

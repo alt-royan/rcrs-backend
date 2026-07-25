@@ -7,14 +7,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
-import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.reactive.server.WebTestClient;
-import org.testcontainers.containers.MongoDBContainer;
+import org.springframework.test.web.servlet.MockMvc;
+import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.ultra.rcrs.events.common.DomainEventOuterClass;
@@ -23,18 +23,18 @@ import org.ultra.rcrs.events.playlist.CreatePlaylistEventOuterClass;
 import org.ultra.rcrs.events.playlist.DeletePlaylistEventOuterClass;
 import org.ultra.rcrs.events.playlist.DeleteTracksFromPlaylistEventOuterClass;
 import org.ultra.rcrs.kafka.Topics;
-import org.ultra.rcrs.playlistservice.model.PlaylistDocument;
+import org.ultra.rcrs.playlistservice.model.Playlist;
 import org.ultra.rcrs.playlistservice.model.PlaylistTrack;
-import org.ultra.rcrs.playlistservice.repository.PlaylistDocumentRepository;
+import org.ultra.rcrs.playlistservice.model.PlaylistType;
+import org.ultra.rcrs.playlistservice.repository.PlaylistRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
-@AutoConfigureWebTestClient
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureMockMvc
 @Testcontainers
 @ActiveProfiles("test")
 @EmbeddedKafka(partitions = 1, topics = {
@@ -48,55 +48,54 @@ public abstract class BaseIntegrationTest {
 
     @Container
     @ServiceConnection
-    static MongoDBContainer mongo = new MongoDBContainer("mongo:7");
+    static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:16");
 
     @Autowired
-    protected WebTestClient webTestClient;
+    protected MockMvc mockMvc;
 
     @Autowired
-    protected PlaylistDocumentRepository playlistRepository;
+    protected PlaylistRepository playlistRepository;
 
     @Autowired
     protected KafkaTemplate<String, byte[]> kafkaTemplate;
 
     @BeforeEach
-    void clearCollections() {
-        playlistRepository.deleteAll().block();
+    void clearData() {
+        playlistRepository.deleteAll();
     }
 
     protected static String randomId() {
         return UUID.randomUUID().toString();
     }
 
-    protected PlaylistDocument createPlaylistDoc(String ownerId, String title, boolean isPublic) {
+    protected Playlist createPlaylistDoc(String ownerId, String title, boolean isPrivate) {
         var now = LocalDateTime.now();
-        return playlistRepository.save(PlaylistDocument.builder()
+        return playlistRepository.save(Playlist.builder()
                 .id(randomId())
                 .ownerId(ownerId)
                 .title(title)
                 .description("desc for " + title)
                 .tags(List.of())
                 .coverS3Key("covers/" + title.toLowerCase().replace(" ", "-") + ".jpg")
-                .isPublic(isPublic)
+                .isPrivate(isPrivate)
+                .type(PlaylistType.CUSTOM)
                 .trackCount(0)
-                .tracks(new ArrayList<>())
                 .createdAt(now)
                 .updatedAt(now)
-                .build()).block();
+                .build());
     }
 
     protected PlaylistTrack addTrackDoc(String playlistId, String trackId, int position) {
+        Playlist playlist = playlistRepository.findById(playlistId).orElseThrow();
         PlaylistTrack track = PlaylistTrack.builder()
+                .playlist(playlist)
                 .trackId(trackId)
                 .position(position)
                 .addedAt(LocalDateTime.now())
                 .build();
-        PlaylistDocument playlist = playlistRepository.findById(playlistId).block();
-        List<PlaylistTrack> tracks = new ArrayList<>(playlist.getTracks() != null ? playlist.getTracks() : List.of());
-        tracks.add(track);
-        playlist.setTracks(tracks);
-        playlist.setTrackCount(tracks.size());
-        playlistRepository.save(playlist).block();
+        playlist.getTracks().add(track);
+        playlist.setTrackCount(playlist.getTracks().size());
+        playlistRepository.save(playlist);
         return track;
     }
 

@@ -14,14 +14,13 @@ class PlaylistCommandIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @Order(1)
-    void playlistCreated_createsDocumentInMongo() throws Exception {
+    void playlistCreated_createsRowInPostgres() throws Exception {
         Thread.sleep(5000);
         String id = randomId();
 
         sendCreatePlaylist(id, "user-1", "Kafka Playlist");
 
-        var doc = playlistRepository.findById(id).block();
-        assertThat(doc).isNotNull();
+        var doc = playlistRepository.findById(id).orElseThrow();
         assertThat(doc.getTitle()).isEqualTo("Kafka Playlist");
         assertThat(doc.getOwnerId()).isEqualTo("user-1");
         assertThat(doc.getTrackCount()).isZero();
@@ -35,8 +34,7 @@ class PlaylistCommandIntegrationTest extends BaseIntegrationTest {
 
         sendAddTracksToPlaylist(id, List.of("track-1", "track-2"));
 
-        var doc = playlistRepository.findById(id).block();
-        assertThat(doc).isNotNull();
+        var doc = playlistRepository.findById(id).orElseThrow();
         assertThat(doc.getTrackCount()).isEqualTo(2);
         assertThat(doc.getTracks()).hasSize(2);
     }
@@ -50,8 +48,7 @@ class PlaylistCommandIntegrationTest extends BaseIntegrationTest {
 
         sendDeleteTracksFromPlaylist(id, List.of("track-1"));
 
-        var doc = playlistRepository.findById(id).block();
-        assertThat(doc).isNotNull();
+        var doc = playlistRepository.findById(id).orElseThrow();
         assertThat(doc.getTrackCount()).isEqualTo(1);
         assertThat(doc.getTracks()).hasSize(1);
         assertThat(doc.getTracks().getFirst().getTrackId()).isEqualTo("track-2");
@@ -66,6 +63,6 @@ class PlaylistCommandIntegrationTest extends BaseIntegrationTest {
 
         sendDeletePlaylist(id);
 
-        assertThat(playlistRepository.findById(id).block()).isNull();
+        assertThat(playlistRepository.findById(id)).isEmpty();
     }
 }

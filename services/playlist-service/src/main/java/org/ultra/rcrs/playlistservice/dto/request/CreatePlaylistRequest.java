@@ -2,6 +2,7 @@ package org.ultra.rcrs.playlistservice.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import org.ultra.rcrs.playlistservice.model.PlaylistType;
 
 import java.util.List;
 
@@ -19,5 +20,7 @@ public class CreatePlaylistRequest {
 
     private String coverUri;
 
-    private boolean isPublic;
+    private boolean isPrivate = true;
+
+    private PlaylistType type = PlaylistType.CUSTOM;
 }

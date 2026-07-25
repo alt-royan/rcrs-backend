@@ -1,125 +1,129 @@
 package org.ultra.rcrs.playlistservice.integration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.test.web.reactive.server.SecurityMockServerConfigurers;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.ultra.rcrs.playlistservice.dto.request.CreatePlaylistRequest;
 import org.ultra.rcrs.playlistservice.dto.request.TrackIdsRequest;
-import org.ultra.rcrs.playlistservice.model.PlaylistDocument;
+import org.ultra.rcrs.playlistservice.model.Playlist;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class PlaylistControllerIntegrationTest extends BaseIntegrationTest {
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Test
-    void createPlaylist_201CreatedAndPersisted() {
+    void createPlaylist_201CreatedAndPersisted() throws Exception {
         CreatePlaylistRequest request = new CreatePlaylistRequest();
         request.setTitle("My Mix");
         request.setDescription("chill vibes");
-        request.setPublic(true);
+        request.setPrivate(false);
 
-        webTestClient
-                .mutateWith(SecurityMockServerConfigurers.mockJwt().jwt(jwt -> jwt.subject("user-1")))
-                .post()
-                .uri("/playlists")
-                .bodyValue(request)
-                .exchange()
-                .expectStatus().isCreated()
-                .expectBody()
-                .jsonPath("$.id").isNotEmpty();
+        mockMvc.perform(post("/playlists")
+                        .with(jwt().jwt(jwt -> jwt.subject("user-1")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").isNotEmpty());
     }
 
     @Test
-    void createPlaylist_missingTitle_400BadRequest() {
+    void createPlaylist_missingTitle_400BadRequest() throws Exception {
         CreatePlaylistRequest request = new CreatePlaylistRequest();
         request.setDescription("no title");
 
-        webTestClient
-                .mutateWith(SecurityMockServerConfigurers.mockJwt().jwt(jwt -> jwt.subject("user-1")))
-                .post()
-                .uri("/playlists")
-                .bodyValue(request)
-                .exchange()
-                .expectStatus().isBadRequest();
+        mockMvc.perform(post("/playlists")
+                        .with(jwt().jwt(jwt -> jwt.subject("user-1")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
-    void getPlaylists_byIds_returnsMatchingPlaylistsWithoutTracks() {
-        PlaylistDocument p1 = createPlaylistDoc("user-1", "Playlist One", true);
-        PlaylistDocument p2 = createPlaylistDoc("user-1", "Playlist Two", false);
-        createPlaylistDoc("user-1", "Playlist Three (excluded)", true);
+    void getPlaylists_byIds_returnsMatchingPlaylistsWithoutTracks() throws Exception {
+        Playlist p1 = createPlaylistDoc("user-1", "Playlist One", false);
+        Playlist p2 = createPlaylistDoc("user-1", "Playlist Two", true);
+        createPlaylistDoc("user-1", "Playlist Three (excluded)", false);
 
-        webTestClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/playlists")
-                        .queryParam("ids", p1.getId(), p2.getId())
-                        .build())
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(Object.class).hasSize(2);
+        mockMvc.perform(get("/playlists")
+                        .param("ids", p1.getId(), p2.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
     }
 
     @Test
-    void getTracks_pagination_respectsOffsetAndLimit() {
-        PlaylistDocument playlist = createPlaylistDoc("user-1", "Paginated", true);
+    void getTracks_pagination_respectsOffsetAndLimit() throws Exception {
+        Playlist playlist = createPlaylistDoc("user-1", "Paginated", false);
         for (int i = 0; i < 5; i++) {
             addTrackDoc(playlist.getId(), "track-" + i, i);
         }
 
-        webTestClient.get()
-                .uri("/playlists/{id}/tracks?offset=2&limit=2", playlist.getId())
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(Object.class).hasSize(2);
+        mockMvc.perform(get("/playlists/{id}/tracks", playlist.getId())
+                        .param("offset", "2")
+                        .param("limit", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
     }
 
     @Test
-    void addTracks_thenGetTracks_returnsAppendedTracksInOrder() {
-        PlaylistDocument playlist = createPlaylistDoc("user-1", "Add Tracks", true);
+    void addTracks_thenGetTracks_returnsAppendedTracksInOrder() throws Exception {
+        Playlist playlist = createPlaylistDoc("user-1", "Add Tracks", false);
         TrackIdsRequest request = new TrackIdsRequest();
         request.setTrackIds(List.of("track-a", "track-b"));
 
-        webTestClient.put()
-                .uri("/playlists/{id}/tracks", playlist.getId())
-                .bodyValue(request)
-                .exchange()
-                .expectStatus().isOk();
+        mockMvc.perform(put("/playlists/{id}/tracks", playlist.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
 
-        var doc = playlistRepository.findById(playlist.getId()).block();
-        assertThat(doc).isNotNull();
-        assertThat(doc.getTrackCount()).isEqualTo(2);
+        Playlist updated = playlistRepository.findById(playlist.getId()).orElseThrow();
+        assertThat(updated.getTrackCount()).isEqualTo(2);
 
-        webTestClient.get()
-                .uri("/playlists/{id}/tracks", playlist.getId())
-                .exchange()
-                .expectStatus().isOk()
-                .expectBodyList(Object.class).hasSize(2);
+        mockMvc.perform(get("/playlists/{id}/tracks", playlist.getId()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2));
     }
 
     @Test
-    void deleteTracks_removesOnlyRequestedTracks() {
-        PlaylistDocument playlist = createPlaylistDoc("user-1", "Remove Tracks", true);
+    void deleteTracks_removesOnlyRequestedTracks() throws Exception {
+        Playlist playlist = createPlaylistDoc("user-1", "Remove Tracks", false);
         addTrackDoc(playlist.getId(), "track-a", 0);
         addTrackDoc(playlist.getId(), "track-b", 1);
 
         TrackIdsRequest request = new TrackIdsRequest();
         request.setTrackIds(List.of("track-a"));
 
-        webTestClient.method(org.springframework.http.HttpMethod.DELETE)
-                .uri("/playlists/{id}/tracks", playlist.getId())
-                .bodyValue(request)
-                .exchange()
-                .expectStatus().isOk();
+        mockMvc.perform(delete("/playlists/{id}/tracks", playlist.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
 
-        var doc = playlistRepository.findById(playlist.getId()).block();
-        assertThat(doc.getTracks()).hasSize(1);
-        assertThat(doc.getTracks().getFirst().getTrackId()).isEqualTo("track-b");
-        assertThat(doc.getTrackCount()).isEqualTo(1);
+        Playlist updated = playlistRepository.findById(playlist.getId()).orElseThrow();
+        assertThat(updated.getTrackCount()).isEqualTo(1);
+
+        mockMvc.perform(get("/playlists/{id}/tracks", playlist.getId())
+                        .param("sortBy", "position")
+                        .param("direction", "ASC"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].trackId").value("track-b"));
     }
 
     @Test
-    void deleteTracks_reindexesRemainingPositions() {
-        PlaylistDocument playlist = createPlaylistDoc("user-1", "Reindex Tracks", true);
+    void deleteTracks_reindexesRemainingPositions() throws Exception {
+        Playlist playlist = createPlaylistDoc("user-1", "Reindex Tracks", false);
         addTrackDoc(playlist.getId(), "track-a", 0);
         addTrackDoc(playlist.getId(), "track-b", 1);
         addTrackDoc(playlist.getId(), "track-c", 2);
@@ -127,30 +131,30 @@ class PlaylistControllerIntegrationTest extends BaseIntegrationTest {
         TrackIdsRequest request = new TrackIdsRequest();
         request.setTrackIds(List.of("track-b"));
 
-        webTestClient.method(org.springframework.http.HttpMethod.DELETE)
-                .uri("/playlists/{id}/tracks", playlist.getId())
-                .bodyValue(request)
-                .exchange()
-                .expectStatus().isOk();
+        mockMvc.perform(delete("/playlists/{id}/tracks", playlist.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk());
 
-        var doc = playlistRepository.findById(playlist.getId()).block();
-        assertThat(doc.getTracks()).hasSize(2);
-        assertThat(doc.getTracks().get(0).getTrackId()).isEqualTo("track-a");
-        assertThat(doc.getTracks().get(0).getPosition()).isZero();
-        assertThat(doc.getTracks().get(1).getTrackId()).isEqualTo("track-c");
-        assertThat(doc.getTracks().get(1).getPosition()).isEqualTo(1);
+        mockMvc.perform(get("/playlists/{id}/tracks", playlist.getId())
+                        .param("sortBy", "position")
+                        .param("direction", "ASC"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(2))
+                .andExpect(jsonPath("$[0].trackId").value("track-a"))
+                .andExpect(jsonPath("$[0].position").value(0))
+                .andExpect(jsonPath("$[1].trackId").value("track-c"))
+                .andExpect(jsonPath("$[1].position").value(1));
     }
 
     @Test
-    void deletePlaylist_removesPlaylistAndItsTracks() {
-        PlaylistDocument playlist = createPlaylistDoc("user-1", "To Delete", true);
+    void deletePlaylist_removesPlaylistAndItsTracks() throws Exception {
+        Playlist playlist = createPlaylistDoc("user-1", "To Delete", false);
         addTrackDoc(playlist.getId(), "track-a", 0);
 
-        webTestClient.delete()
-                .uri("/playlists/{id}", playlist.getId())
-                .exchange()
-                .expectStatus().isNoContent();
+        mockMvc.perform(delete("/playlists/{id}", playlist.getId()))
+                .andExpect(status().isNoContent());
 
-        assertThat(playlistRepository.findById(playlist.getId()).block()).isNull();
+        assertThat(playlistRepository.findById(playlist.getId())).isEmpty();
     }
 }

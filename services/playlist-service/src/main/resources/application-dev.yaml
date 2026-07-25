@@ -4,8 +4,25 @@ server:
 spring:
   application:
     name: playlist-service
-  mongodb:
-    uri: ${SPRING_DATA_MONGODB_URI}
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: ${SPRING_HIBERNATE_DEFAUT_SCHEMA}
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    user: ${SPRING_LIQUIBASE_USER}
+    password: ${SPRING_LIQUIBASE_PASSWORD}
+    url: ${SPRING_LIQUIBASE_URL}
+    database-change-log-table: playlist_databasechangelog
+    database-change-log-lock-table: playlist_databasechangeloglock
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
   security:

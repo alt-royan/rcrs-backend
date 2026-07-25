@@ -2,7 +2,7 @@ package org.ultra.rcrs.playlistservice.mapper;
 
 import org.ultra.rcrs.playlistservice.dto.response.PlaylistTrackViewDto;
 import org.ultra.rcrs.playlistservice.dto.response.PlaylistViewDto;
-import org.ultra.rcrs.playlistservice.model.PlaylistDocument;
+import org.ultra.rcrs.playlistservice.model.Playlist;
 import org.ultra.rcrs.playlistservice.model.PlaylistTrack;
 import org.ultra.rcrs.utils.S3Utils;
 
@@ -11,26 +11,27 @@ public final class PlaylistMapper {
     private PlaylistMapper() {
     }
 
-    public static PlaylistViewDto toViewDto(PlaylistDocument doc, S3Utils s3Utils) {
+    public static PlaylistViewDto toViewDto(Playlist playlist, S3Utils s3Utils) {
         return PlaylistViewDto.builder()
-                .id(doc.getId())
-                .ownerId(doc.getOwnerId())
-                .title(doc.getTitle())
-                .description(doc.getDescription())
-                .tags(doc.getTags())
-                .coverUrl(s3Utils.parseUrl(doc.getCoverS3Key()))
-                .isPublic(doc.getIsPublic())
-                .trackCount(doc.getTrackCount())
-                .createdAt(doc.getCreatedAt())
-                .updatedAt(doc.getUpdatedAt())
+                .id(playlist.getId())
+                .ownerId(playlist.getOwnerId())
+                .title(playlist.getTitle())
+                .description(playlist.getDescription())
+                .tags(playlist.getTags())
+                .coverUrl(s3Utils.parseUrl(playlist.getCoverS3Key()))
+                .isPrivate(playlist.getIsPrivate())
+                .type(playlist.getType())
+                .trackCount(playlist.getTrackCount())
+                .createdAt(playlist.getCreatedAt())
+                .updatedAt(playlist.getUpdatedAt())
                 .build();
     }
 
-    public static PlaylistTrackViewDto toTrackViewDto(PlaylistTrack doc) {
+    public static PlaylistTrackViewDto toTrackViewDto(PlaylistTrack track) {
         return PlaylistTrackViewDto.builder()
-                .trackId(doc.getTrackId())
-                .position(doc.getPosition())
-                .addedAt(doc.getAddedAt())
+                .trackId(track.getTrackId())
+                .position(track.getPosition())
+                .addedAt(track.getAddedAt())
                 .build();
     }
 }

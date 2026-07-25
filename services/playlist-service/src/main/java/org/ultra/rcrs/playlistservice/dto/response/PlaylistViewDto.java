@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.ultra.rcrs.playlistservice.model.PlaylistType;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,7 +21,8 @@ public class PlaylistViewDto {
     private String description;
     private List<String> tags;
     private String coverUrl;
-    private Boolean isPublic;
+    private Boolean isPrivate;
+    private PlaylistType type;
     private Integer trackCount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

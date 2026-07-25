@@ -4,8 +4,25 @@ server:
 spring:
   application:
     name: playlist-service
-  mongodb:
-    uri: mongodb://localhost:27017/rcrs_playlist
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: rcrs_playlist
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    user: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/postgres
+    database-change-log-table: playlist_databasechangelog
+    database-change-log-lock-table: playlist_databasechangeloglock
   kafka:
     bootstrap-servers: localhost:9092
   security:
