@@ -12,7 +12,7 @@ COPY services/metadata-read-service/pom.xml services/metadata-read-service/
 COPY services/metadata-write-service/pom.xml services/metadata-write-service/
 COPY services/search-service/pom.xml services/search-service/
 COPY services/user-service/pom.xml services/user-service/
-COPY services/workflow-service/pom.xml services/workflow-service/
+COPY services/workflow-service/pom.xml services/workflow-service/COPY services/playlist-service/pom.xml services/playlist-service/
 # Скачиваем все зависимости (слой закэшируется)
 RUN mvn dependency:go-offline -B
 

@@ -7,4 +7,5 @@ public class Topics {
     public static final String SEARCH_INDEX_TOPIC = "search.index.topic";
     public static final String DLQ_TOPIC = "global.dlq";
     public static final String IDENTITY_EVENTS_TOPIC = "identity.events";
+    public static final String PLAYLIST_COMMANDS_TOPIC = "playlist.commands.topic";
 }

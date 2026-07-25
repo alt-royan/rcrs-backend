@@ -94,3 +94,12 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/rcrs-user-service:latest
+
+      - name: Build playlist service
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./services/playlist-service/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/rcrs-playlist-service:latest

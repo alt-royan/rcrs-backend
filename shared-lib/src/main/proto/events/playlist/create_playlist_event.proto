@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.playlist";
+
+message CreatePlaylistEvent {
+  string id = 1;
+  string owner_id = 2;
+  string title = 3;
+  string description = 4;
+  string cover_s3_key = 5;
+  bool is_public = 6;
+}

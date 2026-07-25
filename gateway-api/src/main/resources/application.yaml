@@ -60,6 +60,12 @@ spring:
                 - StripPrefix=2
 
             # metadata-write — NOT available via gateway
+
+            # playlist-service — no prefix
+            - id: playlist-service
+              uri: lb://playlist-service
+              predicates:
+                - Path=/playlists/**
 springdoc:
   swagger-ui:
     urls:
@@ -73,6 +79,8 @@ springdoc:
         url: /workflow/v3/api-docs
       - name: user
         url: /me/v3/api-docs
+      - name: playlist
+        url: /playlists/v3/api-docs
 
 eureka:
   client:

@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: playlist-service-test
+  security:
+    enabled: false
+
+eureka:
+  client:
+    enabled: false

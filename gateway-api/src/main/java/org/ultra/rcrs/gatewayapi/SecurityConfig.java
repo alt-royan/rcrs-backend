@@ -67,6 +67,7 @@ public class SecurityConfig {
                         .pathMatchers("/api/search/swagger-ui/**", "/api/search/v3/api-docs/**").permitAll()
                         .pathMatchers("/workflow/swagger-ui/**", "/workflow/v3/api-docs/**").permitAll()
                         .pathMatchers("/api/catalog/swagger-ui/**", "/api/catalog/v3/api-docs/**").permitAll()
+                        .pathMatchers("/playlists/swagger-ui/**", "/playlists/v3/api-docs/**").permitAll()
                         .pathMatchers("/actuator/**").permitAll()
                         .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyExchange().authenticated()
