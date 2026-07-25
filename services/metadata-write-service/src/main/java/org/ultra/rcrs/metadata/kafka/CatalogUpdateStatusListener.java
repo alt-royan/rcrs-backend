@@ -12,6 +12,8 @@ import org.ultra.rcrs.events.common.LifecycleStatusOuterClass;
 import org.ultra.rcrs.events.track.TrackTranscodingCompletedEventOuterClass;
 import org.ultra.rcrs.events.track.TrackUpdateLifecycleStatusEventOuterClass;
 import org.ultra.rcrs.kafka.Topics;
+import org.ultra.rcrs.metadata.model.Album;
+import org.ultra.rcrs.metadata.model.Track;
 import org.ultra.rcrs.metadata.service.AlbumService;
 import org.ultra.rcrs.metadata.service.TrackService;
 import org.ultra.rcrs.utils.Url62;
@@ -63,6 +65,13 @@ public class CatalogUpdateStatusListener {
             UUID trackId = Url62.decode(event.getId());
             LifecycleStatus status = mapLifecycleStatus(event.getLifecycleStatus());
             trackService.updateLifecycleStatus(status, trackId);
+            if (LifecycleStatus.TRANSCODING.equals(status)) {
+                Track track = trackService.findById(trackId);
+                Album album = albumService.findById(track.getAlbumId());
+                if (!LifecycleStatus.TRANSCODING.equals(album.getLifecycleStatus())) {
+                    albumService.updateLifecycleStatus(status, album.getId());
+                }
+            }
         } catch (Exception e) {
             log.error("Failed to unpack TrackUpdateLifecycleStatusEvent: {}", e.getMessage(), e);
         }

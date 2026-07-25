@@ -60,6 +60,12 @@ public class AlbumService {
     }
 
     @Transactional
+    public Album findById(UUID albumId) {
+        return albumRepository.findById(albumId)
+                .orElseThrow(() -> new NotFoundException("Album", albumId));
+    }
+
+    @Transactional
     public void markAlbumDelete(UUID albumId) {
         var tracks = trackService.findAllIdsByAlbum(albumId);
         tracks.forEach(trackService::markTrackDelete);
