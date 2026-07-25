@@ -51,11 +51,7 @@ public class SecurityConfig {
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
-        http.addFilterAt(((exchange, chain) -> {
-            String auth = exchange.getRequest().getHeaders().getFirst("Authorization");
-                    System.out.println(auth);
-                    return chain.filter(exchange);
-                }), SecurityWebFiltersOrder.AUTHENTICATION)
+        http
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .securityContextRepository(
                         NoOpServerSecurityContextRepository.getInstance()
@@ -88,7 +84,7 @@ public class SecurityConfig {
         delegate.setJwtGrantedAuthoritiesConverter(jwt -> {
             JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
             var authorities = grantedAuthoritiesConverter.convert(jwt);
-            var roles = Optional.ofNullable(jwt.getClaimAsStringList("resource_access.rcrs.roles"))
+            var roles = Optional.ofNullable(jwt.getClaimAsStringList("rcrs-roles"))
                     .orElse(List.of());
 
             return Stream.concat(authorities.stream(),
