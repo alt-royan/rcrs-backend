@@ -13,7 +13,7 @@ AUDIO_DIR = DIR / "1000 bars"
 
 KEYCLOAK_URL = "http://192.168.1.3:8180/realms/master/protocol/openid-connect/token"
 KEYCLOAK_CLIENT_ID = "rcrs-app"
-KEYCLOAK_CLIENT_SECRET = "BkQy6CR09D3RrgIyvs4qg5yuoshkM7xv"
+KEYCLOAK_CLIENT_SECRET = "8mYnsi1nVXg4Oa5usCRmgEn6EIEniMP7"
 KEYCLOAK_USERNAME = "bog"
 KEYCLOAK_PASSWORD = "bog"
 

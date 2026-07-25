@@ -21,6 +21,8 @@ spring:
     user: postgres
     password: postgres
     url: jdbc:postgresql://localhost:5432/postgres
+    database-change-log-table: user_databasechangelog
+    database-change-log-lock-table: user_databasechangeloglock
   kafka:
     bootstrap-servers: localhost:9092
   security:

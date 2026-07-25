@@ -9,10 +9,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.ultra.rcrs.workflow.client.model.ArtistsToEntityModel;
 import org.ultra.rcrs.workflow.client.model.OthersToTrackModel;
 import org.ultra.rcrs.workflow.client.model.TrackUploadModel;
+import org.ultra.rcrs.workflow.config.FeignConfig;
 import org.ultra.rcrs.workflow.dto.StatusDto;
 import org.ultra.rcrs.workflow.dto.response.CreateResponse;
 
-@FeignClient(name = "track-write-client", url = "${feign.metadata-service.url}")
+@FeignClient(name = "track-write-client", url = "${feign.metadata-service.url}", configuration = FeignConfig.class)
 public interface TrackClient {
 
     @PostMapping("/tracks")

@@ -17,7 +17,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Active Artist", EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/catalog/artists/{id}", artist.getId())
+                .uri("/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -31,7 +31,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Hidden Artist", EntityStatus.HIDDEN);
 
         webTestClient.get()
-                .uri("/catalog/artists/{id}", artist.getId())
+                .uri("/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -44,7 +44,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Deleted Artist", EntityStatus.DELETED);
 
         webTestClient.get()
-                .uri("/catalog/artists/{id}", artist.getId())
+                .uri("/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -52,7 +52,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void getArtist_nonExistentId_404NotFound() {
         webTestClient.get()
-                .uri("/catalog/artists/{id}", "non-existent-id")
+                .uri("/artists/{id}", "non-existent-id")
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -62,7 +62,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Avatar Test", EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/catalog/artists/{id}", artist.getId())
+                .uri("/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -87,7 +87,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .build()).block();
 
         webTestClient.get()
-                .uri("/catalog/artists/{id}", artist.getId())
+                .uri("/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -107,7 +107,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .build()).block();
 
         webTestClient.get()
-                .uri("/catalog/artists/{id}", artist.getId())
+                .uri("/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -128,7 +128,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/catalog/artists/{id}/albums")
+                        .path("/artists/{id}/albums")
                         .build(artist.getId()))
                 .exchange()
                 .expectStatus().isOk()
@@ -181,7 +181,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/catalog/artists/{id}/albums")
+                        .path("/artists/{id}/albums")
                         .queryParam("type", "FULL")
                         .build(artist.getId()))
                 .exchange()
@@ -195,7 +195,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/catalog/artists/{id}/albums")
+                        .path("/artists/{id}/albums")
                         .build(artist.getId()))
                 .exchange()
                 .expectStatus().isOk()

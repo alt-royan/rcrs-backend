@@ -146,6 +146,11 @@ eureka:
   instance:
     preferIpAddress: true
 
+logging:
+  level:
+    org.springframework.security: TRACE
+    org.springframework.security.oauth2.server.resource: TRACE
+
 management:
   endpoints:
     web:

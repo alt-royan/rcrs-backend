@@ -3,7 +3,7 @@ SET search_path TO rcrs_user;
 
 CREATE TABLE IF NOT EXISTS users
 (
-    user_id        uuid PRIMARY KEY,
+    user_id        text PRIMARY KEY,
     username       text                     NOT NULL,
     email          text,
     enabled        boolean                  NOT NULL DEFAULT true,

@@ -1,7 +1,7 @@
---liquibase formatted sql
 
---changeset rcrs:003-add-processed-events
-CREATE TABLE IF NOT EXISTS rcrs_user.processed_events
+SET search_path TO rcrs_user;
+
+CREATE TABLE IF NOT EXISTS processed_events
 (
     event_id     text PRIMARY KEY,
     event_type   text                     NOT NULL,

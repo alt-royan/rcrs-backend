@@ -10,6 +10,8 @@ spring:
     name: workflow-service
   cloud:
     openfeign:
+      oauth2:
+        enabled: true
       client:
         config:
           default:
@@ -26,13 +28,14 @@ spring:
           jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI}
       client:
         provider:
-          keycloak:
+          metadata-write-service:
             issuer-uri: ${OAUTH2_CLIENT_PROVIDER_ISSUER_URI}
             user-name-attribute: ${OAUTH2_CLIENT_PROVIDER_USERNAME_ATTRIBUTE}
         registration:
-          keycloak:
+          metadata-write-service:
             client-id: ${OAUTH2_CLIENT_REGISTRATION_CLIENT_ID}
             client-secret: ${OAUTH2_CLIENT_REGISTRATION_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
   temporal:
     connection:
       target: ${SPRING_TEMPORAL_CONNECTION_TARGET}
