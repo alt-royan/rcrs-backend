@@ -1,15 +1,33 @@
 #!/usr/bin/env python3
+import base64
 import json
 import os
 import urllib.request
 import urllib.error
 from pathlib import Path
-from urllib.parse import urlparse, urlunparse, urlencode
+from urllib.parse import urlencode
 
 UPLOAD_API = "http://localhost:8099/media"
 CATALOG_API = "http://localhost:8099/workflow"
 DIR = Path(__file__).resolve().parent
-AUDIO_DIR = DIR / "1000 bars"
+
+# ---- Edit these two consts to seed a different release ----
+ARTIST_FILES = [
+    DIR / "PHARAOH.json",
+    DIR / "The Chemodan.json",
+    DIR / "LIL MORTY.json",
+    DIR / "39.json",
+    DIR / "Acid Drop King.json",
+    DIR / "Boulevard Depo.json",
+    DIR / "Mnogoznaal.json",
+    DIR / "noa.json",
+]
+ALBUM_FILE = DIR / "pink-phloyd.json"
+AUDIO_DIR = DIR / "Pink Phloyd"
+# -------------------------------------------------------------
+
+IMAGES_DIR = DIR / "images"
+IMAGE_MIME_TYPES = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png"}
 
 KEYCLOAK_URL = "http://192.168.1.3:8180/realms/master/protocol/openid-connect/token"
 KEYCLOAK_CLIENT_ID = "rcrs-app"
@@ -45,6 +63,7 @@ def get_keycloak_token():
         log(f"  -> token acquired (expires in {result.get('expires_in', '?')}s)")
         return token
 
+
 def normalize_presign_url(url):
     return url.replace("http://s3:4566", "http://localhost:4566")
 
@@ -79,6 +98,7 @@ def post_json(base_url, path, data, token=None):
         log(f"  -> ERROR {e.code} {e.read().decode()}")
         raise
 
+
 def put_file(url, headers, file_path):
     size = file_path.stat().st_size
 
@@ -109,10 +129,9 @@ def put_file(url, headers, file_path):
         raise
 
 
-def load_json(name):
-    path = DIR / name
+def load_json(path):
     log(f"Loading {path}")
-    return json.loads(path.read_text(encoding="utf-8"))
+    return json.loads(Path(path).read_text(encoding="utf-8"))
 
 
 def get_presign(file_path, token):
@@ -160,24 +179,61 @@ def upload_files(presign_map):
     log(f"Upload summary: {ok} ok, {fail} failed")
 
 
-def wait_for_complete(uids, token, poll_interval=3):
-    import time
-    attempt = 0
-    while True:
-        attempt += 1
-        log(f"Poll #{attempt}: {len(uids)} uids")
-        resp = post_json(UPLOAD_API, f"/upload/audio/status?uids={'&uids='.join(uids)}", {}, token=token)
-        statuses = {s["uid"]: s["status"] for s in resp}
-        log(f"  Statuses: {statuses}")
-        if all(s in ("COMPLETE", "FAILED") for s in statuses.values()):
-            failed = [uid for uid, st in statuses.items() if st == "FAILED"]
-            if failed:
-                log(f"  WARNING: failed uids: {failed}")
-            return resp
-        time.sleep(poll_interval)
+def find_image(name):
+    for ext in IMAGE_MIME_TYPES:
+        candidate = IMAGES_DIR / f"{name}{ext}"
+        if candidate.exists():
+            return candidate
+    return None
+
+
+def upload_image(image_path, token):
+    mime = IMAGE_MIME_TYPES[image_path.suffix.lower()]
+    encoded = base64.b64encode(image_path.read_bytes()).decode()
+    data_url = f"data:{mime};base64,{encoded}"
+    log(f"Uploading image: {image_path.name}")
+    resp = post_json(UPLOAD_API, "/upload/image", {"image": data_url}, token=token)
+    return resp["uri"]
+
+
+def create_artists(artist_files, token):
+    """Create every artist in ARTIST_FILES, return {lowercased name: id}."""
+    name_to_id = {}
+    for artist_file in artist_files:
+        artist = load_json(artist_file)
+
+        image_path = find_image(artist["name"])
+        if image_path:
+            artist["avatarUri"] = upload_image(image_path, token)
+            log(f"  Avatar set for {artist['name']}: {image_path.name}")
+        else:
+            log(f"  No avatar image found for {artist['name']}")
+
+        resp = post_json(CATALOG_API, "/artists", artist, token=token)
+        name_to_id[artist["name"].lower()] = resp["id"]
+        log(f"  Artist created: {artist['name']} -> {resp['id']}")
+    return name_to_id
+
+
+def resolve_artist_refs(refs, name_to_id):
+    for ref in refs:
+        name = ref.get("name", "")
+        artist_id = name_to_id.get(name.lower())
+        if artist_id is None:
+            log(f"  WARNING: no created artist matches '{name}'")
+            continue
+        ref["id"] = artist_id
+
+
+def patch_album_artists(album, name_to_id):
+    resolve_artist_refs(album.get("artists", []), name_to_id)
+    for track in album["tracks"]:
+        resolve_artist_refs(track.get("artists", []), name_to_id)
+        resolve_artist_refs(track.get("others", []), name_to_id)
 
 
 log("Starting seed script")
+log(f"ALBUM_FILE={ALBUM_FILE}")
 log(f"AUDIO_DIR={AUDIO_DIR}")
 
 token = get_keycloak_token()
@@ -198,30 +254,28 @@ for audio_file in audio_files:
 
 log(f"Pre-sign complete: {len(uid_map)} uid mappings")
 
-album = load_json("1000 bars.json")
+album = load_json(ALBUM_FILE)
 seed_uids(album, uid_map)
 
 log("\n=== Step 2: Upload audio files ===")
 upload_files(presign_map)
 
-log("\n=== Step 3: Create artist ===")
-artist_resp = post_json(
-    CATALOG_API,
-    "/artists",
-    load_json("heronwater.json"),
-    token=token
-)
-artist_id = artist_resp["id"]
-log(f"Artist ID: {artist_id}")
+log("\n=== Step 3: Create artists ===")
+artist_name_to_id = create_artists(ARTIST_FILES, token)
+log(f"Artists created: {artist_name_to_id}")
 
-log("\n=== Step 4: Patch album JSON with artist ID ===")
-for a in album["artists"]:
-    a["id"] = artist_id
-for track in album["tracks"]:
-    for a in track["artists"]:
-        a["id"] = artist_id
+log("\n=== Step 4: Patch album JSON with artist IDs ===")
+patch_album_artists(album, artist_name_to_id)
 
-log("\n=== Step 5: Create album ===")
+log("\n=== Step 5: Upload album cover ===")
+cover_path = find_image(album["title"])
+if cover_path:
+    album["coverUri"] = upload_image(cover_path, token)
+    log(f"  Cover set: {cover_path.name}")
+else:
+    log(f"  No cover image found for {album['title']}")
+
+log("\n=== Step 6: Create album ===")
 album_resp = post_json(
     CATALOG_API,
     "/albums",
@@ -230,11 +284,5 @@ album_resp = post_json(
 )
 album_id = album_resp["id"]
 log(f"Album ID: {album_id}")
-
-log("\n=== Step 6: Poll audio processing status ===")
-all_uids = list(uid_map.values())
-final_statuses = wait_for_complete(all_uids, token)
-for s in final_statuses:
-    log(f"  Final: uid={s['uid']} status={s['status']} reason={s.get('reason','')}")
 
 log(f"\nDone. Album ID: {album_id}")
