@@ -1,51 +1,20 @@
 package org.ultra.rcrs.mediaservice.dao.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class AudioWithTrack {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
-    private UUID guid;
-
-    private String key;
-
-    private String codec;
-
-    private String container;
-
-    @Column(name = "duration_ms")
-    private Integer durationMs;
-
-    private String bitrate;
-
-    @Column(name = "sample_rate")
-    private String sampleRate;
-
-    @Column(name = "byte_size")
-    private Long byteSize;
-
-    @Column(name = "creation_timestamp")
-    private OffsetDateTime creationTimestamp;
-
-    @Column(name = "track_id")
-    private UUID trackId;
-
-    private Boolean main;
+public record AudioWithTrack(
+        UUID id,
+        UUID guid,
+        String key,
+        String codec,
+        String container,
+        Integer durationMs,
+        String bitrate,
+        String sampleRate,
+        Long byteSize,
+        OffsetDateTime creationTimestamp,
+        UUID trackId,
+        Boolean main
+) {
 }

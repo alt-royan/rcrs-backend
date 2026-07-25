@@ -27,7 +27,6 @@ public class ArtistAdminService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final S3Utils s3Utils;
 
-    @Cacheable("artists-admin")
     public Mono<ArtistAdminViewDto> getById(String id) {
         return artistDocumentRepository.findByIdForAdmin(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Artist", id)))

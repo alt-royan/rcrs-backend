@@ -31,8 +31,15 @@ spring:
           metadata-write-service:
             issuer-uri: ${OAUTH2_CLIENT_PROVIDER_ISSUER_URI}
             user-name-attribute: ${OAUTH2_CLIENT_PROVIDER_USERNAME_ATTRIBUTE}
+          media-service:
+            issuer-uri: ${OAUTH2_CLIENT_PROVIDER_ISSUER_URI}
+            user-name-attribute: ${OAUTH2_CLIENT_PROVIDER_USERNAME_ATTRIBUTE}
         registration:
           metadata-write-service:
+            client-id: ${OAUTH2_CLIENT_REGISTRATION_CLIENT_ID}
+            client-secret: ${OAUTH2_CLIENT_REGISTRATION_CLIENT_SECRET}
+            authorization-grant-type: client_credentials
+          media-service:
             client-id: ${OAUTH2_CLIENT_REGISTRATION_CLIENT_ID}
             client-secret: ${OAUTH2_CLIENT_REGISTRATION_CLIENT_SECRET}
             authorization-grant-type: client_credentials

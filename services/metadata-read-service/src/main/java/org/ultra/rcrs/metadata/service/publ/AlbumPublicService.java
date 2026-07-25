@@ -27,7 +27,6 @@ public class AlbumPublicService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final S3Utils s3Utils;
 
-    @Cacheable("albums-public")
     public Mono<AlbumPublicViewDto> getById(String id) {
         return albumDocumentRepository.findByIdForPublic(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Album", id)))

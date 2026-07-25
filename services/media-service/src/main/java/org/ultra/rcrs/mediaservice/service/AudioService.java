@@ -104,8 +104,8 @@ public class AudioService {
     public Map<UUID, List<AudioItem>> getAudiosByTrackId(String trackId) {
         List<AudioWithTrack> audios = audioRepository.findAllByTrackId(trackId);
         return audios.stream()
-                .map(a -> new AudioItem(a.getId(), a.getGuid(), a.getKey(), a.getCodec(), a.getContainer(),
-                        a.getDurationMs(), a.getBitrate(), a.getSampleRate(), a.getByteSize(), a.getMain()))
+                .map(a -> new AudioItem(a.id(), a.guid(), a.key(), a.codec(), a.container(),
+                        a.durationMs(), a.bitrate(), a.sampleRate(), a.byteSize(), a.main()))
                 .collect(Collectors.groupingBy(AudioItem::getGuid));
     }
 

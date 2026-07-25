@@ -28,14 +28,12 @@ public class TrackAdminService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final S3Utils s3Utils;
 
-    @Cacheable("tracks-admin")
     public Mono<TrackAdminViewDto> getById(String id) {
         return trackDocumentRepository.findByIdForAdmin(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Track", id)))
                 .map(this::toDto);
     }
 
-    @Cacheable("tracks-by-album-admin")
     public Flux<TrackAdminStandaloneDto> getAllByAlbumId(String albumId) {
         return trackDocumentRepository.findAllByAlbumIdForAdmin(albumId, Sort.by("trackNumber"))
                 .map(this::toStandaloneDto);

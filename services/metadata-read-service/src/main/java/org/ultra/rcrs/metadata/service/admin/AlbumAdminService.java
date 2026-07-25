@@ -29,7 +29,6 @@ public class AlbumAdminService {
     private final ReactiveMongoTemplate mongoTemplate;
     private final S3Utils s3Utils;
 
-    @Cacheable("albums-admin")
     public Mono<AlbumAdminViewDto> getById(String id) {
         return albumDocumentRepository.findByIdForAdmin(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Album", id)))

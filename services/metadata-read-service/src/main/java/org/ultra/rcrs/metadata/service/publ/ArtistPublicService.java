@@ -19,7 +19,6 @@ public class ArtistPublicService {
     private final ArtistDocumentRepository artistDocumentRepository;
     private final S3Utils s3Utils;
 
-    @Cacheable("artists-public")
     public Mono<ArtistPublicViewDto> getById(String id) {
         return artistDocumentRepository.findByIdForPublic(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Artist", id)))

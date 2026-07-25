@@ -22,14 +22,12 @@ public class TrackPublicService {
     private final TrackDocumentRepository trackDocumentRepository;
     private final S3Utils s3Utils;
 
-    @Cacheable("tracks-public")
     public Mono<TrackPublicViewDto> getById(String id) {
         return trackDocumentRepository.findByIdForPublic(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Track", id)))
                 .map(this::toDto);
     }
 
-    @Cacheable("tracks-by-album-public")
     public Flux<TrackPublicStandaloneDto> getAllByAlbumId(String albumId) {
         return trackDocumentRepository.findAllByAlbumIdForPublic(albumId, Sort.by("trackNumber"))
                 .map(this::toStandaloneDto);
