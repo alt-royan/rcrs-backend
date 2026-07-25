@@ -9,6 +9,8 @@ import org.ultra.rcrs.mediaservice.temporal.activity.model.AudioMetadata;
 import org.ultra.rcrs.mediaservice.temporal.workflow.AudioTranscodingWorkflow;
 
 import java.io.File;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,9 +43,10 @@ public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
             tempFile = activities.s3Activity().saveUploadedAudioToFile(uid);
 
             UUID guid = UUID.randomUUID();
+            String originalFilename = URLEncoder.encode(audioUpload.getOriginalFileName(), StandardCharsets.UTF_8);
 
             AudioMetadata originalMeta = activities.probeAudioMetadataActivity().probe(tempFile);
-            String key = String.format("%s/%s/%s", trackId, guid, audioUpload.getOriginalFileName());
+            String key = String.format("%s/%s/%s", trackId, guid, originalFilename);
 
             activities.s3Activity().putAudio(key, tempFile, originalMeta.byteSize(), audioUpload.getContentType());
 

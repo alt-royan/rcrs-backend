@@ -13,7 +13,7 @@ public class AudioItem {
 
     private UUID guid;
 
-    private String key;
+    private String downloadUrl;
 
     private String codec;
 

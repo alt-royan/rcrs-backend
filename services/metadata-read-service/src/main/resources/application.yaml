@@ -5,9 +5,9 @@ spring:
   application:
     name: metadata-read-service
   mongodb:
-    uri: mongodb://localhost:27017/rcrs_catalog
+    uri: mongodb://192.168.1.3:27017/rcrs_catalog
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: 192.168.1.3:9092
   security:
     enabled: true
     oauth2:
@@ -18,7 +18,7 @@ spring:
 
 cdn:
   images:
-    endpoint: "http://images.localhost:4566"
+    endpoint: "http://192.168.1.3:4566/images"
 
 eureka:
   client:
