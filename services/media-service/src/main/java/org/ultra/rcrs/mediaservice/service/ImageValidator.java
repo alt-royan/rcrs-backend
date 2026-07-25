@@ -1,32 +1,27 @@
-package org.ultra.rcrs.mediaservice.temporal.activity.impl;
+package org.ultra.rcrs.mediaservice.service;
 
-import io.temporal.spring.boot.ActivityImpl;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.UnsupportedMediaTypeStatusException;
 import org.ultra.rcrs.exceptions.BadRequestException;
-import org.ultra.rcrs.mediaservice.temporal.activity.ValidateActivity;
 import org.ultra.rcrs.mediaservice.temporal.activity.model.ValidatedImage;
 import org.ultra.rcrs.mediaservice.utils.Hash;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.util.Arrays;
 import java.util.Base64;
 
 @Component
-@ActivityImpl
 @Slf4j
-@RequiredArgsConstructor
-public class ValidateActivityImpl implements ValidateActivity {
+public class ImageValidator {
 
     private static final String CONTENT_TYPE_PREFIX = "data:";
     private static final String ENCODING_PREFIX = ";base64,";
     private static final String[] MIME_TYPES = {"image/jpeg", "image/png"};
 
-    @Override
-    public ValidatedImage validateImage(String dataUrl) {
+    public ValidatedImage validate(String dataUrl) {
         if (!dataUrl.startsWith(CONTENT_TYPE_PREFIX) || !dataUrl.contains(ENCODING_PREFIX)) {
             throw new BadRequestException("It is not data url string");
         }
@@ -36,7 +31,7 @@ public class ValidateActivityImpl implements ValidateActivity {
 
         String contentType = dataUrl.substring(contentTypeStartIndex, contentTypeEndIndex);
 
-        if (!java.util.Arrays.asList(MIME_TYPES).contains(contentType)) {
+        if (!Arrays.asList(MIME_TYPES).contains(contentType)) {
             throw new UnsupportedMediaTypeStatusException("Wrong image mime type");
         }
 
@@ -62,5 +57,4 @@ public class ValidateActivityImpl implements ValidateActivity {
         log.info("Image validated: format={}, key={}", format, key);
         return new ValidatedImage(format, contentType, key, imageData);
     }
-
 }

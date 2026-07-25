@@ -5,3 +5,5 @@ databaseChangeLog:
       file: classpath:db/changelog/001-add-processed-events.sql
   - include:
       file: classpath:db/changelog/002-add-user-avatar.sql
+  - include:
+      file: classpath:db/changelog/003-add-likes.sql

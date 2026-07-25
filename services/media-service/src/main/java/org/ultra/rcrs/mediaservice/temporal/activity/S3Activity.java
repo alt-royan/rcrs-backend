@@ -10,9 +10,6 @@ import java.io.IOException;
 public interface S3Activity {
 
     @ActivityMethod
-    String putImage(String key, byte[] imageData, String contentType);
-
-    @ActivityMethod
     void putAudio(String key, File file, Long contentLength, String contentType) throws IOException;
 
     @ActivityMethod

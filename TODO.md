@@ -17,3 +17,8 @@
 - [ ] Tests in read service
 - [ ] Tests in playlist service
 - [ ] Tests in search service
+- 
+- [ ] Не устанавливается duration
+- Лагает фронт
+- Нет картинок при поисках
+- нужен даунлод ендпоит

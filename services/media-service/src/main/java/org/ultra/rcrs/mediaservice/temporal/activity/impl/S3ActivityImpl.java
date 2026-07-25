@@ -28,19 +28,6 @@ public class S3ActivityImpl implements S3Activity {
     private final MediaConfigurationProperties properties;
 
     @Override
-    public String putImage(String key, byte[] body, String contentType) {
-        String imageBucket = properties.getImage().getBucket().getName();
-        s3Client.putObject(PutObjectRequest.builder()
-                        .bucket(imageBucket)
-                        .key(key)
-                        .contentType(contentType)
-                        .build(),
-                RequestBody.fromBytes(body));
-        log.info("Put image to S3: bucket [{}], key [{}]", imageBucket, key);
-        return String.format("s3://%s/%s", imageBucket, key);
-    }
-
-    @Override
     public void putAudio(String key, File file, Long contentLength, String contentType) throws IOException {
         String audioBucket = properties.getAudio().getBucket().getName();
         try (InputStream is = new FileInputStream(file)) {
