@@ -21,6 +21,9 @@ public class MediaConfigurationProperties {
     @NestedConfigurationProperty
     private UploadConfigurationProperties upload;
 
+    @NestedConfigurationProperty
+    private DownloadConfigurationProperties download;
+
     private SqsProperties sqs;
 
     @Data

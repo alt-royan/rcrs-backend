@@ -22,6 +22,8 @@ import static org.ultra.rcrs.mediaservice.temporal.config.TemporalConfig.MEDIA_T
 @WorkflowImpl(taskQueues = MEDIA_TASK_QUEUE)
 public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
 
+    private static final String AUDIO_CONTENT_TYPE = "audio/ogg";
+
     private final List<String> bitrates;
 
     public AudioTranscodingWorkflowImpl(List<String> bitrates) {
@@ -52,22 +54,41 @@ public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
 
             activities.dbActivity().saveAudio(trackId, guid, true, key, originalMeta);
 
+            File bestFile = null;
+            AudioMetadata bestMetadata = null;
+            UUID bestAudioId = null;
+
             for (String bitrate : bitrates) {
                 File outputFile = activities.transcodeAudioActivity().transcode(tempFile, bitrate);
 
                 AudioMetadata metadata = activities.probeAudioMetadataActivity().probe(outputFile);
                 key = String.format("%s/%s/%s_%s", trackId, guid, metadata.container(), bitrate);
 
-                activities.s3Activity().putAudio(key, outputFile, metadata.byteSize(), "audio/ogg");
+                activities.s3Activity().putAudio(key, outputFile, metadata.byteSize(), AUDIO_CONTENT_TYPE);
 
-                activities.dbActivity().saveAudio(trackId, guid, true, key, metadata);
+                UUID audioId = activities.dbActivity().saveAudio(trackId, guid, true, key, metadata);
 
-                if (outputFile != null) {
-                    try {
-                        Files.deleteIfExists(outputFile.toPath());
-                    } catch (Exception ignored) {
-                    }
+                // keep the highest quality rendition around, it becomes the downloadable file
+                if (bestMetadata == null || metadata.byteSize() > bestMetadata.byteSize()) {
+                    deleteQuietly(bestFile);
+                    bestFile = outputFile;
+                    bestMetadata = metadata;
+                    bestAudioId = audioId;
+                } else {
+                    deleteQuietly(outputFile);
                 }
+            }
+
+            if (bestFile != null) {
+                String downloadFileName = downloadFileName(audioUpload.getOriginalFileName(), bestMetadata.container());
+                String downloadKey = String.format("%s/%s/%s", trackId, guid,
+                        URLEncoder.encode(downloadFileName, StandardCharsets.UTF_8));
+
+                activities.s3Activity().putDownload(downloadKey, bestFile, bestMetadata.byteSize(),
+                        AUDIO_CONTENT_TYPE, downloadFileName);
+                activities.dbActivity().saveDownloadFile(bestAudioId, guid, downloadKey, downloadFileName, AUDIO_CONTENT_TYPE);
+
+                deleteQuietly(bestFile);
             }
 
             activities.transcodingStatusActivity().updateStatusToComplete(uid);
@@ -80,12 +101,25 @@ public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
             activities.transcodingStatusActivity().notifyTranscodingFailed(trackId);
             throw new RuntimeException("Audio transcoding failed for uid=" + uid, e);
         } finally {
-            if (tempFile != null) {
-                try {
-                    Files.deleteIfExists(tempFile.toPath());
-                } catch (Exception ignored) {
-                }
-            }
+            deleteQuietly(tempFile);
+        }
+    }
+
+    private static String downloadFileName(String originalFileName, String container) {
+        String baseName = originalFileName.contains(".")
+                ? originalFileName.substring(0, originalFileName.lastIndexOf('.'))
+                : originalFileName;
+        String extension = container.contains(",") ? container.substring(0, container.indexOf(',')) : container;
+        return baseName + "." + extension;
+    }
+
+    private static void deleteQuietly(File file) {
+        if (file == null) {
+            return;
+        }
+        try {
+            Files.deleteIfExists(file.toPath());
+        } catch (Exception ignored) {
         }
     }
 }

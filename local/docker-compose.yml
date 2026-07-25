@@ -164,6 +164,9 @@ services:
       UPLOAD_BUCKET_PUBLIC_URL: http://192.168.1.3:4566/rcrs-upload
       UPLOAD_SIGNATURE_DURATION: 24h
       UPLOAD_UPLOAD_DURATION: 24h
+      DOWNLOAD_BUCKET_NAME: rcrs-download
+      DOWNLOAD_BUCKET_PUBLIC_URL: http://192.168.1.3:4566/rcrs-download
+      DOWNLOAD_SIGNATURE_DURATION: 1h
       SQS_QUEUE: rcrs-upload-event-queue
     depends_on:
       discovery-server:

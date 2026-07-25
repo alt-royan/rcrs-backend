@@ -13,5 +13,8 @@ public interface S3Activity {
     void putAudio(String key, File file, Long contentLength, String contentType) throws IOException;
 
     @ActivityMethod
+    void putDownload(String key, File file, Long contentLength, String contentType, String fileName) throws IOException;
+
+    @ActivityMethod
     File saveUploadedAudioToFile(String uid) throws IOException;
 }

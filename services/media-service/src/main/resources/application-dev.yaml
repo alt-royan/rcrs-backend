@@ -136,6 +136,11 @@ media:
       public-url: ${UPLOAD_BUCKET_PUBLIC_URL}
     signature-duration: ${UPLOAD_SIGNATURE_DURATION}
     upload-duration: ${UPLOAD_UPLOAD_DURATION}
+  download:
+    bucket:
+      name: ${DOWNLOAD_BUCKET_NAME}
+      public-url: ${DOWNLOAD_BUCKET_PUBLIC_URL}
+    signature-duration: ${DOWNLOAD_SIGNATURE_DURATION}
   sqs:
     queue: ${SQS_QUEUE}
 

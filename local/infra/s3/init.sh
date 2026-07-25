@@ -2,7 +2,7 @@
 set -e
 
 ENDPOINT="http://s3:4566"
-BUCKETS="images rcrs-audio rcrs-upload"
+BUCKETS="images rcrs-audio rcrs-upload rcrs-download"
 QUEUE="rcrs-upload-event-queue"
 REGION="eu-west-1"
 

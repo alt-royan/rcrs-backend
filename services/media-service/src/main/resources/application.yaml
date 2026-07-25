@@ -136,6 +136,11 @@ media:
       public-url: http://upload.localhost:4566
     signature-duration: 24h
     upload-duration: 24h
+  download:
+    bucket:
+      name: rcrs-download
+      public-url: http://download.localhost:4566
+    signature-duration: 1h
   sqs:
     queue: rcrs-upload-event-queue
 
