@@ -55,7 +55,7 @@ spring:
           maximum-interval: 10s
           maximum-attempts: 3
       transcodeAudioActivity:
-        start-to-close-timeout: 5m
+        start-to-close-timeout: 3m
         retry:
           initial-interval: 1s
           backoff-coefficient: 2

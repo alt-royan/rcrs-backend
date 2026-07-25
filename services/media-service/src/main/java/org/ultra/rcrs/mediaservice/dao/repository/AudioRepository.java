@@ -12,7 +12,7 @@ import java.util.UUID;
 @Repository
 public interface AudioRepository extends JpaRepository<Audio, UUID> {
 
-    @Query("SELECT a.id, a.guid, a.key, a.codec, a.container, a.durationMs, a.bitrate, a.sampleRate, a.byteSize, t.main " +
+    @Query("SELECT a.id, a.guid, a.key, a.codec, a.container, a.durationMs, a.bitrate, a.sampleRate, a.byteSize, a.creationTimestamp, t.trackId, t.main " +
             "FROM Audio a JOIN TrackToAudio t ON a.guid = t.guid " +
             "WHERE t.trackId = :trackId")
     List<AudioWithTrack> findAllByTrackId(String trackId);

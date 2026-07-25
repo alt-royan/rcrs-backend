@@ -14,7 +14,7 @@ public record AudioWithTrack(
         String sampleRate,
         Long byteSize,
         OffsetDateTime creationTimestamp,
-        UUID trackId,
+        String trackId,
         Boolean main
 ) {
 }
