@@ -2,8 +2,6 @@ package org.ultra.rcrs.userservice.service;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
-import jakarta.persistence.EntityNotFoundException;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.userservice.dto.UserProfileResponse;
@@ -28,48 +26,16 @@ public class UserAvatarService {
 
         String avatarKey = s3Utils.parseKey(avatarUri);
 
-        UserAvatar avatar = userAvatarRepository.findById(user.getId())
+        UserAvatar avatar = userAvatarRepository.findById(user.getUserId())
                 .map(existing -> {
                     existing.setAvatarKey(avatarKey);
                     return existing;
                 })
                 .orElseGet(() -> UserAvatar.builder()
-                        .userId(user.getId())
+                        .userId(user.getUserId())
                         .avatarKey(avatarKey)
                         .build());
 
         userAvatarRepository.save(avatar);
-    }
-
-    @Transactional(readOnly = true)
-    public UserProfileResponse getProfile(String username, boolean full) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User not found for username: " + username));
-
-        String avatarKey = userAvatarRepository.findById(user.getId())
-                .map(UserAvatar::getAvatarKey)
-                .orElse(null);
-
-        if (full) {
-            return new UserProfileResponse(
-                    user.getUsername(),
-                    avatarKey,
-                    user.getEmail(),
-                    user.getFirstName(),
-                    user.getLastName(),
-                    user.isEnabled(),
-                    user.isEmailVerified()
-            );
-        }
-
-        return new UserProfileResponse(
-                user.getUsername(),
-                avatarKey,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
     }
 }

@@ -21,7 +21,7 @@ public class UserAvatar {
 
     @Id
     @Column(name = "user_id", nullable = false)
-    private java.util.UUID userId;
+    private String userId;
 
     @Column(name = "avatar_key", nullable = false)
     private String avatarKey;

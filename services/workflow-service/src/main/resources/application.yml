@@ -22,7 +22,17 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8180/realms/rcrs
+          issuer-uri: http://192.168.1.3:8180/realms/master
+          jwk-set-uri: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
+      client:
+        provider:
+          keycloak:
+            issuer-uri: http://192.168.1.3:8180/realms/rcrs
+            user-name-attribute: preferred_username
+        registration:
+          keycloak:
+            client-id: workflow-client
+            client-secret: 35Br8un5yvUJ8atsjZBlLMpsb0Ust9az
   temporal:
     connection:
       target: 127.0.0.1:7233

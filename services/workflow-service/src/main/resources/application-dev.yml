@@ -22,7 +22,17 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${OAUTH2_ISSUER_URI}
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI}
+          jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI}
+      client:
+        provider:
+          keycloak:
+            issuer-uri: ${OAUTH2_CLIENT_PROVIDER_ISSUER_URI}
+            user-name-attribute: ${OAUTH2_CLIENT_PROVIDER_USERNAME_ATTRIBUTE}
+        registration:
+          keycloak:
+            client-id: ${OAUTH2_CLIENT_REGISTRATION_CLIENT_ID}
+            client-secret: ${OAUTH2_CLIENT_REGISTRATION_CLIENT_SECRET}
   temporal:
     connection:
       target: ${SPRING_TEMPORAL_CONNECTION_TARGET}

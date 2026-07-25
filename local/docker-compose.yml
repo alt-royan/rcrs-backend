@@ -68,7 +68,8 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
       CDN_IMAGES_ENDPOINT: http://192.168.1.3:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://192.168.1.3:8180/realms/master
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -84,11 +85,12 @@ services:
       - "8081:8081"
     environment:
       SPRING_PROFILES_ACTIVE: dev
-      SPRING_DATA_MONGODB_URI: mongodb://192.168.1.3:27017/rcrs_catalog?replicaSet=rs0
+      SPRING_DATA_MONGODB_URI: mongodb://192.168.1.3:27017/rcrs_catalog
       SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
       CDN_IMAGES_ENDPOINT: http://192.168.1.3:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://192.168.1.3:8180/realms/master
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -108,7 +110,8 @@ services:
       SPRING_ELASTICSEARCH_URIS: http://192.168.1.3:9200
       CDN_IMAGES_ENDPOINT: http://192.168.1.3:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://192.168.1.3:8180/realms/master
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -138,7 +141,8 @@ services:
       SPRING_CLOUD_AWS_REGION_STATIC: eu-west-1
       SPRING_CLOUD_AWS_ENDPOINT: http://192.168.1.3:4566
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://192.168.1.3:8180/realms/master
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
       AUDIO_BUCKET_NAME: rcrs-audio
       AUDIO_BUCKET_PUBLIC_URL: http://192.168.1.3:4566/rcrs-audio
       AUDIO_VALIDATION_FORMATS: mp3, wav, ogg, flac
@@ -183,7 +187,8 @@ services:
       SPRING_LIQUIBASE_PASSWORD: postgres
       SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://192.168.1.3:8180/realms/master
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -206,7 +211,12 @@ services:
       FEIGN_MEDIA-SERVICE_URL: http://media-service:8082
       FEIGN_SEARCH-SERVICE_URL: http://search-service:8083
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      OAUTH2_ISSUER_URI: http://192.168.1.3:8180/realms/master
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
+      OAUTH2_CLIENT_PROVIDER_ISSUER_URI: http://192.168.1.3:8180/realms/master
+      OAUTH2_CLIENT_PROVIDER_USERNAME_ATTRIBUTE: preferred_username
+      OAUTH2_CLIENT_REGISTRATION_CLIENT_ID: workflow-client
+      OAUTH2_CLIENT_REGISTRATION_CLIENT_SECRET: 35Br8un5yvUJ8atsjZBlLMpsb0Ust9az
     depends_on:
       discovery-server:
         condition: service_healthy

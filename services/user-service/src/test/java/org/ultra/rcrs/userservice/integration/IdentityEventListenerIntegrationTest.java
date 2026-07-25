@@ -12,126 +12,118 @@ class IdentityEventListenerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void userCreated_createsNewUser() throws Exception {
-        String keycloakId = UUID.randomUUID().toString();
-        sendRegisterEvent(keycloakId, "alice", "alice@example.com", "Alice", "Smith");
+        String userId = UUID.randomUUID().toString();
+        sendRegisterEvent(userId, "alice", "alice@example.com");
         waitForProcessing();
 
-        assertThat(userRepository.findByKeycloakId(keycloakId)).isPresent();
-        User user = userRepository.findByKeycloakId(keycloakId).get();
+        assertThat(userRepository.findByUserId(userId)).isPresent();
+        User user = userRepository.findByUserId(userId).get();
         assertThat(user.getUsername()).isEqualTo("alice");
         assertThat(user.getEmail()).isEqualTo("alice@example.com");
-        assertThat(user.getFirstName()).isEqualTo("Alice");
-        assertThat(user.getLastName()).isEqualTo("Smith");
         assertThat(user.isEnabled()).isTrue();
         assertThat(user.isEmailVerified()).isTrue();
     }
 
     @Test
-    void userCreated_duplicateKeycloakId_updatesExisting() throws Exception {
-        String keycloakId = UUID.randomUUID().toString();
-        sendRegisterEvent(keycloakId, "bob", "bob@example.com", "Bob", "Jones");
+    void userCreated_duplicateUserId_updatesExisting() throws Exception {
+        String userId = UUID.randomUUID().toString();
+        sendRegisterEvent(userId, "bob", "bob@example.com");
         waitForProcessing();
 
-        User first = userRepository.findByKeycloakId(keycloakId).orElseThrow();
+        User first = userRepository.findByUserId(userId).orElseThrow();
         assertThat(first.getUsername()).isEqualTo("bob");
 
-        sendRegisterEvent(keycloakId, "bobby", "bobby@example.com", "Bobby", "Jones");
+        sendRegisterEvent(userId, "bobby", "bobby@example.com");
         waitForProcessing();
 
         assertThat(userRepository.count()).isEqualTo(1);
-        User updated = userRepository.findByKeycloakId(keycloakId).orElseThrow();
+        User updated = userRepository.findByUserId(userId).orElseThrow();
         assertThat(updated.getUsername()).isEqualTo("bobby");
         assertThat(updated.getEmail()).isEqualTo("bobby@example.com");
-        assertThat(updated.getFirstName()).isEqualTo("Bobby");
     }
 
     @Test
     void userUpdated_updatesProfileFields() throws Exception {
-        String keycloakId = UUID.randomUUID().toString();
-        sendRegisterEvent(keycloakId, "carol", "carol@example.com", "Carol", "White");
+        String userId = UUID.randomUUID().toString();
+        sendRegisterEvent(userId, "carol", "carol@example.com");
         waitForProcessing();
 
-        sendUpdateProfileEvent(keycloakId, "carol_new", "carol.new@example.com", "Carolyn", "White");
+        sendUpdateProfileEvent(userId, "carol_new", "carol.new@example.com");
         waitForProcessing();
 
-        User user = userRepository.findByKeycloakId(keycloakId).orElseThrow();
+        User user = userRepository.findByUserId(userId).orElseThrow();
         assertThat(user.getUsername()).isEqualTo("carol_new");
         assertThat(user.getEmail()).isEqualTo("carol.new@example.com");
-        assertThat(user.getFirstName()).isEqualTo("Carolyn");
     }
 
     @Test
-    void userUpdated_unknownKeycloakId_ignored() throws Exception {
+    void userUpdated_unknownUserId_ignored() throws Exception {
         String unknownId = UUID.randomUUID().toString();
-        sendUpdateProfileEvent(unknownId, "ghost", "ghost@example.com", "Ghost", "User");
+        sendUpdateProfileEvent(unknownId, "ghost", "ghost@example.com");
         waitForProcessing();
 
-        assertThat(userRepository.findByKeycloakId(unknownId)).isEmpty();
+        assertThat(userRepository.findByUserId(unknownId)).isEmpty();
     }
 
     @Test
     void userDeleted_softDeletesUser() throws Exception {
-        String keycloakId = UUID.randomUUID().toString();
-        sendRegisterEvent(keycloakId, "dave", "dave@example.com", "Dave", "Brown");
+        String userId = UUID.randomUUID().toString();
+        sendRegisterEvent(userId, "dave", "dave@example.com");
         waitForProcessing();
 
-        User created = userRepository.findByKeycloakId(keycloakId).orElseThrow();
+        User created = userRepository.findByUserId(userId).orElseThrow();
         assertThat(created.isEnabled()).isTrue();
 
-        sendDeleteAccountEvent(keycloakId);
+        sendDeleteAccountEvent(userId);
         waitForProcessing();
 
-        User deleted = userRepository.findByKeycloakId(keycloakId).orElseThrow();
+        User deleted = userRepository.findByUserId(userId).orElseThrow();
         assertThat(deleted.isEnabled()).isFalse();
     }
 
     @Test
-    void userDeleted_unknownKeycloakId_ignored() throws Exception {
+    void userDeleted_unknownUserId_ignored() throws Exception {
         String unknownId = UUID.randomUUID().toString();
         sendDeleteAccountEvent(unknownId);
         waitForProcessing();
 
-        assertThat(userRepository.findByKeycloakId(unknownId)).isEmpty();
+        assertThat(userRepository.findByUserId(unknownId)).isEmpty();
         assertThat(userRepository.count()).isZero();
     }
 
     @Test
     void duplicateEventId_ignored() throws Exception {
-        String keycloakId = UUID.randomUUID().toString();
+        String userId = UUID.randomUUID().toString();
         String eventId = UUID.randomUUID().toString();
 
-        sendKeycloakEvent(eventId, "REGISTER", keycloakId, Map.of(
+        sendKeycloakEvent(eventId, "REGISTER", userId, Map.of(
                 "preferred_username", "eve",
                 "email", "eve@example.com",
-                "first_name", "Eve",
-                "last_name", "Davis",
                 "email_verified", "true"
         ));
         waitForProcessing();
 
-        assertThat(userRepository.findByKeycloakId(keycloakId)).isPresent();
+        assertThat(userRepository.findByUserId(userId)).isPresent();
         assertThat(processedEventRepository.existsByEventId(eventId)).isTrue();
 
-        sendKeycloakEvent(eventId, "REGISTER", keycloakId, Map.of(
+        sendKeycloakEvent(eventId, "REGISTER", userId, Map.of(
                 "preferred_username", "eve_changed",
                 "email", "eve_changed@example.com",
-                "first_name", "Eve",
-                "last_name", "Davis",
                 "email_verified", "true"
         ));
         waitForProcessing();
 
         assertThat(userRepository.count()).isEqualTo(1);
-        User user = userRepository.findByKeycloakId(keycloakId).orElseThrow();
+        User user = userRepository.findByUserId(userId).orElseThrow();
         assertThat(user.getUsername()).isEqualTo("eve");
     }
 
     @Test
     void unmappedEventType_ignored() throws Exception {
-        String keycloakId = UUID.randomUUID().toString();
-        sendKeycloakEvent(UUID.randomUUID().toString(), "LOGOUT", keycloakId, Map.of());
+        String userId = UUID.randomUUID().toString();
+        sendKeycloakEvent(UUID.randomUUID().toString(), "LOGOUT", userId, Map.of());
         waitForProcessing();
 
-        assertThat(userRepository.findByKeycloakId(keycloakId)).isEmpty();
+        assertThat(userRepository.findByUserId(userId)).isEmpty();
     }
 }

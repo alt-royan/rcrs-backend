@@ -6,8 +6,8 @@ import urllib.error
 from pathlib import Path
 from urllib.parse import urlparse, urlunparse, urlencode
 
-UPLOAD_API = "http://localhost:8090/media"
-CATALOG_API = "http://localhost:8090/workflow"
+UPLOAD_API = "http://localhost:8099/media"
+CATALOG_API = "http://localhost:8099/workflow"
 DIR = Path(__file__).resolve().parent
 AUDIO_DIR = DIR / "1000 bars"
 

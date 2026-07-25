@@ -29,11 +29,9 @@ public class KeycloakEventMapper {
         Map<String, String> details = raw.getDetails() != null ? raw.getDetails() : Map.of();
 
         IdentityEventPayload payload = IdentityEventPayload.builder()
-                .keycloakId(raw.getUserId())
+                .userId(raw.getUserId())
                 .username(details.getOrDefault("preferred_username", details.get("username")))
                 .email(details.get("email"))
-                .firstName(details.get("first_name"))
-                .lastName(details.get("last_name"))
                 .enabled(!"DELETE_ACCOUNT".equals(raw.getType()))
                 .emailVerified("true".equals(details.get("email_verified")))
                 .build();
