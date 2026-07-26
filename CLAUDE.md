@@ -17,7 +17,17 @@ Run all commands from the repo root (`pom.xml` is the reactor parent).
 ./mvnw -pl services/media-service test -Dtest=HashTest   # run a single test class
 ```
 
-Integration tests use Testcontainers (Postgres, MongoDB, embedded Kafka) and require Docker to be running — this is why CI runs `docker version` before `mvn clean verify`. Tests live under each module's `src/test/java`; most are Spring Boot `@SpringBootTest` integration tests named `*IntegrationTest` that spin up real containers, plus a smaller number of plain unit tests for services/utils.
+Integration tests use Testcontainers (Postgres, MongoDB, Elasticsearch, embedded Kafka) and require Docker to be running — this is why CI runs `docker version` before `mvn clean verify`. Tests live under each module's `src/test/java`; most are Spring Boot `@SpringBootTest` integration tests named `*IntegrationTest` that spin up real containers, plus a smaller number of plain unit tests for services/utils.
+
+To run several test classes at once, comma-separate them (`-Dtest=FooTest,BarTest`); add `-Dsurefire.failIfNoSpecifiedTests=false` when the pattern won't match in every reactor module that `-am` pulls in. Note the surefire summary is suppressed by `-q` — read `target/surefire-reports/*.txt` instead.
+
+### Testing conventions
+
+- Each service with integration tests has an abstract `integration/BaseIntegrationTest` that owns the `@Container` declarations, `@ActiveProfiles("test")`, `@EmbeddedKafka`, `@DirtiesContext`, and helper methods for seeding fixtures and publishing protobuf events. Add new integration tests by extending it rather than re-declaring containers.
+- **`src/test/resources/application-test.yaml` does not inherit from a test-specific default** — anything not set there falls through to the module's `src/main/resources/application.yaml`, which holds the hardcoded `192.168.1.3` local-dev hosts. When a test asserts on a value derived from config (e.g. `cdn.images.endpoint`, which `S3Utils` uses to build image URLs), pin that property in `application-test.yaml`, or the assertion silently tests the dev config.
+- Tests disable auth with `spring.security.enabled: false`; each service's real `SecurityConfig` is `@ConditionalOnProperty` on that flag, and search-service adds a permissive test-only `SecurityConfig` under `src/test/java`. Eureka is disabled the same way.
+- metadata-read-service is the only WebFlux module, so its tests use `WebTestClient`; every other service is Spring MVC and uses `MockMvc`.
+- On Windows, don't bulk-edit Java sources via PowerShell 5.1 `Set-Content -Encoding utf8` — it prepends a BOM and `javac` fails with `illegal character: '﻿'`. Use `[System.IO.File]::WriteAllText` with `UTF8Encoding($false)`.
 
 ### Local environment
 
@@ -53,6 +63,7 @@ does: create the `rcrs` docker network → `mvnw.cmd clean install -DskipTests` 
 
 - **Event-driven CQRS via Kafka + Protobuf**: writes happen in metadata-write-service, are published as protobuf `DomainEvent`s (schemas in `shared-lib/src/main/proto/events`), and are fanned out to metadata-read-service (Mongo projection) and search-service (Elasticsearch indexing). When changing write-side behavior, check whether a corresponding event/consumer needs updating in metadata-read-service and search-service.
 - **Auth**: every service (including the gateway) independently validates JWTs issued by Keycloak (`spring.security.oauth2.resourceserver.jwt.issuer-uri`/`jwk-set-uri`), and can be disabled per-service via the `spring.security.enabled` property (used in tests). Realm roles are read from a custom `rcrs-roles` JWT claim and mapped to `ROLE_*` Spring authorities — see each service's `SecurityConfig`.
+- **Gateway prefix ↔ controller mapping**: the gateway's `StripPrefix` filter and each service's `@RequestMapping` are two halves of one contract — a service maps the path it receives *after* stripping, not the public URL. Most services keep their own prefix (metadata-read maps `/albums`, `/artists`, `/tracks` and `/admin/*`; playlist-service maps `/playlists` with nothing stripped). The exception is **search-service**, whose `SearchController` has a bare `@RequestMapping` and therefore serves the **root** path: public `/api/search?q=…&type=…` has 2 segments stripped and arrives as `/`. Tests calling `/search` there will 404 on everything, including param-validation cases, because routing fails before binding. metadata-write-service's `PurgeController` likewise maps root. When changing a route prefix, change both sides.
 - **Service discovery**: services register with `discovery-server` (Eureka) and reference each other by logical name (`lb://service-name` in the gateway, `EUREKA_CLIENT_SERVICEURL_DEFAULTZONE` env var elsewhere) rather than hardcoded hosts.
 - **Short IDs**: `Base62`/`Url62` in shared-lib encode UUIDs into short, URL-friendly identifiers used in public-facing catalog URLs.
 - **Admin vs public split**: metadata-read-service and search-service both separate their controller/service layers into `admin` and `publ` packages — admin endpoints expose more/unfiltered data, public endpoints serve the storefront.

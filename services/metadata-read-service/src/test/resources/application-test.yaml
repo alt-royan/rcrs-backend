@@ -4,6 +4,10 @@ spring:
   security:
     enabled: false
 
+cdn:
+  images:
+    endpoint: "http://images.localhost:4566"
+
 eureka:
   client:
     enabled: false
