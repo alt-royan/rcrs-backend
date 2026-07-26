@@ -1,0 +1,54 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: playlist-service
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: ${SPRING_HIBERNATE_DEFAUT_SCHEMA}
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    user: ${SPRING_LIQUIBASE_USER}
+    password: ${SPRING_LIQUIBASE_PASSWORD}
+    url: ${SPRING_LIQUIBASE_URL}
+    database-change-log-table: playlist_databasechangelog
+    database-change-log-lock-table: playlist_databasechangeloglock
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+  security:
+    enabled: true
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI}
+          jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI}
+
+cdn:
+  images:
+    endpoint: ${CDN_IMAGES_ENDPOINT}
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+  instance:
+    preferIpAddress: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized

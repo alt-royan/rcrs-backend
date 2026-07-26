@@ -2,8 +2,8 @@ databaseChangeLog:
   - include:
       file: classpath:db/changelog/init.sql
   - include:
-      file: classpath:db/changelog/002-add-user-enabled-email-verified.sql
+      file: classpath:db/changelog/001-add-processed-events.sql
   - include:
-      file: classpath:db/changelog/003-add-processed-events.sql
+      file: classpath:db/changelog/002-add-user-avatar.sql
   - include:
-      file: classpath:db/changelog/004-add-user-avatar.sql
+      file: classpath:db/changelog/003-add-likes.sql

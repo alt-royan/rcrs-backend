@@ -39,7 +39,7 @@ public class SecurityConfig {
                         .requestMatchers("/swagger-ui/**").permitAll()
                         .requestMatchers("/v3/api-docs/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        .anyRequest().hasRole("ADMIN")
+                        .anyRequest().hasRole("SERVICE_WORKFLOW")
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
@@ -54,7 +54,7 @@ public class SecurityConfig {
 
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
             var authorities = jwtGrantedAuthoritiesConverter.convert(jwt);
-            var roles = Optional.ofNullable(jwt.getClaimAsStringList("rcrs_roles"))
+            var roles = Optional.ofNullable(jwt.getClaimAsStringList("rcrs-roles"))
                     .orElse(List.of());
 
             return Stream.concat(authorities.stream(),

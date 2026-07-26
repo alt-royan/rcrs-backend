@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package events;
+
+option java_package = "org.ultra.rcrs.events.playlist";
+
+message DeleteTracksFromPlaylistEvent {
+  string playlist_id = 1;
+  repeated string track_ids = 2;
+}

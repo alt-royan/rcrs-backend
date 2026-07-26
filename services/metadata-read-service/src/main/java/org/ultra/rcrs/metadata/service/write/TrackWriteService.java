@@ -57,13 +57,7 @@ public class TrackWriteService {
                     if (trackDoc.getReleaseDate() == null) {
                         trackDoc.setReleaseDate(albumDoc.getReleaseDate());
                     }
-                    var trackMono = trackDocumentRepository.save(trackDoc);
-
-                    var totalTracks = albumDoc.getTotalTracks() == null ? 0 : albumDoc.getTotalTracks();
-                    albumDoc.setTotalTracks(totalTracks + 1);
-                    var albumMono = albumDocumentRepository.save(albumDoc);
-
-                    return trackMono.then(albumMono);
+                    return trackDocumentRepository.save(trackDoc);
                 })
                 .doOnSuccess(d -> log.info("Added track to album: trackId={}, albumId={}", event.getTrackId(), event.getAlbumId()))
                 .doOnError(e -> log.error("Failed to add track to album: trackId={}, albumId={}, error={}", event.getTrackId(), event.getAlbumId(), e.getMessage()))
@@ -111,6 +105,31 @@ public class TrackWriteService {
                 })
                 .doOnSuccess(d -> log.info("Updated track lifecycle status: id={}, status={}", event.getId(), event.getLifecycleStatus()))
                 .doOnError(e -> log.error("Failed to update track lifecycle status: id={}, error={}", event.getId(), e.getMessage()))
+                .block();
+    }
+
+    /**
+     * Applies a partial track update: fields absent from the event are left as they are.
+     */
+    public void handleTrackUpdated(TrackUpdatedEventOuterClass.TrackUpdatedEvent event) {
+        trackDocumentRepository.findById(event.getId())
+                .flatMap(doc -> {
+                    if (event.hasTitle()) {
+                        doc.setTitle(event.getTitle());
+                    }
+                    if (event.hasDurationMs()) {
+                        doc.setDurationMs(event.getDurationMs());
+                    }
+                    if (event.hasTrackNumber()) {
+                        doc.setTrackNumber(event.getTrackNumber());
+                    }
+                    if (event.hasExplicit()) {
+                        doc.setExplicit(event.getExplicit());
+                    }
+                    return trackDocumentRepository.save(doc);
+                })
+                .doOnSuccess(d -> log.info("Updated track document: id={}", event.getId()))
+                .doOnError(e -> log.error("Failed to update track document: id={}, error={}", event.getId(), e.getMessage()))
                 .block();
     }
 

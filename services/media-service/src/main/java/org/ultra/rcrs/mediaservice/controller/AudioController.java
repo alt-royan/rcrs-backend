@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.ultra.rcrs.mediaservice.dto.AudioItem;
+import org.ultra.rcrs.mediaservice.dto.AudioItemGroupBy;
 import org.ultra.rcrs.mediaservice.service.AudioService;
 
 import java.util.List;
@@ -22,7 +23,7 @@ public class AudioController {
     private final AudioService audioService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Map<UUID, List<AudioItem>>> getAudiosByTrackId(@RequestParam String trackId) {
+    public ResponseEntity<Map<UUID, AudioItemGroupBy>> getAudiosByTrackId(@RequestParam String trackId) {
         return ResponseEntity.ok(audioService.getAudiosByTrackId(trackId));
     }
 }

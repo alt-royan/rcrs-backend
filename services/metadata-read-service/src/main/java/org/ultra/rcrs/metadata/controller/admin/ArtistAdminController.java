@@ -7,6 +7,7 @@ import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.metadata.dto.AlbumAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.ArtistAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.ArtistAdminViewDto;
+import org.ultra.rcrs.metadata.dto.PaginationResponse;
 import org.ultra.rcrs.metadata.service.admin.AlbumAdminService;
 import org.ultra.rcrs.metadata.service.admin.ArtistAdminService;
 import reactor.core.publisher.Flux;
@@ -26,17 +27,11 @@ public class ArtistAdminController {
     }
 
     @GetMapping
-    public Flux<ArtistAdminStandaloneDto> getArtists(
+    public Mono<PaginationResponse<ArtistAdminStandaloneDto>> getArtists(
             @RequestParam(required = false) EntityStatus availabilityStatus,
             @RequestParam(required = false, defaultValue = "0") int offset,
             @RequestParam(required = false, defaultValue = "50") int limit) {
         return artistAdminService.getAll(availabilityStatus, offset, limit);
-    }
-
-    @GetMapping("/count")
-    public Mono<Long> countArtists(
-            @RequestParam(required = false) EntityStatus availabilityStatus) {
-        return artistAdminService.count(availabilityStatus);
     }
 
     @GetMapping("/{artistId}/albums")

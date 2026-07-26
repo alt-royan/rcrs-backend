@@ -13,25 +13,31 @@ import org.ultra.rcrs.metadata.dto.AlbumPublicStandaloneDto;
 import org.ultra.rcrs.metadata.dto.AlbumPublicViewDto;
 import org.ultra.rcrs.metadata.model.AlbumDocument;
 import org.ultra.rcrs.metadata.repository.AlbumDocumentRepository;
+import org.ultra.rcrs.metadata.repository.AlbumTotalsRepository;
+import org.ultra.rcrs.metadata.repository.AlbumTotalsRepository.AlbumTotals;
 import org.ultra.rcrs.utils.S3Utils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.stream.Collectors;
+
+import static org.ultra.rcrs.metadata.repository.AlbumTotalsRepository.totalsOf;
 
 @Service
 @RequiredArgsConstructor
 public class AlbumPublicService {
 
     private final AlbumDocumentRepository albumDocumentRepository;
+    private final AlbumTotalsRepository albumTotalsRepository;
     private final ReactiveMongoTemplate mongoTemplate;
     private final S3Utils s3Utils;
 
-    @Cacheable("albums-public")
     public Mono<AlbumPublicViewDto> getById(String id) {
         return albumDocumentRepository.findByIdForPublic(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Album", id)))
-                .map(this::toDto);
+                .flatMap(doc -> albumTotalsRepository.findTotalsForPublic(List.of(doc.getId()))
+                        .map(totals -> toDto(doc, totalsOf(totals, doc.getId()))));
     }
 
     public Flux<AlbumPublicStandaloneDto> getAllByArtistId(String artistId, AlbumType albumType, String sortDirection) {
@@ -44,10 +50,18 @@ public class AlbumPublicService {
         }
         query.with(sort);
         return mongoTemplate.find(query, AlbumDocument.class, "albums")
-                .map(this::toStandaloneDto);
+                .collectList()
+                .flatMapMany(this::toStandaloneDtos);
     }
 
-    private AlbumPublicViewDto toDto(AlbumDocument doc) {
+    private Flux<AlbumPublicStandaloneDto> toStandaloneDtos(List<AlbumDocument> docs) {
+        List<String> ids = docs.stream().map(AlbumDocument::getId).toList();
+        return albumTotalsRepository.findTotalsForPublic(ids)
+                .flatMapMany(totals -> Flux.fromIterable(docs)
+                        .map(doc -> toStandaloneDto(doc, totalsOf(totals, doc.getId()))));
+    }
+
+    private AlbumPublicViewDto toDto(AlbumDocument doc, AlbumTotals totals) {
         return AlbumPublicViewDto.builder()
                 .id(doc.getId())
                 .availabilityStatus(doc.getAvailabilityStatus())
@@ -55,8 +69,8 @@ public class AlbumPublicService {
                 .type(doc.getType())
                 .releaseDate(doc.getReleaseDate())
                 .year(doc.getYear())
-                .totalTracks(doc.getTotalTracks())
-                .totalDurationMs(doc.getTotalDurationMs())
+                .totalTracks(totals.totalTracks())
+                .totalDurationMs(totals.totalDurationMs())
                 .coverUrl(s3Utils.parseUrl(doc.getCoverS3Key()))
                 .explicit(doc.getExplicit())
                 .artists(doc.getArtists() != null
@@ -70,7 +84,7 @@ public class AlbumPublicService {
                 .build();
     }
 
-    private AlbumPublicStandaloneDto toStandaloneDto(AlbumDocument doc) {
+    private AlbumPublicStandaloneDto toStandaloneDto(AlbumDocument doc, AlbumTotals totals) {
         return AlbumPublicStandaloneDto.builder()
                 .id(doc.getId())
                 .availabilityStatus(doc.getAvailabilityStatus())
@@ -78,8 +92,8 @@ public class AlbumPublicService {
                 .type(doc.getType())
                 .releaseDate(doc.getReleaseDate())
                 .year(doc.getYear())
-                .totalTracks(doc.getTotalTracks())
-                .totalDurationMs(doc.getTotalDurationMs())
+                .totalTracks(totals.totalTracks())
+                .totalDurationMs(totals.totalDurationMs())
                 .coverUrl(s3Utils.parseUrl(doc.getCoverS3Key()))
                 .explicit(doc.getExplicit())
                 .artists(doc.getArtists() != null

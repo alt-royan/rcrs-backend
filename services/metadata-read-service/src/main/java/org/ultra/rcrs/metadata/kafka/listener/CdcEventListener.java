@@ -48,6 +48,7 @@ public class CdcEventListener {
                 case ARTIST_DELETED_FROM_TRACK -> onArtistDeletedFromTrack(event.getPayload());
                 case ALBUM_LIFECYCLE_STATUS_UPDATED -> onAlbumLifecycleStatusUpdated(event.getPayload());
                 case TRACK_LIFECYCLE_STATUS_UPDATED -> onTrackLifecycleStatusUpdated(event.getPayload());
+                case TRACK_UPDATED -> onTrackUpdated(event.getPayload());
                 case TRACK_ADDED_TO_ALBUM -> onTrackAddedToAlbum(event.getPayload());
                 case ARTIST_ACTIVATED -> onArtistActivated(event.getPayload());
                 case ALBUM_ACTIVATED -> onAlbumActivated(event.getPayload());
@@ -212,6 +213,15 @@ public class CdcEventListener {
             trackWriteService.handleTrackLifecycleStatusUpdated(event);
         } catch (Exception e) {
             log.error("Failed to unpack TrackUpdateLifecycleStatusEvent: {}", e.getMessage(), e);
+        }
+    }
+
+    private void onTrackUpdated(Any payload) {
+        try {
+            TrackUpdatedEventOuterClass.TrackUpdatedEvent event = payload.unpack(TrackUpdatedEventOuterClass.TrackUpdatedEvent.class);
+            trackWriteService.handleTrackUpdated(event);
+        } catch (Exception e) {
+            log.error("Failed to unpack TrackUpdatedEvent: {}", e.getMessage(), e);
         }
     }
 

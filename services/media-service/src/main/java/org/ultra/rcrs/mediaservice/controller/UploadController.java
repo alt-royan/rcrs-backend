@@ -1,22 +1,16 @@
 package org.ultra.rcrs.mediaservice.controller;
 
-import io.temporal.client.WorkflowClient;
-import io.temporal.client.WorkflowOptions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.ultra.rcrs.mediaservice.config.ImageConfigurationProperties;
 import org.ultra.rcrs.mediaservice.dto.*;
 import org.ultra.rcrs.mediaservice.service.AudioService;
-import org.ultra.rcrs.mediaservice.temporal.workflow.ImageUploadWorkflow;
+import org.ultra.rcrs.mediaservice.service.ImageUploadService;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-
-import static org.ultra.rcrs.mediaservice.temporal.config.TemporalConfig.MEDIA_TASK_QUEUE;
 
 @RestController
 @RequiredArgsConstructor
@@ -24,8 +18,7 @@ import static org.ultra.rcrs.mediaservice.temporal.config.TemporalConfig.MEDIA_T
 public class UploadController {
 
     private final AudioService audioService;
-    private final WorkflowClient workflowClient;
-    private final ImageConfigurationProperties imageProperties;
+    private final ImageUploadService imageUploadService;
 
 
     @PostMapping(value = "/audio/pre-sign", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,15 +36,6 @@ public class UploadController {
 
     @PostMapping(value = "/image")
     public ResponseEntity<ImageResponse> uploadImage(@RequestBody ImageUploadRequest request) {
-        ImageUploadWorkflow workflow = workflowClient.newWorkflowStub(
-                ImageUploadWorkflow.class,
-                WorkflowOptions.newBuilder()
-                        .setTaskQueue(MEDIA_TASK_QUEUE)
-                        .setWorkflowId(UUID.randomUUID().toString())
-                        .build()
-        );
-        List<Integer> sizes = imageProperties.getThumbnails().getSizes();
-        var future = WorkflowClient.execute(workflow::uploadImage, request.getImage(), sizes);
-        return ResponseEntity.ok(future.join());
+        return ResponseEntity.ok(imageUploadService.uploadImage(request.getImage()));
     }
 }

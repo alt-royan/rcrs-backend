@@ -5,7 +5,7 @@ spring:
   application:
     name: user-service
   datasource:
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://192.168.1.3:5432/postgres
     username: postgres
     password: postgres
     driver-class-name: org.postgresql.Driver
@@ -20,15 +20,18 @@ spring:
     change-log: classpath:/db/changelog/db.changelog-master.yaml
     user: postgres
     password: postgres
-    url: jdbc:postgresql://localhost:5432/postgres
+    url: jdbc:postgresql://192.168.1.3:5432/postgres
+    database-change-log-table: user_databasechangelog
+    database-change-log-lock-table: user_databasechangeloglock
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: 192.168.1.3:29092
   security:
     enabled: true
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8180/realms/rcrs
+          issuer-uri: http://192.168.1.3:8180/realms/master
+          jwk-set-uri: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
 
 eureka:
   client:

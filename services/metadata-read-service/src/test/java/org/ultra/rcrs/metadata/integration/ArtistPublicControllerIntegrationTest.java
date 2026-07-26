@@ -17,7 +17,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Active Artist", EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/catalog/artists/{id}", artist.getId())
+                .uri("/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -31,7 +31,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Hidden Artist", EntityStatus.HIDDEN);
 
         webTestClient.get()
-                .uri("/catalog/artists/{id}", artist.getId())
+                .uri("/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -44,7 +44,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Deleted Artist", EntityStatus.DELETED);
 
         webTestClient.get()
-                .uri("/catalog/artists/{id}", artist.getId())
+                .uri("/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -52,7 +52,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void getArtist_nonExistentId_404NotFound() {
         webTestClient.get()
-                .uri("/catalog/artists/{id}", "non-existent-id")
+                .uri("/artists/{id}", "non-existent-id")
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -62,7 +62,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Avatar Test", EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/catalog/artists/{id}", artist.getId())
+                .uri("/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -87,7 +87,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .build()).block();
 
         webTestClient.get()
-                .uri("/catalog/artists/{id}", artist.getId())
+                .uri("/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -107,7 +107,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .build()).block();
 
         webTestClient.get()
-                .uri("/catalog/artists/{id}", artist.getId())
+                .uri("/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -128,7 +128,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/catalog/artists/{id}/albums")
+                        .path("/artists/{id}/albums")
                         .build(artist.getId()))
                 .exchange()
                 .expectStatus().isOk()
@@ -147,8 +147,6 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .availabilityStatus(EntityStatus.ACTIVE)
                 .releaseDate(java.time.LocalDateTime.of(2025, 6, 1, 0, 0))
                 .year(2025)
-                .totalTracks(10)
-                .totalDurationMs(300000)
                 .coverS3Key("covers/full.jpg")
                 .explicit(false)
                 .artists(List.of(AlbumDocument.ArtistEmbed.builder()
@@ -167,8 +165,6 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .availabilityStatus(EntityStatus.ACTIVE)
                 .releaseDate(java.time.LocalDateTime.of(2025, 7, 1, 0, 0))
                 .year(2025)
-                .totalTracks(1)
-                .totalDurationMs(200000)
                 .coverS3Key("covers/single.jpg")
                 .explicit(false)
                 .artists(List.of(AlbumDocument.ArtistEmbed.builder()
@@ -181,7 +177,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/catalog/artists/{id}/albums")
+                        .path("/artists/{id}/albums")
                         .queryParam("type", "FULL")
                         .build(artist.getId()))
                 .exchange()
@@ -195,7 +191,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/catalog/artists/{id}/albums")
+                        .path("/artists/{id}/albums")
                         .build(artist.getId()))
                 .exchange()
                 .expectStatus().isOk()

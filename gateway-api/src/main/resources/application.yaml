@@ -9,11 +9,13 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: lb://localhost:8180/realms/rcrs
+          issuer-uri: http://192.168.1.3:8180/realms/master
+          jwk-set-uri: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
   cloud:
     gateway:
       server:
         webflux:
+          globalcors:
           discovery:
             locator: enabled
           routes:
@@ -58,6 +60,12 @@ spring:
                 - StripPrefix=2
 
             # metadata-write — NOT available via gateway
+
+            # playlist-service — no prefix
+            - id: playlist-service
+              uri: lb://playlist-service
+              predicates:
+                - Path=/playlists/**
 springdoc:
   swagger-ui:
     urls:
@@ -71,6 +79,8 @@ springdoc:
         url: /workflow/v3/api-docs
       - name: user
         url: /me/v3/api-docs
+      - name: playlist
+        url: /playlists/v3/api-docs
 
 eureka:
   client:

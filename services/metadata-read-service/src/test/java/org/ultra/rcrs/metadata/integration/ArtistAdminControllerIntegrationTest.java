@@ -15,7 +15,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Active Artist", EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/catalog/admin/artists/{id}", artist.getId())
+                .uri("/admin/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -28,7 +28,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Deleted Artist", EntityStatus.DELETED);
 
         webTestClient.get()
-                .uri("/catalog/admin/artists/{id}", artist.getId())
+                .uri("/admin/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -39,7 +39,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void getArtist_nonExistentId_404NotFound() {
         webTestClient.get()
-                .uri("/catalog/admin/artists/{id}", "non-existent-id")
+                .uri("/admin/artists/{id}", "non-existent-id")
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -55,7 +55,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
                 artist.getId(), "Album Artist", org.ultra.rcrs.enums.ArtistRole.MAIN_ARTIST);
 
         webTestClient.get()
-                .uri("/catalog/admin/artists/{id}/albums", artist.getId())
+                .uri("/admin/artists/{id}/albums", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Object.class).hasSize(3);
@@ -74,8 +74,6 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
                 .availabilityStatus(EntityStatus.ACTIVE)
                 .releaseDate(java.time.LocalDateTime.of(2025, 6, 1, 0, 0))
                 .year(2025)
-                .totalTracks(10)
-                .totalDurationMs(300000)
                 .coverS3Key("covers/full.jpg")
                 .explicit(false)
                 .artists(List.of(AlbumDocument.ArtistEmbed.builder()
@@ -94,8 +92,6 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
                 .availabilityStatus(EntityStatus.ACTIVE)
                 .releaseDate(java.time.LocalDateTime.of(2025, 7, 1, 0, 0))
                 .year(2025)
-                .totalTracks(1)
-                .totalDurationMs(200000)
                 .coverS3Key("covers/single.jpg")
                 .explicit(false)
                 .artists(List.of(AlbumDocument.ArtistEmbed.builder()
@@ -108,7 +104,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/catalog/admin/artists/{id}/albums")
+                        .path("/admin/artists/{id}/albums")
                         .queryParam("type", "FULL")
                         .build(artist.getId()))
                 .exchange()
@@ -117,17 +113,41 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void countArtists_filtersByAvailabilityStatus() {
+    void getArtists_filtersByAvailabilityStatusAndReturnsTotalCount() {
         createArtistDoc("Active Artist", EntityStatus.ACTIVE);
         createArtistDoc("Deleted Artist", EntityStatus.DELETED);
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/catalog/admin/artists/count")
+                        .path("/admin/artists")
                         .queryParam("availabilityStatus", "ACTIVE")
                         .build())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(Long.class).isEqualTo(1L);
+                .expectBody()
+                .jsonPath("$.totalCount").isEqualTo(1)
+                .jsonPath("$.items.length()").isEqualTo(1);
+    }
+
+    @Test
+    void getArtists_totalCountIgnoresPaging() {
+        createArtistDoc("Artist One", EntityStatus.ACTIVE);
+        createArtistDoc("Artist Two", EntityStatus.ACTIVE);
+        createArtistDoc("Artist Three", EntityStatus.ACTIVE);
+
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/admin/artists")
+                        .queryParam("availabilityStatus", "ACTIVE")
+                        .queryParam("offset", 0)
+                        .queryParam("limit", 2)
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.totalCount").isEqualTo(3)
+                .jsonPath("$.items.length()").isEqualTo(2)
+                .jsonPath("$.offset").isEqualTo(0)
+                .jsonPath("$.limit").isEqualTo(2);
     }
 }

@@ -5,6 +5,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.exceptions.NotFoundException;
+import org.ultra.rcrs.metadata.dto.TrackAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.TrackPublicStandaloneDto;
 import org.ultra.rcrs.metadata.dto.TrackPublicViewDto;
 import org.ultra.rcrs.metadata.model.TrackDocument;
@@ -22,14 +23,12 @@ public class TrackPublicService {
     private final TrackDocumentRepository trackDocumentRepository;
     private final S3Utils s3Utils;
 
-    @Cacheable("tracks-public")
     public Mono<TrackPublicViewDto> getById(String id) {
         return trackDocumentRepository.findByIdForPublic(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Track", id)))
                 .map(this::toDto);
     }
 
-    @Cacheable("tracks-by-album-public")
     public Flux<TrackPublicStandaloneDto> getAllByAlbumId(String albumId) {
         return trackDocumentRepository.findAllByAlbumIdForPublic(albumId, Sort.by("trackNumber"))
                 .map(this::toStandaloneDto);
@@ -83,6 +82,11 @@ public class TrackPublicService {
                 .durationMs(doc.getDurationMs())
                 .trackNumber(doc.getTrackNumber())
                 .explicit(doc.getExplicit())
+                .album(TrackPublicStandaloneDto.AlbumEmbed.builder()
+                        .id(doc.getAlbum().getId())
+                        .title(doc.getAlbum().getTitle())
+                        .coverUrl(s3Utils.parseUrl(doc.getAlbum().getCoverS3Key()))
+                        .build())
                 .artists(doc.getArtists() != null
                         ? doc.getArtists().stream().map(a -> TrackPublicStandaloneDto.ArtistEmbed.builder()
                         .id(a.getId())

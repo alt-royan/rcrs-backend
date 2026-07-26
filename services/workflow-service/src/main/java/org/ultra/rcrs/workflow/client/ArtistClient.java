@@ -4,9 +4,10 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.workflow.client.model.ArtistCreateModel;
+import org.ultra.rcrs.workflow.config.FeignMetadataServiceConfig;
 import org.ultra.rcrs.workflow.dto.response.CreateResponse;
 
-@FeignClient(name = "artist-write-client", url = "${feign.metadata-service.url}")
+@FeignClient(name = "artist-write-client", url = "${feign.metadata-service.url}", configuration = FeignMetadataServiceConfig.class)
 public interface ArtistClient {
 
     @PostMapping("/artists")

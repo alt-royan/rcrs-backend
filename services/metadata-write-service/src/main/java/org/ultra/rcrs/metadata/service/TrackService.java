@@ -93,6 +93,8 @@ public class TrackService {
     public void handleTranscodingCompleted(UUID trackId, LifecycleStatus status, Integer durationMs) {
         trackRepository.updateLifecycleStatusAndDurationById(status, durationMs, trackId);
         log.info("Track {} transcoding completed: status={}, durationMs={}", trackId, status, durationMs);
+        catalogEventProducer.updateTrackLifecycleStatus(status, trackId);
+        catalogEventProducer.trackUpdated(trackId, null, durationMs, null, null);
     }
 
     @Transactional

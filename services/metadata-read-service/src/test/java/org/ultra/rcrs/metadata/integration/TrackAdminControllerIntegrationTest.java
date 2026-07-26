@@ -15,7 +15,7 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
                 LifecycleStatus.CREATED, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/catalog/admin/tracks/{id}", track.getId())
+                .uri("/admin/tracks/{id}", track.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -31,7 +31,7 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
                 LifecycleStatus.PUBLISHED, EntityStatus.DELETED);
 
         webTestClient.get()
-                .uri("/catalog/admin/tracks/{id}", track.getId())
+                .uri("/admin/tracks/{id}", track.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -42,7 +42,7 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void getTrack_nonExistentId_404NotFound() {
         webTestClient.get()
-                .uri("/catalog/admin/tracks/{id}", "non-existent-id")
+                .uri("/admin/tracks/{id}", "non-existent-id")
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -54,7 +54,7 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
                 LifecycleStatus.TRANSCODING, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/catalog/admin/tracks/{id}", track.getId())
+                .uri("/admin/tracks/{id}", track.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -68,7 +68,7 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
                 LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/catalog/admin/tracks/{id}", track.getId())
+                .uri("/admin/tracks/{id}", track.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -77,7 +77,7 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void countTracks_filtersByAlbumId() {
+    void getTracks_filtersByAlbumIdAndReturnsTotalCount() {
         AlbumDocument albumA = createAlbumDoc("Album A", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
         AlbumDocument albumB = createAlbumDoc("Album B", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
 
@@ -87,11 +87,13 @@ class TrackAdminControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/catalog/admin/tracks/count")
+                        .path("/admin/tracks")
                         .queryParam("albumId", albumA.getId())
                         .build())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(Long.class).isEqualTo(2L);
+                .expectBody()
+                .jsonPath("$.totalCount").isEqualTo(2)
+                .jsonPath("$.items.length()").isEqualTo(2);
     }
 }

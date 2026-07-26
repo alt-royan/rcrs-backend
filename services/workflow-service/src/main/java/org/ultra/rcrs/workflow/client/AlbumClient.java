@@ -8,10 +8,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.ultra.rcrs.workflow.client.model.AlbumUploadModel;
 import org.ultra.rcrs.workflow.client.model.ArtistsToEntityModel;
+import org.ultra.rcrs.workflow.config.FeignMetadataServiceConfig;
 import org.ultra.rcrs.workflow.dto.StatusDto;
 import org.ultra.rcrs.workflow.dto.response.CreateResponse;
 
-@FeignClient(name = "album-write-client", url = "${feign.metadata-service.url}")
+@FeignClient(name = "album-write-client", url = "${feign.metadata-service.url}", configuration = FeignMetadataServiceConfig.class)
 public interface AlbumClient {
 
     @PostMapping("/albums")

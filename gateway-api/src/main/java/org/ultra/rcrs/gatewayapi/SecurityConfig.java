@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -16,6 +17,9 @@ import org.springframework.security.oauth2.server.resource.web.access.server.Bea
 import org.springframework.security.oauth2.server.resource.web.server.BearerTokenServerAuthenticationEntryPoint;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.context.NoOpServerSecurityContextRepository;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.reactive.CorsWebFilter;
+import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +29,24 @@ import java.util.stream.Stream;
 @EnableWebFluxSecurity
 @ConditionalOnProperty(prefix = "spring.security", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class SecurityConfig {
+
+    //TODO:доработать
+    @Bean
+    public CorsWebFilter corsWebFilter() {
+        CorsConfiguration config = new CorsConfiguration();
+
+        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedMethods(List.of("*"));
+        config.setAllowedHeaders(List.of("*"));
+        config.setAllowCredentials(true);
+
+        UrlBasedCorsConfigurationSource source =
+                new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration("/**", config);
+
+        return new CorsWebFilter(source);
+    }
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -45,7 +67,9 @@ public class SecurityConfig {
                         .pathMatchers("/api/search/swagger-ui/**", "/api/search/v3/api-docs/**").permitAll()
                         .pathMatchers("/workflow/swagger-ui/**", "/workflow/v3/api-docs/**").permitAll()
                         .pathMatchers("/api/catalog/swagger-ui/**", "/api/catalog/v3/api-docs/**").permitAll()
+                        .pathMatchers("/playlists/swagger-ui/**", "/playlists/v3/api-docs/**").permitAll()
                         .pathMatchers("/actuator/**").permitAll()
+                        .pathMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -61,7 +85,7 @@ public class SecurityConfig {
         delegate.setJwtGrantedAuthoritiesConverter(jwt -> {
             JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
             var authorities = grantedAuthoritiesConverter.convert(jwt);
-            var roles = Optional.ofNullable(jwt.getClaimAsStringList("rcrs_roles"))
+            var roles = Optional.ofNullable(jwt.getClaimAsStringList("rcrs-roles"))
                     .orElse(List.of());
 
             return Stream.concat(authorities.stream(),

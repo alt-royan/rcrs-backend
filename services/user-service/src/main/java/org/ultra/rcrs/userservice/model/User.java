@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.Instant;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -16,23 +15,14 @@ import java.util.UUID;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
-
-    @Column(name = "keycloak_id", nullable = false, unique = true)
-    private String keycloakId;
+    @Column(name = "user_id", nullable = false, unique = true)
+    private String userId;
 
     @Column(name = "username", nullable = false)
     private String username;
 
     @Column(name = "email")
     private String email;
-
-    @Column(name = "first_name")
-    private String firstName;
-
-    @Column(name = "last_name")
-    private String lastName;
 
     @Column(name = "enabled", nullable = false)
     private boolean enabled;

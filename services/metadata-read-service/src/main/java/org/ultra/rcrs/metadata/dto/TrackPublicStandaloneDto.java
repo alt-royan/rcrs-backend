@@ -21,7 +21,18 @@ public class TrackPublicStandaloneDto {
     private Integer durationMs;
     private Integer trackNumber;
     private Boolean explicit;
+    private AlbumEmbed album;
     private List<ArtistEmbed> artists;
+
+    @Data
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    public static class AlbumEmbed {
+        private String id;
+        private String title;
+        private String coverUrl;
+    }
 
     @Data
     @AllArgsConstructor

@@ -5,14 +5,13 @@ import org.springframework.stereotype.Repository;
 import org.ultra.rcrs.userservice.model.User;
 
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, UUID> {
+public interface UserRepository extends JpaRepository<User, String> {
 
-    Optional<User> findByKeycloakId(String keycloakId);
+    Optional<User> findByUserId(String userId);
 
     Optional<User> findByUsername(String username);
 
-    boolean existsByKeycloakId(String keycloakId);
+    boolean existsByUserId(String userId);
 }

@@ -107,30 +107,24 @@ public abstract class BaseIntegrationTest {
         kafkaTemplate.send(Topics.IDENTITY_EVENTS_TOPIC, userId, json).get();
     }
 
-    protected void sendRegisterEvent(String keycloakId, String username, String email,
-                                     String firstName, String lastName) throws Exception {
-        sendKeycloakEvent(UUID.randomUUID().toString(), "REGISTER", keycloakId, Map.of(
+    protected void sendRegisterEvent(String userId, String username, String email) throws Exception {
+        sendKeycloakEvent(UUID.randomUUID().toString(), "REGISTER", userId, Map.of(
                 "preferred_username", username,
                 "email", email,
-                "first_name", firstName,
-                "last_name", lastName,
                 "email_verified", "true"
         ));
     }
 
-    protected void sendUpdateProfileEvent(String keycloakId, String username, String email,
-                                          String firstName, String lastName) throws Exception {
-        sendKeycloakEvent(UUID.randomUUID().toString(), "UPDATE_PROFILE", keycloakId, Map.of(
+    protected void sendUpdateProfileEvent(String userId, String username, String email) throws Exception {
+        sendKeycloakEvent(UUID.randomUUID().toString(), "UPDATE_PROFILE", userId, Map.of(
                 "preferred_username", username,
                 "email", email,
-                "first_name", firstName,
-                "last_name", lastName,
                 "email_verified", "true"
         ));
     }
 
-    protected void sendDeleteAccountEvent(String keycloakId) throws Exception {
-        sendKeycloakEvent(UUID.randomUUID().toString(), "DELETE_ACCOUNT", keycloakId, Map.of());
+    protected void sendDeleteAccountEvent(String userId) throws Exception {
+        sendKeycloakEvent(UUID.randomUUID().toString(), "DELETE_ACCOUNT", userId, Map.of());
     }
 
     protected void waitForProcessing() throws Exception {

@@ -12,11 +12,9 @@ import org.ultra.rcrs.mediaservice.dao.model.AudioUpload;
 import org.ultra.rcrs.mediaservice.dao.model.AudioWithTrack;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioRepository;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioUploadRepository;
-import org.ultra.rcrs.mediaservice.dto.AudioItem;
-import org.ultra.rcrs.mediaservice.dto.FileStatusResponse;
-import org.ultra.rcrs.mediaservice.dto.PreloadFileRequest;
-import org.ultra.rcrs.mediaservice.dto.S3PresignUrlResponse;
+import org.ultra.rcrs.mediaservice.dto.*;
 import org.ultra.rcrs.mediaservice.utils.Hash;
+import org.ultra.rcrs.utils.S3Utils;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.ServerSideEncryption;
@@ -42,6 +40,7 @@ public class AudioService {
     private final AudioRepository audioRepository;
     private final S3Presigner s3Presigner;
     private final UploadConfigurationProperties uploadProperties;
+    private final S3Utils s3Utils;
 
     @Transactional
     public S3PresignUrlResponse getPreSignUrl(PreloadFileRequest request) {
@@ -101,12 +100,18 @@ public class AudioService {
                 .toList();
     }
 
-    public Map<UUID, List<AudioItem>> getAudiosByTrackId(String trackId) {
+    public Map<UUID, AudioItemGroupBy> getAudiosByTrackId(String trackId) {
         List<AudioWithTrack> audios = audioRepository.findAllByTrackId(trackId);
         return audios.stream()
-                .map(a -> new AudioItem(a.getId(), a.getGuid(), a.getKey(), a.getCodec(), a.getContainer(),
-                        a.getDurationMs(), a.getBitrate(), a.getSampleRate(), a.getByteSize(), a.getMain()))
-                .collect(Collectors.groupingBy(AudioItem::getGuid));
+                .map(a -> new AudioItem(a.id(), a.guid(), s3Utils.parseUrl(a.key()), a.codec(), a.container(),
+                        a.durationMs(), a.bitrate(), a.sampleRate(), a.byteSize(), a.main()))
+                .collect(Collectors.groupingBy(
+                        AudioItem::getGuid,
+                        Collectors.collectingAndThen(
+                                Collectors.toList(),
+                                items -> new AudioItemGroupBy(items.getFirst().getGuid(), items.getFirst().getMain(), items)
+                        )
+                ));
     }
 
 }

@@ -29,14 +29,6 @@ public class ActivityFactory {
         return instance;
     }
 
-    public ValidateActivity validateActivity() {
-        return Workflow.newActivityStub(ValidateActivity.class, buildOptions("validate"));
-    }
-
-    public ThumbnailActivity thumbnailActivity() {
-        return Workflow.newActivityStub(ThumbnailActivity.class, buildOptions("thumbnail"));
-    }
-
     public ProbeAudioMetadataActivity probeAudioMetadataActivity() {
         return Workflow.newActivityStub(ProbeAudioMetadataActivity.class, buildOptions("probeAudioMetadata"));
     }

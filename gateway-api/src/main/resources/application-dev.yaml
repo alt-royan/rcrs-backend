@@ -9,7 +9,8 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${OAUTH2_ISSUER_URI}
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI}
+          jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI}
   cloud:
     gateway:
       server:
@@ -80,7 +81,8 @@ eureka:
 
 logging:
   level:
-    root: info
+    org.springframework.security: TRACE
+    org.springframework.security.oauth2.server.resource: TRACE
 
 management:
   endpoints:

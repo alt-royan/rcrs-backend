@@ -3,6 +3,7 @@ package org.ultra.rcrs.mediaservice.temporal.activity.impl;
 import io.temporal.spring.boot.ActivityImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.mediaservice.config.MediaConfigurationProperties;
 import org.ultra.rcrs.mediaservice.temporal.activity.S3Activity;
@@ -15,6 +16,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 
@@ -26,19 +28,6 @@ public class S3ActivityImpl implements S3Activity {
 
     private final S3Client s3Client;
     private final MediaConfigurationProperties properties;
-
-    @Override
-    public String putImage(String key, byte[] body, String contentType) {
-        String imageBucket = properties.getImage().getBucket().getName();
-        s3Client.putObject(PutObjectRequest.builder()
-                        .bucket(imageBucket)
-                        .key(key)
-                        .contentType(contentType)
-                        .build(),
-                RequestBody.fromBytes(body));
-        log.info("Put image to S3: bucket [{}], key [{}]", imageBucket, key);
-        return String.format("s3://%s/%s", imageBucket, key);
-    }
 
     @Override
     public void putAudio(String key, File file, Long contentLength, String contentType) throws IOException {
@@ -53,6 +42,25 @@ public class S3ActivityImpl implements S3Activity {
         }
 
         log.info("Put audio to S3: bucket [{}], key [{}]", audioBucket, key);
+    }
+
+    @Override
+    public void putDownload(String key, File file, Long contentLength, String contentType, String fileName) throws IOException {
+        String downloadBucket = properties.getDownload().getBucket().getName();
+        String contentDisposition = ContentDisposition.attachment()
+                .filename(fileName, StandardCharsets.UTF_8)
+                .build().toString();
+        try (InputStream is = new FileInputStream(file)) {
+            s3Client.putObject(PutObjectRequest.builder()
+                            .bucket(downloadBucket)
+                            .key(key)
+                            .contentType(contentType)
+                            .contentDisposition(contentDisposition)
+                            .build(),
+                    RequestBody.fromInputStream(is, contentLength));
+        }
+
+        log.info("Put download file to S3: bucket [{}], key [{}]", downloadBucket, key);
     }
 
     @Override

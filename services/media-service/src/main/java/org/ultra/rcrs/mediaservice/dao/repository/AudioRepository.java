@@ -7,15 +7,18 @@ import org.ultra.rcrs.mediaservice.dao.model.Audio;
 import org.ultra.rcrs.mediaservice.dao.model.AudioWithTrack;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface AudioRepository extends JpaRepository<Audio, UUID> {
 
-    @Query("SELECT a.id, a.guid, a.key, a.codec, a.container, a.durationMs, a.bitrate, a.sampleRate, a.byteSize, t.main " +
+    @Query("SELECT a.id, a.guid, a.key, a.codec, a.container, a.durationMs, a.bitrate, a.sampleRate, a.byteSize, a.creationTimestamp, t.trackId, t.main " +
             "FROM Audio a JOIN TrackToAudio t ON a.guid = t.guid " +
             "WHERE t.trackId = :trackId")
     List<AudioWithTrack> findAllByTrackId(String trackId);
 
     List<Audio> findAllByGuid(UUID guid);
+
+    Optional<Audio> findByGuidAndBitrate(UUID guid, String bitrate);
 }

@@ -10,22 +10,42 @@ spring:
     name: workflow-service
   cloud:
     openfeign:
+      oauth2:
+        enabled: true
       client:
         config:
           default:
             connectTimeout: 5000
             readTimeout: 5000
   kafka:
-    bootstrap-servers: localhost:9092
+    bootstrap-servers: 192.168.1.3:29092
   security:
     enabled: true
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://localhost:8180/realms/rcrs
+          issuer-uri: http://192.168.1.3:8180/realms/master
+          jwk-set-uri: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
+      client:
+        provider:
+          metadata-write-service:
+            issuer-uri: http://192.168.1.3:8180/realms/master
+            user-name-attribute: preferred_username
+          media-service:
+            issuer-uri: http://192.168.1.3:8180/realms/master
+            user-name-attribute: preferred_username
+        registration:
+          metadata-write-service:
+            client-id: workflow-client
+            client-secret: 35Br8un5yvUJ8atsjZBlLMpsb0Ust9az
+            authorization-grant-type: client_credentials
+          media-service:
+            client-id: workflow-client
+            client-secret: 35Br8un5yvUJ8atsjZBlLMpsb0Ust9az
+            authorization-grant-type: client_credentials
   temporal:
     connection:
-      target: 127.0.0.1:7233
+      target: 192.168.1.3:7233
     workflow:
 
     workers:

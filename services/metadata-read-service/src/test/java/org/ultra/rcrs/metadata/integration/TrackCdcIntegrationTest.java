@@ -97,7 +97,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @Order(7)
-    void trackAddedToAlbum_setsAlbumEmbedAndIncrementsTotalTracks() throws Exception {
+    void trackAddedToAlbum_setsAlbumEmbedAndAlbumTotalsAreComputed() throws Exception {
         String trackId = randomId();
         String albumId = randomId();
 
@@ -113,9 +113,15 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         assertThat(trackDoc.getAlbum().getId()).isEqualTo(albumId);
         assertThat(trackDoc.getAlbum().getTitle()).isEqualTo("Album For Track");
 
-        var albumDoc = albumRepository.findById(albumId).block();
-        assertThat(albumDoc).isNotNull();
-        assertThat(albumDoc.getTotalTracks()).isEqualTo(1);
+        sendTrackUpdatedDuration(trackId, 180000);
+
+        webTestClient.get()
+                .uri("/admin/albums/{id}", albumId)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.totalTracks").isEqualTo(1)
+                .jsonPath("$.totalDurationMs").isEqualTo(180000);
     }
 
     @Test
@@ -318,5 +324,21 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         var ids = doc.getOthers().stream()
                 .map(TrackDocument.OtherArtistEmbed::getId).toList();
         assertThat(ids).containsExactlyInAnyOrder(other1Id, other2Id);
+    }
+
+    @Test
+    @Order(19)
+    void trackUpdated_setsDurationAndLeavesAbsentFieldsUntouched() throws Exception {
+        String id = randomId();
+        sendTrackCreated(id, "Duration Track");
+
+        sendTrackUpdatedDuration(id, 214000);
+
+        var doc = trackRepository.findById(id).block();
+        assertThat(doc).isNotNull();
+        assertThat(doc.getDurationMs()).isEqualTo(214000);
+        assertThat(doc.getTitle()).isEqualTo("Duration Track");
+        assertThat(doc.getTrackNumber()).isEqualTo(1);
+        assertThat(doc.getExplicit()).isFalse();
     }
 }
