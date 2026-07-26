@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.ConditionalOperators;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.stereotype.Repository;
+import org.ultra.rcrs.metadata.model.TrackDocument;
 import reactor.core.publisher.Mono;
 
 import java.util.Collection;
@@ -53,7 +54,8 @@ public class AlbumTotalsRepository {
             return Mono.just(Map.of());
         }
 
-        Aggregation aggregation = Aggregation.newAggregation(
+        // typed aggregation so "album.id" is mapped to the stored field name ("album._id")
+        Aggregation aggregation = Aggregation.newAggregation(TrackDocument.class,
                 Aggregation.match(criteria),
                 Aggregation.group("album.id")
                         .count().as("totalTracks")
