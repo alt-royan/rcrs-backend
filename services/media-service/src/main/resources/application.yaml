@@ -111,6 +111,7 @@ media:
     bucket:
       name: rcrs-audio
       public-url: http://audio.localhost:4566
+    signature-duration: 6h
     validation:
       formats: mp3, wav, ogg, flac
       duration:

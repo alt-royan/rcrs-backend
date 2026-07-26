@@ -11,6 +11,7 @@ import java.util.List;
 public class AudioConfigurationProperties {
 
     private BucketProperties bucket;
+    private Duration signatureDuration;
     private Validation validation;
     private Loudnorm loudnorm;
     private List<String> bitrates;

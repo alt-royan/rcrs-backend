@@ -111,6 +111,7 @@ media:
     bucket:
       name: ${AUDIO_BUCKET_NAME}
       public-url: ${AUDIO_BUCKET_PUBLIC_URL}
+    signature-duration: ${AUDIO_SIGNATURE_DURATION}
     validation:
       formats: ${AUDIO_VALIDATION_FORMATS}
       duration:
