@@ -99,8 +99,6 @@ public abstract class BaseIntegrationTest {
                 .availabilityStatus(availability)
                 .releaseDate(LocalDateTime.of(2025, 1, 15, 0, 0))
                 .year(2025)
-                .totalTracks(10)
-                .totalDurationMs(300000)
                 .coverS3Key("covers/" + title.toLowerCase().replace(" ", "-") + ".jpg")
                 .explicit(false)
                 .artists(List.of())
@@ -119,8 +117,6 @@ public abstract class BaseIntegrationTest {
                 .availabilityStatus(availability)
                 .releaseDate(LocalDateTime.of(2025, 1, 15, 0, 0))
                 .year(2025)
-                .totalTracks(10)
-                .totalDurationMs(300000)
                 .coverS3Key("covers/" + title.toLowerCase().replace(" ", "-") + ".jpg")
                 .explicit(false)
                 .artists(List.of(AlbumDocument.ArtistEmbed.builder()
@@ -331,6 +327,15 @@ public abstract class BaseIntegrationTest {
                 .setLifecycleStatus(LifecycleStatusOuterClass.LifecycleStatus.valueOf(status.name()))
                 .build();
         sendEvent(DomainEventOuterClass.EventType.TRACK_LIFECYCLE_STATUS_UPDATED,
+                DomainEventOuterClass.AggregateType.TRACK, id, event);
+    }
+
+    protected void sendTrackUpdatedDuration(String id, int durationMs) throws Exception {
+        var event = TrackUpdatedEventOuterClass.TrackUpdatedEvent.newBuilder()
+                .setId(id)
+                .setDurationMs(durationMs)
+                .build();
+        sendEvent(DomainEventOuterClass.EventType.TRACK_UPDATED,
                 DomainEventOuterClass.AggregateType.TRACK, id, event);
     }
 

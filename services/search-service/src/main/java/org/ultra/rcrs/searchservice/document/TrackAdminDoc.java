@@ -20,6 +20,9 @@ public class TrackAdminDoc implements TrackDoc {
     @Field(type = FieldType.Text)
     private String title;
 
+    @Field(type = FieldType.Integer)
+    private Integer durationMs;
+
     @Field(type = FieldType.Nested)
     private List<NestedArtist> artists;
 

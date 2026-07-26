@@ -29,8 +29,6 @@ public class AlbumDocument {
     private AlbumType type;
     private LocalDateTime releaseDate;
     private Integer year;
-    private Integer totalTracks;
-    private Integer totalDurationMs;
     private String coverS3Key;
     private Boolean explicit;
     private List<ArtistEmbed> artists;

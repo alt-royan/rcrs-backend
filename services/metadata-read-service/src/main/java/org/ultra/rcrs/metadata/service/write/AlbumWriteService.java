@@ -37,8 +37,6 @@ public class AlbumWriteService {
                 .type(org.ultra.rcrs.enums.AlbumType.valueOf(event.getType().name()))
                 .releaseDate(releaseDate)
                 .year(releaseDate.getYear())
-                .totalTracks(0)
-                .totalDurationMs(0)
                 .coverS3Key(event.getCoverS3Key())
                 .availabilityStatus(EntityStatus.valueOf(event.getAvailabilityStatus().name()))
                 .lifecycleStatus(LifecycleStatus.valueOf(event.getLifecycleStatus().name()))

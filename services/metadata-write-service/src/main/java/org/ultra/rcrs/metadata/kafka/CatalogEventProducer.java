@@ -452,6 +452,42 @@ public class CatalogEventProducer extends ProtobufEventProducer {
         sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
     }
 
+    /**
+     * Partial track update — only non-null arguments are put on the event, consumers
+     * leave the absent fields untouched.
+     */
+    public void trackUpdated(UUID trackId, String title, Integer durationMs, Integer trackNumber, Boolean explicit) {
+        String stringId = Url62.encode(trackId);
+        var eventBuilder = TrackUpdatedEventOuterClass.TrackUpdatedEvent.newBuilder()
+                .setId(stringId);
+
+        if (title != null) {
+            eventBuilder.setTitle(title);
+        }
+        if (durationMs != null) {
+            eventBuilder.setDurationMs(durationMs);
+        }
+        if (trackNumber != null) {
+            eventBuilder.setTrackNumber(trackNumber);
+        }
+        if (explicit != null) {
+            eventBuilder.setExplicit(explicit);
+        }
+
+        var now = Instant.now();
+        var domainEvent = DomainEventOuterClass.DomainEvent.newBuilder()
+                .setEventId(UUID.randomUUID().toString())
+                .setEventType(DomainEventOuterClass.EventType.TRACK_UPDATED)
+                .setAggregateType(DomainEventOuterClass.AggregateType.TRACK)
+                .setAggregateId(stringId)
+                .setOccurredAt(Timestamp.newBuilder().setSeconds(now.getEpochSecond()).setNanos(now.getNano()))
+                .setProducer(serviceName)
+                .setPayload(Any.pack(eventBuilder.build()))
+                .build();
+        sendEvent(domainEvent, Topics.CATALOG_CDC_TOPIC);
+        sendEvent(domainEvent, Topics.SEARCH_INDEX_TOPIC);
+    }
+
     public void artistActivated(UUID artistId) {
         String stringId = Url62.encode(artistId);
         var event = ArtistActivatedEventOuterClass.ArtistActivatedEvent.newBuilder()

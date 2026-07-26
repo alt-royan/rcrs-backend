@@ -16,25 +16,32 @@ import org.ultra.rcrs.metadata.dto.AlbumAdminViewDto;
 import org.ultra.rcrs.metadata.dto.PaginationResponse;
 import org.ultra.rcrs.metadata.model.AlbumDocument;
 import org.ultra.rcrs.metadata.repository.AlbumDocumentRepository;
+import org.ultra.rcrs.metadata.repository.AlbumTotalsRepository;
+import org.ultra.rcrs.metadata.repository.AlbumTotalsRepository.AlbumTotals;
 import org.ultra.rcrs.utils.S3Utils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
+
+import static org.ultra.rcrs.metadata.repository.AlbumTotalsRepository.totalsOf;
 
 @Service
 @RequiredArgsConstructor
 public class AlbumAdminService {
 
     private final AlbumDocumentRepository albumDocumentRepository;
+    private final AlbumTotalsRepository albumTotalsRepository;
     private final ReactiveMongoTemplate mongoTemplate;
     private final S3Utils s3Utils;
 
     public Mono<AlbumAdminViewDto> getById(String id) {
         return albumDocumentRepository.findByIdForAdmin(id)
                 .switchIfEmpty(Mono.error(new NotFoundException("Album", id)))
-                .map(this::toDto);
+                .flatMap(doc -> albumTotalsRepository.findTotalsForAdmin(List.of(doc.getId()))
+                        .map(totals -> toDto(doc, totalsOf(totals, doc.getId()))));
     }
 
     public Flux<AlbumAdminStandaloneDto> getAllByArtistId(String artistId, AlbumType albumType, String sortDirection) {
@@ -45,7 +52,8 @@ public class AlbumAdminService {
         }
         query.with(sort);
         return mongoTemplate.find(query, AlbumDocument.class, "albums")
-                .map(this::toStandaloneDto);
+                .collectList()
+                .flatMapMany(this::toStandaloneDtos);
     }
 
     public Mono<PaginationResponse<AlbumAdminStandaloneDto>> getAll(EntityStatus availabilityStatus,
@@ -60,7 +68,8 @@ public class AlbumAdminService {
         Query page = Query.of(filter).with(sort).skip(offset).limit(limit);
 
         Mono<List<AlbumAdminStandaloneDto>> items = mongoTemplate.find(page, AlbumDocument.class, "albums")
-                .map(this::toStandaloneDto)
+                .collectList()
+                .flatMapMany(this::toStandaloneDtos)
                 .collectList();
         Mono<Long> totalCount = mongoTemplate.count(filter, AlbumDocument.class, "albums");
 
@@ -90,7 +99,14 @@ public class AlbumAdminService {
         return query;
     }
 
-    private AlbumAdminViewDto toDto(AlbumDocument doc) {
+    private Flux<AlbumAdminStandaloneDto> toStandaloneDtos(List<AlbumDocument> docs) {
+        List<String> ids = docs.stream().map(AlbumDocument::getId).toList();
+        return albumTotalsRepository.findTotalsForAdmin(ids)
+                .flatMapMany(totals -> Flux.fromIterable(docs)
+                        .map(doc -> toStandaloneDto(doc, totalsOf(totals, doc.getId()))));
+    }
+
+    private AlbumAdminViewDto toDto(AlbumDocument doc, AlbumTotals totals) {
         return AlbumAdminViewDto.builder()
                 .id(doc.getId())
                 .lifecycleStatus(doc.getLifecycleStatus())
@@ -99,8 +115,8 @@ public class AlbumAdminService {
                 .type(doc.getType())
                 .releaseDate(doc.getReleaseDate())
                 .year(doc.getYear())
-                .totalTracks(doc.getTotalTracks())
-                .totalDurationMs(doc.getTotalDurationMs())
+                .totalTracks(totals.totalTracks())
+                .totalDurationMs(totals.totalDurationMs())
                 .coverUrl(s3Utils.parseUrl(doc.getCoverS3Key()))
                 .explicit(doc.getExplicit())
                 .artists(doc.getArtists() != null
@@ -114,7 +130,7 @@ public class AlbumAdminService {
                 .build();
     }
 
-    private AlbumAdminStandaloneDto toStandaloneDto(AlbumDocument doc) {
+    private AlbumAdminStandaloneDto toStandaloneDto(AlbumDocument doc, AlbumTotals totals) {
         return AlbumAdminStandaloneDto.builder()
                 .id(doc.getId())
                 .lifecycleStatus(doc.getLifecycleStatus())
@@ -123,8 +139,8 @@ public class AlbumAdminService {
                 .type(doc.getType())
                 .releaseDate(doc.getReleaseDate())
                 .year(doc.getYear())
-                .totalTracks(doc.getTotalTracks())
-                .totalDurationMs(doc.getTotalDurationMs())
+                .totalTracks(totals.totalTracks())
+                .totalDurationMs(totals.totalDurationMs())
                 .coverUrl(s3Utils.parseUrl(doc.getCoverS3Key()))
                 .explicit(doc.getExplicit())
                 .artists(doc.getArtists() != null

@@ -52,6 +52,35 @@ public class TrackIndexService {
         log.info("Track lifecycle updated: id={}, lifecycle={}", event.getId(), newLifecycle);
     }
 
+    /**
+     * Applies a partial track update to both indexes: fields absent from the event are left as they are.
+     */
+    public void handleTrackUpdated(TrackUpdatedEventOuterClass.TrackUpdatedEvent event) {
+        TrackAdminDoc adminDoc = trackIndexRepository.get(event.getId(), TrackAdminDoc.class);
+        if (adminDoc != null) {
+            if (event.hasTitle()) {
+                adminDoc.setTitle(event.getTitle());
+            }
+            if (event.hasDurationMs()) {
+                adminDoc.setDurationMs(event.getDurationMs());
+            }
+            trackIndexRepository.index(adminDoc);
+        }
+
+        TrackPublicDoc publicDoc = trackIndexRepository.get(event.getId(), TrackPublicDoc.class);
+        if (publicDoc != null) {
+            if (event.hasTitle()) {
+                publicDoc.setTitle(event.getTitle());
+            }
+            if (event.hasDurationMs()) {
+                publicDoc.setDurationMs(event.getDurationMs());
+            }
+            trackIndexRepository.index(publicDoc);
+        }
+
+        log.info("Track updated: id={}", event.getId());
+    }
+
     public void handleArtistAddedToTrack(ArtistAddedToTrackEventOuterClass.ArtistAddedToTrackEvent event) {
         TrackAdminDoc adminDoc = trackIndexRepository.get(event.getTrackId(), TrackAdminDoc.class);
         if (adminDoc == null) return;
@@ -281,6 +310,7 @@ public class TrackIndexService {
         TrackPublicDoc publicDoc = new TrackPublicDoc();
         publicDoc.setId(adminDoc.getId());
         publicDoc.setTitle(adminDoc.getTitle());
+        publicDoc.setDurationMs(adminDoc.getDurationMs());
         publicDoc.setAvailability(adminDoc.getAvailability());
         publicDoc.setLifecycleStatus(adminDoc.getLifecycleStatus());
         publicDoc.setArtists(adminDoc.getArtists());
