@@ -31,7 +31,7 @@ public class S3ActivityImpl implements S3Activity {
 
     @Override
     public void putAudio(String key, File file, Long contentLength, String contentType) throws IOException {
-        String audioBucket = properties.getAudio().getBucket().getName();
+        String audioBucket = properties.getStream().getBucket().getName();
         try (InputStream is = new FileInputStream(file)) {
             s3Client.putObject(PutObjectRequest.builder()
                             .bucket(audioBucket)

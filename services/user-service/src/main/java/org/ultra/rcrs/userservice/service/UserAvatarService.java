@@ -1,9 +1,9 @@
 package org.ultra.rcrs.userservice.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.userservice.dto.UserProfileResponse;
 import org.ultra.rcrs.userservice.model.User;
 import org.ultra.rcrs.userservice.model.UserAvatar;
@@ -22,7 +22,7 @@ public class UserAvatarService {
     @Transactional
     public void saveAvatar(String username, String avatarUri) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("User not found for username: " + username));
+                .orElseThrow(() -> new NotFoundException("User not found for username: " + username));
 
         String avatarKey = s3Utils.parseKey(avatarUri);
 

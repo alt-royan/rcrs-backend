@@ -36,7 +36,12 @@ public class ImageValidator {
         }
 
         String format = contentType.split("/")[1];
-        byte[] imageData = Base64.getMimeDecoder().decode(dataUrl.substring(contentStartIndex));
+        byte[] imageData;
+        try {
+            imageData = Base64.getMimeDecoder().decode(dataUrl.substring(contentStartIndex));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException("Image payload is not valid base64", e);
+        }
 
         BufferedImage originalImage;
         try {

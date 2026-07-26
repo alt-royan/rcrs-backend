@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.ultra.rcrs.mediaservice.dto.PresignedUrlResponse;
+import org.ultra.rcrs.mediaservice.enums.Quality;
 import org.ultra.rcrs.mediaservice.service.StreamingService;
 
 @RestController
@@ -18,8 +19,8 @@ public class StreamingController {
 
     @PostMapping(value = "/stream", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<PresignedUrlResponse> streamTrack(@RequestParam("trackId") String trackId,
-                                                            @RequestParam("bitrate") String bitrate) {
-        return ResponseEntity.ok(streamingService.streamTrack(trackId, bitrate));
+                                                            @RequestParam("quality") Quality quality) {
+        return ResponseEntity.ok(streamingService.streamTrack(trackId, quality));
     }
 
 }

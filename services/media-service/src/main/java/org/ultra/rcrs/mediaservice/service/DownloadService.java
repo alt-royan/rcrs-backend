@@ -5,13 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ContentDisposition;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.exceptions.NotFoundException;
-import org.ultra.rcrs.mediaservice.config.DownloadConfigurationProperties;
 import org.ultra.rcrs.mediaservice.config.MediaConfigurationProperties;
 import org.ultra.rcrs.mediaservice.dao.model.Audio;
-import org.ultra.rcrs.mediaservice.dao.model.DownloadFile;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioRepository;
-import org.ultra.rcrs.mediaservice.dao.repository.DownloadFileRepository;
+import org.ultra.rcrs.mediaservice.dao.repository.TrackToAudioRepository;
 import org.ultra.rcrs.mediaservice.dto.PresignedUrlResponse;
+import org.ultra.rcrs.mediaservice.enums.Quality;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
@@ -25,48 +24,68 @@ import java.util.UUID;
 @Service
 public class DownloadService {
 
-    private final DownloadFileRepository downloadFileRepository;
+    private static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
+
     private final AudioRepository audioRepository;
+    private final TrackToAudioRepository trackToAudioRepository;
     private final S3Presigner s3Presigner;
     private final MediaConfigurationProperties properties;
 
     public PresignedUrlResponse getByAudioId(UUID audioId) {
         Audio audio = audioRepository.findById(audioId)
                 .orElseThrow(() -> new NotFoundException("Audio", audioId));
-        DownloadFile downloadFile = downloadFileRepository.findByGuid(audio.getGuid())
-                .orElseThrow(() -> new NotFoundException("Download file for audio " + audioId + " not found"));
-        return presign(downloadFile);
+        return presign(audio);
     }
 
-    public PresignedUrlResponse getByTrackId(String trackId) {
-        DownloadFile downloadFile = downloadFileRepository.findByTrackId(trackId)
-                .orElseThrow(() -> new NotFoundException("Download file for track " + trackId + " not found"));
-        return presign(downloadFile);
+    public PresignedUrlResponse getByTrackId(String trackId, Quality quality) {
+        String bitrate = switch (quality) {
+            case LOW -> "128k";
+            case MID -> "192k";
+            case HIGH -> "320k";
+        };
+        UUID mainGuid = trackToAudioRepository.findByTrackIdAndMain(trackId, true)
+                .orElseThrow(() -> new NotFoundException("Main audio for track " + trackId + " not found"))
+                .getGuid();
+
+        Audio audio = audioRepository.findByGuidAndBitrate(mainGuid, bitrate)
+                .orElseThrow(() -> new NotFoundException(
+                        "Audio with bitrate " + bitrate + " for track " + trackId + " not found"));
+        return presign(audio);
     }
 
-    private PresignedUrlResponse presign(DownloadFile downloadFile) {
-        DownloadConfigurationProperties downloadProperties = properties.getDownload();
-
+    private PresignedUrlResponse presign(Audio audio) {
         String contentDisposition = ContentDisposition.attachment()
-                .filename(downloadFile.getFileName(), StandardCharsets.UTF_8)
                 .build().toString();
 
         GetObjectRequest objectRequest = GetObjectRequest.builder()
-                .bucket(downloadProperties.getBucket().getName())
-                .key(downloadFile.getKey())
+                .bucket(properties.getDownload().getBucket().getName())
+                .key(audio.getKey())
                 .responseContentDisposition(contentDisposition)
-                .responseContentType(downloadFile.getContentType())
+                .responseContentType(contentType(audio.getContainer()))
                 .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-                .signatureDuration(downloadProperties.getSignatureDuration())
+                .signatureDuration(properties.getDownload().getSignatureDuration())
                 .getObjectRequest(objectRequest)
                 .build();
 
         PresignedGetObjectRequest presignedRequest = s3Presigner.presignGetObject(presignRequest);
 
-        log.info("Presigned download URL for key [{}] expires at [{}]", downloadFile.getKey(), presignedRequest.expiration());
+        log.info("Presigned streaming URL for key [{}] expires at [{}]", audio.getKey(), presignedRequest.expiration());
 
         return new PresignedUrlResponse(presignedRequest.url().toExternalForm());
+    }
+
+    private static String contentType(String container) {
+        if (container == null) {
+            return DEFAULT_CONTENT_TYPE;
+        }
+        return switch (container.toLowerCase()) {
+            case "ogg" -> "audio/ogg";
+            case "mp3" -> "audio/mpeg";
+            case "wav" -> "audio/wav";
+            case "flac" -> "audio/flac";
+            default -> DEFAULT_CONTENT_TYPE;
+        };
     }
 }

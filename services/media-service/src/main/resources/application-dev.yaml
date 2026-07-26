@@ -107,7 +107,7 @@ spring:
         path-style-access-enabled: true
 
 media:
-  audio:
+  stream:
     bucket:
       name: ${AUDIO_BUCKET_NAME}
       public-url: ${AUDIO_BUCKET_PUBLIC_URL}
@@ -122,6 +122,7 @@ media:
     rate: ${AUDIO_RATE}
     format: ${AUDIO_FORMAT}
     loudnorm:
+      enabled: ${AUDIO_LOUDNORM_ENABLED}
       I: ${AUDIO_LOUDNORM_I}
       LRA: ${AUDIO_LOUDNORM_LRA}
       TP: ${AUDIO_LOUDNORM_TP}

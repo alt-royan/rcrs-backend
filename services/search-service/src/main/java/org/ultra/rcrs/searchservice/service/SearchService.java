@@ -69,7 +69,7 @@ public class SearchService {
             }
             return searchCollection;
         } catch (URISyntaxException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException("Unable to build the next page link", e);
         }
     }
 

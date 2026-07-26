@@ -2,6 +2,7 @@ package org.ultra.rcrs.utils;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
+import org.ultra.rcrs.exceptions.BadRequestException;
 
 import java.net.URI;
 import java.util.regex.Pattern;
@@ -16,7 +17,7 @@ public class S3Utils {
             return null;
         }
         if (!Pattern.matches("s3://[\\w\\-]+/[\\w\\-.]+", uri)) {
-            throw new IllegalArgumentException("URI must be s3://{bucket}/{key} formatted");
+            throw new BadRequestException("URI must be s3://{bucket}/{key} formatted");
         }
         String imageKey = URI.create(uri).getPath();
         if (imageKey.startsWith("/")) imageKey = imageKey.substring(1);

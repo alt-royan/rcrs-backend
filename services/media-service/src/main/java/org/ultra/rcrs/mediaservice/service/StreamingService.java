@@ -9,6 +9,7 @@ import org.ultra.rcrs.mediaservice.dao.model.Audio;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioRepository;
 import org.ultra.rcrs.mediaservice.dao.repository.TrackToAudioRepository;
 import org.ultra.rcrs.mediaservice.dto.PresignedUrlResponse;
+import org.ultra.rcrs.mediaservice.enums.Quality;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
@@ -28,7 +29,12 @@ public class StreamingService {
     private final AudioConfigurationProperties audioProperties;
     private final S3Presigner s3Presigner;
 
-    public PresignedUrlResponse streamTrack(String trackId, String bitrate) {
+    public PresignedUrlResponse streamTrack(String trackId, Quality quality) {
+        String bitrate = switch (quality) {
+            case LOW -> "128k";
+            case MID -> "192k";
+            case HIGH -> "320k";
+        };
         UUID mainGuid = trackToAudioRepository.findByTrackIdAndMain(trackId, true)
                 .orElseThrow(() -> new NotFoundException("Main audio for track " + trackId + " not found"))
                 .getGuid();

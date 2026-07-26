@@ -3,9 +3,24 @@ package org.ultra.rcrs.workflow.activity;
 import io.temporal.activity.ActivityOptions;
 import io.temporal.common.RetryOptions;
 import io.temporal.workflow.Workflow;
+import org.ultra.rcrs.exceptions.BadRequestException;
+import org.ultra.rcrs.exceptions.ConflictException;
+import org.ultra.rcrs.exceptions.DecodeFromBase62Exception;
+import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.workflow.config.TemporalProperties;
 
 public class ActivityFactory {
+
+    /**
+     * Client errors reported by the downstream services never succeed on a retry — failing fast
+     * lets the caller get the corresponding 4xx instead of waiting out the whole retry budget.
+     */
+    private static final String[] NON_RETRYABLE_FAILURES = {
+            NotFoundException.class.getName(),
+            BadRequestException.class.getName(),
+            ConflictException.class.getName(),
+            DecodeFromBase62Exception.class.getName()
+    };
 
     private static ActivityFactory instance;
 
@@ -67,6 +82,7 @@ public class ActivityFactory {
                 .setBackoffCoefficient(config.backoffCoefficient())
                 .setMaximumInterval(config.maximumInterval())
                 .setMaximumAttempts(config.maximumAttempts())
+                .setDoNotRetry(NON_RETRYABLE_FAILURES)
                 .build();
     }
 }

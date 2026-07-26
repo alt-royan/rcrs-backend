@@ -1,40 +1,33 @@
-package org.ultra.rcrs.mediaservice.controller;
-
+package org.ultra.rcrs.searchservice.controller;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.ErrorResponseException;
-import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 import org.ultra.rcrs.exceptions.BadRequestException;
-import org.ultra.rcrs.exceptions.ConflictException;
 import org.ultra.rcrs.exceptions.DecodeFromBase62Exception;
-import org.ultra.rcrs.exceptions.EncodeToBase62Exception;
-import org.ultra.rcrs.exceptions.ImageDecodeException;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.exceptions.ServiceUnavailableException;
-import org.ultra.rcrs.mediaservice.dto.ErrorResponse;
+import org.ultra.rcrs.searchservice.dto.ErrorResponse;
 
+import java.util.concurrent.CompletionException;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private final String internalErrorMessage = "Internal Server Error";
+    private static final String INTERNAL_ERROR_MESSAGE = "Internal Server Error";
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFoundException(final NotFoundException ex) {
@@ -54,28 +47,10 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.BAD_REQUEST, ex.getMessage());
     }
 
-    @ExceptionHandler(ImageDecodeException.class)
-    public ResponseEntity<ErrorResponse> handleImageDecodeException(final ImageDecodeException ex) {
-        log.debug(ex.getMessage(), ex);
-        return error(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
-
     @ExceptionHandler(DecodeFromBase62Exception.class)
     public ResponseEntity<ErrorResponse> handleDecodeFromBase62Exception(final DecodeFromBase62Exception ex) {
         log.debug(ex.getMessage(), ex);
         return error(HttpStatus.BAD_REQUEST, ex.getMessage());
-    }
-
-    @ExceptionHandler(EncodeToBase62Exception.class)
-    public ResponseEntity<ErrorResponse> handleEncodeToBase62Exception(final EncodeToBase62Exception ex) {
-        log.error(ex.getMessage(), ex);
-        return error(HttpStatus.INTERNAL_SERVER_ERROR, internalErrorMessage);
-    }
-
-    @ExceptionHandler(ConflictException.class)
-    public ResponseEntity<ErrorResponse> handleConflictException(final ConflictException ex) {
-        log.debug(ex.getMessage(), ex);
-        return error(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler(ServiceUnavailableException.class)
@@ -106,12 +81,6 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.BAD_REQUEST, message);
     }
 
-    @ExceptionHandler(HandlerMethodValidationException.class)
-    public ResponseEntity<ErrorResponse> handleHandlerMethodValidationException(final HandlerMethodValidationException ex) {
-        log.debug(ex.getMessage(), ex);
-        return error(HttpStatus.BAD_REQUEST, "validation failed");
-    }
-
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(final ConstraintViolationException ex) {
         log.debug(ex.getMessage(), ex);
@@ -136,50 +105,38 @@ public class GlobalExceptionHandler {
         return error(HttpStatus.BAD_REQUEST, "malformed request body");
     }
 
-    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public ResponseEntity<ErrorResponse> handleHttpMediaTypeNotSupportedException(final HttpMediaTypeNotSupportedException ex) {
-        log.debug(ex.getMessage(), ex);
-        return error(HttpStatus.UNSUPPORTED_MEDIA_TYPE, ex.getMessage());
-    }
-
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupportedException(final HttpRequestMethodNotSupportedException ex) {
         log.debug(ex.getMessage(), ex);
         return error(HttpStatus.METHOD_NOT_ALLOWED, ex.getMessage());
     }
 
-    @ExceptionHandler(MaxUploadSizeExceededException.class)
-    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceededException(final MaxUploadSizeExceededException ex) {
-        log.debug(ex.getMessage(), ex);
-        return error(HttpStatus.PAYLOAD_TOO_LARGE, "uploaded file is too large");
-    }
-
     /**
-     * Covers exceptions that already carry an HTTP status (e.g. {@code UnsupportedMediaTypeStatusException}
-     * thrown while validating an uploaded image) — without this they would fall through to the
-     * catch-all handler and be reported as 500.
+     * The per-type searches run in parallel, so a failure surfaces wrapped in a
+     * {@link CompletionException} — unwrap it to keep the status of the original exception.
      */
-    @ExceptionHandler(ErrorResponseException.class)
-    public ResponseEntity<ErrorResponse> handleErrorResponseException(final ErrorResponseException ex) {
-        log.debug(ex.getMessage(), ex);
-        final HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
-        final String message = status.is5xxServerError() ? internalErrorMessage : ex.getBody().getDetail();
-        if (status.is5xxServerError()) {
-            log.error(ex.getMessage(), ex);
-        }
-        return error(status, message != null ? message : status.getReasonPhrase());
+    @ExceptionHandler(CompletionException.class)
+    public ResponseEntity<ErrorResponse> handleCompletionException(final CompletionException ex) {
+        return switch (ex.getCause()) {
+            case NotFoundException cause -> handleNotFoundException(cause);
+            case BadRequestException cause -> handleBadRequestException(cause);
+            case DecodeFromBase62Exception cause -> handleDecodeFromBase62Exception(cause);
+            case ServiceUnavailableException cause -> handleServiceUnavailableException(cause);
+            case null, default -> {
+                log.error(ex.getMessage(), ex);
+                yield error(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_ERROR_MESSAGE);
+            }
+        };
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(final Exception ex) {
         log.error(ex.getMessage(), ex);
-        return error(HttpStatus.INTERNAL_SERVER_ERROR, internalErrorMessage);
+        return error(HttpStatus.INTERNAL_SERVER_ERROR, INTERNAL_ERROR_MESSAGE);
     }
 
-    private ResponseEntity<ErrorResponse> error(final HttpStatus status, final String message) {
-        return ResponseEntity
-                .status(status)
-                .body(new ErrorResponse(status.value(), message));
+    private static ResponseEntity<ErrorResponse> error(final HttpStatus status, final String message) {
+        return ResponseEntity.status(status)
+                .body(new ErrorResponse(status.value(), message != null ? message : status.getReasonPhrase()));
     }
-
 }

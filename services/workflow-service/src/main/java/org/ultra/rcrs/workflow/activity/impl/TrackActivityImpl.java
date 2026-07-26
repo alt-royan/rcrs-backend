@@ -2,6 +2,7 @@ package org.ultra.rcrs.workflow.activity.impl;
 
 import io.temporal.spring.boot.ActivityImpl;
 import org.springframework.stereotype.Component;
+import org.ultra.rcrs.exceptions.ServiceUnavailableException;
 import org.ultra.rcrs.workflow.activity.TrackActivity;
 import org.ultra.rcrs.workflow.client.TrackClient;
 import org.ultra.rcrs.workflow.client.model.ArtistsToEntityModel;
@@ -24,7 +25,7 @@ public class TrackActivityImpl implements TrackActivity {
     public CreateResponse createTrack(TrackUploadModel request) {
         var res = trackClient.createTrack(request);
         if (!res.getStatusCode().is2xxSuccessful() || res.getBody() == null) {
-            throw new RuntimeException("Unsupported behavior: response is not 2xx");
+            throw new ServiceUnavailableException("Unsupported behavior: response is not 2xx");
         }
         return res.getBody();
     }

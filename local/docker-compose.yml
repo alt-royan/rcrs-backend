@@ -155,6 +155,7 @@ services:
       AUDIO_CODEC: libvorbis
       AUDIO_RATE: 44100
       AUDIO_FORMAT: ogg
+      AUDIO_LOUDNORM_ENABLED: false
       AUDIO_LOUDNORM_I: -18
       AUDIO_LOUDNORM_LRA: 18
       AUDIO_LOUDNORM_TP: -1

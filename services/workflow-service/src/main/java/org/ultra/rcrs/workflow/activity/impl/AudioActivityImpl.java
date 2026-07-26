@@ -3,6 +3,9 @@ package org.ultra.rcrs.workflow.activity.impl;
 import io.temporal.spring.boot.ActivityImpl;
 import org.springframework.stereotype.Component;
 import org.ultra.rcrs.enums.FileStatus;
+import org.ultra.rcrs.exceptions.ConflictException;
+import org.ultra.rcrs.exceptions.NotFoundException;
+import org.ultra.rcrs.exceptions.ServiceUnavailableException;
 import org.ultra.rcrs.workflow.activity.AudioActivity;
 import org.ultra.rcrs.workflow.client.AudioClient;
 import org.ultra.rcrs.workflow.dto.AudioStatusResponse;
@@ -27,7 +30,7 @@ public class AudioActivityImpl implements AudioActivity {
     public void checkAllAudiosUploaded(List<String> uids) {
         var res = audioClient.getAudioStatus(uids);
         if (res == null || !res.getStatusCode().is2xxSuccessful() || res.getBody() == null) {
-            throw new RuntimeException("Failed to fetch audio status from media-service");
+            throw new ServiceUnavailableException("Failed to fetch audio status from media-service");
         }
 
         List<AudioStatusResponse> statuses = res.getBody();
@@ -40,7 +43,7 @@ public class AudioActivityImpl implements AudioActivity {
                 .filter(uid -> !foundUids.contains(uid))
                 .toList();
         if (!missing.isEmpty()) {
-            throw new RuntimeException("Audio records not found for uids: " + missing);
+            throw new NotFoundException("Audio records not found for uids: " + missing);
         }
 
         List<String> notReady = statuses.stream()
@@ -48,7 +51,7 @@ public class AudioActivityImpl implements AudioActivity {
                 .map(s -> s.uid() + "(" + s.status() + ")")
                 .toList();
         if (!notReady.isEmpty()) {
-            throw new RuntimeException("Audios are not uploaded yet: " + notReady);
+            throw new ConflictException("Audios are not uploaded yet: " + notReady);
         }
     }
 }
