@@ -11,12 +11,14 @@ import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.ArtistAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.ArtistAdminViewDto;
+import org.ultra.rcrs.metadata.dto.PaginationResponse;
 import org.ultra.rcrs.metadata.model.ArtistDocument;
 import org.ultra.rcrs.metadata.repository.ArtistDocumentRepository;
 import org.ultra.rcrs.utils.S3Utils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -33,25 +35,28 @@ public class ArtistAdminService {
                 .map(this::toDto);
     }
 
-    public Flux<ArtistAdminStandaloneDto> getAll(EntityStatus availabilityStatus, int offset, int limit) {
+    public Mono<PaginationResponse<ArtistAdminStandaloneDto>> getAll(EntityStatus availabilityStatus,
+                                                                     int offset,
+                                                                     int limit) {
         Sort sort = Sort.by(Sort.Direction.ASC, "name");
-        Query query = new Query();
+        Query filter = buildQuery(availabilityStatus);
+        Query page = Query.of(filter).with(sort).skip(offset).limit(limit);
 
-        if (availabilityStatus != null) {
-            query.addCriteria(Criteria.where("availabilityStatus").is(availabilityStatus));
-        }
+        Mono<List<ArtistAdminStandaloneDto>> items = mongoTemplate.find(page, ArtistDocument.class, "artists")
+                .map(this::toStandaloneDto)
+                .collectList();
+        Mono<Long> totalCount = mongoTemplate.count(filter, ArtistDocument.class, "artists");
 
-        query.with(sort).skip(offset).limit(limit);
-        return mongoTemplate.find(query, ArtistDocument.class, "artists")
-                .map(this::toStandaloneDto);
+        return Mono.zip(items, totalCount,
+                (found, total) -> new PaginationResponse<>(found, total, offset, limit));
     }
 
-    public Mono<Long> count(EntityStatus availabilityStatus) {
+    private Query buildQuery(EntityStatus availabilityStatus) {
         Query query = new Query();
         if (availabilityStatus != null) {
             query.addCriteria(Criteria.where("availabilityStatus").is(availabilityStatus));
         }
-        return mongoTemplate.count(query, ArtistDocument.class, "artists");
+        return query;
     }
 
     private ArtistAdminViewDto toDto(ArtistDocument doc) {

@@ -12,7 +12,6 @@ import org.ultra.rcrs.mediaservice.service.StreamingService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping
 public class StreamingController {
 
     private final StreamingService streamingService;

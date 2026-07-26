@@ -15,7 +15,6 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/downloads")
 public class DownloadController {
 
     private final DownloadService downloadService;

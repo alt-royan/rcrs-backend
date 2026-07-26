@@ -117,17 +117,41 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
     }
 
     @Test
-    void countArtists_filtersByAvailabilityStatus() {
+    void getArtists_filtersByAvailabilityStatusAndReturnsTotalCount() {
         createArtistDoc("Active Artist", EntityStatus.ACTIVE);
         createArtistDoc("Deleted Artist", EntityStatus.DELETED);
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/admin/artists/count")
+                        .path("/admin/artists")
                         .queryParam("availabilityStatus", "ACTIVE")
                         .build())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBody(Long.class).isEqualTo(1L);
+                .expectBody()
+                .jsonPath("$.totalCount").isEqualTo(1)
+                .jsonPath("$.items.length()").isEqualTo(1);
+    }
+
+    @Test
+    void getArtists_totalCountIgnoresPaging() {
+        createArtistDoc("Artist One", EntityStatus.ACTIVE);
+        createArtistDoc("Artist Two", EntityStatus.ACTIVE);
+        createArtistDoc("Artist Three", EntityStatus.ACTIVE);
+
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/admin/artists")
+                        .queryParam("availabilityStatus", "ACTIVE")
+                        .queryParam("offset", 0)
+                        .queryParam("limit", 2)
+                        .build())
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.totalCount").isEqualTo(3)
+                .jsonPath("$.items.length()").isEqualTo(2)
+                .jsonPath("$.offset").isEqualTo(0)
+                .jsonPath("$.limit").isEqualTo(2);
     }
 }

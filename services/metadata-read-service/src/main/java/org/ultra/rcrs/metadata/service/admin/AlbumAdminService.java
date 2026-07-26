@@ -13,12 +13,14 @@ import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.AlbumAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.AlbumAdminViewDto;
+import org.ultra.rcrs.metadata.dto.PaginationResponse;
 import org.ultra.rcrs.metadata.model.AlbumDocument;
 import org.ultra.rcrs.metadata.repository.AlbumDocumentRepository;
 import org.ultra.rcrs.utils.S3Utils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -46,38 +48,30 @@ public class AlbumAdminService {
                 .map(this::toStandaloneDto);
     }
 
-    public Flux<AlbumAdminStandaloneDto> getAll(EntityStatus availabilityStatus,
-                                                LifecycleStatus lifecycleStatus,
-                                                AlbumType type,
-                                                Boolean explicit,
-                                                int offset,
-                                                int limit,
-                                                String sortDirection) {
+    public Mono<PaginationResponse<AlbumAdminStandaloneDto>> getAll(EntityStatus availabilityStatus,
+                                                                    LifecycleStatus lifecycleStatus,
+                                                                    AlbumType type,
+                                                                    Boolean explicit,
+                                                                    int offset,
+                                                                    int limit,
+                                                                    String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "releaseDate");
-        Query query = new Query();
+        Query filter = buildQuery(availabilityStatus, lifecycleStatus, type, explicit);
+        Query page = Query.of(filter).with(sort).skip(offset).limit(limit);
 
-        if (availabilityStatus != null) {
-            query.addCriteria(Criteria.where("availabilityStatus").is(availabilityStatus));
-        }
-        if (lifecycleStatus != null) {
-            query.addCriteria(Criteria.where("lifecycleStatus").is(lifecycleStatus));
-        }
-        if (type != null) {
-            query.addCriteria(Criteria.where("type").is(type));
-        }
-        if (explicit != null) {
-            query.addCriteria(Criteria.where("explicit").is(explicit));
-        }
+        Mono<List<AlbumAdminStandaloneDto>> items = mongoTemplate.find(page, AlbumDocument.class, "albums")
+                .map(this::toStandaloneDto)
+                .collectList();
+        Mono<Long> totalCount = mongoTemplate.count(filter, AlbumDocument.class, "albums");
 
-        query.with(sort).skip(offset).limit(limit);
-        return mongoTemplate.find(query, AlbumDocument.class, "albums")
-                .map(this::toStandaloneDto);
+        return Mono.zip(items, totalCount,
+                (found, total) -> new PaginationResponse<>(found, total, offset, limit));
     }
 
-    public Mono<Long> count(EntityStatus availabilityStatus,
-                            LifecycleStatus lifecycleStatus,
-                            AlbumType type,
-                            Boolean explicit) {
+    private Query buildQuery(EntityStatus availabilityStatus,
+                             LifecycleStatus lifecycleStatus,
+                             AlbumType type,
+                             Boolean explicit) {
         Query query = new Query();
 
         if (availabilityStatus != null) {
@@ -93,7 +87,7 @@ public class AlbumAdminService {
             query.addCriteria(Criteria.where("explicit").is(explicit));
         }
 
-        return mongoTemplate.count(query, AlbumDocument.class, "albums");
+        return query;
     }
 
     private AlbumAdminViewDto toDto(AlbumDocument doc) {

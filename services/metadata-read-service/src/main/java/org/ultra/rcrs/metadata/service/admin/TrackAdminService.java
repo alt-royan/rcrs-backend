@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
 import org.ultra.rcrs.exceptions.NotFoundException;
+import org.ultra.rcrs.metadata.dto.PaginationResponse;
 import org.ultra.rcrs.metadata.dto.TrackAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.TrackAdminViewDto;
 import org.ultra.rcrs.metadata.model.TrackDocument;
@@ -18,6 +19,7 @@ import org.ultra.rcrs.utils.S3Utils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,38 +41,30 @@ public class TrackAdminService {
                 .map(this::toStandaloneDto);
     }
 
-    public Flux<TrackAdminStandaloneDto> getAll(EntityStatus availabilityStatus,
-                                                LifecycleStatus lifecycleStatus,
-                                                String albumId,
-                                                Boolean explicit,
-                                                int offset,
-                                                int limit,
-                                                String sortDirection) {
+    public Mono<PaginationResponse<TrackAdminStandaloneDto>> getAll(EntityStatus availabilityStatus,
+                                                                    LifecycleStatus lifecycleStatus,
+                                                                    String albumId,
+                                                                    Boolean explicit,
+                                                                    int offset,
+                                                                    int limit,
+                                                                    String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "releaseDate");
-        Query query = new Query();
+        Query filter = buildQuery(availabilityStatus, lifecycleStatus, albumId, explicit);
+        Query page = Query.of(filter).with(sort).skip(offset).limit(limit);
 
-        if (availabilityStatus != null) {
-            query.addCriteria(Criteria.where("availabilityStatus").is(availabilityStatus));
-        }
-        if (lifecycleStatus != null) {
-            query.addCriteria(Criteria.where("lifecycleStatus").is(lifecycleStatus));
-        }
-        if (albumId != null) {
-            query.addCriteria(Criteria.where("album.id").is(albumId));
-        }
-        if (explicit != null) {
-            query.addCriteria(Criteria.where("explicit").is(explicit));
-        }
+        Mono<List<TrackAdminStandaloneDto>> items = mongoTemplate.find(page, TrackDocument.class, "tracks")
+                .map(this::toStandaloneDto)
+                .collectList();
+        Mono<Long> totalCount = mongoTemplate.count(filter, TrackDocument.class, "tracks");
 
-        query.with(sort).skip(offset).limit(limit);
-        return mongoTemplate.find(query, TrackDocument.class, "tracks")
-                .map(this::toStandaloneDto);
+        return Mono.zip(items, totalCount,
+                (found, total) -> new PaginationResponse<>(found, total, offset, limit));
     }
 
-    public Mono<Long> count(EntityStatus availabilityStatus,
-                            LifecycleStatus lifecycleStatus,
-                            String albumId,
-                            Boolean explicit) {
+    private Query buildQuery(EntityStatus availabilityStatus,
+                             LifecycleStatus lifecycleStatus,
+                             String albumId,
+                             Boolean explicit) {
         Query query = new Query();
 
         if (availabilityStatus != null) {
@@ -86,7 +80,7 @@ public class TrackAdminService {
             query.addCriteria(Criteria.where("explicit").is(explicit));
         }
 
-        return mongoTemplate.count(query, TrackDocument.class, "tracks");
+        return query;
     }
 
     private TrackAdminViewDto toDto(TrackDocument doc) {
