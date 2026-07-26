@@ -17,7 +17,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
         indexArtistPublicDoc("a3", "Miles Davis", List.of("jazz"), "ACTIVE", null, null);
         refreshAllIndices();
 
-        mockMvc.perform(get("/search")
+        mockMvc.perform(get("/")
                         .param("q", "the")
                         .param("type", "artist"))
                 .andExpect(status().isOk())
@@ -34,7 +34,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
                 List.of(nested("a1", "The Beatles")), null);
         refreshAllIndices();
 
-        mockMvc.perform(get("/search")
+        mockMvc.perform(get("/")
                         .param("q", "Abbey")
                         .param("type", "album"))
                 .andExpect(status().isOk())
@@ -51,7 +51,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
                 List.of(nested("a1", "The Beatles")), nestedAlbum("al2", "Let It Be"));
         refreshAllIndices();
 
-        mockMvc.perform(get("/search")
+        mockMvc.perform(get("/")
                         .param("q", "Come Together")
                         .param("type", "track"))
                 .andExpect(status().isOk())
@@ -67,7 +67,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
         indexTrackPublicDoc("t1", "Test Track", "ACTIVE", null, null);
         refreshAllIndices();
 
-        mockMvc.perform(get("/search")
+        mockMvc.perform(get("/")
                         .param("q", "Test")
                         .param("type", "artist,album,track"))
                 .andExpect(status().isOk())
@@ -82,7 +82,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
         indexAlbumPublicDoc("al1", "Solo Album", "2025", "ACTIVE", null, null);
         refreshAllIndices();
 
-        mockMvc.perform(get("/search")
+        mockMvc.perform(get("/")
                         .param("q", "Solo")
                         .param("type", "artist"))
                 .andExpect(status().isOk())
@@ -93,7 +93,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void search_noResults_returnsEmptyCollections() throws Exception {
-        mockMvc.perform(get("/search")
+        mockMvc.perform(get("/")
                         .param("q", "nonexistent")
                         .param("type", "artist"))
                 .andExpect(status().isOk())
@@ -107,7 +107,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
         }
         refreshAllIndices();
 
-        mockMvc.perform(get("/search")
+        mockMvc.perform(get("/")
                         .param("q", "Paginated")
                         .param("type", "artist")
                         .param("page", "0")
@@ -119,14 +119,14 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void search_queryParamRequired_returns400WhenMissing() throws Exception {
-        mockMvc.perform(get("/search")
+        mockMvc.perform(get("/")
                         .param("type", "artist"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void search_typeParamRequired_returns400WhenMissing() throws Exception {
-        mockMvc.perform(get("/search")
+        mockMvc.perform(get("/")
                         .param("q", "test"))
                 .andExpect(status().isBadRequest());
     }
@@ -136,7 +136,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
         indexArtistPublicDoc("a1", "Some Artist", List.of("rock"), "ACTIVE", null, null);
         refreshAllIndices();
 
-        mockMvc.perform(get("/search")
+        mockMvc.perform(get("/")
                         .param("q", "")
                         .param("type", "artist"))
                 .andExpect(status().isOk());
@@ -149,7 +149,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
                 List.of(nested("t1", "Some Track")));
         refreshAllIndices();
 
-        mockMvc.perform(get("/search")
+        mockMvc.perform(get("/")
                         .param("q", "Nested")
                         .param("type", "artist"))
                 .andExpect(status().isOk())
