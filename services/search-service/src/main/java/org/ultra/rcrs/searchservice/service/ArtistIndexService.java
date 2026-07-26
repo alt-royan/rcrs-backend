@@ -24,6 +24,7 @@ public class ArtistIndexService {
         ArtistAdminDoc adminDoc = new ArtistAdminDoc();
         adminDoc.setId(event.getId());
         adminDoc.setName(event.getName());
+        adminDoc.setAvatarS3Key(event.getAvatarS3Key());
         adminDoc.setTags(event.getTagsList());
         adminDoc.setAvailability(status);
         adminDoc.setAlbums(new ArrayList<>());
@@ -87,6 +88,7 @@ public class ArtistIndexService {
         ArtistPublicDoc publicDoc = new ArtistPublicDoc();
         publicDoc.setId(adminDoc.getId());
         publicDoc.setName(adminDoc.getName());
+        publicDoc.setAvatarS3Key(adminDoc.getAvatarS3Key());
         publicDoc.setTags(adminDoc.getTags());
         publicDoc.setAlbums(adminDoc.getAlbums());
         publicDoc.setTracks(adminDoc.getTracks());

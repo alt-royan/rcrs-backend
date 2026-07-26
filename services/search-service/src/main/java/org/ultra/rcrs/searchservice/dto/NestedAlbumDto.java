@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class NestedAlbumDto {
     private String id;
     private String title;
+    private String coverUrl;
 }

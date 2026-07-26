@@ -6,4 +6,5 @@ import lombok.Data;
 public class NestedArtist {
     private String id;
     private String name;
+    private String avatarS3Key;
 }

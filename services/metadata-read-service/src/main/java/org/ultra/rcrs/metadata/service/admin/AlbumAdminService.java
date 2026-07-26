@@ -24,6 +24,7 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static org.ultra.rcrs.metadata.repository.AlbumTotalsRepository.totalsOf;
@@ -56,7 +57,8 @@ public class AlbumAdminService {
                 .flatMapMany(this::toStandaloneDtos);
     }
 
-    public Mono<PaginationResponse<AlbumAdminStandaloneDto>> getAll(EntityStatus availabilityStatus,
+    public Mono<PaginationResponse<AlbumAdminStandaloneDto>> getAll(String title,
+                                                                    EntityStatus availabilityStatus,
                                                                     LifecycleStatus lifecycleStatus,
                                                                     AlbumType type,
                                                                     Boolean explicit,
@@ -64,7 +66,7 @@ public class AlbumAdminService {
                                                                     int limit,
                                                                     String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "releaseDate");
-        Query filter = buildQuery(availabilityStatus, lifecycleStatus, type, explicit);
+        Query filter = buildQuery(title, availabilityStatus, lifecycleStatus, type, explicit);
         Query page = Query.of(filter).with(sort).skip(offset).limit(limit);
 
         Mono<List<AlbumAdminStandaloneDto>> items = mongoTemplate.find(page, AlbumDocument.class, "albums")
@@ -77,12 +79,16 @@ public class AlbumAdminService {
                 (found, total) -> new PaginationResponse<>(found, total, offset, limit));
     }
 
-    private Query buildQuery(EntityStatus availabilityStatus,
+    private Query buildQuery(String title,
+                             EntityStatus availabilityStatus,
                              LifecycleStatus lifecycleStatus,
                              AlbumType type,
                              Boolean explicit) {
         Query query = new Query();
 
+        if (title != null && !title.isBlank()) {
+            query.addCriteria(Criteria.where("title").regex(Pattern.quote(title), "i"));
+        }
         if (availabilityStatus != null) {
             query.addCriteria(Criteria.where("availabilityStatus").is(availabilityStatus));
         }

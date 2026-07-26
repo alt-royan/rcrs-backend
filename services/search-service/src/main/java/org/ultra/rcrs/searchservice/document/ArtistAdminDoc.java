@@ -21,6 +21,9 @@ public class ArtistAdminDoc implements ArtistDoc {
     @Field(type = FieldType.Text)
     private String name;
 
+    @Field(type = FieldType.Keyword, index = false)
+    private String avatarS3Key;
+
     @Field(type = FieldType.Keyword)
     private List<String> tags;
 

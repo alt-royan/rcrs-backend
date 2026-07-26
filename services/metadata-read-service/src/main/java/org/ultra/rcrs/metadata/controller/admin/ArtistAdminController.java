@@ -28,10 +28,11 @@ public class ArtistAdminController {
 
     @GetMapping
     public Mono<PaginationResponse<ArtistAdminStandaloneDto>> getArtists(
+            @RequestParam(required = false) String name,
             @RequestParam(required = false) EntityStatus availabilityStatus,
             @RequestParam(required = false, defaultValue = "0") int offset,
             @RequestParam(required = false, defaultValue = "50") int limit) {
-        return artistAdminService.getAll(availabilityStatus, offset, limit);
+        return artistAdminService.getAll(name, availabilityStatus, offset, limit);
     }
 
     @GetMapping("/{artistId}/albums")

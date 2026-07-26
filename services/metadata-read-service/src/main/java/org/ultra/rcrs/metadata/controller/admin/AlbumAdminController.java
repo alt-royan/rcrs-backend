@@ -29,6 +29,7 @@ public class AlbumAdminController {
 
     @GetMapping
     public Mono<PaginationResponse<AlbumAdminStandaloneDto>> getAlbums(
+            @RequestParam(required = false) String title,
             @RequestParam(required = false) EntityStatus availabilityStatus,
             @RequestParam(required = false) LifecycleStatus lifecycleStatus,
             @RequestParam(required = false) AlbumType type,
@@ -36,7 +37,7 @@ public class AlbumAdminController {
             @RequestParam(required = false, defaultValue = "0") int offset,
             @RequestParam(required = false, defaultValue = "50") int limit,
             @RequestParam(required = false, defaultValue = "asc") String sort) {
-        return albumAdminService.getAll(availabilityStatus, lifecycleStatus, type, explicit, offset, limit, sort);
+        return albumAdminService.getAll(title, availabilityStatus, lifecycleStatus, type, explicit, offset, limit, sort);
     }
 
     @GetMapping("/{albumId}/tracks")

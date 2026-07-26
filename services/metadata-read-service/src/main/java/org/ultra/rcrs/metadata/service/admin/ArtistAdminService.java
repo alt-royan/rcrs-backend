@@ -19,6 +19,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -35,11 +36,12 @@ public class ArtistAdminService {
                 .map(this::toDto);
     }
 
-    public Mono<PaginationResponse<ArtistAdminStandaloneDto>> getAll(EntityStatus availabilityStatus,
+    public Mono<PaginationResponse<ArtistAdminStandaloneDto>> getAll(String name,
+                                                                     EntityStatus availabilityStatus,
                                                                      int offset,
                                                                      int limit) {
         Sort sort = Sort.by(Sort.Direction.ASC, "name");
-        Query filter = buildQuery(availabilityStatus);
+        Query filter = buildQuery(name, availabilityStatus);
         Query page = Query.of(filter).with(sort).skip(offset).limit(limit);
 
         Mono<List<ArtistAdminStandaloneDto>> items = mongoTemplate.find(page, ArtistDocument.class, "artists")
@@ -51,8 +53,11 @@ public class ArtistAdminService {
                 (found, total) -> new PaginationResponse<>(found, total, offset, limit));
     }
 
-    private Query buildQuery(EntityStatus availabilityStatus) {
+    private Query buildQuery(String name, EntityStatus availabilityStatus) {
         Query query = new Query();
+        if (name != null && !name.isBlank()) {
+            query.addCriteria(Criteria.where("name").regex(Pattern.quote(name), "i"));
+        }
         if (availabilityStatus != null) {
             query.addCriteria(Criteria.where("availabilityStatus").is(availabilityStatus));
         }

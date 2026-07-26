@@ -14,6 +14,7 @@ import java.util.List;
 public class ArtistSearchResult {
     private String id;
     private String name;
+    private String avatarUrl;
     private List<String> tags;
     private String availability;
     private List<NestedAlbumDto> albums;
