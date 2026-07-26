@@ -3,6 +3,7 @@ package org.ultra.rcrs.mediaservice.service;
 import lombok.extern.slf4j.Slf4j;
 import org.imgscalr.Scalr;
 import org.springframework.stereotype.Component;
+import org.ultra.rcrs.exceptions.ImageDecodeException;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -24,7 +25,7 @@ public class ThumbnailGenerator {
             return baos.toByteArray();
         } catch (IOException e) {
             log.error("Failed when try to create thumbnail", e);
-            throw new RuntimeException(e);
+            throw new ImageDecodeException("Unable to create thumbnail from the given image", e);
         }
     }
 }

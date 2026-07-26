@@ -15,6 +15,7 @@ public class AlbumSearchResult {
     private String id;
     private String title;
     private String year;
+    private String coverUrl;
     private String availability;
     private String lifecycleStatus;
     private List<NestedArtistDto> artists;

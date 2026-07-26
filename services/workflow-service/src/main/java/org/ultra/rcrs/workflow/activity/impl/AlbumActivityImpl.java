@@ -2,6 +2,7 @@ package org.ultra.rcrs.workflow.activity.impl;
 
 import io.temporal.spring.boot.ActivityImpl;
 import org.springframework.stereotype.Component;
+import org.ultra.rcrs.exceptions.ServiceUnavailableException;
 import org.ultra.rcrs.workflow.activity.AlbumActivity;
 import org.ultra.rcrs.workflow.client.AlbumClient;
 import org.ultra.rcrs.workflow.client.model.AlbumUploadModel;
@@ -24,7 +25,7 @@ public class AlbumActivityImpl implements AlbumActivity {
     public CreateResponse createAlbum(AlbumUploadModel request) {
         var res = albumClient.createAlbum(request);
         if (!res.getStatusCode().is2xxSuccessful() || res.getBody() == null) {
-            throw new RuntimeException("Unsupported behavior: response is not 2xx");
+            throw new ServiceUnavailableException("Unsupported behavior: response is not 2xx");
         }
         return res.getBody();
     }

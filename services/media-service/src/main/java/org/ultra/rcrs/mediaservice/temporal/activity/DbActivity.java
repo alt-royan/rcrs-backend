@@ -14,8 +14,5 @@ public interface DbActivity {
     UUID saveAudio(String trackId, UUID guid, Boolean main, String key, AudioMetadata metadata);
 
     @ActivityMethod
-    void saveDownloadFile(UUID audioId, UUID guid, String key, String fileName, String contentType);
-
-    @ActivityMethod
     AudioUpload getAudioUpload(String uid);
 }

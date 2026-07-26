@@ -24,6 +24,7 @@ public class TrackAdminController {
 
     @GetMapping
     public Mono<PaginationResponse<TrackAdminStandaloneDto>> getTracks(
+            @RequestParam(required = false) String title,
             @RequestParam(required = false) EntityStatus availabilityStatus,
             @RequestParam(required = false) LifecycleStatus lifecycleStatus,
             @RequestParam(required = false) String albumId,
@@ -31,6 +32,6 @@ public class TrackAdminController {
             @RequestParam(required = false, defaultValue = "0") int offset,
             @RequestParam(required = false, defaultValue = "50") int limit,
             @RequestParam(required = false, defaultValue = "asc") String sort) {
-        return trackAdminService.getAll(availabilityStatus, lifecycleStatus, albumId, explicit, offset, limit, sort);
+        return trackAdminService.getAll(title, availabilityStatus, lifecycleStatus, albumId, explicit, offset, limit, sort);
     }
 }

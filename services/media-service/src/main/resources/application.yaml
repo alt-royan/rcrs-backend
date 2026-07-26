@@ -107,9 +107,9 @@ spring:
         path-style-access-enabled: true
 
 media:
-  audio:
+  stream:
     bucket:
-      name: rcrs-audio
+      name: rcrs-stream
       public-url: http://audio.localhost:4566
     signature-duration: 6h
     validation:
@@ -122,6 +122,7 @@ media:
     rate: 44100
     format: ogg
     loudnorm:
+      enabled: true
       I: -18
       LRA: 18
       TP: -1

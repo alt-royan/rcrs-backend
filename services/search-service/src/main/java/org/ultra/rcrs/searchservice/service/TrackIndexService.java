@@ -91,6 +91,7 @@ public class TrackIndexService {
         NestedArtist nested = new NestedArtist();
         nested.setId(event.getArtistId());
         nested.setName(artistName);
+        nested.setAvatarS3Key(artistDoc != null ? artistDoc.getAvatarS3Key() : null);
 
         if (adminDoc.getArtists() == null) {
             adminDoc.setArtists(new ArrayList<>());
@@ -216,6 +217,7 @@ public class TrackIndexService {
         NestedAlbum nestedAlbum = new NestedAlbum();
         nestedAlbum.setId(albumDoc.getId());
         nestedAlbum.setTitle(albumDoc.getTitle());
+        nestedAlbum.setCoverS3Key(albumDoc.getCoverS3Key());
 
         TrackAdminDoc adminDoc = trackIndexRepository.get(event.getTrackId(), TrackAdminDoc.class);
         if (adminDoc != null) {

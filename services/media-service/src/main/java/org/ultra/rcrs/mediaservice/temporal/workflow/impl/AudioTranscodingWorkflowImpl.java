@@ -1,5 +1,6 @@
 package org.ultra.rcrs.mediaservice.temporal.workflow.impl;
 
+import io.temporal.failure.ApplicationFailure;
 import io.temporal.spring.boot.WorkflowImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.ultra.rcrs.mediaservice.dao.model.AudioUpload;
@@ -51,12 +52,10 @@ public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
             String key = String.format("%s/%s/%s", trackId, guid, originalFilename);
 
             activities.s3Activity().putAudio(key, tempFile, originalMeta.byteSize(), audioUpload.getContentType());
+            String downloadFileName = downloadFileName(audioUpload.getOriginalFileName(), originalMeta.container());
+            activities.s3Activity().putDownload(key, tempFile, originalMeta.byteSize(), AUDIO_CONTENT_TYPE, downloadFileName);
 
             activities.dbActivity().saveAudio(trackId, guid, true, key, originalMeta);
-
-            File bestFile = null;
-            AudioMetadata bestMetadata = null;
-            UUID bestAudioId = null;
 
             for (String bitrate : bitrates) {
                 File outputFile = activities.transcodeAudioActivity().transcode(tempFile, bitrate);
@@ -65,31 +64,12 @@ public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
                 key = String.format("%s/%s/%s_%s", trackId, guid, metadata.container(), bitrate);
 
                 activities.s3Activity().putAudio(key, outputFile, metadata.byteSize(), AUDIO_CONTENT_TYPE);
+                downloadFileName = downloadFileName(audioUpload.getOriginalFileName(), metadata.container());
+                activities.s3Activity().putDownload(key, outputFile, metadata.byteSize(), AUDIO_CONTENT_TYPE, downloadFileName);
 
-                UUID audioId = activities.dbActivity().saveAudio(trackId, guid, true, key, metadata);
+                activities.dbActivity().saveAudio(trackId, guid, true, key, metadata);
 
-                // keep the highest quality rendition around, it becomes the downloadable file
-                if (bestMetadata == null || metadata.byteSize() > bestMetadata.byteSize()) {
-                    deleteQuietly(bestFile);
-                    bestFile = outputFile;
-                    bestMetadata = metadata;
-                    bestAudioId = audioId;
-                } else {
-                    deleteQuietly(outputFile);
-                }
-            }
-
-            //TODO: переделать даунлоад для всех качеств
-            if (bestFile != null) {
-                String downloadFileName = downloadFileName(audioUpload.getOriginalFileName(), bestMetadata.container());
-                String downloadKey = String.format("%s/%s/%s", trackId, guid,
-                        URLEncoder.encode(downloadFileName, StandardCharsets.UTF_8));
-
-                activities.s3Activity().putDownload(downloadKey, bestFile, bestMetadata.byteSize(),
-                        AUDIO_CONTENT_TYPE, downloadFileName);
-                activities.dbActivity().saveDownloadFile(bestAudioId, guid, downloadKey, downloadFileName, AUDIO_CONTENT_TYPE);
-
-                deleteQuietly(bestFile);
+                deleteQuietly(outputFile);
             }
 
             activities.transcodingStatusActivity().updateStatusToComplete(uid);
@@ -100,7 +80,7 @@ public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
             log.error("Audio transcoding workflow failed for uid={}: {}", uid, e.getMessage());
             activities.transcodingStatusActivity().updateStatusToFailed(uid, e.getMessage());
             activities.transcodingStatusActivity().notifyTranscodingFailed(trackId);
-            throw new RuntimeException("Audio transcoding failed for uid=" + uid, e);
+            throw ApplicationFailure.newNonRetryableFailure("Audio transcoding failed for uid=" + uid, e.getClass().getName(), e);
         } finally {
             deleteQuietly(tempFile);
         }

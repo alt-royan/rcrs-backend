@@ -33,6 +33,7 @@ public class AlbumIndexService {
         AlbumAdminDoc adminDoc = new AlbumAdminDoc();
         adminDoc.setId(event.getId());
         adminDoc.setTitle(event.getTitle());
+        adminDoc.setCoverS3Key(event.getCoverS3Key());
         adminDoc.setAvailability(availability);
         adminDoc.setLifecycleStatus(lifecycle);
         adminDoc.setTracks(new ArrayList<>());
@@ -68,6 +69,7 @@ public class AlbumIndexService {
         NestedArtist nested = new NestedArtist();
         nested.setId(event.getArtistId());
         nested.setName(artistName);
+        nested.setAvatarS3Key(artistDoc != null ? artistDoc.getAvatarS3Key() : null);
 
         if (adminDoc.getArtists() == null) {
             adminDoc.setArtists(new ArrayList<>());
@@ -88,6 +90,7 @@ public class AlbumIndexService {
             NestedAlbum nestedAlbum = new NestedAlbum();
             nestedAlbum.setId(adminDoc.getId());
             nestedAlbum.setTitle(adminDoc.getTitle());
+            nestedAlbum.setCoverS3Key(adminDoc.getCoverS3Key());
 
             if (artistDoc.getAlbums() == null) {
                 artistDoc.setAlbums(new ArrayList<>());
@@ -206,6 +209,7 @@ public class AlbumIndexService {
         publicDoc.setId(adminDoc.getId());
         publicDoc.setTitle(adminDoc.getTitle());
         publicDoc.setYear(adminDoc.getYear());
+        publicDoc.setCoverS3Key(adminDoc.getCoverS3Key());
         publicDoc.setAvailability(adminDoc.getAvailability());
         publicDoc.setTracks(adminDoc.getTracks());
         publicDoc.setArtists(adminDoc.getArtists());

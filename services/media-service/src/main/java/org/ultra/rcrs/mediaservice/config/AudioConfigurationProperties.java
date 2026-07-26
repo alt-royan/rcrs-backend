@@ -33,6 +33,7 @@ public class AudioConfigurationProperties {
 
     @Data
     public static class Loudnorm {
+        private Boolean enabled;
         private Double I;
         private Double LRA;
         private Double TP;

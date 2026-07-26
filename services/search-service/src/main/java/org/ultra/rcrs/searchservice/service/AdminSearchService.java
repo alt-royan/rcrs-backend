@@ -13,8 +13,11 @@ import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.searchservice.document.AlbumAdminDoc;
 import org.ultra.rcrs.searchservice.document.ArtistAdminDoc;
+import org.ultra.rcrs.searchservice.document.NestedAlbum;
+import org.ultra.rcrs.searchservice.document.NestedArtist;
 import org.ultra.rcrs.searchservice.document.TrackAdminDoc;
 import org.ultra.rcrs.searchservice.dto.*;
+import org.ultra.rcrs.utils.S3Utils;
 
 import java.util.Collections;
 
@@ -24,6 +27,7 @@ import java.util.Collections;
 public class AdminSearchService {
 
     private final ElasticsearchOperations elasticsearchOperations;
+    private final S3Utils s3Utils;
 
     public SearchCollection<ArtistResultWrapper> searchArtists(String query, int page, int size) {
         var nativeQ = NativeQuery.builder()
@@ -156,23 +160,24 @@ public class AdminSearchService {
 
     private ArtistSearchResult toArtistResult(ArtistAdminDoc doc) {
         var albums = doc.getAlbums() != null
-                ? doc.getAlbums().stream().map(a -> new NestedAlbumDto(a.getId(), a.getTitle())).toList()
+                ? doc.getAlbums().stream().map(this::toNestedAlbumDto).toList()
                 : Collections.<NestedAlbumDto>emptyList();
         var tracks = doc.getTracks() != null
                 ? doc.getTracks().stream().map(t -> new NestedTrackDto(t.getId(), t.getTitle())).toList()
                 : Collections.<NestedTrackDto>emptyList();
-        return new ArtistSearchResult(doc.getId(), doc.getName(), doc.getTags(),
+        return new ArtistSearchResult(doc.getId(), doc.getName(), s3Utils.parseUrl(doc.getAvatarS3Key()), doc.getTags(),
                 doc.getAvailability() != null ? doc.getAvailability().name() : null, albums, tracks);
     }
 
     private AlbumSearchResult toAlbumResult(AlbumAdminDoc doc) {
         var artists = doc.getArtists() != null
-                ? doc.getArtists().stream().map(a -> new NestedArtistDto(a.getId(), a.getName())).toList()
+                ? doc.getArtists().stream().map(this::toNestedArtistDto).toList()
                 : Collections.<NestedArtistDto>emptyList();
         var tracks = doc.getTracks() != null
                 ? doc.getTracks().stream().map(t -> new NestedTrackDto(t.getId(), t.getTitle())).toList()
                 : Collections.<NestedTrackDto>emptyList();
         return new AlbumSearchResult(doc.getId(), doc.getTitle(), doc.getYear(),
+                s3Utils.parseUrl(doc.getCoverS3Key()),
                 doc.getAvailability() != null ? doc.getAvailability().name() : null,
                 doc.getLifecycleStatus() != null ? doc.getLifecycleStatus().name() : null,
                 artists, tracks);
@@ -180,15 +185,23 @@ public class AdminSearchService {
 
     private TrackSearchResult toTrackResult(TrackAdminDoc doc) {
         var artists = doc.getArtists() != null
-                ? doc.getArtists().stream().map(a -> new NestedArtistDto(a.getId(), a.getName())).toList()
+                ? doc.getArtists().stream().map(this::toNestedArtistDto).toList()
                 : Collections.<NestedArtistDto>emptyList();
         NestedAlbumDto albumDto = null;
         if (doc.getAlbum() != null) {
-            albumDto = new NestedAlbumDto(doc.getAlbum().getId(), doc.getAlbum().getTitle());
+            albumDto = toNestedAlbumDto(doc.getAlbum());
         }
         return new TrackSearchResult(doc.getId(), doc.getTitle(),
                 doc.getAvailability() != null ? doc.getAvailability().name() : null,
                 doc.getLifecycleStatus() != null ? doc.getLifecycleStatus().name() : null,
                 artists, albumDto);
+    }
+
+    private NestedArtistDto toNestedArtistDto(NestedArtist artist) {
+        return new NestedArtistDto(artist.getId(), artist.getName(), s3Utils.parseUrl(artist.getAvatarS3Key()));
+    }
+
+    private NestedAlbumDto toNestedAlbumDto(NestedAlbum album) {
+        return new NestedAlbumDto(album.getId(), album.getTitle(), s3Utils.parseUrl(album.getCoverS3Key()));
     }
 }

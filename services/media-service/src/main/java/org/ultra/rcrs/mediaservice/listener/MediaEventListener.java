@@ -3,6 +3,7 @@ package org.ultra.rcrs.mediaservice.listener;
 import com.google.protobuf.Any;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowOptions;
+import io.temporal.common.RetryOptions;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -15,6 +16,7 @@ import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.mediaservice.dto.TranscodingWorkflowInput;
 import org.ultra.rcrs.mediaservice.temporal.workflow.AudioTranscodingWorkflow;
 
+import java.time.Duration;
 import java.util.UUID;
 
 import static org.ultra.rcrs.mediaservice.temporal.config.TemporalConfig.MEDIA_TASK_QUEUE;
@@ -49,6 +51,7 @@ public class MediaEventListener {
                         AudioTranscodingWorkflow.class,
                         WorkflowOptions.newBuilder()
                                 .setTaskQueue(MEDIA_TASK_QUEUE)
+                                .setWorkflowExecutionTimeout(Duration.ofMinutes(3))
                                 .setWorkflowId(UUID.randomUUID().toString())
                                 .build()
                 );

@@ -23,6 +23,9 @@ public class AlbumAdminDoc implements AlbumDoc {
     @Field(type = FieldType.Text)
     private String year;
 
+    @Field(type = FieldType.Keyword, index = false)
+    private String coverS3Key;
+
     @Field(type = FieldType.Keyword)
     private EntityStatus availability;
 

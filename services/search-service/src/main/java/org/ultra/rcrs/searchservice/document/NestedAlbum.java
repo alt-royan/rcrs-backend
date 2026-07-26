@@ -6,4 +6,5 @@ import lombok.Data;
 public class NestedAlbum {
     private String id;
     private String title;
+    private String coverS3Key;
 }

@@ -2,6 +2,7 @@ package org.ultra.rcrs.workflow.activity.impl;
 
 import io.temporal.spring.boot.ActivityImpl;
 import org.springframework.stereotype.Component;
+import org.ultra.rcrs.exceptions.ServiceUnavailableException;
 import org.ultra.rcrs.workflow.activity.ArtistActivity;
 import org.ultra.rcrs.workflow.client.ArtistClient;
 import org.ultra.rcrs.workflow.client.model.ArtistCreateModel;
@@ -21,7 +22,7 @@ public class ArtistActivityImpl implements ArtistActivity {
     public CreateResponse createArtist(ArtistCreateModel request) {
         var res = artistClient.createArtist(request);
         if (!res.getStatusCode().is2xxSuccessful() || res.getBody() == null) {
-            throw new RuntimeException("Unsupported behavior: response is not 2xx");
+            throw new ServiceUnavailableException("Unsupported behavior: response is not 2xx");
         }
         return res.getBody();
     }

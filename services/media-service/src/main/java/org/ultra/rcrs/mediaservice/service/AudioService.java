@@ -14,7 +14,6 @@ import org.ultra.rcrs.mediaservice.dao.repository.AudioRepository;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioUploadRepository;
 import org.ultra.rcrs.mediaservice.dto.*;
 import org.ultra.rcrs.mediaservice.utils.Hash;
-import org.ultra.rcrs.utils.S3Utils;
 import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.ServerSideEncryption;
@@ -40,7 +39,6 @@ public class AudioService {
     private final AudioRepository audioRepository;
     private final S3Presigner s3Presigner;
     private final UploadConfigurationProperties uploadProperties;
-    private final S3Utils s3Utils;
 
     @Transactional
     public S3PresignUrlResponse getPreSignUrl(PreloadFileRequest request) {
@@ -103,7 +101,7 @@ public class AudioService {
     public Map<UUID, AudioItemGroupBy> getAudiosByTrackId(String trackId) {
         List<AudioWithTrack> audios = audioRepository.findAllByTrackId(trackId);
         return audios.stream()
-                .map(a -> new AudioItem(a.id(), a.guid(), s3Utils.parseUrl(a.key()), a.codec(), a.container(),
+                .map(a -> new AudioItem(a.id(), a.guid(), a.key(), a.codec(), a.container(),
                         a.durationMs(), a.bitrate(), a.sampleRate(), a.byteSize(), a.main()))
                 .collect(Collectors.groupingBy(
                         AudioItem::getGuid,

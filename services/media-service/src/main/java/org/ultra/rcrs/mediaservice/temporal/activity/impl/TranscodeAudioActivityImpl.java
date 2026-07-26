@@ -45,19 +45,35 @@ public class TranscodeAudioActivityImpl implements TranscodeAudioActivity {
     }
 
     private @NonNull Process getProcess(File inputFile, String bitrate, File outputFile) throws IOException {
-        String loudnorm = String.format("loudnorm=I=%s:LRA=%s:TP=%s", properties.getLoudnorm().getI(), properties.getLoudnorm().getLRA(), properties.getLoudnorm().getTP());
-        ProcessBuilder pb = new ProcessBuilder(
-                "ffmpeg",
-                "-i", inputFile.getAbsolutePath(),
-                "-af", loudnorm,
-                "-c:a", properties.getCodec(),
-                "-b:a", bitrate,
-                "-ar", properties.getRate(),
-                "-vn",
-                "-map_metadata", "-1",
-                "-y",
-                "-f", properties.getFormat(),
-                outputFile.getAbsolutePath());
+        var enabled = properties.getLoudnorm().getEnabled();
+        ProcessBuilder pb;
+        if (enabled) {
+            String loudnorm = String.format("-af loudnorm=I=%s:LRA=%s:TP=%s", properties.getLoudnorm().getI(), properties.getLoudnorm().getLRA(), properties.getLoudnorm().getTP());
+            pb = new ProcessBuilder(
+                    "ffmpeg",
+                    "-i", inputFile.getAbsolutePath(),
+                    "-af", loudnorm,
+                    "-c:a", properties.getCodec(),
+                    "-b:a", bitrate,
+                    "-ar", properties.getRate(),
+                    "-vn",
+                    "-map_metadata", "-1",
+                    "-y",
+                    "-f", properties.getFormat(),
+                    outputFile.getAbsolutePath());
+        } else {
+            pb = new ProcessBuilder(
+                    "ffmpeg",
+                    "-i", inputFile.getAbsolutePath(),
+                    "-c:a", properties.getCodec(),
+                    "-b:a", bitrate,
+                    "-ar", properties.getRate(),
+                    "-vn",
+                    "-map_metadata", "-1",
+                    "-y",
+                    "-f", properties.getFormat(),
+                    outputFile.getAbsolutePath());
+        }
         pb.redirectError(ProcessBuilder.Redirect.DISCARD);
         return pb.start();
     }

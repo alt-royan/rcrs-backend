@@ -20,6 +20,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,7 +42,8 @@ public class TrackAdminService {
                 .map(this::toStandaloneDto);
     }
 
-    public Mono<PaginationResponse<TrackAdminStandaloneDto>> getAll(EntityStatus availabilityStatus,
+    public Mono<PaginationResponse<TrackAdminStandaloneDto>> getAll(String title,
+                                                                    EntityStatus availabilityStatus,
                                                                     LifecycleStatus lifecycleStatus,
                                                                     String albumId,
                                                                     Boolean explicit,
@@ -49,7 +51,7 @@ public class TrackAdminService {
                                                                     int limit,
                                                                     String sortDirection) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "releaseDate");
-        Query filter = buildQuery(availabilityStatus, lifecycleStatus, albumId, explicit);
+        Query filter = buildQuery(title, availabilityStatus, lifecycleStatus, albumId, explicit);
         Query page = Query.of(filter).with(sort).skip(offset).limit(limit);
 
         Mono<List<TrackAdminStandaloneDto>> items = mongoTemplate.find(page, TrackDocument.class, "tracks")
@@ -61,12 +63,16 @@ public class TrackAdminService {
                 (found, total) -> new PaginationResponse<>(found, total, offset, limit));
     }
 
-    private Query buildQuery(EntityStatus availabilityStatus,
+    private Query buildQuery(String title,
+                             EntityStatus availabilityStatus,
                              LifecycleStatus lifecycleStatus,
                              String albumId,
                              Boolean explicit) {
         Query query = new Query();
 
+        if (title != null && !title.isBlank()) {
+            query.addCriteria(Criteria.where("title").regex(Pattern.quote(title), "i"));
+        }
         if (availabilityStatus != null) {
             query.addCriteria(Criteria.where("availabilityStatus").is(availabilityStatus));
         }

@@ -1,6 +1,5 @@
 package org.ultra.rcrs.userservice.service;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -87,7 +86,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserProfileResponse getProfile(String userId) {
         User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new NotFoundException("User" + userId));
+                .orElseThrow(() -> new NotFoundException("User", userId));
 
         String avatarUrl = getAvatarUrl(user.getUserId());
 
@@ -104,7 +103,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserProfileResponse getCompactProfile(String userId) {
         User user = userRepository.findByUsername(userId)
-                .orElseThrow(() -> new NotFoundException("User" + userId));
+                .orElseThrow(() -> new NotFoundException("User", userId));
 
         String avatarUrl = getAvatarUrl(user.getUserId());
 

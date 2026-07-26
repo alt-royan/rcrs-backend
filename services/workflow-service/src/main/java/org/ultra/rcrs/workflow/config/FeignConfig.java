@@ -3,6 +3,7 @@ package org.ultra.rcrs.workflow.config;
 import feign.Logger;
 import feign.RequestInterceptor;
 import feign.Retryer;
+import feign.codec.ErrorDecoder;
 import feign.okhttp.OkHttpClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -30,5 +31,10 @@ public class FeignConfig {
     @Bean
     public Retryer retryer() {
         return new Retryer.Default(1000, 3000, 3);
+    }
+
+    @Bean
+    public ErrorDecoder errorDecoder() {
+        return new FeignErrorDecoder();
     }
 }

@@ -24,7 +24,7 @@ Integration tests use Testcontainers (Postgres, MongoDB, embedded Kafka) and req
 ```
 local/start.bat
 ```
-does: create the `rcrs` docker network → `mvnw.cmd clean install -DskipTests` → build then start `local/docker-compose.yml`. That compose file builds and runs all 8 services. `local/infra/docker-compose.yml` and the `elk/`, `keycloak/`, `s3/`, `temporal/` subfolders under `local/infra/` hold the supporting infrastructure (Postgres, MongoDB, Kafka, Elasticsearch/ELK, Keycloak, LocalStack S3, Temporal) that the app services expect to reach over the network at `192.168.1.3` (see the hardcoded hosts in `local/docker-compose.yml`) — adjust that IP for your own machine when running locally.
+does: create the `rcrs` docker network → `mvnw.cmd clean install -DskipTests` → build then start `local/docker-compose.yml`. That compose file builds and runs all 9 services. `local/infra/docker-compose.yml` and the `elk/`, `keycloak/`, `s3/`, `temporal/` subfolders under `local/infra/` hold the supporting infrastructure (Postgres, MongoDB, Kafka, Elasticsearch/ELK, Keycloak, LocalStack S3, Temporal) that the app services expect to reach over the network at `192.168.1.3` (see the hardcoded hosts in `local/docker-compose.yml`) — adjust that IP for your own machine when running locally.
 
 ## Architecture
 
@@ -38,6 +38,7 @@ does: create the `rcrs` docker network → `mvnw.cmd clean install -DskipTests` 
   - `/media/**` → media-service (prefix stripped)
   - `/api/search/**` → search-service (2 segments stripped)
   - `/api/catalog/**` → metadata-read-service (2 segments stripped)
+  - `/playlists/**` → playlist-service (no prefix stripped — the service maps `/playlists` itself)
   - metadata-write-service is **not** exposed through the gateway — it's write-path-internal only.
 - `services/metadata-write-service` — command side of catalog CQRS. Owns artists/albums/tracks as the source of truth in Postgres (Liquibase-managed, schema `rcrs_catalog`). Validates and persists writes, then emits protobuf domain events (create/update/delete/lifecycle-change/relationship-change) to Kafka (`Topics.CATALOG_CDC_TOPIC`).
 - `services/metadata-read-service` — query side of catalog CQRS. Consumes the CDC events from metadata-write-service and projects them into MongoDB, then serves fast reads through separate `admin` and `publ` (public) controllers/services. Do not expect it to accept writes.
@@ -45,7 +46,8 @@ does: create the `rcrs` docker network → `mvnw.cmd clean install -DskipTests` 
 - `services/media-service` — handles audio/image assets: upload, S3 storage (via LocalStack in local dev), image thumbnailing, and audio transcoding/loudness-normalization orchestrated as **Temporal workflows** (`temporal/workflow`, `temporal/activity`, `temporal/worker`). Publishes transcoding-status events (`Topics.MEDIA_TRANSCODING_TOPIC`).
 - `services/workflow-service` — cross-service saga/orchestration layer, also built on Temporal. Talks to metadata-write, media, and search services via Feign clients (`FEIGN_*_URL` env vars) to coordinate multi-step processes (e.g. publishing a track end-to-end) and runs a scheduled purge job (`WORKFLOW_PURGE_CRON`).
 - `services/user-service` — identity/profile service backed by Postgres (schema `rcrs_user`); consumes identity events from Keycloak (`Topics.IDENTITY_EVENTS_TOPIC`) to keep local user records in sync.
-- `web-ui` — a standalone static HTML/JS debug tool (`index.html`) plus a Python seeding script (`seed-1000-bars.py`) for exercising the catalog API; not part of the Spring build.
+- `services/playlist-service` — user playlists backed by Postgres (schema `rcrs_playlist`, own Liquibase changelog tables `playlist_databasechangelog*`). Serves reads/writes directly over REST (`PlaylistController`, owner taken from the JWT subject) **and** accepts the same four commands asynchronously as protobuf `DomainEvent`s on `Topics.PLAYLIST_COMMANDS_TOPIC` (`PLAYLIST_CREATED`, `TRACKS_ADDED_TO_PLAYLIST`, `TRACKS_REMOVED_FROM_PLAYLIST`, `PLAYLIST_DELETED`). Nothing in the repo produces to that topic yet — the consumer side exists for other services to drive playlists later, so keep the two paths in sync when changing playlist behavior.
+- `web-ui` — a standalone static HTML/JS debug tool (`index.html`) plus a Python seeding script (`seed.py`) and JSON/audio seed fixtures for exercising the catalog API; not part of the Spring build.
 
 ### Cross-cutting patterns
 
@@ -55,3 +57,4 @@ does: create the `rcrs` docker network → `mvnw.cmd clean install -DskipTests` 
 - **Short IDs**: `Base62`/`Url62` in shared-lib encode UUIDs into short, URL-friendly identifiers used in public-facing catalog URLs.
 - **Admin vs public split**: metadata-read-service and search-service both separate their controller/service layers into `admin` and `publ` packages — admin endpoints expose more/unfiltered data, public endpoints serve the storefront.
 - **Docker builds**: each service's `Dockerfile` is a multi-stage Maven build run from the repo root as build context (so it can `COPY` `shared-lib` and its own module), producing a slim `eclipse-temurin:21-jre-alpine` image running as a non-root user.
+- **Adding a service module** touches four places beyond the module itself: `<modules>` in the root `pom.xml`, a per-service build step in `.github/workflows/build.yaml` (pushes `ghcr.io/<owner>/rcrs-<name>:latest` on every push to `main`), a service entry in `local/docker-compose.yml`, and — if it should be publicly reachable — a route plus a `springdoc.swagger-ui.urls` entry in `gateway-api/src/main/resources/application.yaml`.
