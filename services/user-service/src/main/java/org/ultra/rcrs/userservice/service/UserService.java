@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.userservice.dto.IdentityEvent;
 import org.ultra.rcrs.userservice.dto.IdentityEventPayload;
 import org.ultra.rcrs.userservice.dto.UserProfileResponse;
@@ -86,7 +87,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserProfileResponse getProfile(String userId) {
         User user = userRepository.findByUserId(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found for userId: " + userId));
+                .orElseThrow(() -> new NotFoundException("User" + userId));
 
         String avatarUrl = getAvatarUrl(user.getUserId());
 
@@ -103,7 +104,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserProfileResponse getCompactProfile(String userId) {
         User user = userRepository.findByUsername(userId)
-                .orElseThrow(() -> new EntityNotFoundException("User not found for userId: " + userId));
+                .orElseThrow(() -> new NotFoundException("User" + userId));
 
         String avatarUrl = getAvatarUrl(user.getUserId());
 

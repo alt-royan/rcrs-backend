@@ -133,6 +133,11 @@ public class TrackAdminService {
                 .durationMs(doc.getDurationMs())
                 .trackNumber(doc.getTrackNumber())
                 .explicit(doc.getExplicit())
+                .album(TrackAdminStandaloneDto.AlbumEmbed.builder()
+                        .id(doc.getAlbum().getId())
+                        .title(doc.getAlbum().getTitle())
+                        .coverUrl(s3Utils.parseUrl(doc.getAlbum().getCoverS3Key()))
+                        .build())
                 .artists(doc.getArtists() != null
                         ? doc.getArtists().stream().map(a -> TrackAdminStandaloneDto.ArtistEmbed.builder()
                         .id(a.getId())

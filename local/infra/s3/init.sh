@@ -20,6 +20,13 @@ for BUCKET in $BUCKETS; do
     aws --endpoint-url="$ENDPOINT" s3 mb "s3://$BUCKET"
     echo "Bucket '$BUCKET' created."
   fi
+
+  echo "Applying CORS configuration to bucket '$BUCKET'..."
+  aws --endpoint-url="$ENDPOINT" s3api put-bucket-cors \
+    --bucket "$BUCKET" \
+    --cors-configuration file:///scripts/cors.json \
+    --region "$REGION"
+  echo "CORS configuration applied to '$BUCKET'."
 done
 
 echo "Creating SQS queue '$QUEUE'..."

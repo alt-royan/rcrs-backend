@@ -331,6 +331,7 @@ services:
       - ./s3/init.sh:/scripts/init.sh:ro
       - ./s3/queue-policy.json:/scripts/queue-policy.json:ro
       - ./s3/notification.json:/scripts/notification.json:ro
+      - ./s3/cors.json:/scripts/cors.json:ro
     environment:
       AWS_ACCESS_KEY_ID: test
       AWS_SECRET_ACCESS_KEY: test
