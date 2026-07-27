@@ -19,6 +19,5 @@ public class ArtistChangeAvailabilityStatusWorkflowImpl extends BaseWorkflow imp
             case HIDDEN -> activityFactory.artistActivity().hideArtist(id);
             case DELETED -> activityFactory.artistActivity().markArtistDeleted(id);
         }
-        ;
     }
 }

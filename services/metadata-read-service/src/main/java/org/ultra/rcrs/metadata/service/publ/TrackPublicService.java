@@ -32,6 +32,12 @@ public class TrackPublicService {
                 .map(this::toDto);
     }
 
+    public Mono<List<TrackPublicStandaloneDto>> getAllByIds(List<String> ids) {
+        return trackDocumentRepository.findAllByIdIn(ids)
+                .map(this::toStandaloneDto)
+                .collectList();
+    }
+
     public Mono<PaginationResponse<TrackPublicStandaloneDto>> getAllByAlbumId(String albumId, int offset, int limit) {
         Sort sort = Sort.by("trackNumber");
         Query filter = new Query(Criteria.where("album.id").is(albumId)

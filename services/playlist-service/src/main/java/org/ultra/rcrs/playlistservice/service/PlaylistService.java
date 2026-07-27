@@ -7,17 +7,21 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.exceptions.NotFoundException;
+import org.ultra.rcrs.playlistservice.dto.response.PaginationResponse;
+import org.ultra.rcrs.playlistservice.dto.response.PlaylistStandaloneDto;
+import org.ultra.rcrs.playlistservice.dto.response.PlaylistTrackViewDto;
+import org.ultra.rcrs.playlistservice.dto.response.PlaylistViewDto;
+import org.ultra.rcrs.playlistservice.mapper.PlaylistMapper;
 import org.ultra.rcrs.playlistservice.model.Playlist;
 import org.ultra.rcrs.playlistservice.model.PlaylistTrack;
+import org.ultra.rcrs.playlistservice.model.PlaylistTrackPK;
 import org.ultra.rcrs.playlistservice.model.PlaylistType;
 import org.ultra.rcrs.playlistservice.repository.OffsetBasedPageRequest;
 import org.ultra.rcrs.playlistservice.repository.PlaylistRepository;
 import org.ultra.rcrs.playlistservice.repository.PlaylistTrackRepository;
 
 import java.time.Instant;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,13 +31,13 @@ public class PlaylistService {
 
     private final PlaylistRepository playlistRepository;
     private final PlaylistTrackRepository playlistTrackRepository;
+    private final PlaylistMapper mapper;
 
     @Transactional
-    public Playlist createPlaylist(String id, String ownerId, String title, String description,
-                                    List<String> tags, List<String> trackIds, String coverS3Key,
-                                    boolean isPrivate, PlaylistType type) {
+    public UUID createPlaylist(UUID id, String ownerId, String title, String description,
+                               List<String> tags, List<String> trackIds, String coverS3Key,
+                               boolean isPrivate, PlaylistType type) {
         var now = Instant.now();
-        List<String> distinctTrackIds = trackIds != null ? trackIds.stream().distinct().toList() : List.of();
 
         Playlist playlist = Playlist.builder()
                 .id(id)
@@ -44,90 +48,104 @@ public class PlaylistService {
                 .coverS3Key(coverS3Key)
                 .isPrivate(isPrivate)
                 .type(type != null ? type : PlaylistType.CUSTOM)
-                .trackCount(distinctTrackIds.size())
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
 
+        List<String> distinctTrackIds = trackIds != null ? trackIds.stream().distinct().toList() : List.of();
+
+        List<PlaylistTrack> tracks = new ArrayList<>();
+
         for (int i = 0; i < distinctTrackIds.size(); i++) {
-            playlist.getTracks().add(PlaylistTrack.builder()
-                    .playlist(playlist)
+            tracks.add(PlaylistTrack.builder()
+                    .playlistId(id)
                     .trackId(distinctTrackIds.get(i))
-                    .position(i)
+                    .position(i + 1)
                     .addedAt(now)
                     .build());
         }
 
-        Playlist saved = playlistRepository.save(playlist);
+        var saved = playlistRepository.save(playlist);
+        playlistTrackRepository.saveAll(tracks);
         log.info("Created playlist: id={}, ownerId={}", saved.getId(), saved.getOwnerId());
-        return saved;
+        return saved.getId();
     }
 
-    public List<Playlist> getPlaylistsByIds(List<String> ids) {
-        return playlistRepository.findAllByIdIn(ids);
+    public PlaylistViewDto getPlaylistById(UUID id) {
+        return playlistRepository.findByIdWithTrackCount(id)
+                .map(mapper::toViewDto)
+                .orElseThrow(() -> new NotFoundException("Playlist", id));
     }
 
-    public List<PlaylistTrack> getTracks(String playlistId, int offset, int limit, String sortBy, Sort.Direction direction) {
+    public List<PlaylistStandaloneDto> getPlaylistsByIds(List<UUID> ids) {
+        return playlistRepository.findAllByIdIn(ids).stream()
+                .map(mapper::toStandaloneDto)
+                .toList();
+    }
+
+    public PaginationResponse<PlaylistTrackViewDto> getTracks(UUID playlistId, int offset, int limit, String sortBy, Sort.Direction direction) {
         String sortField = "addedAt".equalsIgnoreCase(sortBy) ? "addedAt" : "position";
         Pageable pageable = new OffsetBasedPageRequest(offset, limit, Sort.by(direction, sortField));
-        return playlistTrackRepository.findByPlaylistId(playlistId, pageable);
+        List<PlaylistTrackViewDto> tracks = playlistTrackRepository.findByPlaylistId(playlistId, pageable).stream()
+                .map(mapper::toTrackViewDto).toList();
+        Integer count = playlistTrackRepository.countByPlaylistId(playlistId);
+        return new PaginationResponse<>(tracks, count, offset, limit);
     }
 
     @Transactional
-    public Playlist addTracks(String playlistId, List<String> trackIds) {
+    public void addTracks(UUID playlistId, List<String> trackIds) {
         Playlist playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new NotFoundException("Playlist", playlistId));
 
-        List<PlaylistTrack> existing = playlist.getTracks();
-        Set<String> existingIds = existing.stream().map(PlaylistTrack::getTrackId).collect(Collectors.toSet());
+        Set<String> existingIds = playlistTrackRepository.findAllByPlaylistId(playlist.getId()).stream()
+                .map(PlaylistTrack::getTrackId)
+                .collect(Collectors.toSet());
         List<String> toAdd = trackIds.stream().distinct().filter(trackId -> !existingIds.contains(trackId)).toList();
         if (toAdd.isEmpty()) {
-            return playlist;
+            return;
         }
 
-        int startPosition = existing.size();
         var now = Instant.now();
+        var lastPosition = existingIds.size();
         for (int i = 0; i < toAdd.size(); i++) {
-            existing.add(PlaylistTrack.builder()
-                    .playlist(playlist)
+            playlistTrackRepository.save(PlaylistTrack.builder()
+                    .playlistId(playlist.getId())
                     .trackId(toAdd.get(i))
-                    .position(startPosition + i)
+                    .position(lastPosition + i + 1)
                     .addedAt(now)
                     .build());
         }
-        playlist.setTrackCount(existing.size());
+
         playlist.setUpdatedAt(now);
 
-        Playlist saved = playlistRepository.save(playlist);
+        playlistRepository.save(playlist);
         log.info("Added {} tracks to playlist: id={}", trackIds.size(), playlistId);
-        return saved;
     }
 
     @Transactional
-    public Playlist deleteTracks(String playlistId, List<String> trackIds) {
+    public void deleteTracks(UUID playlistId, List<String> trackIds) {
         Playlist playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new NotFoundException("Playlist", playlistId));
 
-        List<PlaylistTrack> tracks = playlist.getTracks();
-        boolean removed = tracks.removeIf(t -> trackIds.contains(t.getTrackId()));
-        if (!removed) {
-            return playlist;
-        }
+        List<PlaylistTrackPK> forDelete = trackIds.stream().distinct()
+                .map(id -> new PlaylistTrackPK(playlist.getId(), id))
+                .toList();
+        playlistTrackRepository.deleteAllById(forDelete);
+        List<PlaylistTrack> survivors = playlistTrackRepository.findAllByPlaylistId(playlist.getId());
 
-        tracks.sort(Comparator.comparingInt(PlaylistTrack::getPosition));
-        for (int i = 0; i < tracks.size(); i++) {
-            tracks.get(i).setPosition(i);
+        survivors.sort(Comparator.comparingInt(PlaylistTrack::getPosition));
+        for (int i = 0; i < survivors.size(); i++) {
+            survivors.get(i).setPosition(i + 1);
         }
-        playlist.setTrackCount(tracks.size());
         playlist.setUpdatedAt(Instant.now());
 
-        Playlist saved = playlistRepository.save(playlist);
+        playlistRepository.save(playlist);
+        playlistTrackRepository.saveAll(survivors);
         log.info("Removed tracks from playlist: id={}, trackIds={}", playlistId, trackIds);
-        return saved;
     }
 
     @Transactional
-    public void deletePlaylist(String playlistId) {
+    public void deletePlaylist(UUID playlistId) {
         playlistRepository.deleteById(playlistId);
         log.info("Deleted playlist: id={}", playlistId);
     }

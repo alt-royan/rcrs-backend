@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.enums.AlbumType;
+import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.metadata.dto.AlbumPublicStandaloneDto;
 import org.ultra.rcrs.metadata.dto.ArtistPublicViewDto;
 import org.ultra.rcrs.metadata.dto.ErrorResponse;
@@ -49,9 +50,10 @@ public class ArtistPublicController {
     public Mono<PaginationResponse<AlbumPublicStandaloneDto>> getAlbumsByArtist(
             @Parameter(description = "Base62-encoded short ID of the artist.") @PathVariable("artistId") String artistId,
             @Parameter(description = "Optional album type filter (e.g. ALBUM, SINGLE, EP, COMPILATION).") @RequestParam(required = false) AlbumType type,
+            @Parameter(description = "Optional artist role filter (e.g. MAIN_ARTIST, FEATURED_ARTIST).") @RequestParam(required = false) ArtistRole role,
             @Parameter(description = "Sort direction by release date: \"asc\" or \"desc\".") @RequestParam(required = false, defaultValue = "asc") String sort,
             @Parameter(description = "Zero-based offset of the first item to return.") @RequestParam(required = false, defaultValue = "0") int offset,
             @Parameter(description = "Maximum number of items to return.") @RequestParam(required = false, defaultValue = "50") int limit) {
-        return albumPublicService.getAllByArtistId(artistId, type, sort, offset, limit);
+        return albumPublicService.getAllByArtistId(artistId, type, role, sort, offset, limit);
     }
 }

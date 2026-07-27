@@ -1,5 +1,6 @@
 package org.ultra.rcrs.utils;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.ultra.rcrs.enums.ImageSize;
@@ -14,6 +15,7 @@ import java.util.regex.Pattern;
 public class ImageUtils {
 
     private final String cdnImagesEndpoint;
+    @Getter
     private final Map<ImageSize, Integer> thumbnailSizes;
 
     public String parseKey(String uri) {
@@ -50,7 +52,4 @@ public class ImageUtils {
         return urls;
     }
 
-    public Map<ImageSize, Integer> getThumbnailSizes() {
-        return thumbnailSizes;
-    }
 }

@@ -14,6 +14,7 @@ import org.ultra.rcrs.events.playlist.DeleteTracksFromPlaylistEventOuterClass;
 import org.ultra.rcrs.kafka.Topics;
 import org.ultra.rcrs.playlistservice.model.PlaylistType;
 import org.ultra.rcrs.playlistservice.service.PlaylistService;
+import org.ultra.rcrs.utils.Url62;
 
 @Component
 @Slf4j
@@ -43,9 +44,9 @@ public class PlaylistCommandListener {
     private void onPlaylistCreated(Any payload) {
         try {
             CreatePlaylistEventOuterClass.CreatePlaylistEvent event = payload.unpack(CreatePlaylistEventOuterClass.CreatePlaylistEvent.class);
-            playlistService.createPlaylist(event.getId(), event.getOwnerId(), event.getTitle(),
+            playlistService.createPlaylist(Url62.decode(event.getId()), event.getOwnerId(), event.getTitle(),
                     event.getDescription(), event.getTagsList(), event.getTrackIdsList(), event.getCoverS3Key(),
-                    !event.getIsPublic(), PlaylistType.CUSTOM);
+                    event.getIsPrivate(), PlaylistType.valueOf(event.getType().name()));
         } catch (Exception e) {
             log.error("Failed to unpack CreatePlaylistEvent: {}", e.getMessage(), e);
         }
@@ -54,7 +55,7 @@ public class PlaylistCommandListener {
     private void onTracksAddedToPlaylist(Any payload) {
         try {
             AddTracksToPlaylistEventOuterClass.AddTracksToPlaylistEvent event = payload.unpack(AddTracksToPlaylistEventOuterClass.AddTracksToPlaylistEvent.class);
-            playlistService.addTracks(event.getPlaylistId(), event.getTrackIdsList());
+            playlistService.addTracks(Url62.decode(event.getPlaylistId()), event.getTrackIdsList());
         } catch (Exception e) {
             log.error("Failed to unpack AddTracksToPlaylistEvent: {}", e.getMessage(), e);
         }
@@ -63,7 +64,7 @@ public class PlaylistCommandListener {
     private void onTracksRemovedFromPlaylist(Any payload) {
         try {
             DeleteTracksFromPlaylistEventOuterClass.DeleteTracksFromPlaylistEvent event = payload.unpack(DeleteTracksFromPlaylistEventOuterClass.DeleteTracksFromPlaylistEvent.class);
-            playlistService.deleteTracks(event.getPlaylistId(), event.getTrackIdsList());
+            playlistService.deleteTracks(Url62.decode(event.getPlaylistId()), event.getTrackIdsList());
         } catch (Exception e) {
             log.error("Failed to unpack DeleteTracksFromPlaylistEvent: {}", e.getMessage(), e);
         }
@@ -72,7 +73,7 @@ public class PlaylistCommandListener {
     private void onPlaylistDeleted(Any payload) {
         try {
             DeletePlaylistEventOuterClass.DeletePlaylistEvent event = payload.unpack(DeletePlaylistEventOuterClass.DeletePlaylistEvent.class);
-            playlistService.deletePlaylist(event.getId());
+            playlistService.deletePlaylist(Url62.decode(event.getId()));
         } catch (Exception e) {
             log.error("Failed to unpack DeletePlaylistEvent: {}", e.getMessage(), e);
         }

@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.enums.AlbumType;
+import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.AlbumPublicStandaloneDto;
 import org.ultra.rcrs.metadata.dto.AlbumPublicViewDto;
@@ -40,13 +41,16 @@ public class AlbumPublicService {
                         .map(totals -> toDto(doc, totalsOf(totals, doc.getId()))));
     }
 
-    public Mono<PaginationResponse<AlbumPublicStandaloneDto>> getAllByArtistId(String artistId, AlbumType albumType, String sortDirection, int offset, int limit) {
+    public Mono<PaginationResponse<AlbumPublicStandaloneDto>> getAllByArtistId(String artistId, AlbumType albumType, ArtistRole role, String sortDirection, int offset, int limit) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "releaseDate");
         Query filter = new Query(Criteria.where("artists.id").is(artistId)
                 .and("lifecycleStatus").is("PUBLISHED")
                 .and("availabilityStatus").in("ACTIVE", "HIDDEN"));
         if (albumType != null) {
             filter.addCriteria(Criteria.where("type").is(albumType));
+        }
+        if (role != null) {
+            filter.addCriteria(Criteria.where("artist.role").is(role));
         }
         Query page = Query.of(filter).with(sort).skip(offset).limit(limit);
 

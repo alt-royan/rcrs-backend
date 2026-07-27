@@ -1,18 +1,12 @@
 package org.ultra.rcrs.workflow.config;
 
 import feign.Logger;
-import feign.RequestInterceptor;
 import feign.Retryer;
 import feign.codec.ErrorDecoder;
 import feign.okhttp.OkHttpClient;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
-import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
-import org.springframework.security.oauth2.core.OAuth2AccessToken;
-
-import java.util.Objects;
 
 @Slf4j
 @Configuration

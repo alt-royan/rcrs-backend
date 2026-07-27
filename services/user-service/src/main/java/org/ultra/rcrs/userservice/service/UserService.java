@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.ultra.rcrs.enums.ImageSize;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.userservice.dto.IdentityEvent;
 import org.ultra.rcrs.userservice.dto.IdentityEventPayload;
@@ -12,7 +13,6 @@ import org.ultra.rcrs.userservice.model.User;
 import org.ultra.rcrs.userservice.model.UserAvatar;
 import org.ultra.rcrs.userservice.repository.UserAvatarRepository;
 import org.ultra.rcrs.userservice.repository.UserRepository;
-import org.ultra.rcrs.enums.ImageSize;
 import org.ultra.rcrs.utils.ImageUtils;
 
 import java.net.URI;

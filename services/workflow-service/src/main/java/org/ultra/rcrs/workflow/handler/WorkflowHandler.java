@@ -3,8 +3,6 @@ package org.ultra.rcrs.workflow.handler;
 import io.temporal.client.WorkflowClient;
 import io.temporal.client.WorkflowOptions;
 import io.temporal.common.RetryOptions;
-import io.temporal.common.SearchAttributeKey;
-import io.temporal.common.SearchAttributes;
 import lombok.RequiredArgsConstructor;
 import org.jspecify.annotations.NonNull;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +28,7 @@ public class WorkflowHandler {
     @Value("${workflow.purge.cron}")
     private String purgeCronSchedule;
 
-    public CreateResponse startRegisterArtistWorkflow(ArtistUploadRequest request,Jwt jwt) {
+    public CreateResponse startRegisterArtistWorkflow(ArtistUploadRequest request, Jwt jwt) {
 
         ArtistRegistrationWorkflow workflow = workflowClient.newWorkflowStub(
                 ArtistRegistrationWorkflow.class,

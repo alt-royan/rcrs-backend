@@ -11,11 +11,7 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
-import org.ultra.rcrs.searchservice.document.AlbumPublicDoc;
-import org.ultra.rcrs.searchservice.document.ArtistPublicDoc;
-import org.ultra.rcrs.searchservice.document.NestedAlbum;
-import org.ultra.rcrs.searchservice.document.NestedArtist;
-import org.ultra.rcrs.searchservice.document.TrackPublicDoc;
+import org.ultra.rcrs.searchservice.document.*;
 import org.ultra.rcrs.searchservice.dto.*;
 import org.ultra.rcrs.utils.ImageUtils;
 
@@ -79,29 +75,29 @@ public class PublicSearchService {
                         .bool(b -> {
                             releaseYearRange.ifPresent(b::should);
                             return b
-                                .should(s -> s.multiMatch(mm -> mm
-                                        .query(query)
-                                        .fields("title^3")
-                                        .type(TextQueryType.BestFields)
-                                ))
-                                .should(s -> s.nested(n -> n
-                                        .path("tracks")
-                                        .query(nq -> nq.multiMatch(mm -> mm
-                                                .query(query)
-                                                .fields("tracks.title^1")
-                                                .type(TextQueryType.BestFields)
-                                        ))
-                                        .scoreMode(ChildScoreMode.Sum)
-                                ))
-                                .should(s -> s.nested(n -> n
-                                        .path("artists")
-                                        .query(nq -> nq.multiMatch(mm -> mm
-                                                .query(query)
-                                                .fields("artists.name^1")
-                                                .type(TextQueryType.BestFields)
-                                        ))
-                                        .scoreMode(ChildScoreMode.Sum)
-                                ));
+                                    .should(s -> s.multiMatch(mm -> mm
+                                            .query(query)
+                                            .fields("title^3")
+                                            .type(TextQueryType.BestFields)
+                                    ))
+                                    .should(s -> s.nested(n -> n
+                                            .path("tracks")
+                                            .query(nq -> nq.multiMatch(mm -> mm
+                                                    .query(query)
+                                                    .fields("tracks.title^1")
+                                                    .type(TextQueryType.BestFields)
+                                            ))
+                                            .scoreMode(ChildScoreMode.Sum)
+                                    ))
+                                    .should(s -> s.nested(n -> n
+                                            .path("artists")
+                                            .query(nq -> nq.multiMatch(mm -> mm
+                                                    .query(query)
+                                                    .fields("artists.name^1")
+                                                    .type(TextQueryType.BestFields)
+                                            ))
+                                            .scoreMode(ChildScoreMode.Sum)
+                                    ));
                         })
                 ))
                 .withPageable(PageRequest.of(page, size))

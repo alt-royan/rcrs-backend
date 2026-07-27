@@ -12,11 +12,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.ultra.rcrs.mediaservice.dto.AudioItem;
 import org.ultra.rcrs.mediaservice.dto.AudioItemGroupBy;
 import org.ultra.rcrs.mediaservice.service.AudioService;
 
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 

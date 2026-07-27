@@ -18,11 +18,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-import org.ultra.rcrs.exceptions.BadRequestException;
-import org.ultra.rcrs.exceptions.ConflictException;
-import org.ultra.rcrs.exceptions.DecodeFromBase62Exception;
-import org.ultra.rcrs.exceptions.NotFoundException;
-import org.ultra.rcrs.exceptions.ServiceUnavailableException;
+import org.ultra.rcrs.exceptions.*;
 
 import java.util.Map;
 import java.util.concurrent.CompletionException;

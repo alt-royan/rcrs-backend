@@ -22,8 +22,8 @@ import org.ultra.rcrs.metadata.repository.ArtistToAlbumRepository;
 import org.ultra.rcrs.utils.ImageUtils;
 import org.ultra.rcrs.utils.Url62;
 
-import java.time.LocalDate;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 

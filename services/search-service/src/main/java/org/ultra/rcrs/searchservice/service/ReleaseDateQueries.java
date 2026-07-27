@@ -1,7 +1,6 @@
 package org.ultra.rcrs.searchservice.service;
 
 import co.elastic.clients.elasticsearch._types.query_dsl.Query;
-import co.elastic.clients.json.JsonData;
 
 import java.time.LocalDate;
 import java.util.Optional;

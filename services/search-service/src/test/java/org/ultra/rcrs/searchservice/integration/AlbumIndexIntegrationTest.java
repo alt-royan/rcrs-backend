@@ -1,6 +1,5 @@
 package org.ultra.rcrs.searchservice.integration;
 
-import java.time.LocalDate;
 import org.junit.jupiter.api.Test;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.LifecycleStatus;
@@ -8,6 +7,7 @@ import org.ultra.rcrs.events.album.*;
 import org.ultra.rcrs.events.common.*;
 import org.ultra.rcrs.events.track.TrackAddedToAlbumEventOuterClass;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;

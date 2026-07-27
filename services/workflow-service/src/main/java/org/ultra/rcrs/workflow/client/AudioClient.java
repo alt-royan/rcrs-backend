@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.ultra.rcrs.workflow.config.FeignMediaServiceConfig;
-import org.ultra.rcrs.workflow.config.FeignMetadataServiceConfig;
 import org.ultra.rcrs.workflow.dto.AudioStatusResponse;
 
 import java.util.List;

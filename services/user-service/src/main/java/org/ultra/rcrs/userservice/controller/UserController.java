@@ -1,10 +1,10 @@
 package org.ultra.rcrs.userservice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -16,10 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ultra.rcrs.userservice.dto.ErrorResponse;
 import org.ultra.rcrs.userservice.dto.UserProfileResponse;
-import org.ultra.rcrs.userservice.service.UserAvatarService;
 import org.ultra.rcrs.userservice.service.UserService;
-
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/me")

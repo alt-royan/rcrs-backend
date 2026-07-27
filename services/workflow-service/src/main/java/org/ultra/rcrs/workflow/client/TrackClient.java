@@ -10,7 +10,6 @@ import org.ultra.rcrs.workflow.client.model.ArtistsToEntityModel;
 import org.ultra.rcrs.workflow.client.model.OthersToTrackModel;
 import org.ultra.rcrs.workflow.client.model.TrackUploadModel;
 import org.ultra.rcrs.workflow.config.FeignMediaServiceConfig;
-import org.ultra.rcrs.workflow.config.FeignMetadataServiceConfig;
 import org.ultra.rcrs.workflow.dto.StatusDto;
 import org.ultra.rcrs.workflow.dto.response.CreateResponse;
 
