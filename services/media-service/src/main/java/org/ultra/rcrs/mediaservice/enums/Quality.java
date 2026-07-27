@@ -1,5 +1,5 @@
 package org.ultra.rcrs.mediaservice.enums;
 
 public enum Quality {
-    LOW, MID, HIGH
+    LOW, MID, HIGH, ORIGINAL
 }

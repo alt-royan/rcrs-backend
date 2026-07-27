@@ -100,8 +100,8 @@ public class AudioService {
     public Map<UUID, AudioItemGroupBy> getAudiosByTrackId(String trackId) {
         List<AudioWithTrack> audios = audioRepository.findAllByTrackId(trackId);
         return audios.stream()
-                .map(a -> new AudioItem(a.id(), a.guid(), a.key(), a.codec(), a.container(),
-                        a.durationMs(), a.bitrate(), a.sampleRate(), a.byteSize(), a.main()))
+                .map(a -> new AudioItem(a.id(), a.guid(), a.key(), a.codec(), a.container(), a.contentType(),
+                        a.durationMs(), a.bitrate(), a.quality(), a.sampleRate(), a.byteSize(), a.main()))
                 .collect(Collectors.groupingBy(
                         AudioItem::getGuid,
                         Collectors.collectingAndThen(

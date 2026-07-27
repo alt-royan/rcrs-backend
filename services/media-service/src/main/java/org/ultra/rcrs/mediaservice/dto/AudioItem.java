@@ -3,6 +3,7 @@ package org.ultra.rcrs.mediaservice.dto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.ultra.rcrs.mediaservice.enums.Quality;
 
 import java.util.UUID;
 
@@ -26,11 +27,17 @@ public class AudioItem {
     @Schema(description = "Container/format of the encoded file (e.g. mp4, ogg, mp3)")
     private String container;
 
+    @Schema(description = "ContainerType of the encoded file (e.g. audio/ogg)")
+    private String contentType;
+
     @Schema(description = "Duration of the audio in milliseconds")
     private Integer durationMs;
 
     @Schema(description = "Bitrate of this encoded variant, as a display string (e.g. \"128k\")")
     private String bitrate;
+
+    @Schema(description = "Quality of this encoded variant, as a display string (LOW, MID, HIGH)")
+    private Quality quality;
 
     @Schema(description = "Sample rate of this encoded variant, as a display string (e.g. \"44100\")")
     private String sampleRate;

@@ -23,7 +23,7 @@ public class TranscodeAudioActivityImpl implements TranscodeAudioActivity {
     @Override
     public File transcode(File inputFile, String bitrate) {
         try {
-            File outputFile = File.createTempFile("audio-transcode-output-", ".ogg");
+            File outputFile = File.createTempFile("audio-transcode-output-", "." + properties.getFormat());
 
             Process process = getProcess(inputFile, bitrate, outputFile);
 
@@ -48,7 +48,7 @@ public class TranscodeAudioActivityImpl implements TranscodeAudioActivity {
         var enabled = properties.getLoudnorm().getEnabled();
         ProcessBuilder pb;
         if (enabled) {
-            String loudnorm = String.format("-af loudnorm=I=%s:LRA=%s:TP=%s", properties.getLoudnorm().getI(), properties.getLoudnorm().getLRA(), properties.getLoudnorm().getTP());
+            String loudnorm = String.format("loudnorm=I=%s:LRA=%s:TP=%s", properties.getLoudnorm().getI(), properties.getLoudnorm().getLRA(), properties.getLoudnorm().getTP());
             pb = new ProcessBuilder(
                     "ffmpeg",
                     "-i", inputFile.getAbsolutePath(),
@@ -56,6 +56,7 @@ public class TranscodeAudioActivityImpl implements TranscodeAudioActivity {
                     "-c:a", properties.getCodec(),
                     "-b:a", bitrate,
                     "-ar", properties.getRate(),
+                    "-movflags", "+faststart",
                     "-vn",
                     "-map_metadata", "-1",
                     "-y",
@@ -68,13 +69,14 @@ public class TranscodeAudioActivityImpl implements TranscodeAudioActivity {
                     "-c:a", properties.getCodec(),
                     "-b:a", bitrate,
                     "-ar", properties.getRate(),
+                    "-movflags", "+faststart",
                     "-vn",
                     "-map_metadata", "-1",
                     "-y",
                     "-f", properties.getFormat(),
                     outputFile.getAbsolutePath());
         }
-        pb.redirectError(ProcessBuilder.Redirect.DISCARD);
+        pb.redirectError(ProcessBuilder.Redirect.PIPE);
         return pb.start();
     }
 }

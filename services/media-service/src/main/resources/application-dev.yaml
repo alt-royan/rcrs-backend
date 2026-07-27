@@ -116,7 +116,7 @@ image:
       lg: ${IMAGE_THUMBNAILS_SIZES_LG:1024}
 
 media:
-  stream:
+  audio:
     bucket:
       name: ${AUDIO_BUCKET_NAME}
     signature-duration: ${AUDIO_SIGNATURE_DURATION}
@@ -125,10 +125,14 @@ media:
       duration:
         min: ${AUDIO_VALIDATION_DURATION_MIN}
         max: ${AUDIO_VALIDATION_DURATION_MAX}
-    bitrates: ${AUDIO_BITRATES}
+    quality:
+      low: ${AUDIO_QUALITY_LOW}
+      mid: ${AUDIO_QUALITY_MID}
+      high: ${AUDIO_QUALITY_HIGH}
     codec: ${AUDIO_CODEC}
     rate: ${AUDIO_RATE}
     format: ${AUDIO_FORMAT}
+    content-type: ${AUDIO_CONTENT_TYPE}
     loudnorm:
       enabled: ${AUDIO_LOUDNORM_ENABLED}
       I: ${AUDIO_LOUDNORM_I}

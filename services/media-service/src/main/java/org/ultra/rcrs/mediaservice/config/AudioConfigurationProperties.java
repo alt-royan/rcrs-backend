@@ -14,15 +14,23 @@ public class AudioConfigurationProperties {
     private Duration signatureDuration;
     private Validation validation;
     private Loudnorm loudnorm;
-    private List<String> bitrates;
+    private Quality quality;
     private String codec;
     private String rate;
     private String format;
+    private String contentType;
 
     @Data
     public static class AudioDuration {
         private Duration min;
         private Duration max;
+    }
+
+    @Data
+    public static class Quality {
+        private String low;
+        private String mid;
+        private String high;
     }
 
     @Data

@@ -24,8 +24,6 @@ import java.util.UUID;
 @Service
 public class DownloadService {
 
-    private static final String DEFAULT_CONTENT_TYPE = "application/octet-stream";
-
     private final AudioRepository audioRepository;
     private final TrackToAudioRepository trackToAudioRepository;
     private final S3Presigner s3Presigner;
@@ -38,18 +36,13 @@ public class DownloadService {
     }
 
     public PresignedUrlResponse getByTrackId(String trackId, Quality quality) {
-        String bitrate = switch (quality) {
-            case LOW -> "128k";
-            case MID -> "192k";
-            case HIGH -> "320k";
-        };
         UUID mainGuid = trackToAudioRepository.findByTrackIdAndMain(trackId, true)
                 .orElseThrow(() -> new NotFoundException("Main audio for track " + trackId + " not found"))
                 .getGuid();
 
-        Audio audio = audioRepository.findByGuidAndBitrate(mainGuid, bitrate)
+        Audio audio = audioRepository.findByGuidAndQuality(mainGuid, quality)
                 .orElseThrow(() -> new NotFoundException(
-                        "Audio with bitrate " + bitrate + " for track " + trackId + " not found"));
+                        "Audio with quality " + quality + " for track " + trackId + " not found"));
         return presign(audio);
     }
 
@@ -61,7 +54,7 @@ public class DownloadService {
                 .bucket(properties.getDownload().getBucket().getName())
                 .key(audio.getKey())
                 .responseContentDisposition(contentDisposition)
-                .responseContentType(contentType(audio.getContainer()))
+                .responseContentType(audio.getContentType())
                 .build();
 
         GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
@@ -74,18 +67,5 @@ public class DownloadService {
         log.info("Presigned streaming URL for key [{}] expires at [{}]", audio.getKey(), presignedRequest.expiration());
 
         return new PresignedUrlResponse(presignedRequest.url().toExternalForm());
-    }
-
-    private static String contentType(String container) {
-        if (container == null) {
-            return DEFAULT_CONTENT_TYPE;
-        }
-        return switch (container.toLowerCase()) {
-            case "ogg" -> "audio/ogg";
-            case "mp3" -> "audio/mpeg";
-            case "wav" -> "audio/wav";
-            case "flac" -> "audio/flac";
-            default -> DEFAULT_CONTENT_TYPE;
-        };
     }
 }

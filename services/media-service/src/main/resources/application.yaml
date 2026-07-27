@@ -116,7 +116,7 @@ image:
       lg: 1024
 
 media:
-  stream:
+  audio:
     bucket:
       name: rcrs-stream
     signature-duration: 30m
@@ -125,10 +125,14 @@ media:
       duration:
         min: 1s
         max: 2h
-    bitrates: 128k, 192k, 320k
-    codec: libvorbis
+    quality:
+      low: 96k
+      mid: 128k
+      high: 192k
+    codec: aac
     rate: 44100
-    format: ogg
+    format: m4a
+    content-type: audio/mp4
     loudnorm:
       enabled: true
       I: -18
