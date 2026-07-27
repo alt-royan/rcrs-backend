@@ -19,7 +19,7 @@ import org.ultra.rcrs.metadata.model.ArtistToAlbumPK;
 import org.ultra.rcrs.metadata.repository.AlbumRepository;
 import org.ultra.rcrs.metadata.repository.ArtistRepository;
 import org.ultra.rcrs.metadata.repository.ArtistToAlbumRepository;
-import org.ultra.rcrs.utils.S3Utils;
+import org.ultra.rcrs.utils.ImageUtils;
 import org.ultra.rcrs.utils.Url62;
 
 import java.time.LocalDateTime;
@@ -44,7 +44,7 @@ class AlbumServiceTest {
     @Mock
     private ArtistRepository artistRepository;
     @Mock
-    private S3Utils s3Utils;
+    private ImageUtils imageUtils;
     @Mock
     private CatalogEventProducer catalogEventProducer;
 
@@ -67,7 +67,7 @@ class AlbumServiceTest {
                 .type(request.getType())
                 .releaseDate(request.getReleaseDate())
                 .publishTimestamp(request.getPublishTimestamp())
-                .coverS3Key(s3Utils.parseKey(request.getCoverUri()))
+                .coverS3Key(imageUtils.parseKey(request.getCoverUri()))
                 .availabilityStatus(EntityStatus.ACTIVE)
                 .build();
 

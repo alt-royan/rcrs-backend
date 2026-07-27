@@ -8,7 +8,7 @@ import java.net.URI;
 import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
-public class S3Utils {
+public class ImageUtils {
 
     private final String s3ImagesEndpoint;
 

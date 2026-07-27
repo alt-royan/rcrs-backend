@@ -17,7 +17,7 @@ import org.ultra.rcrs.metadata.repository.AlbumRepository;
 import org.ultra.rcrs.metadata.repository.ArtistRepository;
 import org.ultra.rcrs.metadata.repository.ArtistToAlbumRepository;
 import org.ultra.rcrs.metadata.repository.TrackRepository;
-import org.ultra.rcrs.utils.S3Utils;
+import org.ultra.rcrs.utils.ImageUtils;
 import org.ultra.rcrs.utils.Url62;
 
 import java.util.List;
@@ -33,7 +33,7 @@ public class AlbumService {
     private final TrackRepository trackRepository;
     private final TrackService trackService;
     private final ArtistToAlbumRepository artistToAlbumRepository;
-    private final S3Utils s3Utils;
+    private final ImageUtils imageUtils;
     private final CatalogEventProducer catalogEventProducer;
 
     @Transactional
@@ -44,7 +44,7 @@ public class AlbumService {
                 .type(request.getType())
                 .releaseDate(request.getReleaseDate())
                 .publishTimestamp(request.getPublishTimestamp())
-                .coverS3Key(s3Utils.parseKey(request.getCoverUri()))
+                .coverS3Key(imageUtils.parseKey(request.getCoverUri()))
                 .availabilityStatus(EntityStatus.ACTIVE)
                 .build());
 

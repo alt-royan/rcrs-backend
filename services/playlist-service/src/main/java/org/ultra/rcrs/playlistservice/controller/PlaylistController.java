@@ -22,7 +22,7 @@ import org.ultra.rcrs.playlistservice.dto.response.PlaylistViewDto;
 import org.ultra.rcrs.playlistservice.mapper.PlaylistMapper;
 import org.ultra.rcrs.playlistservice.model.Playlist;
 import org.ultra.rcrs.playlistservice.service.PlaylistService;
-import org.ultra.rcrs.utils.S3Utils;
+import org.ultra.rcrs.utils.ImageUtils;
 import org.ultra.rcrs.utils.Url62;
 
 import java.util.List;
@@ -37,7 +37,7 @@ import java.util.UUID;
 public class PlaylistController {
 
     private final PlaylistService playlistService;
-    private final S3Utils s3Utils;
+    private final ImageUtils imageUtils;
 
     @GetMapping
     @Operation(summary = "Get playlists by ID",
@@ -56,7 +56,7 @@ public class PlaylistController {
             @Parameter(description = "Short (Base62) IDs of the playlists to fetch.", required = true)
             @RequestParam List<String> ids) {
         return playlistService.getPlaylistsByIds(ids).stream()
-                .map(playlist -> PlaylistMapper.toViewDto(playlist, s3Utils))
+                .map(playlist -> PlaylistMapper.toViewDto(playlist, imageUtils))
                 .toList();
     }
 
@@ -82,7 +82,7 @@ public class PlaylistController {
             @AuthenticationPrincipal Jwt jwt) {
         String id = Url62.encode(UUID.randomUUID());
         Playlist playlist = playlistService.createPlaylist(id, jwt.getSubject(), request.getTitle(), request.getDescription(),
-                request.getTags(), request.getTrackIds(), s3Utils.parseKey(request.getCoverUri()), request.isPrivate(),
+                request.getTags(), request.getTrackIds(), imageUtils.parseKey(request.getCoverUri()), request.isPrivate(),
                 request.getType());
         return ResponseEntity.status(HttpStatus.CREATED).body(new CreateResponse(playlist.getId()));
     }

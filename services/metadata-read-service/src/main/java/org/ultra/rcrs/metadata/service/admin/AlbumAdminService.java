@@ -1,7 +1,6 @@
 package org.ultra.rcrs.metadata.service.admin;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -18,12 +17,11 @@ import org.ultra.rcrs.metadata.model.AlbumDocument;
 import org.ultra.rcrs.metadata.repository.AlbumDocumentRepository;
 import org.ultra.rcrs.metadata.repository.AlbumTotalsRepository;
 import org.ultra.rcrs.metadata.repository.AlbumTotalsRepository.AlbumTotals;
-import org.ultra.rcrs.utils.S3Utils;
+import org.ultra.rcrs.utils.ImageUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -36,7 +34,7 @@ public class AlbumAdminService {
     private final AlbumDocumentRepository albumDocumentRepository;
     private final AlbumTotalsRepository albumTotalsRepository;
     private final ReactiveMongoTemplate mongoTemplate;
-    private final S3Utils s3Utils;
+    private final ImageUtils imageUtils;
 
     public Mono<AlbumAdminViewDto> getById(String id) {
         return albumDocumentRepository.findByIdForAdmin(id)
@@ -123,13 +121,13 @@ public class AlbumAdminService {
                 .year(doc.getYear())
                 .totalTracks(totals.totalTracks())
                 .totalDurationMs(totals.totalDurationMs())
-                .coverUrl(s3Utils.parseUrl(doc.getCoverS3Key()))
+                .coverUrl(imageUtils.parseUrl(doc.getCoverS3Key()))
                 .explicit(doc.getExplicit())
                 .artists(doc.getArtists() != null
                         ? doc.getArtists().stream().map(a -> AlbumAdminViewDto.ArtistEmbed.builder()
                         .id(a.getId())
                         .name(a.getName())
-                        .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
+                        .avatarUrl(imageUtils.parseUrl(a.getAvatarS3Key()))
                         .role(a.getRole())
                         .build()).collect(Collectors.toList())
                         : null)
@@ -147,13 +145,13 @@ public class AlbumAdminService {
                 .year(doc.getYear())
                 .totalTracks(totals.totalTracks())
                 .totalDurationMs(totals.totalDurationMs())
-                .coverUrl(s3Utils.parseUrl(doc.getCoverS3Key()))
+                .coverUrl(imageUtils.parseUrl(doc.getCoverS3Key()))
                 .explicit(doc.getExplicit())
                 .artists(doc.getArtists() != null
                         ? doc.getArtists().stream().map(a -> AlbumAdminStandaloneDto.ArtistEmbed.builder()
                         .id(a.getId())
                         .name(a.getName())
-                        .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
+                        .avatarUrl(imageUtils.parseUrl(a.getAvatarS3Key()))
                         .role(a.getRole())
                         .build()).collect(Collectors.toList())
                         : null)

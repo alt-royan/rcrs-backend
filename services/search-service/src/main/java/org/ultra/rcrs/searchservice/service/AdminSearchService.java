@@ -17,7 +17,7 @@ import org.ultra.rcrs.searchservice.document.NestedAlbum;
 import org.ultra.rcrs.searchservice.document.NestedArtist;
 import org.ultra.rcrs.searchservice.document.TrackAdminDoc;
 import org.ultra.rcrs.searchservice.dto.*;
-import org.ultra.rcrs.utils.S3Utils;
+import org.ultra.rcrs.utils.ImageUtils;
 
 import java.util.Collections;
 
@@ -27,7 +27,7 @@ import java.util.Collections;
 public class AdminSearchService {
 
     private final ElasticsearchOperations elasticsearchOperations;
-    private final S3Utils s3Utils;
+    private final ImageUtils imageUtils;
 
     public SearchCollection<ArtistResultWrapper> searchArtists(String query, int page, int size) {
         var nativeQ = NativeQuery.builder()
@@ -165,7 +165,7 @@ public class AdminSearchService {
         var tracks = doc.getTracks() != null
                 ? doc.getTracks().stream().map(t -> new NestedTrackDto(t.getId(), t.getTitle())).toList()
                 : Collections.<NestedTrackDto>emptyList();
-        return new ArtistSearchResult(doc.getId(), doc.getName(), s3Utils.parseUrl(doc.getAvatarS3Key()), doc.getTags(),
+        return new ArtistSearchResult(doc.getId(), doc.getName(), imageUtils.parseUrl(doc.getAvatarS3Key()), doc.getTags(),
                 doc.getAvailability() != null ? doc.getAvailability().name() : null, albums, tracks);
     }
 
@@ -177,7 +177,7 @@ public class AdminSearchService {
                 ? doc.getTracks().stream().map(t -> new NestedTrackDto(t.getId(), t.getTitle())).toList()
                 : Collections.<NestedTrackDto>emptyList();
         return new AlbumSearchResult(doc.getId(), doc.getTitle(), doc.getYear(),
-                s3Utils.parseUrl(doc.getCoverS3Key()),
+                imageUtils.parseUrl(doc.getCoverS3Key()),
                 doc.getAvailability() != null ? doc.getAvailability().name() : null,
                 doc.getLifecycleStatus() != null ? doc.getLifecycleStatus().name() : null,
                 artists, tracks);
@@ -198,10 +198,10 @@ public class AdminSearchService {
     }
 
     private NestedArtistDto toNestedArtistDto(NestedArtist artist) {
-        return new NestedArtistDto(artist.getId(), artist.getName(), s3Utils.parseUrl(artist.getAvatarS3Key()));
+        return new NestedArtistDto(artist.getId(), artist.getName(), imageUtils.parseUrl(artist.getAvatarS3Key()));
     }
 
     private NestedAlbumDto toNestedAlbumDto(NestedAlbum album) {
-        return new NestedAlbumDto(album.getId(), album.getTitle(), s3Utils.parseUrl(album.getCoverS3Key()));
+        return new NestedAlbumDto(album.getId(), album.getTitle(), imageUtils.parseUrl(album.getCoverS3Key()));
     }
 }

@@ -4,21 +4,21 @@ import org.ultra.rcrs.playlistservice.dto.response.PlaylistTrackViewDto;
 import org.ultra.rcrs.playlistservice.dto.response.PlaylistViewDto;
 import org.ultra.rcrs.playlistservice.model.Playlist;
 import org.ultra.rcrs.playlistservice.model.PlaylistTrack;
-import org.ultra.rcrs.utils.S3Utils;
+import org.ultra.rcrs.utils.ImageUtils;
 
 public final class PlaylistMapper {
 
     private PlaylistMapper() {
     }
 
-    public static PlaylistViewDto toViewDto(Playlist playlist, S3Utils s3Utils) {
+    public static PlaylistViewDto toViewDto(Playlist playlist, ImageUtils imageUtils) {
         return PlaylistViewDto.builder()
                 .id(playlist.getId())
                 .ownerId(playlist.getOwnerId())
                 .title(playlist.getTitle())
                 .description(playlist.getDescription())
                 .tags(playlist.getTags())
-                .coverUrl(s3Utils.parseUrl(playlist.getCoverS3Key()))
+                .coverUrl(imageUtils.parseUrl(playlist.getCoverS3Key()))
                 .isPrivate(playlist.getIsPrivate())
                 .type(playlist.getType())
                 .trackCount(playlist.getTrackCount())

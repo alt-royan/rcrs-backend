@@ -12,7 +12,7 @@ import org.ultra.rcrs.userservice.model.User;
 import org.ultra.rcrs.userservice.model.UserAvatar;
 import org.ultra.rcrs.userservice.repository.UserAvatarRepository;
 import org.ultra.rcrs.userservice.repository.UserRepository;
-import org.ultra.rcrs.utils.S3Utils;
+import org.ultra.rcrs.utils.ImageUtils;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -24,7 +24,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserAvatarRepository userAvatarRepository;
-    private final S3Utils s3Utils;
+    private final ImageUtils imageUtils;
 
     @Transactional
     public void handleEvent(IdentityEvent event) {
@@ -120,7 +120,7 @@ public class UserService {
     private String getAvatarUrl(String userId) {
         return userAvatarRepository.findById(userId)
                 .map(UserAvatar::getAvatarKey)
-                .map(s3Utils::parseUrl)
+                .map(imageUtils::parseUrl)
                 .orElse(null);
     }
 }

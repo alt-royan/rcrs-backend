@@ -1,7 +1,6 @@
 package org.ultra.rcrs.metadata.service.publ;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -16,7 +15,7 @@ import org.ultra.rcrs.metadata.model.AlbumDocument;
 import org.ultra.rcrs.metadata.repository.AlbumDocumentRepository;
 import org.ultra.rcrs.metadata.repository.AlbumTotalsRepository;
 import org.ultra.rcrs.metadata.repository.AlbumTotalsRepository.AlbumTotals;
-import org.ultra.rcrs.utils.S3Utils;
+import org.ultra.rcrs.utils.ImageUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -32,7 +31,7 @@ public class AlbumPublicService {
     private final AlbumDocumentRepository albumDocumentRepository;
     private final AlbumTotalsRepository albumTotalsRepository;
     private final ReactiveMongoTemplate mongoTemplate;
-    private final S3Utils s3Utils;
+    private final ImageUtils imageUtils;
 
     public Mono<AlbumPublicViewDto> getById(String id) {
         return albumDocumentRepository.findByIdForPublic(id)
@@ -78,13 +77,13 @@ public class AlbumPublicService {
                 .year(doc.getYear())
                 .totalTracks(totals.totalTracks())
                 .totalDurationMs(totals.totalDurationMs())
-                .coverUrl(s3Utils.parseUrl(doc.getCoverS3Key()))
+                .coverUrl(imageUtils.parseUrl(doc.getCoverS3Key()))
                 .explicit(doc.getExplicit())
                 .artists(doc.getArtists() != null
                         ? doc.getArtists().stream().map(a -> AlbumPublicViewDto.ArtistEmbed.builder()
                         .id(a.getId())
                         .name(a.getName())
-                        .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
+                        .avatarUrl(imageUtils.parseUrl(a.getAvatarS3Key()))
                         .role(a.getRole())
                         .build()).collect(Collectors.toList())
                         : null)
@@ -101,13 +100,13 @@ public class AlbumPublicService {
                 .year(doc.getYear())
                 .totalTracks(totals.totalTracks())
                 .totalDurationMs(totals.totalDurationMs())
-                .coverUrl(s3Utils.parseUrl(doc.getCoverS3Key()))
+                .coverUrl(imageUtils.parseUrl(doc.getCoverS3Key()))
                 .explicit(doc.getExplicit())
                 .artists(doc.getArtists() != null
                         ? doc.getArtists().stream().map(a -> AlbumPublicStandaloneDto.ArtistEmbed.builder()
                         .id(a.getId())
                         .name(a.getName())
-                        .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
+                        .avatarUrl(imageUtils.parseUrl(a.getAvatarS3Key()))
                         .role(a.getRole())
                         .build()).collect(Collectors.toList())
                         : null)
