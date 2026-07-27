@@ -19,7 +19,4 @@ public interface TrackDocumentRepository extends ReactiveMongoRepository<TrackDo
 
     @Query("{ 'album.id': ?0 }")
     Flux<TrackDocument> findAllByAlbumIdForAdmin(String albumId, Sort sort);
-
-    @Query("{ 'album.id': ?0, 'lifecycleStatus': 'PUBLISHED', 'availabilityStatus': { '$in': [ 'ACTIVE', 'HIDDEN' ] } }")
-    Flux<TrackDocument> findAllByAlbumIdForPublic(String albumId, Sort sort);
 }

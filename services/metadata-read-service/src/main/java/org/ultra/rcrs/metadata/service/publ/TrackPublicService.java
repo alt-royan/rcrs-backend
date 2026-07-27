@@ -3,17 +3,21 @@ package org.ultra.rcrs.metadata.service.publ;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.exceptions.NotFoundException;
+import org.ultra.rcrs.metadata.dto.PaginationResponse;
 import org.ultra.rcrs.metadata.dto.TrackAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.TrackPublicStandaloneDto;
 import org.ultra.rcrs.metadata.dto.TrackPublicViewDto;
 import org.ultra.rcrs.metadata.model.TrackDocument;
 import org.ultra.rcrs.metadata.repository.TrackDocumentRepository;
 import org.ultra.rcrs.utils.S3Utils;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,6 +25,7 @@ import java.util.stream.Collectors;
 public class TrackPublicService {
 
     private final TrackDocumentRepository trackDocumentRepository;
+    private final ReactiveMongoTemplate mongoTemplate;
     private final S3Utils s3Utils;
 
     public Mono<TrackPublicViewDto> getById(String id) {
@@ -29,9 +34,20 @@ public class TrackPublicService {
                 .map(this::toDto);
     }
 
-    public Flux<TrackPublicStandaloneDto> getAllByAlbumId(String albumId) {
-        return trackDocumentRepository.findAllByAlbumIdForPublic(albumId, Sort.by("trackNumber"))
-                .map(this::toStandaloneDto);
+    public Mono<PaginationResponse<TrackPublicStandaloneDto>> getAllByAlbumId(String albumId, int offset, int limit) {
+        Sort sort = Sort.by("trackNumber");
+        Query filter = new Query(Criteria.where("album.id").is(albumId)
+                .and("lifecycleStatus").is("PUBLISHED")
+                .and("availabilityStatus").in("ACTIVE", "HIDDEN"));
+        Query page = Query.of(filter).with(sort).skip(offset).limit(limit);
+
+        Mono<List<TrackPublicStandaloneDto>> items = mongoTemplate.find(page, TrackDocument.class, "tracks")
+                .map(this::toStandaloneDto)
+                .collectList();
+        Mono<Long> totalCount = mongoTemplate.count(filter, TrackDocument.class, "tracks");
+
+        return Mono.zip(items, totalCount,
+                (found, total) -> new PaginationResponse<>(found, total, offset, limit));
     }
 
     private TrackPublicViewDto toDto(TrackDocument doc) {

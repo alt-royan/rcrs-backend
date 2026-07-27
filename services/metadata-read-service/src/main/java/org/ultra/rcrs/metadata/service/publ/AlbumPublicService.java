@@ -11,6 +11,7 @@ import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.metadata.dto.AlbumPublicStandaloneDto;
 import org.ultra.rcrs.metadata.dto.AlbumPublicViewDto;
+import org.ultra.rcrs.metadata.dto.PaginationResponse;
 import org.ultra.rcrs.metadata.model.AlbumDocument;
 import org.ultra.rcrs.metadata.repository.AlbumDocumentRepository;
 import org.ultra.rcrs.metadata.repository.AlbumTotalsRepository;
@@ -40,18 +41,24 @@ public class AlbumPublicService {
                         .map(totals -> toDto(doc, totalsOf(totals, doc.getId()))));
     }
 
-    public Flux<AlbumPublicStandaloneDto> getAllByArtistId(String artistId, AlbumType albumType, String sortDirection) {
+    public Mono<PaginationResponse<AlbumPublicStandaloneDto>> getAllByArtistId(String artistId, AlbumType albumType, String sortDirection, int offset, int limit) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortDirection), "releaseDate");
-        Query query = new Query(Criteria.where("artists.id").is(artistId)
+        Query filter = new Query(Criteria.where("artists.id").is(artistId)
                 .and("lifecycleStatus").is("PUBLISHED")
                 .and("availabilityStatus").in("ACTIVE", "HIDDEN"));
         if (albumType != null) {
-            query.addCriteria(Criteria.where("type").is(albumType));
+            filter.addCriteria(Criteria.where("type").is(albumType));
         }
-        query.with(sort);
-        return mongoTemplate.find(query, AlbumDocument.class, "albums")
+        Query page = Query.of(filter).with(sort).skip(offset).limit(limit);
+
+        Mono<List<AlbumPublicStandaloneDto>> items = mongoTemplate.find(page, AlbumDocument.class, "albums")
                 .collectList()
-                .flatMapMany(this::toStandaloneDtos);
+                .flatMapMany(this::toStandaloneDtos)
+                .collectList();
+        Mono<Long> totalCount = mongoTemplate.count(filter, AlbumDocument.class, "albums");
+
+        return Mono.zip(items, totalCount,
+                (found, total) -> new PaginationResponse<>(found, total, offset, limit));
     }
 
     private Flux<AlbumPublicStandaloneDto> toStandaloneDtos(List<AlbumDocument> docs) {

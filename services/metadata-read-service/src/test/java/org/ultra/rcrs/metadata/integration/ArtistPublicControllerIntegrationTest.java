@@ -132,7 +132,11 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                         .build(artist.getId()))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Object.class).hasSize(1);
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(1)
+                .jsonPath("$.totalCount").isEqualTo(1)
+                .jsonPath("$.offset").isEqualTo(0)
+                .jsonPath("$.limit").isEqualTo(50);
     }
 
     @Test
@@ -182,7 +186,9 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                         .build(artist.getId()))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Object.class).hasSize(1);
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(1)
+                .jsonPath("$.totalCount").isEqualTo(1);
     }
 
     @Test
@@ -195,6 +201,31 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                         .build(artist.getId()))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Object.class).hasSize(0);
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(0)
+                .jsonPath("$.totalCount").isEqualTo(0);
+    }
+
+    @Test
+    void getAlbumsByArtist_respectsOffsetAndLimit() {
+        ArtistDocument artist = createArtistDoc("Paged Albums Artist", EntityStatus.ACTIVE);
+        for (int i = 0; i < 5; i++) {
+            createAlbumDocWithArtist("Album " + i, LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE,
+                    artist.getId(), "Paged Albums Artist", ArtistRole.MAIN_ARTIST);
+        }
+
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/catalog/artists/{id}/albums")
+                        .queryParam("offset", 2)
+                        .queryParam("limit", 2)
+                        .build(artist.getId()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(2)
+                .jsonPath("$.totalCount").isEqualTo(5)
+                .jsonPath("$.offset").isEqualTo(2)
+                .jsonPath("$.limit").isEqualTo(2);
     }
 }

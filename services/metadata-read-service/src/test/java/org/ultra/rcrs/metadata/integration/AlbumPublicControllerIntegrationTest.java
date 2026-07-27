@@ -114,7 +114,11 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .uri("/api/catalog/albums/{id}/tracks", album.getId())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Object.class).hasSize(2);
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(2)
+                .jsonPath("$.totalCount").isEqualTo(2)
+                .jsonPath("$.offset").isEqualTo(0)
+                .jsonPath("$.limit").isEqualTo(50);
     }
 
     @Test
@@ -127,7 +131,9 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .uri("/api/catalog/albums/{id}/tracks", album.getId())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Object.class).hasSize(1);
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(1)
+                .jsonPath("$.totalCount").isEqualTo(1);
     }
 
     @Test
@@ -140,7 +146,9 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .uri("/api/catalog/albums/{id}/tracks", album.getId())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Object.class).hasSize(1);
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(1)
+                .jsonPath("$.totalCount").isEqualTo(1);
     }
 
     @Test
@@ -151,6 +159,30 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .uri("/api/catalog/albums/{id}/tracks", album.getId())
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Object.class).hasSize(0);
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(0)
+                .jsonPath("$.totalCount").isEqualTo(0);
+    }
+
+    @Test
+    void getTracksByAlbum_respectsOffsetAndLimit() {
+        AlbumDocument album = createAlbumDoc("Paged Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        for (int i = 0; i < 5; i++) {
+            createTrackDoc("Track " + i, album.getId(), "Paged Album", LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE);
+        }
+
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/catalog/albums/{id}/tracks")
+                        .queryParam("offset", 2)
+                        .queryParam("limit", 2)
+                        .build(album.getId()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(2)
+                .jsonPath("$.totalCount").isEqualTo(5)
+                .jsonPath("$.offset").isEqualTo(2)
+                .jsonPath("$.limit").isEqualTo(2);
     }
 }

@@ -5,22 +5,6 @@
 - [ ] **Refine CORS configuration** — `gateway-api/src/main/java/org/ultra/rcrs/gatewayapi/SecurityConfig.java:33`
   - `//TODO:доработать` — placeholder CORS config, needs to be properly configured.
 
-- [ ] **`GET /me` всегда отдаёт 404** — `services/user-service/src/main/java/org/ultra/rcrs/userservice/service/UserService.java:105`
-  - `getCompactProfile` получает из контроллера `jwt.getSubject()` (`controller/UserController.java:23`),
-    но ищет пользователя через `findByUsername(userId)` — то есть сравнивает `sub` с `username`.
-    Соседний `getProfile` (`:88`) делает верно: `findByUserId`.
-  - Фикс: заменить `findByUsername` на `findByUserId` в `getCompactProfile`.
-  - До фикса клиентам использовать только `GET /me/profile`.
-
-- [ ] **`POST /media/stream` должен быть `GET`** — `services/media-service/src/main/java/org/ultra/rcrs/mediaservice/controller/StreamingController.java:20`
-  - Эндпоинт ничего не меняет: принимает два query-параметра (`trackId`, `quality`), тела нет,
-    возвращает presigned-ссылку. POST для чистого чтения ломает семантику HTTP, запрещает
-    кэширование и мешает клиентам (мобильные плееры и CDN ожидают GET).
-  - Фикс: `@PostMapping` → `@GetMapping`. Рядом `DownloadController` уже использует GET —
-    привести к одному виду.
-  - Поменять синхронно на клиентах; в `config/SecurityConfig.java:42` есть ещё мёртвый матчер
-    `/track/*/stream` на путь, которого не существует — заодно убрать.
-
 ## Найдено при разработке мобильного клиента
 
 Обнаружено при проектировании `rcrs-frontend/music-app-mobile` (см. его `docs/PLAN.md`).
@@ -48,13 +32,6 @@
     `GET /api/catalog/tracks/{id}` по одному. Плейлист на 50 треков — 51 запрос с телефона.
   - Фикс: `GET /api/catalog/tracks?ids=...` в metadata-read-service (или отдавать метаданные
     сразу в ответе playlist-service).
-
-- [ ] **В публичном каталоге нет пагинации** — `services/metadata-read-service/.../controller/publ/*`
-  - `GET /artists/{id}/albums` и `GET /albums/{id}/tracks` возвращают bare JSON array: без
-    обёртки, без `total`, без `offset/limit` — вся дискография и весь трек-лист целиком.
-    Пагинация есть только в search-service.
-  - Для мобильного это трафик и память на популярных артистах.
-  - Фикс: `offset/limit` + та же обёртка `PaginationResponse`, что используется в `/admin/*`.
 
 - [ ] **Обложки недостижимы с устройства и хосты рассинхронизированы**
   - `cdn.images.endpoint` задан по-разному: **только** metadata-read использует достижимый
@@ -129,16 +106,5 @@
   - Фикс: закоммитить realm-export JSON и подключить `--import-realm`; заодно завести
     public-клиент для мобильного (PKCE S256, redirect `musicapp://redirect`) декларативно.
   - Примечание: `music-app-mobile/.env.example` ссылается на realm `music` и порты
-    8081/8082/8083 — не соответствует реальности (`master`, шлюз `:8099`, Keycloak `:8180`).
+    8081/8082/8083 — не соответствует реальности (`master`, шлюз `:8099`, Keycloak `:8180`)./
 
-## Additional
-
-- [ ] Fix tests and test all functions
-- [ ] Tests in read service
-- [ ] Tests in playlist service
-- [ ] Tests in search service
-- 
-- [ ] Не устанавливается duration
-- Лагает фронт
-- Нет картинок при поисках
-- нужен даунлод ендпоит
