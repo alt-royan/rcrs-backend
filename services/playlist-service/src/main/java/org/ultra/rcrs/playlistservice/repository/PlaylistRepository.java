@@ -15,8 +15,12 @@ public interface PlaylistRepository extends JpaRepository<Playlist, UUID> {
 
     List<Playlist> findAllByIdIn(List<UUID> ids);
 
-    @Query("SELECT p.id, p.ownerId, p.title, p.description, p.tags, p.coverS3Key, p.isPrivate, p.type, count(pt), p.createdAt, p.updatedAt " +
-            "FROM Playlist p JOIN PlaylistTrack pt ON p.id = pt.playlist_id " +
-            "WHERE p.id = :id")
+    @Query("SELECT new PlaylistWithCountProjection(" +
+            "p.id, p.ownerId, p.title, p.description, p.tags, p.coverS3Key, p.isPrivate, p.type, " +
+            "cast(count(pt) as integer), p.createdAt, p.updatedAt) " +
+            "FROM Playlist p LEFT JOIN PlaylistTrack pt ON pt.playlistId = p.id " +
+            "WHERE p.id = :id " +
+            "GROUP BY p.id, p.ownerId, p.title, p.description, p.tags, p.coverS3Key, p.isPrivate, p.type, " +
+            "p.createdAt, p.updatedAt")
     Optional<PlaylistWithCountProjection> findByIdWithTrackCount(UUID id);
 }

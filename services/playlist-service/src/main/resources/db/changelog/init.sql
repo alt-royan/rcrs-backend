@@ -19,8 +19,9 @@ CREATE TABLE IF NOT EXISTS playlists
 CREATE TABLE IF NOT EXISTS playlist_tracks
 (
     playlist_id uuid                     NOT NULL,
-    track_id    text                     NOT NULL UNIQUE,
+    track_id    text                     NOT NULL,
     position    int                      NOT NULL,
     added_at    timestamp with time zone NOT NULL,
-    FOREIGN KEY (playlist_id) REFERENCES playlists (id)
+    PRIMARY KEY (playlist_id, track_id),
+    FOREIGN KEY (playlist_id) REFERENCES playlists (id) ON DELETE CASCADE
 );

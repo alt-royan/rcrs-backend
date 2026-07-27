@@ -18,6 +18,7 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.ultra.rcrs.events.common.DomainEventOuterClass;
+import org.ultra.rcrs.events.common.PlaylistTypeOuterClass;
 import org.ultra.rcrs.events.playlist.AddTracksToPlaylistEventOuterClass;
 import org.ultra.rcrs.events.playlist.CreatePlaylistEventOuterClass;
 import org.ultra.rcrs.events.playlist.DeletePlaylistEventOuterClass;
@@ -27,6 +28,8 @@ import org.ultra.rcrs.playlistservice.model.Playlist;
 import org.ultra.rcrs.playlistservice.model.PlaylistTrack;
 import org.ultra.rcrs.playlistservice.model.PlaylistType;
 import org.ultra.rcrs.playlistservice.repository.PlaylistRepository;
+import org.ultra.rcrs.playlistservice.repository.PlaylistTrackRepository;
+import org.ultra.rcrs.utils.Url62;
 
 import java.time.Instant;
 import java.util.List;
@@ -57,15 +60,19 @@ public abstract class BaseIntegrationTest {
     protected PlaylistRepository playlistRepository;
 
     @Autowired
+    protected PlaylistTrackRepository playlistTrackRepository;
+
+    @Autowired
     protected KafkaTemplate<String, byte[]> kafkaTemplate;
 
     @BeforeEach
     void clearData() {
+        playlistTrackRepository.deleteAll();
         playlistRepository.deleteAll();
     }
 
-    protected static String randomId() {
-        return UUID.randomUUID().toString();
+    protected static UUID randomId() {
+        return UUID.randomUUID();
     }
 
     protected Playlist createPlaylistDoc(String ownerId, String title, boolean isPrivate) {
@@ -79,24 +86,21 @@ public abstract class BaseIntegrationTest {
                 .coverS3Key("covers/" + title.toLowerCase().replace(" ", "-") + ".jpg")
                 .isPrivate(isPrivate)
                 .type(PlaylistType.CUSTOM)
-                .trackCount(0)
                 .createdAt(now)
                 .updatedAt(now)
                 .build());
     }
 
-    protected PlaylistTrack addTrackDoc(String playlistId, String trackId, int position) {
-        Playlist playlist = playlistRepository.findById(playlistId).orElseThrow();
-        PlaylistTrack track = PlaylistTrack.builder()
-                .playlist(playlist)
+    /**
+     * Positions are 1-based, matching {@code PlaylistService}.
+     */
+    protected PlaylistTrack addTrackDoc(UUID playlistId, String trackId, int position) {
+        return playlistTrackRepository.save(PlaylistTrack.builder()
+                .playlistId(playlistId)
                 .trackId(trackId)
                 .position(position)
                 .addedAt(Instant.now())
-                .build();
-        playlist.getTracks().add(track);
-        playlist.setTrackCount(playlist.getTracks().size());
-        playlistRepository.save(playlist);
-        return track;
+                .build());
     }
 
     protected void sendEvent(DomainEventOuterClass.EventType eventType,
@@ -118,42 +122,47 @@ public abstract class BaseIntegrationTest {
         Thread.sleep(1000);
     }
 
-    protected void sendCreatePlaylist(String id, String ownerId, String title) throws Exception {
+    protected void sendCreatePlaylist(UUID id, String ownerId, String title) throws Exception {
+        String encodedId = Url62.encode(id);
         var event = CreatePlaylistEventOuterClass.CreatePlaylistEvent.newBuilder()
-                .setId(id)
+                .setId(encodedId)
                 .setOwnerId(ownerId)
                 .setTitle(title)
                 .setDescription("desc for " + title)
-                .setCoverS3Key("covers/" + id + ".jpg")
-                .setIsPublic(true)
+                .setCoverS3Key("covers/" + encodedId + ".jpg")
+                .setIsPrivate(true)
+                .setType(PlaylistTypeOuterClass.PlaylistType.CUSTOM)
                 .build();
         sendEvent(DomainEventOuterClass.EventType.PLAYLIST_CREATED,
-                DomainEventOuterClass.AggregateType.PLAYLIST, id, event);
+                DomainEventOuterClass.AggregateType.PLAYLIST, encodedId, event);
     }
 
-    protected void sendAddTracksToPlaylist(String playlistId, List<String> trackIds) throws Exception {
+    protected void sendAddTracksToPlaylist(UUID playlistId, List<String> trackIds) throws Exception {
+        String encodedId = Url62.encode(playlistId);
         var event = AddTracksToPlaylistEventOuterClass.AddTracksToPlaylistEvent.newBuilder()
-                .setPlaylistId(playlistId)
+                .setPlaylistId(encodedId)
                 .addAllTrackIds(trackIds)
                 .build();
         sendEvent(DomainEventOuterClass.EventType.TRACKS_ADDED_TO_PLAYLIST,
-                DomainEventOuterClass.AggregateType.PLAYLIST, playlistId, event);
+                DomainEventOuterClass.AggregateType.PLAYLIST, encodedId, event);
     }
 
-    protected void sendDeleteTracksFromPlaylist(String playlistId, List<String> trackIds) throws Exception {
+    protected void sendDeleteTracksFromPlaylist(UUID playlistId, List<String> trackIds) throws Exception {
+        String encodedId = Url62.encode(playlistId);
         var event = DeleteTracksFromPlaylistEventOuterClass.DeleteTracksFromPlaylistEvent.newBuilder()
-                .setPlaylistId(playlistId)
+                .setPlaylistId(encodedId)
                 .addAllTrackIds(trackIds)
                 .build();
         sendEvent(DomainEventOuterClass.EventType.TRACKS_REMOVED_FROM_PLAYLIST,
-                DomainEventOuterClass.AggregateType.PLAYLIST, playlistId, event);
+                DomainEventOuterClass.AggregateType.PLAYLIST, encodedId, event);
     }
 
-    protected void sendDeletePlaylist(String id) throws Exception {
+    protected void sendDeletePlaylist(UUID id) throws Exception {
+        String encodedId = Url62.encode(id);
         var event = DeletePlaylistEventOuterClass.DeletePlaylistEvent.newBuilder()
-                .setId(id)
+                .setId(encodedId)
                 .build();
         sendEvent(DomainEventOuterClass.EventType.PLAYLIST_DELETED,
-                DomainEventOuterClass.AggregateType.PLAYLIST, id, event);
+                DomainEventOuterClass.AggregateType.PLAYLIST, encodedId, event);
     }
 }
