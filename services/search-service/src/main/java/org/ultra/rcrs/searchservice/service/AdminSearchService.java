@@ -73,12 +73,15 @@ public class AdminSearchService {
     }
 
     public SearchCollection<AlbumResultWrapper> searchAlbums(String query, int page, int size) {
+        var releaseYearRange = ReleaseDateQueries.forYearIn(query);
         var nativeQ = NativeQuery.builder()
                 .withQuery(Query.of(q -> q
-                        .bool(b -> b
+                        .bool(b -> {
+                            releaseYearRange.ifPresent(b::should);
+                            return b
                                 .should(s -> s.multiMatch(mm -> mm
                                         .query(query)
-                                        .fields("title^3", "year^1.5")
+                                        .fields("title^3")
                                         .type(TextQueryType.BestFields)
                                 ))
                                 .should(s -> s.nested(n -> n
@@ -98,8 +101,8 @@ public class AdminSearchService {
                                                 .type(TextQueryType.BestFields)
                                         ))
                                         .scoreMode(ChildScoreMode.Sum)
-                                ))
-                        )
+                                ));
+                        })
                 ))
                 .withPageable(PageRequest.of(page, size))
                 .build();
@@ -176,7 +179,7 @@ public class AdminSearchService {
         var tracks = doc.getTracks() != null
                 ? doc.getTracks().stream().map(t -> new NestedTrackDto(t.getId(), t.getTitle())).toList()
                 : Collections.<NestedTrackDto>emptyList();
-        return new AlbumSearchResult(doc.getId(), doc.getTitle(), doc.getYear(),
+        return new AlbumSearchResult(doc.getId(), doc.getTitle(), doc.getReleaseDate(),
                 imageUtils.parseUrls(doc.getCoverS3Key()),
                 doc.getAvailability() != null ? doc.getAvailability().name() : null,
                 doc.getLifecycleStatus() != null ? doc.getLifecycleStatus().name() : null,

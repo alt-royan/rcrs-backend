@@ -28,9 +28,9 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void searchAlbums_returnsMatchingResults() throws Exception {
-        indexAlbumPublicDoc("al1", "Abbey Road", "1969", "ACTIVE",
+        indexAlbumPublicDoc("al1", "Abbey Road", "1969-01-01", "ACTIVE",
                 List.of(nested("a1", "The Beatles")), null);
-        indexAlbumPublicDoc("al2", "Let It Be", "1970", "ACTIVE",
+        indexAlbumPublicDoc("al2", "Let It Be", "1970-01-01", "ACTIVE",
                 List.of(nested("a1", "The Beatles")), null);
         refreshAllIndices();
 
@@ -63,7 +63,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void searchMultipleTypes_returnsAllRequestedTypes() throws Exception {
         indexArtistPublicDoc("a1", "Test Artist", List.of("rock"), "ACTIVE", null, null);
-        indexAlbumPublicDoc("al1", "Test Album", "2025", "ACTIVE", null, null);
+        indexAlbumPublicDoc("al1", "Test Album", "2025-01-01", "ACTIVE", null, null);
         indexTrackPublicDoc("t1", "Test Track", "ACTIVE", null, null);
         refreshAllIndices();
 
@@ -79,7 +79,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void searchSingleType_onlyReturnsRequestedType() throws Exception {
         indexArtistPublicDoc("a1", "Solo Artist", List.of("rock"), "ACTIVE", null, null);
-        indexAlbumPublicDoc("al1", "Solo Album", "2025", "ACTIVE", null, null);
+        indexAlbumPublicDoc("al1", "Solo Album", "2025-01-01", "ACTIVE", null, null);
         refreshAllIndices();
 
         mockMvc.perform(get("/api/search")

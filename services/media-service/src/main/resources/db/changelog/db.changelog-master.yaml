@@ -7,3 +7,5 @@ databaseChangeLog:
       file: classpath:db/changelog/002-add-track-to-audio.sql
   - include:
       file: classpath:db/changelog/003-add-download-file.sql
+  - include:
+      file: classpath:db/changelog/004-timestamps-with-time-zone.sql

@@ -15,8 +15,7 @@ import org.ultra.rcrs.metadata.model.ArtistDocument;
 import org.ultra.rcrs.metadata.repository.AlbumDocumentRepository;
 import org.ultra.rcrs.metadata.repository.ArtistDocumentRepository;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 @Service
@@ -28,15 +27,14 @@ public class AlbumWriteService {
     private final ArtistDocumentRepository artistDocumentRepository;
 
     public void handleAlbumCreated(AlbumCreatedEventOuterClass.AlbumCreatedEvent event) {
-        LocalDateTime releaseDate = event.hasReleaseDate()
-                ? LocalDateTime.ofEpochSecond(event.getReleaseDate().getSeconds(), event.getReleaseDate().getNanos(), ZoneOffset.UTC)
-                : LocalDateTime.now();
+        LocalDate releaseDate = event.getReleaseDate().isEmpty()
+                ? LocalDate.now()
+                : LocalDate.parse(event.getReleaseDate());
         AlbumDocument doc = AlbumDocument.builder()
                 .id(event.getId())
                 .title(event.getTitle())
                 .type(org.ultra.rcrs.enums.AlbumType.valueOf(event.getType().name()))
                 .releaseDate(releaseDate)
-                .year(releaseDate.getYear())
                 .coverS3Key(event.getCoverS3Key())
                 .availabilityStatus(EntityStatus.valueOf(event.getAvailabilityStatus().name()))
                 .lifecycleStatus(LifecycleStatus.valueOf(event.getLifecycleStatus().name()))

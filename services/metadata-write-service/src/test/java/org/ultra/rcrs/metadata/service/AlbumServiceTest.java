@@ -22,8 +22,8 @@ import org.ultra.rcrs.metadata.repository.ArtistToAlbumRepository;
 import org.ultra.rcrs.utils.ImageUtils;
 import org.ultra.rcrs.utils.Url62;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -56,8 +56,8 @@ class AlbumServiceTest {
         AlbumUploadRequest request = new AlbumUploadRequest();
         request.setTitle("Test Album");
         request.setType(AlbumType.FULL);
-        request.setReleaseDate(LocalDateTime.of(2025, 1, 15, 0, 0));
-        request.setPublishTimestamp(OffsetDateTime.now());
+        request.setReleaseDate(LocalDate.of(2025, 1, 15));
+        request.setPublishTimestamp(Instant.now());
         request.setCoverUri("s3://bucket/cover.jpg");
 
         Album albumExpected = Album.builder()

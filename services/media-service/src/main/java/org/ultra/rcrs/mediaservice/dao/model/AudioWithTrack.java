@@ -1,6 +1,6 @@
 package org.ultra.rcrs.mediaservice.dao.model;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 public record AudioWithTrack(
@@ -13,7 +13,7 @@ public record AudioWithTrack(
         String bitrate,
         String sampleRate,
         Long byteSize,
-        OffsetDateTime creationTimestamp,
+        Instant creationTimestamp,
         String trackId,
         Boolean main
 ) {

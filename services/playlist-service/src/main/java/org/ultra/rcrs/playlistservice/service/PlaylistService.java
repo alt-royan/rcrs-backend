@@ -14,7 +14,7 @@ import org.ultra.rcrs.playlistservice.repository.OffsetBasedPageRequest;
 import org.ultra.rcrs.playlistservice.repository.PlaylistRepository;
 import org.ultra.rcrs.playlistservice.repository.PlaylistTrackRepository;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -32,7 +32,7 @@ public class PlaylistService {
     public Playlist createPlaylist(String id, String ownerId, String title, String description,
                                     List<String> tags, List<String> trackIds, String coverS3Key,
                                     boolean isPrivate, PlaylistType type) {
-        var now = LocalDateTime.now();
+        var now = Instant.now();
         List<String> distinctTrackIds = trackIds != null ? trackIds.stream().distinct().toList() : List.of();
 
         Playlist playlist = Playlist.builder()
@@ -86,7 +86,7 @@ public class PlaylistService {
         }
 
         int startPosition = existing.size();
-        var now = LocalDateTime.now();
+        var now = Instant.now();
         for (int i = 0; i < toAdd.size(); i++) {
             existing.add(PlaylistTrack.builder()
                     .playlist(playlist)
@@ -119,7 +119,7 @@ public class PlaylistService {
             tracks.get(i).setPosition(i);
         }
         playlist.setTrackCount(tracks.size());
-        playlist.setUpdatedAt(LocalDateTime.now());
+        playlist.setUpdatedAt(Instant.now());
 
         Playlist saved = playlistRepository.save(playlist);
         log.info("Removed tracks from playlist: id={}, trackIds={}", playlistId, trackIds);

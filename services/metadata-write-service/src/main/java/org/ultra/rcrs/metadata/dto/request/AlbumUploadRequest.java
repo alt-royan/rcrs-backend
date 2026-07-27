@@ -5,8 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import org.ultra.rcrs.enums.AlbumType;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.Instant;
+import java.time.LocalDate;
 
 @Schema(description = "Payload for creating a new album.")
 @Data
@@ -20,12 +20,12 @@ public class AlbumUploadRequest {
     @NotNull
     private AlbumType type;
 
-    @Schema(description = "Date the album was/will be released. Required.")
+    @Schema(description = "Calendar date the album was/will be released, ISO-8601 (yyyy-MM-dd). Required.", example = "2024-03-01")
     @NotNull
-    private LocalDateTime releaseDate;
+    private LocalDate releaseDate;
 
-    @Schema(description = "Timestamp at which the album should become publicly visible/published. Optional.")
-    private OffsetDateTime publishTimestamp;
+    @Schema(description = "Instant at which the album should become publicly visible/published, ISO-8601 UTC. Optional.", example = "2024-03-01T00:00:00Z")
+    private Instant publishTimestamp;
 
     @Schema(description = "URI/key of the album cover image previously uploaded to storage. Optional.")
     private String coverUri;

@@ -15,7 +15,7 @@ import org.ultra.rcrs.mediaservice.dao.repository.TrackToAudioRepository;
 import org.ultra.rcrs.mediaservice.temporal.activity.DbActivity;
 import org.ultra.rcrs.mediaservice.temporal.activity.model.AudioMetadata;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Component
@@ -40,7 +40,7 @@ public class DbActivityImpl implements DbActivity {
                 .bitrate(metadata.bitrate())
                 .sampleRate(metadata.sampleRate())
                 .byteSize(metadata.byteSize())
-                .creationTimestamp(OffsetDateTime.now())
+                .creationTimestamp(Instant.now())
                 .build();
 
         TrackToAudio trackToAudio = TrackToAudio.builder()

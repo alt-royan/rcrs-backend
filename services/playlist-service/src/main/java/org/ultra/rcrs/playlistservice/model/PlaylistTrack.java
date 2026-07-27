@@ -15,7 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
@@ -42,5 +42,5 @@ public class PlaylistTrack {
     private int position;
 
     @Column(name = "added_at", nullable = false)
-    private LocalDateTime addedAt;
+    private Instant addedAt;
 }

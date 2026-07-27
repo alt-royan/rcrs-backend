@@ -6,7 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 
 @Data
 @Builder
@@ -22,5 +22,5 @@ public class PlaylistTrackViewDto {
     private int position;
 
     @Schema(description = "Timestamp at which the track was added to the playlist.")
-    private LocalDateTime addedAt;
+    private Instant addedAt;
 }

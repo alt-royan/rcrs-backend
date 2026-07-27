@@ -2,13 +2,14 @@ package org.ultra.rcrs.workflow.client.model;
 
 import org.ultra.rcrs.enums.AlbumType;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
+import java.time.LocalDate;
 
 public record AlbumUploadModel(
         String title,
         AlbumType type,
-        OffsetDateTime releaseDate,
-        OffsetDateTime publishTimestamp,
+        LocalDate releaseDate,
+        Instant publishTimestamp,
         String coverUri
 ) {
 }

@@ -7,7 +7,8 @@ import jakarta.validation.constraints.NotNull;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.workflow.dto.ArtistDto;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 
 @Schema(description = "Request body for uploading a new album, including its tracks and artist relationships, " +
@@ -19,10 +20,10 @@ public record AlbumUploadRequest(
         @NotNull
         @Schema(description = "Type of the album (e.g. single, EP, LP).", requiredMode = Schema.RequiredMode.REQUIRED)
         AlbumType type,
-        @Schema(description = "Original/official release date of the album.")
-        OffsetDateTime releaseDate,
-        @Schema(description = "Timestamp at which the album should become publicly visible.")
-        OffsetDateTime publishTimestamp,
+        @Schema(description = "Calendar release date of the album, ISO-8601 (yyyy-MM-dd).", example = "2024-03-01")
+        LocalDate releaseDate,
+        @Schema(description = "Instant at which the album should become publicly visible, ISO-8601 UTC.", example = "2024-03-01T00:00:00Z")
+        Instant publishTimestamp,
         @Schema(description = "URI of the album's cover artwork, if already uploaded.")
         String coverUri,
         @JsonSetter(nulls = Nulls.AS_EMPTY)

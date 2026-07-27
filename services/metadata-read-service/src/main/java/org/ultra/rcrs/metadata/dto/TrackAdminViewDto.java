@@ -9,7 +9,7 @@ import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -27,8 +27,8 @@ public class TrackAdminViewDto {
     private EntityStatus availabilityStatus;
     @Schema(description = "Track title.")
     private String title;
-    @Schema(description = "Official release date/time of the track.")
-    private LocalDateTime releaseDate;
+    @Schema(description = "Calendar release date of the track, ISO-8601 (yyyy-MM-dd).")
+    private LocalDate releaseDate;
     @Schema(description = "Playback duration of the track, in milliseconds.")
     private Integer durationMs;
     @Schema(description = "Position of the track within its album's tracklist.")

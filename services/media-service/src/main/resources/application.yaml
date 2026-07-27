@@ -119,7 +119,7 @@ media:
   stream:
     bucket:
       name: rcrs-stream
-    signature-duration: 6h
+    signature-duration: 30m
     validation:
       formats: mp3, wav, ogg, flac
       duration:

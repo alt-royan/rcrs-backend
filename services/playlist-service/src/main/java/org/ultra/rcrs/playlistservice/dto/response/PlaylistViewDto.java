@@ -9,7 +9,7 @@ import org.ultra.rcrs.enums.ImageSize;
 import org.ultra.rcrs.playlistservice.model.PlaylistType;
 
 import java.net.URI;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -48,8 +48,8 @@ public class PlaylistViewDto {
     private Integer trackCount;
 
     @Schema(description = "Timestamp at which the playlist was created.")
-    private LocalDateTime createdAt;
+    private Instant createdAt;
 
     @Schema(description = "Timestamp at which the playlist was last updated.")
-    private LocalDateTime updatedAt;
+    private Instant updatedAt;
 }

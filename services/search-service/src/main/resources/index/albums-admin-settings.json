@@ -33,8 +33,9 @@
         "type": "text",
         "analyzer": "tokens"
       },
-      "year": {
-        "type": "text"
+      "releaseDate": {
+        "type": "date",
+        "format": "yyyy-MM-dd"
       },
       "availability": {
         "type": "keyword"

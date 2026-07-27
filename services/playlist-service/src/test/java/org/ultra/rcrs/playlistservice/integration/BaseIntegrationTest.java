@@ -28,7 +28,7 @@ import org.ultra.rcrs.playlistservice.model.PlaylistTrack;
 import org.ultra.rcrs.playlistservice.model.PlaylistType;
 import org.ultra.rcrs.playlistservice.repository.PlaylistRepository;
 
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -69,7 +69,7 @@ public abstract class BaseIntegrationTest {
     }
 
     protected Playlist createPlaylistDoc(String ownerId, String title, boolean isPrivate) {
-        var now = LocalDateTime.now();
+        var now = Instant.now();
         return playlistRepository.save(Playlist.builder()
                 .id(randomId())
                 .ownerId(ownerId)
@@ -91,7 +91,7 @@ public abstract class BaseIntegrationTest {
                 .playlist(playlist)
                 .trackId(trackId)
                 .position(position)
-                .addedAt(LocalDateTime.now())
+                .addedAt(Instant.now())
                 .build();
         playlist.getTracks().add(track);
         playlist.setTrackCount(playlist.getTracks().size());

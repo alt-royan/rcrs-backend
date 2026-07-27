@@ -24,7 +24,6 @@ import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignReques
 
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -42,7 +41,7 @@ public class AudioService {
 
     @Transactional
     public S3PresignUrlResponse getPreSignUrl(PreloadFileRequest request) {
-        String key = Hash.sha1Base64(request.getName() + "_" + LocalDateTime.now());
+        String key = Hash.sha1Base64(request.getName() + "_" + Instant.now());
         String contentType = (new MimetypesFileTypeMap()).getContentType(request.getName());
 
         PutObjectRequest objectRequest = PutObjectRequest.builder()

@@ -10,7 +10,7 @@ import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -25,7 +25,7 @@ public class TrackDocument {
     private LifecycleStatus lifecycleStatus;
     private EntityStatus availabilityStatus;
     private String title;
-    private LocalDateTime releaseDate;
+    private LocalDate releaseDate;
     private Integer durationMs;
     private Integer trackNumber;
     private Boolean explicit;

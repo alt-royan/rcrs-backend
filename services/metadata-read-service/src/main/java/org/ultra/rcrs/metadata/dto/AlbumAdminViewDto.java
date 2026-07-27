@@ -10,7 +10,7 @@ import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -30,10 +30,8 @@ public class AlbumAdminViewDto {
     private String title;
     @Schema(description = "Album type (e.g. ALBUM, SINGLE, EP, COMPILATION).")
     private AlbumType type;
-    @Schema(description = "Official release date/time of the album.")
-    private LocalDateTime releaseDate;
-    @Schema(description = "Release year, derived from the release date.")
-    private Integer year;
+    @Schema(description = "Calendar release date of the album, ISO-8601 (yyyy-MM-dd).")
+    private LocalDate releaseDate;
     @Schema(description = "Total number of tracks on the album.")
     private Integer totalTracks;
     @Schema(description = "Total playback duration of the album, in milliseconds.")

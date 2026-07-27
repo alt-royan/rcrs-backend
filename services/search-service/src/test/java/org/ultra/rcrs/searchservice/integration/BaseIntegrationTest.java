@@ -108,12 +108,12 @@ public abstract class BaseIntegrationTest {
         indexDoc("artists-public", id, body);
     }
 
-    protected void indexAlbumPublicDoc(String id, String title, String year, String availability,
+    protected void indexAlbumPublicDoc(String id, String title, String releaseDate, String availability,
                                        List<Map<String, String>> artists,
                                        List<Map<String, String>> tracks) {
         var body = new java.util.HashMap<String, Object>();
         body.put("title", title);
-        body.put("year", year);
+        body.put("releaseDate", releaseDate);
         body.put("availability", availability);
         if (artists != null) body.put("artists", artists);
         if (tracks != null) body.put("tracks", tracks);
@@ -144,13 +144,13 @@ public abstract class BaseIntegrationTest {
         indexDoc("artists-admin", id, body);
     }
 
-    protected void indexAlbumAdminDoc(String id, String title, String year, String availability,
+    protected void indexAlbumAdminDoc(String id, String title, String releaseDate, String availability,
                                       String lifecycleStatus,
                                       List<Map<String, String>> artists,
                                       List<Map<String, String>> tracks) {
         var body = new java.util.HashMap<String, Object>();
         body.put("title", title);
-        body.put("year", year);
+        body.put("releaseDate", releaseDate);
         body.put("availability", availability);
         body.put("lifecycleStatus", lifecycleStatus);
         if (artists != null) body.put("artists", artists);

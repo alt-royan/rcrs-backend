@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.ultra.rcrs.enums.ImageSize;
 
 import java.net.URI;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
@@ -21,8 +22,8 @@ public class AlbumSearchResult {
     private String id;
     @Schema(description = "Title of the album.")
     private String title;
-    @Schema(description = "Release year of the album.")
-    private String year;
+    @Schema(description = "Calendar release date of the album, ISO-8601 (yyyy-MM-dd).", example = "2024-03-01")
+    private LocalDate releaseDate;
     @Schema(description = "URLs of the album cover art, keyed by thumbnail size (SM/MD/LG); empty if none is set.")
     private Map<ImageSize, URI> cover;
     @Schema(description = "Public visibility/availability of the album; only meaningful in admin mode, where non-public albums may also be returned.")

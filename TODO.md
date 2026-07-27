@@ -5,22 +5,6 @@
 - [ ] **Refine CORS configuration** — `gateway-api/src/main/java/org/ultra/rcrs/gatewayapi/SecurityConfig.java:33`
   - `//TODO:доработать` — placeholder CORS config, needs to be properly configured.
 
-- [ ] **`GET /me` всегда отдаёт 404** — `services/user-service/src/main/java/org/ultra/rcrs/userservice/service/UserService.java:105`
-  - `getCompactProfile` получает из контроллера `jwt.getSubject()` (`controller/UserController.java:23`),
-    но ищет пользователя через `findByUsername(userId)` — то есть сравнивает `sub` с `username`.
-    Соседний `getProfile` (`:88`) делает верно: `findByUserId`.
-  - Фикс: заменить `findByUsername` на `findByUserId` в `getCompactProfile`.
-  - До фикса клиентам использовать только `GET /me/profile`.
-
-- [ ] **`POST /media/stream` должен быть `GET`** — `services/media-service/src/main/java/org/ultra/rcrs/mediaservice/controller/StreamingController.java:20`
-  - Эндпоинт ничего не меняет: принимает два query-параметра (`trackId`, `quality`), тела нет,
-    возвращает presigned-ссылку. POST для чистого чтения ломает семантику HTTP, запрещает
-    кэширование и мешает клиентам (мобильные плееры и CDN ожидают GET).
-  - Фикс: `@PostMapping` → `@GetMapping`. Рядом `DownloadController` уже использует GET —
-    привести к одному виду.
-  - Поменять синхронно на клиентах; в `config/SecurityConfig.java:42` есть ещё мёртвый матчер
-    `/track/*/stream` на путь, которого не существует — заодно убрать.
-
 ## Найдено при разработке мобильного клиента
 
 Обнаружено при проектировании `rcrs-frontend/music-app-mobile` (см. его `docs/PLAN.md`).
@@ -83,56 +67,6 @@
   - Фикс: `GET /api/catalog/tracks?ids=...` в metadata-read-service (или отдавать метаданные
     сразу в ответе playlist-service).
 
-- [ ] **В публичном каталоге нет пагинации** — `services/metadata-read-service/.../controller/publ/*`
-  - `GET /artists/{id}/albums` и `GET /albums/{id}/tracks` возвращают bare JSON array: без
-    обёртки, без `total`, без `offset/limit` — вся дискография и весь трек-лист целиком.
-    Пагинация есть только в search-service.
-  - Для мобильного это трафик и память на популярных артистах.
-  - Фикс: `offset/limit` + та же обёртка `PaginationResponse`, что используется в `/admin/*`.
-
-- [ ] **Обложки недостижимы с устройства и хосты рассинхронизированы**
-  - `cdn.images.endpoint` задан по-разному: **только** metadata-read использует достижимый
-    хост `http://192.168.1.3:4566/images` (`metadata-read-service/application.yaml:21`), а
-    остальные четыре — нерезолвящийся `http://images.localhost:4566`
-    (`metadata-write-service/application.yaml:38`, `playlist-service/application.yaml:38`,
-    `search-service/application.yaml:23`, `media-service/application.yaml:132`).
-    Поэтому один и тот же альбом приходит с рабочей картинкой из каталога и с битой из
-    поиска — что ровно совпадает с уже записанным ниже пунктом «Нет картинок при поисках».
-  - `S3Utils.parseUrl` возвращает `null` при пустом ключе (`shared-lib/.../utils/S3Utils.java:27-32`),
-    так что **все** `coverUrl`/`avatarUrl` nullable — это нормально, но должно быть в контракте.
-  - Фикс: один внешне достижимый CDN-хост во всех сервисах (одна переменная окружения на все
-    пять, а не пять независимых значений в пяти `application.yaml`).
-
-- [ ] **DTO должны отдавать URL всех размеров изображения, а не один оригинал**
-  - Сейчас в DTO лежит единственный `coverUrl`/`avatarUrl` — результат
-    `S3Utils.parseUrl(imageKey)` (`shared-lib/src/main/java/org/ultra/rcrs/utils/S3Utils.java:27-32`),
-    то есть ссылка на **оригинал**. Ссылок на превью API не отдаёт вообще, поэтому клиент
-    обязан сам склеивать `{coverUrl}/64x64`, `/300x300`, `/640x640` — ключи с такими
-    суффиксами создаются при загрузке в
-    `media-service/src/main/java/org/ultra/rcrs/mediaservice/service/ImageUploadService.java:28-31`.
-  - Почему это плохо:
-    - Схема ключей превью — внутренняя деталь хранилища, а её вынуждены знать все клиенты
-      (мобильный, админка, будущий веб). Меняется схема — ломаются все сразу.
-    - Набор размеров **берётся из конфига** (`imageProperties.getThumbnails().getSizes()`,
-      сейчас `image.thumbnails.sizes: 64,300,640` в `media-service/application.yaml:133-134`,
-      в dev — из `IMAGE_THUMBNAILS_SIZES`). Клиент хардкодит три значения и тихо отдаёт 404
-      на картинках, если конфиг изменят. Про это нельзя узнать из API.
-    - Клиент не может отличить «превью ещё не сгенерировано» от «размера не существует» —
-      в обоих случаях просто битая ссылка.
-    - Отдавая только оригинал, API провоцирует тянуть полноразмерную картинку в строку списка.
-  - Фикс: заменить строковое поле на объект с готовыми ссылками, например
-    `cover: { original, sm, md, lg }` (или `{ "64": url, "300": url, "640": url }`, если хочется
-    оставить связь с размерами явной), и собирать его на сервере из того же конфига, что
-    генерирует превью. Затрагивает `AlbumPublicViewDto`, `AlbumPublicStandaloneDto`,
-    `ArtistPublicViewDto`, `TrackPublicViewDto`, `TrackPublicStandaloneDto`, search-результаты,
-    `PlaylistViewDto`, `UserProfileResponse` — то есть выносить в общий хелпер в `shared-lib`
-    рядом с `S3Utils`, а не дублировать по сервисам.
-  - Поле остаётся nullable (`parseUrl` возвращает `null` на пустом ключе) — это нормально, но
-    должно быть в контракте, чтобы клиенты обязательно рисовали плейсхолдер.
-  - До этого фикса в мобильном приложении вся логика живёт в одной точке —
-    `music-app-mobile/src/utils/images.ts` (подмена хоста, суффикс размера, плейсхолдер).
-    После фикса этот файл сводится к плейсхолдеру и удаляется почти целиком.
-
 - [ ] **Привести все даты и метки времени к единому типу (`Instant` / `LocalDate`)**
   - Сейчас в кодовой базе два несовместимых подхода к одному и тому же смыслу: `user-service`
     хранит `createdAt`/`updatedAt` как `Instant` (`user-service/.../model/User.java:34,37`), а
@@ -158,33 +92,6 @@
   - Менять синхронно: JPA/Mongo-модели, DTO, мапперы, protobuf-события в
     `shared-lib/src/main/proto/events` и Liquibase-миграции (`timestamp` →
     `timestamp with time zone`), иначе тип разъедется между write- и read-стороной CQRS.
-
-- [ ] **Настроить OpenAPI-документацию, сейчас она полностью автогенерируется**
-  - `springdoc` подключён и шлюз агрегирует спеки пяти сервисов
-    (`gateway-api/src/main/resources/application.yaml:69-77`), но в коде **ноль** аннотаций
-    `@Operation`, `@ApiResponse`, `@Schema`, `@Tag` — проверено по всем сервисам. Спека
-    выводится только рефлексией, то есть содержит имена полей и типы и **больше ничего**.
-  - Чего в ней из-за этого нет:
-    - Описаний эндпоинтов и полей — читающий не понимает разницы между `GET /me` и
-      `GET /me/profile`, между `/stream` и `/download`, между `admin`- и `publ`-вариантами.
-    - Кодов ошибок: 400/401/403/404 не описаны нигде, хотя сервисы их возвращают
-      (`NotFoundException`, `BadRequestException`).
-    - Ограничений и семантики параметров: что `q` и `type` в поиске обязательны, что `type` —
-      в нижнем регистре, что `sort` принимает только `asc`/`desc` и падает 500 на всём
-      остальном, что у `size` нет верхней границы, что `quality` — это `LOW|MID|HIGH`.
-    - Nullability: все `coverUrl`/`avatarUrl` могут быть `null`, но в спеке это не отражено.
-    - Формы ответов, которые не выводятся из типа: `GET /media/audios` отдаёт
-      `Map<UUID, AudioItemGroupBy>` — в спеке это невнятный `object`.
-    - Примеров запросов/ответов — ни одного.
-  - Почему это стоит закрыть: спека — единственный контракт между бэкендом и клиентами
-    (экспорта схемы нигде больше нет), и типы мобильного приложения планируется генерировать
-    из `/v3/api-docs`. Всё, чего в спеке нет, превращается в догадки на стороне клиента и в
-    расхождения, которые всплывают только в рантайме.
-  - Фикс: `@Tag` на контроллеры, `@Operation(summary/description)` на методы,
-    `@ApiResponse` на реальные коды ошибок, `@Schema(description, nullable, example)` на поля
-    DTO и enum-ы; общий `OpenAPI`-бин с названием, версией и `securityScheme` bearer-JWT
-    (сейчас в Swagger UI нельзя авторизоваться, а без токена не работает ни один запрос).
-    Начать с публичных путей — их потребляет мобильное приложение.
 
 - [ ] **Транскод по умолчанию Ogg/Vorbis — iOS его не играет** — `services/media-service/src/main/resources/application.yaml:120-123`
   - `codec: libvorbis`, `format: ogg`. В AVFoundation нет декодера Vorbis, поэтому AVPlayer не

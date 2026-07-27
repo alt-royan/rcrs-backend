@@ -8,6 +8,7 @@ import org.springframework.data.elasticsearch.annotations.FieldType;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Data
@@ -20,8 +21,8 @@ public class AlbumAdminDoc implements AlbumDoc {
     @Field(type = FieldType.Text)
     private String title;
 
-    @Field(type = FieldType.Text)
-    private String year;
+    @Field(type = FieldType.Date, format = {}, pattern = "yyyy-MM-dd")
+    private LocalDate releaseDate;
 
     @Field(type = FieldType.Keyword, index = false)
     private String coverS3Key;
