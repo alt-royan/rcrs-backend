@@ -5,6 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.ultra.rcrs.userservice.dto.UserProfileResponse;
 import org.ultra.rcrs.userservice.service.UserAvatarService;
@@ -13,6 +14,7 @@ import org.ultra.rcrs.userservice.service.UserService;
 import java.security.Principal;
 
 @RestController
+@RequestMapping("/me")
 @RequiredArgsConstructor
 public class UserController {
 

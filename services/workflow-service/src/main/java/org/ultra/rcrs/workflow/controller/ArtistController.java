@@ -14,7 +14,7 @@ import org.ultra.rcrs.workflow.handler.WorkflowHandler;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/artists")
+@RequestMapping("/workflow/artists")
 public class ArtistController {
 
     private final WorkflowHandler handler;

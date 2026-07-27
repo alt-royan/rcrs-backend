@@ -28,7 +28,7 @@ class ArtistWriteControllerIntegrationTest extends BaseIntegrationTest {
                 }
                 """;
 
-        String responseJson = mockMvc.perform(post("/artists")
+        String responseJson = mockMvc.perform(post("/catalog/artists")
                         .contentType("application/json")
                         .content(json))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isCreated())
@@ -62,7 +62,7 @@ class ArtistWriteControllerIntegrationTest extends BaseIntegrationTest {
         Artist artist = createArtistInDb("Artist To Hide", EntityStatus.ACTIVE);
         String encodedId = Url62.encode(artist.getId());
 
-        mockMvc.perform(put("/artists/" + encodedId + "/hide"))
+        mockMvc.perform(put("/catalog/artists/" + encodedId + "/hide"))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
 
         Artist updated = artistRepository.findById(artist.getId()).orElseThrow();
@@ -85,7 +85,7 @@ class ArtistWriteControllerIntegrationTest extends BaseIntegrationTest {
         Artist artist = createArtistInDb("Artist To Activate", EntityStatus.HIDDEN);
         String encodedId = Url62.encode(artist.getId());
 
-        mockMvc.perform(put("/artists/" + encodedId + "/active"))
+        mockMvc.perform(put("/catalog/artists/" + encodedId + "/active"))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
 
         Artist updated = artistRepository.findById(artist.getId()).orElseThrow();
@@ -110,7 +110,7 @@ class ArtistWriteControllerIntegrationTest extends BaseIntegrationTest {
         linkArtistToAlbum(artist.getId(), album.getId());
         Track track = createTrackInDb("Track To Delete", EntityStatus.ACTIVE, album.getId());
 
-        mockMvc.perform(delete("/artists/" + Url62.encode(artist.getId())))
+        mockMvc.perform(delete("/catalog/artists/" + Url62.encode(artist.getId())))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isNoContent());
 
         assertThat(artistRepository.findById(artist.getId()).orElseThrow().getAvailabilityStatus()).isEqualTo(EntityStatus.DELETED);

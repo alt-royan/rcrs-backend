@@ -32,7 +32,7 @@ class TrackWriteControllerIntegrationTest extends BaseIntegrationTest {
                 }
                 """.formatted(Url62.encode(album.getId()));
 
-        String responseJson = mockMvc.perform(post("/tracks")
+        String responseJson = mockMvc.perform(post("/catalog/tracks")
                         .contentType("application/json")
                         .content(json))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isCreated())
@@ -83,7 +83,7 @@ class TrackWriteControllerIntegrationTest extends BaseIntegrationTest {
                 }
                 """.formatted(Url62.encode(artist.getId()));
 
-        mockMvc.perform(post("/tracks/" + Url62.encode(track.getId()) + "/artists")
+        mockMvc.perform(post("/catalog/tracks/" + Url62.encode(track.getId()) + "/artists")
                         .contentType("application/json")
                         .content(json))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
@@ -127,7 +127,7 @@ class TrackWriteControllerIntegrationTest extends BaseIntegrationTest {
                 }
                 """.formatted(Url62.encode(artist.getId()));
 
-        mockMvc.perform(delete("/tracks/" + Url62.encode(track.getId()) + "/artists")
+        mockMvc.perform(delete("/catalog/tracks/" + Url62.encode(track.getId()) + "/artists")
                         .contentType("application/json")
                         .content(json))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
@@ -162,7 +162,7 @@ class TrackWriteControllerIntegrationTest extends BaseIntegrationTest {
                 }
                 """;
 
-        mockMvc.perform(post("/tracks/" + Url62.encode(track.getId()) + "/others")
+        mockMvc.perform(post("/catalog/tracks/" + Url62.encode(track.getId()) + "/others")
                         .contentType("application/json")
                         .content(json))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
@@ -207,7 +207,7 @@ class TrackWriteControllerIntegrationTest extends BaseIntegrationTest {
                 }
                 """.formatted(Url62.encode(other.getId()));
 
-        mockMvc.perform(delete("/tracks/" + Url62.encode(track.getId()) + "/others")
+        mockMvc.perform(delete("/catalog/tracks/" + Url62.encode(track.getId()) + "/others")
                         .contentType("application/json")
                         .content(json))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
@@ -235,7 +235,7 @@ class TrackWriteControllerIntegrationTest extends BaseIntegrationTest {
                 }
                 """;
 
-        mockMvc.perform(put("/tracks/" + Url62.encode(track.getId()) + "/status")
+        mockMvc.perform(put("/catalog/tracks/" + Url62.encode(track.getId()) + "/status")
                         .contentType("application/json")
                         .content(json))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
@@ -260,7 +260,7 @@ class TrackWriteControllerIntegrationTest extends BaseIntegrationTest {
         Album album = createAlbumInDb("Album", EntityStatus.ACTIVE);
         Track track = createTrackInDb("Track To Hide", EntityStatus.ACTIVE, album.getId());
 
-        mockMvc.perform(put("/tracks/" + Url62.encode(track.getId()) + "/hide"))
+        mockMvc.perform(put("/catalog/tracks/" + Url62.encode(track.getId()) + "/hide"))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
 
         Track updated = trackRepository.findById(track.getId()).orElseThrow();
@@ -283,7 +283,7 @@ class TrackWriteControllerIntegrationTest extends BaseIntegrationTest {
         Album album = createAlbumInDb("Album", EntityStatus.ACTIVE);
         Track track = createTrackInDb("Track To Activate", EntityStatus.HIDDEN, album.getId());
 
-        mockMvc.perform(put("/tracks/" + Url62.encode(track.getId()) + "/active"))
+        mockMvc.perform(put("/catalog/tracks/" + Url62.encode(track.getId()) + "/active"))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
 
         Track updated = trackRepository.findById(track.getId()).orElseThrow();
@@ -306,7 +306,7 @@ class TrackWriteControllerIntegrationTest extends BaseIntegrationTest {
         Album album = createAlbumInDb("Album", EntityStatus.ACTIVE);
         Track track = createTrackInDb("Track To Delete", EntityStatus.ACTIVE, album.getId());
 
-        mockMvc.perform(delete("/tracks/" + Url62.encode(track.getId())))
+        mockMvc.perform(delete("/catalog/tracks/" + Url62.encode(track.getId())))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isNoContent());
 
         Track updated = trackRepository.findById(track.getId()).orElseThrow();

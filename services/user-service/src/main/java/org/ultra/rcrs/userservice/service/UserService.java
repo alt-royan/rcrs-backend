@@ -102,7 +102,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserProfileResponse getCompactProfile(String userId) {
-        User user = userRepository.findByUsername(userId)
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("User", userId));
 
         String avatarUrl = getAvatarUrl(user.getUserId());

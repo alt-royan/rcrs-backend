@@ -9,7 +9,7 @@ import org.ultra.rcrs.metadata.service.PurgeService;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping
+@RequestMapping("/catalog")
 public class PurgeController {
 
     private final PurgeService purgeService;

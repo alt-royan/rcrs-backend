@@ -10,15 +10,15 @@ import org.ultra.rcrs.workflow.dto.response.CreateResponse;
 @FeignClient(name = "artist-write-client", url = "${feign.metadata-service.url}", configuration = FeignMetadataServiceConfig.class)
 public interface ArtistClient {
 
-    @PostMapping("/artists")
+    @PostMapping("/catalog/artists")
     ResponseEntity<CreateResponse> createArtist(@RequestBody ArtistCreateModel request);
 
-    @DeleteMapping("/artists/{id}")
+    @DeleteMapping("/catalog/artists/{id}")
     ResponseEntity<Void> markArtistDeleted(@PathVariable("id") String id);
 
-    @PutMapping("/artists/{id}/hide")
+    @PutMapping("/catalog/artists/{id}/hide")
     ResponseEntity<Void> hideArtist(@PathVariable("id") String id);
 
-    @PutMapping("/artists/{id}/active")
+    @PutMapping("/catalog/artists/{id}/active")
     ResponseEntity<Void> activeArtist(@PathVariable("id") String id);
 }

@@ -12,7 +12,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/artists")
+@RequestMapping("/api/catalog/artists")
 public class ArtistPublicController {
 
     private final AlbumPublicService albumPublicService;

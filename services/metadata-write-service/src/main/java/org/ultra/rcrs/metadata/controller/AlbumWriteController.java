@@ -14,7 +14,7 @@ import org.ultra.rcrs.utils.Url62;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/albums")
+@RequestMapping("/catalog/albums")
 public class AlbumWriteController {
 
     private final AlbumService albumService;

@@ -13,7 +13,7 @@ import org.ultra.rcrs.userservice.service.UserAvatarService;
 import java.security.Principal;
 
 @RestController
-@RequestMapping("/avatar")
+@RequestMapping("/me/avatar")
 @RequiredArgsConstructor
 public class UserAvatarController {
 

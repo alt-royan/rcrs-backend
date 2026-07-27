@@ -16,7 +16,7 @@ import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin/albums")
+@RequestMapping("/api/catalog/admin/albums")
 public class AlbumAdminController {
 
     private final AlbumAdminService albumAdminService;

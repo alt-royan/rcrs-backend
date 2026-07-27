@@ -19,49 +19,39 @@ spring:
           discovery:
             locator: enabled
           routes:
-            # user-service — prefix /me
+            # user-service — owns /me prefix itself, gateway only routes
             - id: user-service
               uri: lb://user-service
               predicates:
                 - Path=/me/**
-              filters:
-                - StripPrefix=1
 
-            # workflow-service — prefix /workflow
+            # workflow-service — owns /workflow prefix itself, gateway only routes
             - id: workflow-service
               uri: lb://workflow-service
               predicates:
                 - Path=/workflow/**
-              filters:
-                - StripPrefix=1
 
-            # media-service — prefix /media
+            # media-service — owns /media prefix itself, gateway only routes
             - id: media-service
               uri: lb://media-service
               predicates:
                 - Path=/media/**
-              filters:
-                - StripPrefix=1
 
-            # search-service — no prefix
+            # search-service — owns /api/search prefix itself, gateway only routes
             - id: search-service
               uri: lb://search-service
               predicates:
                 - Path=/api/search/**
-              filters:
-                - StripPrefix=2
 
-            # metadata-read-service — no prefix
+            # metadata-read-service — owns /api/catalog prefix itself, gateway only routes
             - id: metadata-read-service
               uri: lb://metadata-read-service
               predicates:
                 - Path=/api/catalog/**
-              filters:
-                - StripPrefix=2
 
             # metadata-write — NOT available via gateway
 
-            # playlist-service — no prefix
+            # playlist-service — owns /playlists prefix itself, gateway only routes
             - id: playlist-service
               uri: lb://playlist-service
               predicates:

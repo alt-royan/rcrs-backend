@@ -15,7 +15,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Active Artist", EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/admin/artists/{id}", artist.getId())
+                .uri("/api/catalog/admin/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -28,7 +28,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Deleted Artist", EntityStatus.DELETED);
 
         webTestClient.get()
-                .uri("/admin/artists/{id}", artist.getId())
+                .uri("/api/catalog/admin/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -39,7 +39,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void getArtist_nonExistentId_404NotFound() {
         webTestClient.get()
-                .uri("/admin/artists/{id}", "non-existent-id")
+                .uri("/api/catalog/admin/artists/{id}", "non-existent-id")
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -55,7 +55,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
                 artist.getId(), "Album Artist", org.ultra.rcrs.enums.ArtistRole.MAIN_ARTIST);
 
         webTestClient.get()
-                .uri("/admin/artists/{id}/albums", artist.getId())
+                .uri("/api/catalog/admin/artists/{id}/albums", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBodyList(Object.class).hasSize(3);
@@ -104,7 +104,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/admin/artists/{id}/albums")
+                        .path("/api/catalog/admin/artists/{id}/albums")
                         .queryParam("type", "FULL")
                         .build(artist.getId()))
                 .exchange()
@@ -119,7 +119,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/admin/artists")
+                        .path("/api/catalog/admin/artists")
                         .queryParam("availabilityStatus", "ACTIVE")
                         .build())
                 .exchange()
@@ -137,7 +137,7 @@ class ArtistAdminControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/admin/artists")
+                        .path("/api/catalog/admin/artists")
                         .queryParam("availabilityStatus", "ACTIVE")
                         .queryParam("offset", 0)
                         .queryParam("limit", 2)

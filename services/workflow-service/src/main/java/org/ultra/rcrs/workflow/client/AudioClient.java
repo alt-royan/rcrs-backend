@@ -13,6 +13,6 @@ import java.util.List;
 @FeignClient(name = "audio-client", url = "${feign.media-service.url}", configuration = FeignMediaServiceConfig.class)
 public interface AudioClient {
 
-    @PostMapping("/upload/audio/get-status")
+    @PostMapping("/media/upload/audio/get-status")
     ResponseEntity<List<AudioStatusResponse>> getAudioStatus(@RequestParam("uids") List<String> uids);
 }

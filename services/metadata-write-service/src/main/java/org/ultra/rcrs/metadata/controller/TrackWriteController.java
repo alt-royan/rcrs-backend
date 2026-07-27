@@ -15,7 +15,7 @@ import org.ultra.rcrs.utils.Url62;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/tracks")
+@RequestMapping("/catalog/tracks")
 public class TrackWriteController {
 
     private final TrackService trackService;

@@ -8,6 +8,6 @@ import org.ultra.rcrs.workflow.config.FeignMetadataServiceConfig;
 @FeignClient(name = "metadata-purge-client", url = "${feign.metadata-service.url}", configuration = FeignMetadataServiceConfig.class)
 public interface MetadataClient {
 
-    @PostMapping("/admin/purge")
+    @PostMapping("/catalog/admin/purge")
     ResponseEntity<Void> purge();
 }

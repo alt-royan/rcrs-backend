@@ -11,7 +11,7 @@ import org.ultra.rcrs.workflow.handler.WorkflowHandler;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/tracks")
+@RequestMapping("/workflow/tracks")
 public class TrackController {
 
     private final WorkflowHandler handler;

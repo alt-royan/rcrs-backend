@@ -12,7 +12,7 @@ import org.ultra.rcrs.utils.Url62;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/artists")
+@RequestMapping("/catalog/artists")
 public class ArtistWriteController {
 
     private final ArtistService artistService;

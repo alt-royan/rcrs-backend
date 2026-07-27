@@ -15,24 +15,24 @@ import org.ultra.rcrs.workflow.dto.response.CreateResponse;
 @FeignClient(name = "album-write-client", url = "${feign.metadata-service.url}", configuration = FeignMetadataServiceConfig.class)
 public interface AlbumClient {
 
-    @PostMapping("/albums")
+    @PostMapping("/catalog/albums")
     ResponseEntity<CreateResponse> createAlbum(AlbumUploadModel request);
 
-    @PostMapping("/albums/{albumId}/artists")
+    @PostMapping("/catalog/albums/{albumId}/artists")
     ResponseEntity<Void> addArtistsToAlbum(ArtistsToEntityModel request, @PathVariable String albumId);
 
-    @DeleteMapping("/albums/{albumId}/artists")
+    @DeleteMapping("/catalog/albums/{albumId}/artists")
     ResponseEntity<Void> deleteArtistsFromAlbum(ArtistsToEntityModel request, @PathVariable String albumId);
 
-    @PutMapping("/albums/{albumId}/status")
+    @PutMapping("/catalog/albums/{albumId}/status")
     ResponseEntity<Void> updateAlbumStatus(StatusDto statusDto, @PathVariable String albumId);
 
-    @PutMapping("/albums/{albumId}/hide")
+    @PutMapping("/catalog/albums/{albumId}/hide")
     ResponseEntity<Void> hideAlbum(@PathVariable String albumId);
 
-    @PutMapping("/albums/{albumId}/active")
+    @PutMapping("/catalog/albums/{albumId}/active")
     ResponseEntity<Void> activeAlbum(@PathVariable String albumId);
 
-    @DeleteMapping("/albums/{albumId}")
+    @DeleteMapping("/catalog/albums/{albumId}")
     ResponseEntity<Void> markAlbumDeleted(@PathVariable String albumId);
 }
