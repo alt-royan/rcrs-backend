@@ -20,7 +20,9 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .expectBody()
                 .jsonPath("$.title").isEqualTo("Published Album")
                 .jsonPath("$.availabilityStatus").isEqualTo("ACTIVE")
-                .jsonPath("$.coverUrl").isNotEmpty();
+                .jsonPath("$.cover.SM").isNotEmpty()
+                .jsonPath("$.cover.MD").isNotEmpty()
+                .jsonPath("$.cover.LG").isNotEmpty();
     }
 
     @Test
@@ -83,8 +85,15 @@ class AlbumPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.coverUrl").value(url -> {
+                .jsonPath("$.cover.SM").value(url -> {
                     assert url.toString().startsWith("http://images.localhost:4566/");
+                    assert url.toString().endsWith("/128x128");
+                })
+                .jsonPath("$.cover.MD").value(url -> {
+                    assert url.toString().endsWith("/512x512");
+                })
+                .jsonPath("$.cover.LG").value(url -> {
+                    assert url.toString().endsWith("/1024x1024");
                 });
     }
 

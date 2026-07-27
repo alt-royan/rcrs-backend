@@ -99,7 +99,9 @@ class TrackPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .expectBody()
                 .jsonPath("$.album.id").isEqualTo(album.getId())
                 .jsonPath("$.album.title").isEqualTo("Embed Album")
-                .jsonPath("$.album.coverUrl").isNotEmpty();
+                .jsonPath("$.album.cover.SM").isNotEmpty()
+                .jsonPath("$.album.cover.MD").isNotEmpty()
+                .jsonPath("$.album.cover.LG").isNotEmpty();
     }
 
     @Test

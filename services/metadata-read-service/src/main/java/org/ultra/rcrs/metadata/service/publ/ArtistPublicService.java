@@ -28,7 +28,7 @@ public class ArtistPublicService {
         return ArtistPublicViewDto.builder()
                 .id(doc.getId())
                 .name(doc.getName())
-                .avatarUrl(imageUtils.parseUrl(doc.getAvatarS3Key()))
+                .avatar(imageUtils.parseUrls(doc.getAvatarS3Key()))
                 .socialLinks(doc.getSocialLinks() != null
                         ? doc.getSocialLinks().stream().map(s -> ArtistPublicViewDto.SocialLinkEmbed.builder()
                         .resourceName(s.getResourceName())

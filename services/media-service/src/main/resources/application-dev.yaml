@@ -106,11 +106,19 @@ spring:
       s3:
         path-style-access-enabled: true
 
+image:
+  cdn:
+    endpoint: ${IMAGE_CDN_ENDPOINT}
+  thumbnails:
+    sizes:
+      sm: ${IMAGE_THUMBNAILS_SIZES_SM:128}
+      md: ${IMAGE_THUMBNAILS_SIZES_MD:512}
+      lg: ${IMAGE_THUMBNAILS_SIZES_LG:1024}
+
 media:
   stream:
     bucket:
       name: ${AUDIO_BUCKET_NAME}
-      public-url: ${AUDIO_BUCKET_PUBLIC_URL}
     signature-duration: ${AUDIO_SIGNATURE_DURATION}
     validation:
       formats: ${AUDIO_VALIDATION_FORMATS}
@@ -130,8 +138,6 @@ media:
     bucket:
       name: ${IMAGE_BUCKET_NAME}
       public-url: ${IMAGE_BUCKET_PUBLIC_URL}
-    thumbnails:
-      sizes: ${IMAGE_THUMBNAILS_SIZES}
   upload:
     bucket:
       name: ${UPLOAD_BUCKET_NAME}

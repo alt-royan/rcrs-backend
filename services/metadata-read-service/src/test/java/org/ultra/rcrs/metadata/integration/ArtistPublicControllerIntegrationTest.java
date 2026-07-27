@@ -23,7 +23,9 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .expectBody()
                 .jsonPath("$.name").isEqualTo("Active Artist")
                 .jsonPath("$.availabilityStatus").isEqualTo("ACTIVE")
-                .jsonPath("$.avatarUrl").isNotEmpty();
+                .jsonPath("$.avatar.SM").isNotEmpty()
+                .jsonPath("$.avatar.MD").isNotEmpty()
+                .jsonPath("$.avatar.LG").isNotEmpty();
     }
 
     @Test
@@ -66,8 +68,9 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.avatarUrl").value(url -> {
+                .jsonPath("$.avatar.SM").value(url -> {
                     assert url.toString().startsWith("http://images.localhost:4566/");
+                    assert url.toString().endsWith("/128x128");
                 });
     }
 

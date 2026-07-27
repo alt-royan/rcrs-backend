@@ -18,7 +18,7 @@ public final class PlaylistMapper {
                 .title(playlist.getTitle())
                 .description(playlist.getDescription())
                 .tags(playlist.getTags())
-                .coverUrl(imageUtils.parseUrl(playlist.getCoverS3Key()))
+                .cover(imageUtils.parseUrls(playlist.getCoverS3Key()))
                 .isPrivate(playlist.getIsPrivate())
                 .type(playlist.getType())
                 .trackCount(playlist.getTrackCount())

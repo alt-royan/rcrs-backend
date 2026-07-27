@@ -8,9 +8,12 @@ import lombok.NoArgsConstructor;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.EntityStatus;
+import org.ultra.rcrs.enums.ImageSize;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
@@ -35,8 +38,8 @@ public class AlbumPublicStandaloneDto {
     private Integer totalTracks;
     @Schema(description = "Total playback duration of the album, in milliseconds.")
     private Integer totalDurationMs;
-    @Schema(description = "URL of the album cover artwork.")
-    private String coverUrl;
+    @Schema(description = "URLs of the album cover artwork, keyed by thumbnail size (SM/MD/LG). Empty if no cover has been set.")
+    private Map<ImageSize, URI> cover;
     @Schema(description = "Whether the album contains explicit content.")
     private Boolean explicit;
     @Schema(description = "Artists credited on the album.")
@@ -52,8 +55,8 @@ public class AlbumPublicStandaloneDto {
         private String id;
         @Schema(description = "Artist display name.")
         private String name;
-        @Schema(description = "URL of the artist's avatar image.")
-        private String avatarUrl;
+        @Schema(description = "URLs of the artist's avatar image, keyed by thumbnail size (SM/MD/LG). Empty if no avatar has been set.")
+        private Map<ImageSize, URI> avatar;
         @Schema(description = "Role of the artist on this album (e.g. PRIMARY, FEATURED, PRODUCER).")
         private ArtistRole role;
     }

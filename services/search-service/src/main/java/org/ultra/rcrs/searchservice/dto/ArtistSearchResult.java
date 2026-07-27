@@ -5,8 +5,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.ultra.rcrs.enums.ImageSize;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -18,8 +21,8 @@ public class ArtistSearchResult {
     private String id;
     @Schema(description = "Display name of the artist.")
     private String name;
-    @Schema(description = "URL of the artist's avatar/profile image, if one is set.")
-    private String avatarUrl;
+    @Schema(description = "URLs of the artist's avatar/profile image, keyed by thumbnail size (SM/MD/LG); empty if none is set.")
+    private Map<ImageSize, URI> avatar;
     @Schema(description = "Genre/style tags associated with the artist.")
     private List<String> tags;
     @Schema(description = "Public visibility/availability of the artist (e.g. whether it is publicly listed); only meaningful in admin mode, where non-public artists may also be returned.")

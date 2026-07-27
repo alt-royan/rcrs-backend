@@ -106,11 +106,19 @@ spring:
       s3:
         path-style-access-enabled: true
 
+image:
+  cdn:
+    endpoint: "http://images.localhost:4566"
+  thumbnails:
+    sizes:
+      sm: 128
+      md: 512
+      lg: 1024
+
 media:
   stream:
     bucket:
       name: rcrs-stream
-      public-url: http://audio.localhost:4566
     signature-duration: 6h
     validation:
       formats: mp3, wav, ogg, flac
@@ -130,8 +138,6 @@ media:
     bucket:
       name: images
       public-url: http://images.localhost:4566
-    thumbnails:
-      sizes: 64,300,640
   upload:
     bucket:
       name: rcrs-upload

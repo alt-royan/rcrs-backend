@@ -6,5 +6,4 @@ import lombok.Data;
 public class BucketProperties {
 
     private String name;
-    private String publicUrl;
 }

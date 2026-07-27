@@ -5,10 +5,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.ultra.rcrs.enums.ImageSize;
 import org.ultra.rcrs.playlistservice.model.PlaylistType;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
@@ -32,8 +35,8 @@ public class PlaylistViewDto {
     @Schema(description = "Free-form tags associated with the playlist.")
     private List<String> tags;
 
-    @Schema(description = "Fully resolved URL of the playlist cover image, built from the stored storage key.")
-    private String coverUrl;
+    @Schema(description = "URLs of the playlist cover image, keyed by thumbnail size (SM/MD/LG), built from the stored storage key. Empty if no cover has been set.")
+    private Map<ImageSize, URI> cover;
 
     @Schema(description = "Whether the playlist is private to its owner.")
     private Boolean isPrivate;

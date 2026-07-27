@@ -12,9 +12,12 @@ import org.ultra.rcrs.userservice.model.User;
 import org.ultra.rcrs.userservice.model.UserAvatar;
 import org.ultra.rcrs.userservice.repository.UserAvatarRepository;
 import org.ultra.rcrs.userservice.repository.UserRepository;
+import org.ultra.rcrs.enums.ImageSize;
 import org.ultra.rcrs.utils.ImageUtils;
 
+import java.net.URI;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -88,12 +91,12 @@ public class UserService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("User", userId));
 
-        String avatarUrl = getAvatarUrl(user.getUserId());
+        Map<ImageSize, URI> avatar = getAvatarUrls(user.getUserId());
 
         return new UserProfileResponse(
                 user.getUserId(),
                 user.getUsername(),
-                avatarUrl,
+                avatar,
                 user.getEmail(),
                 user.isEnabled(),
                 user.isEmailVerified()
@@ -105,22 +108,22 @@ public class UserService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("User", userId));
 
-        String avatarUrl = getAvatarUrl(user.getUserId());
+        Map<ImageSize, URI> avatar = getAvatarUrls(user.getUserId());
 
         return new UserProfileResponse(
                 user.getUserId(),
                 user.getUsername(),
-                avatarUrl,
+                avatar,
                 null,
                 null,
                 null
         );
     }
 
-    private String getAvatarUrl(String userId) {
+    private Map<ImageSize, URI> getAvatarUrls(String userId) {
         return userAvatarRepository.findById(userId)
                 .map(UserAvatar::getAvatarKey)
-                .map(imageUtils::parseUrl)
-                .orElse(null);
+                .map(imageUtils::parseUrls)
+                .orElse(Map.of());
     }
 }

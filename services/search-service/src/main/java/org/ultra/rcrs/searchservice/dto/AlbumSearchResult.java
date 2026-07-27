@@ -5,8 +5,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.ultra.rcrs.enums.ImageSize;
 
+import java.net.URI;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @NoArgsConstructor
@@ -20,8 +23,8 @@ public class AlbumSearchResult {
     private String title;
     @Schema(description = "Release year of the album.")
     private String year;
-    @Schema(description = "URL of the album cover art, if one is set.")
-    private String coverUrl;
+    @Schema(description = "URLs of the album cover art, keyed by thumbnail size (SM/MD/LG); empty if none is set.")
+    private Map<ImageSize, URI> cover;
     @Schema(description = "Public visibility/availability of the album; only meaningful in admin mode, where non-public albums may also be returned.")
     private String availability;
     @Schema(description = "Lifecycle status of the album (e.g. draft/published/archived), primarily relevant in admin mode.")

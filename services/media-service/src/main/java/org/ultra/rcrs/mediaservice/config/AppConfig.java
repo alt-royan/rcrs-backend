@@ -5,11 +5,14 @@ import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.ultra.rcrs.utils.ImageConfigBase;
 
 import java.util.List;
 
 @Configuration
 @EnableConfigurationProperties(MediaConfigurationProperties.class)
+@Import(ImageConfigBase.class)
 public class AppConfig {
 
     @Bean

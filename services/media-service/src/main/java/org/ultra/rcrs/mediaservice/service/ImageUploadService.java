@@ -3,9 +3,9 @@ package org.ultra.rcrs.mediaservice.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.ultra.rcrs.mediaservice.config.ImageConfigurationProperties;
 import org.ultra.rcrs.mediaservice.dto.ImageResponse;
 import org.ultra.rcrs.mediaservice.temporal.activity.model.ValidatedImage;
+import org.ultra.rcrs.utils.ImageUtils;
 
 @Service
 @Slf4j
@@ -15,7 +15,7 @@ public class ImageUploadService {
     private final ImageValidator imageValidator;
     private final ThumbnailGenerator thumbnailGenerator;
     private final ImageStorage imageStorage;
-    private final ImageConfigurationProperties imageProperties;
+    private final ImageUtils imageUtils;
 
     public ImageResponse uploadImage(String dataUrl) {
         ValidatedImage validated = imageValidator.validate(dataUrl);
@@ -25,7 +25,7 @@ public class ImageUploadService {
 
         String uri = imageStorage.putImage(key, imageData, contentType);
 
-        for (int size : imageProperties.getThumbnails().getSizes()) {
+        for (int size : imageUtils.getThumbnailSizes().values()) {
             String thumbnailKey = key + String.format("/%sx%s", size, size);
             byte[] thumbnail = thumbnailGenerator.createThumbnail(imageData, validated.format(), size);
             imageStorage.putImage(thumbnailKey, thumbnail, contentType);
