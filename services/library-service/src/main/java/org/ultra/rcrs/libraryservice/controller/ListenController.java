@@ -26,6 +26,7 @@ import org.ultra.rcrs.libraryservice.dto.request.ListenReportRequest;
 import org.ultra.rcrs.libraryservice.dto.response.*;
 import org.ultra.rcrs.libraryservice.model.LibraryEntityType;
 import org.ultra.rcrs.libraryservice.service.ListenService;
+import org.ultra.rcrs.security.CallerId;
 
 import java.time.Instant;
 import java.util.List;
@@ -66,7 +67,7 @@ public class ListenController {
             List<@Valid ListenReportRequest> reports,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.status(HttpStatus.ACCEPTED)
-                .body(listenService.ingest(jwt.getSubject(), reports));
+                .body(listenService.ingest(CallerId.of(jwt), reports));
     }
 
     @Operation(
@@ -90,7 +91,7 @@ public class ListenController {
             @Parameter(description = "Maximum number of entries to return")
             @RequestParam(defaultValue = "50") @Min(1) @Max(100) int limit,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        return listenService.timeline(jwt.getSubject(), cursor, limit);
+        return listenService.timeline(CallerId.of(jwt), cursor, limit);
     }
 
     @Operation(
@@ -105,7 +106,7 @@ public class ListenController {
     })
     @DeleteMapping("/listens")
     public ResponseEntity<Void> clear(@Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        listenService.clearTimeline(jwt.getSubject());
+        listenService.clearTimeline(CallerId.of(jwt));
         return ResponseEntity.noContent().build();
     }
 
@@ -129,7 +130,7 @@ public class ListenController {
             @Parameter(description = "Maximum number of entries to return")
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int limit,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        return listenService.recentlyPlayed(jwt.getSubject(), type, limit);
+        return listenService.recentlyPlayed(CallerId.of(jwt), type, limit);
     }
 
     @Operation(
@@ -148,7 +149,7 @@ public class ListenController {
             @Parameter(description = "Maximum number of tracks to return")
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int limit,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        return listenService.topTracks(jwt.getSubject(), limit);
+        return listenService.topTracks(CallerId.of(jwt), limit);
     }
 
     @Operation(
@@ -167,6 +168,6 @@ public class ListenController {
     public List<TrackPlayCountDto> playCounts(
             @Valid @RequestBody IdsRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        return listenService.playCounts(jwt.getSubject(), request.getIds());
+        return listenService.playCounts(CallerId.of(jwt), request.getIds());
     }
 }

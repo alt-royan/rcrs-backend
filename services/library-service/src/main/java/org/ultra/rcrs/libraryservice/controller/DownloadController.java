@@ -25,6 +25,7 @@ import org.ultra.rcrs.libraryservice.dto.response.PaginationResponse;
 import org.ultra.rcrs.libraryservice.model.LibraryEntityType;
 import org.ultra.rcrs.libraryservice.model.Quality;
 import org.ultra.rcrs.libraryservice.service.DownloadService;
+import org.ultra.rcrs.security.CallerId;
 
 import java.util.Map;
 
@@ -62,7 +63,7 @@ public class DownloadController {
             @Parameter(description = "Maximum number of items to return")
             @RequestParam(defaultValue = "50") @Min(1) @Max(100) int limit,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        return downloadService.listTracks(jwt.getSubject(), offset, limit);
+        return downloadService.listTracks(CallerId.of(jwt), offset, limit);
     }
 
     @Operation(
@@ -84,7 +85,7 @@ public class DownloadController {
             @Parameter(description = "Maximum number of items to return")
             @RequestParam(defaultValue = "50") @Min(1) @Max(100) int limit,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        return downloadService.listCollections(jwt.getSubject(), offset, limit);
+        return downloadService.listCollections(CallerId.of(jwt), offset, limit);
     }
 
     @Operation(
@@ -107,7 +108,7 @@ public class DownloadController {
             @Parameter(description = "Audio quality the file was downloaded at", required = true)
             @RequestParam Quality quality,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        downloadService.addTrack(jwt.getSubject(), trackId, quality);
+        downloadService.addTrack(CallerId.of(jwt), trackId, quality);
         return ResponseEntity.noContent().build();
     }
 
@@ -125,7 +126,7 @@ public class DownloadController {
             @Parameter(description = "Base62-encoded short identifier of the track", required = true)
             @PathVariable("trackId") String trackId,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        downloadService.removeTrack(jwt.getSubject(), trackId);
+        downloadService.removeTrack(CallerId.of(jwt), trackId);
         return ResponseEntity.noContent().build();
     }
 
@@ -146,7 +147,7 @@ public class DownloadController {
     public ResponseEntity<Void> addCollection(
             @Valid @RequestBody DownloadCollectionRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        downloadService.addCollection(jwt.getSubject(), request);
+        downloadService.addCollection(CallerId.of(jwt), request);
         return ResponseEntity.noContent().build();
     }
 
@@ -170,7 +171,7 @@ public class DownloadController {
             @Parameter(description = "Base62-encoded short identifier of the album or playlist", required = true)
             @PathVariable("id") String id,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        downloadService.removeCollection(jwt.getSubject(), LibraryEntityType.fromPathSegment(type), id);
+        downloadService.removeCollection(CallerId.of(jwt), LibraryEntityType.fromPathSegment(type), id);
         return ResponseEntity.noContent().build();
     }
 
@@ -190,6 +191,6 @@ public class DownloadController {
     public Map<String, Quality> check(
             @Valid @RequestBody IdsRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        return downloadService.check(jwt.getSubject(), request.getIds());
+        return downloadService.check(CallerId.of(jwt), request.getIds());
     }
 }

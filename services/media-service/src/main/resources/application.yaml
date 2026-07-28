@@ -156,6 +156,12 @@ media:
   sqs:
     queue: rcrs-upload-event-queue
 
+springdoc:
+  api-docs:
+    path: /media/v3/api-docs
+  swagger-ui:
+    path: /media/swagger-ui.html
+
 eureka:
   client:
     serviceUrl:

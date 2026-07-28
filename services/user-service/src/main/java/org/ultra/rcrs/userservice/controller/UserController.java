@@ -14,9 +14,12 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.ultra.rcrs.security.CallerId;
 import org.ultra.rcrs.userservice.dto.ErrorResponse;
 import org.ultra.rcrs.userservice.dto.UserProfileResponse;
 import org.ultra.rcrs.userservice.service.UserService;
+
+;
 
 @RestController
 @RequestMapping("/me")
@@ -45,7 +48,7 @@ public class UserController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<UserProfileResponse> getCompactProfile(@AuthenticationPrincipal Jwt jwt) {
-        UserProfileResponse profile = userService.getCompactProfile(jwt.getSubject());
+        UserProfileResponse profile = userService.getCompactProfile(CallerId.of(jwt));
         return ResponseEntity.ok(profile);
     }
 
@@ -68,7 +71,7 @@ public class UserController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<UserProfileResponse> getProfile(@AuthenticationPrincipal Jwt jwt) {
-        UserProfileResponse profile = userService.getProfile(jwt.getSubject());
+        UserProfileResponse profile = userService.getProfile(CallerId.of(jwt));
         return ResponseEntity.ok(profile);
     }
 }

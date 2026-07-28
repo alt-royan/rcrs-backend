@@ -36,10 +36,10 @@ public class SecurityConfig {
                         .accessDeniedHandler(new BearerTokenAccessDeniedHandler())
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/v3/api-docs/**").permitAll()
+                        .requestMatchers("/catalog/swagger-ui/**").permitAll()
+                        .requestMatchers("/catalog/v3/api-docs/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        .anyRequest().hasRole("SERVICE_WORKFLOW")
+                        .anyRequest().hasAnyRole("SERVICE_WORKFLOW", "ADMIN")
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));

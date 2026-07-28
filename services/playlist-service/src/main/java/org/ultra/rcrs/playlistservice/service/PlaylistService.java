@@ -77,7 +77,7 @@ public class PlaylistService {
         var playlist = playlistRepository.findByIdWithTrackCount(id)
                 .orElseThrow(() -> new NotFoundException("Playlist", id));
         if (isHiddenFrom(playlist.isPrivate(), playlist.ownerId(), requesterId)) {
-            throw new NotFoundException("Playlist", id);
+            throw new AccessDeniedException("It is private playlist");
         }
         return mapper.toViewDto(playlist);
     }
@@ -108,7 +108,7 @@ public class PlaylistService {
         Playlist playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new NotFoundException("Playlist", playlistId));
         if (isHiddenFrom(playlist.getIsPrivate(), playlist.getOwnerId(), requesterId)) {
-            throw new NotFoundException("Playlist", playlistId);
+            throw new AccessDeniedException("It is private playlist");
         }
 
         String sortField = "addedAt".equalsIgnoreCase(sortBy) ? "addedAt" : "position";

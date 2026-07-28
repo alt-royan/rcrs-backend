@@ -113,6 +113,12 @@ feign:
   search-service:
     url: http://localhost:8083
 
+springdoc:
+  api-docs:
+    path: /workflow/v3/api-docs
+  swagger-ui:
+    path: /workflow/swagger-ui.html
+
 eureka:
   client:
     serviceUrl:

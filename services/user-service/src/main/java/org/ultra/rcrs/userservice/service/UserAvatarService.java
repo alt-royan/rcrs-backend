@@ -19,9 +19,9 @@ public class UserAvatarService {
     private final ImageUtils imageUtils;
 
     @Transactional
-    public void saveAvatar(String username, String avatarUri) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new NotFoundException("User not found for username: " + username));
+    public void saveAvatar(String sub, String avatarUri) {
+        User user = userRepository.findByUserId(sub)
+                .orElseThrow(() -> new NotFoundException("User not found for id: " + sub));
 
         String avatarKey = imageUtils.parseKey(avatarUri);
 

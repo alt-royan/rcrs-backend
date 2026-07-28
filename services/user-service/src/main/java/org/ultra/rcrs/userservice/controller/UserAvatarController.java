@@ -10,15 +10,16 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.ultra.rcrs.security.CallerId;
 import org.ultra.rcrs.userservice.dto.ErrorResponse;
 import org.ultra.rcrs.userservice.dto.UserAvatarRequest;
 import org.ultra.rcrs.userservice.service.UserAvatarService;
-
-import java.security.Principal;
 
 @RestController
 @RequestMapping("/me/avatar")
@@ -49,8 +50,8 @@ public class UserAvatarController {
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
     public ResponseEntity<Void> uploadAvatar(@RequestBody @Valid UserAvatarRequest request,
-                                             Principal principal) {
-        userAvatarService.saveAvatar(principal.getName(), request.avatar());
+                                             @AuthenticationPrincipal Jwt jwt) {
+        userAvatarService.saveAvatar(CallerId.of(jwt), request.avatar());
         return ResponseEntity.noContent().build();
     }
 }

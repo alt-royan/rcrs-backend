@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.ultra.rcrs.security.CallerId;
 import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.workflow.dto.request.AlbumUploadRequest;
 import org.ultra.rcrs.workflow.dto.request.ChangeAvailabilityStatusRequest;
@@ -50,7 +51,7 @@ public class AlbumController {
     })
     @PostMapping
     public ResponseEntity<CreateResponse> uploadAlbum(@Valid @RequestBody AlbumUploadRequest request, @AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(handler.startAlbumUploadWorkflow(request, jwt));
+        return ResponseEntity.status(HttpStatus.CREATED).body(handler.startAlbumUploadWorkflow(request, CallerId.require(jwt)));
     }
 
     @Operation(
@@ -76,7 +77,7 @@ public class AlbumController {
             @Parameter(description = "Short (Base62) identifier of the album whose availability status is being changed", required = true)
             @PathVariable("id") String id,
             @AuthenticationPrincipal Jwt jwt) {
-        handler.startAlbumChangeAvailabilityStatusWorkflow(request.status(), id, jwt);
+        handler.startAlbumChangeAvailabilityStatusWorkflow(request.status(), id, CallerId.require(jwt));
         return ResponseEntity.ok().build();
     }
 

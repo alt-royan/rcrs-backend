@@ -3,6 +3,7 @@ package org.ultra.rcrs.metadata.config;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,10 +32,12 @@ public class SecurityConfig {
                         .accessDeniedHandler(new BearerTokenServerAccessDeniedHandler())
                 )
                 .authorizeExchange(auth -> auth
-                        .pathMatchers("/swagger-ui/**").permitAll()
-                        .pathMatchers("/v3/api-docs/**").permitAll()
+                        .pathMatchers("/api/catalog/swagger-ui/**").permitAll()
+                        .pathMatchers("/api/catalog/v3/api-docs/**").permitAll()
                         .pathMatchers("/actuator/**").permitAll()
-                        .pathMatchers("/admin/**").hasRole("ADMIN")
+                        .pathMatchers(HttpMethod.GET, "/api/catalog/**").permitAll()
+                        .pathMatchers(HttpMethod.POST, "/api/catalog/**").permitAll()
+                        .pathMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2

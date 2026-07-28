@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 @Tag(name = "Track Admin", description = "Administrative endpoints for browsing tracks with unfiltered lifecycle and availability data.")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/catalog/admin/tracks")
+@RequestMapping("/api/admin/catalog/tracks")
 public class TrackAdminController {
 
     private final TrackAdminService trackAdminService;

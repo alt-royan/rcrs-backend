@@ -20,6 +20,7 @@ import org.ultra.rcrs.playlistservice.dto.request.CreatePlaylistRequest;
 import org.ultra.rcrs.playlistservice.dto.request.IdsRequest;
 import org.ultra.rcrs.playlistservice.dto.response.*;
 import org.ultra.rcrs.playlistservice.service.PlaylistService;
+import org.ultra.rcrs.security.CallerId;
 import org.ultra.rcrs.utils.ImageUtils;
 import org.ultra.rcrs.utils.Url62;
 
@@ -58,7 +59,7 @@ public class PlaylistController {
             @Parameter(description = "Maximum number of playlists to return.")
             @RequestParam(defaultValue = "50") int limit,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        return playlistService.getOwnPlaylists(jwt.getSubject(), offset, limit);
+        return playlistService.getOwnPlaylists(CallerId.of(jwt), offset, limit);
     }
 
     @PostMapping("/get")
@@ -80,7 +81,7 @@ public class PlaylistController {
             @RequestBody IdsRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
         List<UUID> uuids = request.getIds().stream().map(Url62::decode).toList();
-        return playlistService.getPlaylistsByIds(uuids, jwt.getSubject());
+        return playlistService.getPlaylistsByIds(uuids, CallerId.of(jwt));
     }
 
     @GetMapping("/{playlistId}")
@@ -102,7 +103,7 @@ public class PlaylistController {
     public PlaylistViewDto getPlaylist(
             @PathVariable("playlistId") String playlistId,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        return playlistService.getPlaylistById(Url62.decode(playlistId), jwt.getSubject());
+        return playlistService.getPlaylistById(Url62.decode(playlistId), CallerId.of(jwt));
     }
 
     @PostMapping
@@ -125,7 +126,7 @@ public class PlaylistController {
             @RequestBody @Validated CreatePlaylistRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
         UUID id = UUID.randomUUID();
-        var playlistId = playlistService.createPlaylist(id, jwt.getSubject(), request.getTitle(), request.getDescription(),
+        var playlistId = playlistService.createPlaylist(id, CallerId.of(jwt), request.getTitle(), request.getDescription(),
                 request.getTags(), request.getTrackIds(), imageUtils.parseKey(request.getCoverUri()), request.isPrivate(), request.getType());
         return ResponseEntity.status(HttpStatus.CREATED).body(new CreateResponse(Url62.encode(playlistId)));
     }
@@ -158,7 +159,7 @@ public class PlaylistController {
             @Parameter(description = "Sort direction.")
             @RequestParam(defaultValue = "DESC") Sort.Direction direction,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        return playlistService.getTracks(Url62.decode(playlistId), jwt.getSubject(), offset, limit, sortBy, direction);
+        return playlistService.getTracks(Url62.decode(playlistId), CallerId.of(jwt), offset, limit, sortBy, direction);
     }
 
     @PutMapping("/{playlistId}/tracks")
@@ -183,7 +184,7 @@ public class PlaylistController {
             @Parameter(description = "Track IDs to add to the playlist.", required = true)
             @RequestBody @Validated IdsRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        playlistService.addTracks(Url62.decode(playlistId), request.getIds(), jwt.getSubject());
+        playlistService.addTracks(Url62.decode(playlistId), request.getIds(), CallerId.of(jwt));
         return ResponseEntity.ok().build();
     }
 
@@ -209,7 +210,7 @@ public class PlaylistController {
             @Parameter(description = "Track IDs to remove from the playlist.", required = true)
             @RequestBody @Validated IdsRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        playlistService.deleteTracks(Url62.decode(playlistId), request.getIds(), jwt.getSubject());
+        playlistService.deleteTracks(Url62.decode(playlistId), request.getIds(), CallerId.of(jwt));
         return ResponseEntity.ok().build();
     }
 
@@ -231,7 +232,7 @@ public class PlaylistController {
             @Parameter(description = "Short (Base62) ID of the playlist to delete.", required = true)
             @PathVariable String playlistId,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        playlistService.deletePlaylist(Url62.decode(playlistId), jwt.getSubject());
+        playlistService.deletePlaylist(Url62.decode(playlistId), CallerId.of(jwt));
         return ResponseEntity.noContent().build();
     }
 }

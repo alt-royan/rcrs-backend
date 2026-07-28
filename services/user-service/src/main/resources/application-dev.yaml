@@ -42,6 +42,12 @@ image:
       md: ${IMAGE_THUMBNAILS_SIZES_MD:512}
       lg: ${IMAGE_THUMBNAILS_SIZES_LG:1024}
 
+springdoc:
+  api-docs:
+    path: /me/v3/api-docs
+  swagger-ui:
+    path: /me/swagger-ui.html
+
 eureka:
   client:
     serviceUrl:

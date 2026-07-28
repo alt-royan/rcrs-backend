@@ -23,6 +23,7 @@ import org.ultra.rcrs.libraryservice.dto.response.LikedEntityDto;
 import org.ultra.rcrs.libraryservice.dto.response.PaginationResponse;
 import org.ultra.rcrs.libraryservice.model.LibraryEntityType;
 import org.ultra.rcrs.libraryservice.service.LikeService;
+import org.ultra.rcrs.security.CallerId;
 
 import java.util.Map;
 
@@ -62,7 +63,7 @@ public class LikeController {
             @Parameter(description = "Maximum number of items to return")
             @RequestParam(defaultValue = "50") @Min(1) @Max(100) int limit,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        return likeService.list(jwt.getSubject(), LibraryEntityType.fromPathSegment(type), offset, limit);
+        return likeService.list(CallerId.of(jwt), LibraryEntityType.fromPathSegment(type), offset, limit);
     }
 
     @Operation(
@@ -84,7 +85,7 @@ public class LikeController {
             @Parameter(description = "Base62-encoded short identifier of the entity", required = true)
             @PathVariable("id") String id,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        likeService.like(jwt.getSubject(), LibraryEntityType.fromPathSegment(type), id);
+        likeService.like(CallerId.of(jwt), LibraryEntityType.fromPathSegment(type), id);
         return ResponseEntity.noContent().build();
     }
 
@@ -106,7 +107,7 @@ public class LikeController {
             @Parameter(description = "Base62-encoded short identifier of the entity", required = true)
             @PathVariable("id") String id,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        likeService.unlike(jwt.getSubject(), LibraryEntityType.fromPathSegment(type), id);
+        likeService.unlike(CallerId.of(jwt), LibraryEntityType.fromPathSegment(type), id);
         return ResponseEntity.noContent().build();
     }
 
@@ -126,7 +127,7 @@ public class LikeController {
     public Map<String, Boolean> check(
             @Valid @RequestBody LikeCheckRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        return likeService.check(jwt.getSubject(), request);
+        return likeService.check(CallerId.of(jwt), request);
     }
 
     @Operation(
@@ -140,6 +141,6 @@ public class LikeController {
     })
     @GetMapping("/summary")
     public LikeSummaryResponse summary(@Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        return likeService.summary(jwt.getSubject());
+        return likeService.summary(CallerId.of(jwt));
     }
 }

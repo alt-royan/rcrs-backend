@@ -42,6 +42,12 @@ image:
       md: 512
       lg: 1024
 
+springdoc:
+  api-docs:
+    path: /me/v3/api-docs
+  swagger-ui:
+    path: /me/swagger-ui.html
+
 eureka:
   client:
     serviceUrl:

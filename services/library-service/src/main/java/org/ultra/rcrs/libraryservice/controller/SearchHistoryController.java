@@ -21,6 +21,7 @@ import org.ultra.rcrs.libraryservice.dto.request.SearchHistoryRequest;
 import org.ultra.rcrs.libraryservice.dto.response.SearchHistoryEntryDto;
 import org.ultra.rcrs.libraryservice.model.LibraryEntityType;
 import org.ultra.rcrs.libraryservice.service.SearchHistoryService;
+import org.ultra.rcrs.security.CallerId;
 
 import java.util.List;
 
@@ -56,7 +57,7 @@ public class SearchHistoryController {
             @Parameter(description = "Maximum number of entries to return")
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int limit,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        return searchHistoryService.list(jwt.getSubject(), limit);
+        return searchHistoryService.list(CallerId.of(jwt), limit);
     }
 
     @Operation(
@@ -76,7 +77,7 @@ public class SearchHistoryController {
     public ResponseEntity<Void> record(
             @Valid @RequestBody SearchHistoryRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        searchHistoryService.record(jwt.getSubject(), request);
+        searchHistoryService.record(CallerId.of(jwt), request);
         return ResponseEntity.noContent().build();
     }
 
@@ -88,7 +89,7 @@ public class SearchHistoryController {
     })
     @DeleteMapping
     public ResponseEntity<Void> clear(@Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        searchHistoryService.clear(jwt.getSubject());
+        searchHistoryService.clear(CallerId.of(jwt));
         return ResponseEntity.noContent().build();
     }
 
@@ -108,7 +109,7 @@ public class SearchHistoryController {
             @Parameter(description = "Base62-encoded short identifier of the entity", required = true)
             @PathVariable("id") String id,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
-        searchHistoryService.delete(jwt.getSubject(), LibraryEntityType.fromPathSegment(type), id);
+        searchHistoryService.delete(CallerId.of(jwt), LibraryEntityType.fromPathSegment(type), id);
         return ResponseEntity.noContent().build();
     }
 }
