@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.exceptions.NotFoundException;
@@ -93,10 +95,12 @@ public class PlaylistService {
     }
 
     @Transactional
-    public void addTracks(UUID playlistId, List<String> trackIds) {
+    public void addTracks(UUID playlistId, List<String> trackIds, String ownerId) {
         Playlist playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new NotFoundException("Playlist", playlistId));
-
+        if (!playlist.getOwnerId().equals(ownerId)){
+            throw new AccessDeniedException("You are not allowed to add tracks at this playlist. You are not it's owner.");
+        }
         Set<String> existingIds = playlistTrackRepository.findAllByPlaylistId(playlist.getId()).stream()
                 .map(PlaylistTrack::getTrackId)
                 .collect(Collectors.toSet());
@@ -123,10 +127,12 @@ public class PlaylistService {
     }
 
     @Transactional
-    public void deleteTracks(UUID playlistId, List<String> trackIds) {
+    public void deleteTracks(UUID playlistId, List<String> trackIds, String ownerId) {
         Playlist playlist = playlistRepository.findById(playlistId)
                 .orElseThrow(() -> new NotFoundException("Playlist", playlistId));
-
+        if (!playlist.getOwnerId().equals(ownerId)){
+            throw new AccessDeniedException("You are not allowed to delete tracks from this playlist. You are not it's owner.");
+        }
         List<PlaylistTrackPK> forDelete = trackIds.stream().distinct()
                 .map(id -> new PlaylistTrackPK(playlist.getId(), id))
                 .toList();
@@ -145,7 +151,12 @@ public class PlaylistService {
     }
 
     @Transactional
-    public void deletePlaylist(UUID playlistId) {
+    public void deletePlaylist(UUID playlistId, String ownerId) {
+        Playlist playlist = playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new NotFoundException("Playlist", playlistId));
+        if (!playlist.getOwnerId().equals(ownerId)){
+            throw new AccessDeniedException("You are not allowed to delete this playlist. You are not it's owner.");
+        }
         playlistRepository.deleteById(playlistId);
         log.info("Deleted playlist: id={}", playlistId);
     }

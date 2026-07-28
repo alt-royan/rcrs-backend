@@ -145,8 +145,9 @@ public class PlaylistController {
             @Parameter(description = "Short (Base62) ID of the playlist to add tracks to.", required = true)
             @PathVariable String playlistId,
             @Parameter(description = "Track IDs to add to the playlist.", required = true)
-            @RequestBody @Validated IdsRequest request) {
-        playlistService.addTracks(Url62.decode(playlistId), request.getIds());
+            @RequestBody @Validated IdsRequest request,
+            @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
+        playlistService.addTracks(Url62.decode(playlistId), request.getIds(), jwt.getSubject());
         return ResponseEntity.ok().build();
     }
 
@@ -170,8 +171,9 @@ public class PlaylistController {
             @Parameter(description = "Short (Base62) ID of the playlist to remove tracks from.", required = true)
             @PathVariable String playlistId,
             @Parameter(description = "Track IDs to remove from the playlist.", required = true)
-            @RequestBody @Validated IdsRequest request) {
-        playlistService.deleteTracks(Url62.decode(playlistId), request.getIds());
+            @RequestBody @Validated IdsRequest request,
+            @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
+        playlistService.deleteTracks(Url62.decode(playlistId), request.getIds(), jwt.getSubject());
         return ResponseEntity.ok().build();
     }
 
@@ -191,8 +193,9 @@ public class PlaylistController {
     })
     public ResponseEntity<Void> deletePlaylist(
             @Parameter(description = "Short (Base62) ID of the playlist to delete.", required = true)
-            @PathVariable String playlistId) {
-        playlistService.deletePlaylist(Url62.decode(playlistId));
+            @PathVariable String playlistId,
+            @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
+        playlistService.deletePlaylist(Url62.decode(playlistId), jwt.getSubject());
         return ResponseEntity.noContent().build();
     }
 }

@@ -1,9 +1,0 @@
-syntax = "proto3";
-
-package events;
-
-option java_package = "org.ultra.rcrs.events.playlist";
-
-message DeletePlaylistEvent {
-  string id = 1;
-}
