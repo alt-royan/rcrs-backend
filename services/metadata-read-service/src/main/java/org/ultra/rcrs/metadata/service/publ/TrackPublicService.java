@@ -1,19 +1,21 @@
 package org.ultra.rcrs.metadata.service.publ;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import org.ultra.rcrs.exceptions.NotFoundException;
-import org.ultra.rcrs.metadata.dto.TrackAdminStandaloneDto;
+import org.ultra.rcrs.metadata.dto.PaginationResponse;
 import org.ultra.rcrs.metadata.dto.TrackPublicStandaloneDto;
 import org.ultra.rcrs.metadata.dto.TrackPublicViewDto;
 import org.ultra.rcrs.metadata.model.TrackDocument;
 import org.ultra.rcrs.metadata.repository.TrackDocumentRepository;
-import org.ultra.rcrs.utils.S3Utils;
-import reactor.core.publisher.Flux;
+import org.ultra.rcrs.utils.ImageUtils;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -21,7 +23,8 @@ import java.util.stream.Collectors;
 public class TrackPublicService {
 
     private final TrackDocumentRepository trackDocumentRepository;
-    private final S3Utils s3Utils;
+    private final ReactiveMongoTemplate mongoTemplate;
+    private final ImageUtils imageUtils;
 
     public Mono<TrackPublicViewDto> getById(String id) {
         return trackDocumentRepository.findByIdForPublic(id)
@@ -29,9 +32,26 @@ public class TrackPublicService {
                 .map(this::toDto);
     }
 
-    public Flux<TrackPublicStandaloneDto> getAllByAlbumId(String albumId) {
-        return trackDocumentRepository.findAllByAlbumIdForPublic(albumId, Sort.by("trackNumber"))
-                .map(this::toStandaloneDto);
+    public Mono<List<TrackPublicStandaloneDto>> getAllByIds(List<String> ids) {
+        return trackDocumentRepository.findAllByIdIn(ids)
+                .map(this::toStandaloneDto)
+                .collectList();
+    }
+
+    public Mono<PaginationResponse<TrackPublicStandaloneDto>> getAllByAlbumId(String albumId, int offset, int limit) {
+        Sort sort = Sort.by("trackNumber");
+        Query filter = new Query(Criteria.where("album.id").is(albumId)
+                .and("lifecycleStatus").is("PUBLISHED")
+                .and("availabilityStatus").in("ACTIVE", "HIDDEN"));
+        Query page = Query.of(filter).with(sort).skip(offset).limit(limit);
+
+        Mono<List<TrackPublicStandaloneDto>> items = mongoTemplate.find(page, TrackDocument.class, "tracks")
+                .map(this::toStandaloneDto)
+                .collectList();
+        Mono<Long> totalCount = mongoTemplate.count(filter, TrackDocument.class, "tracks");
+
+        return Mono.zip(items, totalCount,
+                (found, total) -> new PaginationResponse<>(found, total, offset, limit));
     }
 
     private TrackPublicViewDto toDto(TrackDocument doc) {
@@ -47,14 +67,14 @@ public class TrackPublicService {
                         ? TrackPublicViewDto.AlbumEmbed.builder()
                         .id(doc.getAlbum().getId())
                         .title(doc.getAlbum().getTitle())
-                        .coverUrl(s3Utils.parseUrl(doc.getAlbum().getCoverS3Key()))
+                        .cover(imageUtils.parseUrls(doc.getAlbum().getCoverS3Key()))
                         .build()
                         : null)
                 .artists(doc.getArtists() != null
                         ? doc.getArtists().stream().map(a -> TrackPublicViewDto.ArtistEmbed.builder()
                         .id(a.getId())
                         .name(a.getName())
-                        .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
+                        .avatar(imageUtils.parseUrls(a.getAvatarS3Key()))
                         .role(a.getRole())
                         .build()).collect(Collectors.toList())
                         : null)
@@ -85,13 +105,13 @@ public class TrackPublicService {
                 .album(TrackPublicStandaloneDto.AlbumEmbed.builder()
                         .id(doc.getAlbum().getId())
                         .title(doc.getAlbum().getTitle())
-                        .coverUrl(s3Utils.parseUrl(doc.getAlbum().getCoverS3Key()))
+                        .cover(imageUtils.parseUrls(doc.getAlbum().getCoverS3Key()))
                         .build())
                 .artists(doc.getArtists() != null
                         ? doc.getArtists().stream().map(a -> TrackPublicStandaloneDto.ArtistEmbed.builder()
                         .id(a.getId())
                         .name(a.getName())
-                        .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
+                        .avatar(imageUtils.parseUrls(a.getAvatarS3Key()))
                         .role(a.getRole())
                         .build()).collect(Collectors.toList())
                         : null)

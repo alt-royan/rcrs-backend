@@ -12,7 +12,7 @@ import org.ultra.rcrs.metadata.kafka.CatalogEventProducer;
 import org.ultra.rcrs.metadata.model.Artist;
 import org.ultra.rcrs.metadata.model.SocialLinks;
 import org.ultra.rcrs.metadata.repository.ArtistRepository;
-import org.ultra.rcrs.utils.S3Utils;
+import org.ultra.rcrs.utils.ImageUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -34,7 +34,7 @@ class ArtistServiceTest {
     @Mock
     private CatalogEventProducer catalogEventProducer;
     @Mock
-    private S3Utils s3Utils;
+    private ImageUtils imageUtils;
 
     @InjectMocks
     private ArtistService artistService;
@@ -47,12 +47,12 @@ class ArtistServiceTest {
         request.setSocialLinks(List.of());
         request.setTags(List.of("rock"));
 
-        when(s3Utils.parseKey("s3://bucket/avatar.jpg")).thenReturn("avatar.jpg");
+        when(imageUtils.parseKey("s3://bucket/avatar.jpg")).thenReturn("avatar.jpg");
 
         Artist artistExpected = Artist.builder()
                 .id(UUID.randomUUID())
                 .name(request.getName())
-                .avatarS3Key(s3Utils.parseKey(request.getAvatarUri()))
+                .avatarS3Key(imageUtils.parseKey(request.getAvatarUri()))
                 .socialLinks(new SocialLinks(request.getSocialLinks()))
                 .tags(request.getTags())
                 .availabilityStatus(EntityStatus.ACTIVE)

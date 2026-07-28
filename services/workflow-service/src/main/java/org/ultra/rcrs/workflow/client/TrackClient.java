@@ -10,37 +10,36 @@ import org.ultra.rcrs.workflow.client.model.ArtistsToEntityModel;
 import org.ultra.rcrs.workflow.client.model.OthersToTrackModel;
 import org.ultra.rcrs.workflow.client.model.TrackUploadModel;
 import org.ultra.rcrs.workflow.config.FeignMediaServiceConfig;
-import org.ultra.rcrs.workflow.config.FeignMetadataServiceConfig;
 import org.ultra.rcrs.workflow.dto.StatusDto;
 import org.ultra.rcrs.workflow.dto.response.CreateResponse;
 
 @FeignClient(name = "track-write-client", url = "${feign.metadata-service.url}", configuration = FeignMediaServiceConfig.class)
 public interface TrackClient {
 
-    @PostMapping("/tracks")
+    @PostMapping("/catalog/tracks")
     ResponseEntity<CreateResponse> createTrack(TrackUploadModel request);
 
-    @PostMapping("/tracks/{trackId}/artists")
+    @PostMapping("/catalog/tracks/{trackId}/artists")
     ResponseEntity<Void> addArtistsToTrack(ArtistsToEntityModel request, @PathVariable String trackId);
 
-    @DeleteMapping("/tracks/{trackId}/artists")
+    @DeleteMapping("/catalog/tracks/{trackId}/artists")
     ResponseEntity<Void> deleteArtistsFromTrack(ArtistsToEntityModel request, @PathVariable String trackId);
 
-    @PostMapping("/tracks/{trackId}/others")
+    @PostMapping("/catalog/tracks/{trackId}/others")
     ResponseEntity<Void> addOthersToTrack(OthersToTrackModel request, @PathVariable String trackId);
 
-    @DeleteMapping("/tracks/{trackId}/others")
+    @DeleteMapping("/catalog/tracks/{trackId}/others")
     ResponseEntity<Void> deleteOthersFromTrack(OthersToTrackModel request, @PathVariable String trackId);
 
-    @PutMapping("/tracks/{trackId}/status")
+    @PutMapping("/catalog/tracks/{trackId}/status")
     ResponseEntity<Void> updateTrackStatus(StatusDto statusDto, @PathVariable String trackId);
 
-    @PutMapping("/tracks/{trackId}/hide")
+    @PutMapping("/catalog/tracks/{trackId}/hide")
     ResponseEntity<Void> hideTrack(@PathVariable String trackId);
 
-    @PutMapping("/tracks/{trackId}/active")
+    @PutMapping("/catalog/tracks/{trackId}/active")
     ResponseEntity<Void> activeTrack(@PathVariable String trackId);
 
-    @DeleteMapping("/tracks/{trackId}")
+    @DeleteMapping("/catalog/tracks/{trackId}")
     ResponseEntity<Void> markTrackDeleted(@PathVariable String trackId);
 }

@@ -19,11 +19,11 @@ import org.ultra.rcrs.metadata.model.ArtistToAlbumPK;
 import org.ultra.rcrs.metadata.repository.AlbumRepository;
 import org.ultra.rcrs.metadata.repository.ArtistRepository;
 import org.ultra.rcrs.metadata.repository.ArtistToAlbumRepository;
-import org.ultra.rcrs.utils.S3Utils;
+import org.ultra.rcrs.utils.ImageUtils;
 import org.ultra.rcrs.utils.Url62;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -44,7 +44,7 @@ class AlbumServiceTest {
     @Mock
     private ArtistRepository artistRepository;
     @Mock
-    private S3Utils s3Utils;
+    private ImageUtils imageUtils;
     @Mock
     private CatalogEventProducer catalogEventProducer;
 
@@ -56,8 +56,8 @@ class AlbumServiceTest {
         AlbumUploadRequest request = new AlbumUploadRequest();
         request.setTitle("Test Album");
         request.setType(AlbumType.FULL);
-        request.setReleaseDate(LocalDateTime.of(2025, 1, 15, 0, 0));
-        request.setPublishTimestamp(OffsetDateTime.now());
+        request.setReleaseDate(LocalDate.of(2025, 1, 15));
+        request.setPublishTimestamp(Instant.now());
         request.setCoverUri("s3://bucket/cover.jpg");
 
         Album albumExpected = Album.builder()
@@ -67,7 +67,7 @@ class AlbumServiceTest {
                 .type(request.getType())
                 .releaseDate(request.getReleaseDate())
                 .publishTimestamp(request.getPublishTimestamp())
-                .coverS3Key(s3Utils.parseKey(request.getCoverUri()))
+                .coverS3Key(imageUtils.parseKey(request.getCoverUri()))
                 .availabilityStatus(EntityStatus.ACTIVE)
                 .build();
 

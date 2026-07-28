@@ -33,6 +33,15 @@ spring:
           issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI}
           jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI}
 
+image:
+  cdn:
+    endpoint: ${IMAGE_CDN_ENDPOINT}
+  thumbnails:
+    sizes:
+      sm: ${IMAGE_THUMBNAILS_SIZES_SM:128}
+      md: ${IMAGE_THUMBNAILS_SIZES_MD:512}
+      lg: ${IMAGE_THUMBNAILS_SIZES_LG:1024}
+
 eureka:
   client:
     serviceUrl:

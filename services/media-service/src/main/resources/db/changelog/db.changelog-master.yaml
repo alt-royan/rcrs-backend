@@ -2,8 +2,4 @@ databaseChangeLog:
   - include:
       file: classpath:db/changelog/init.sql
   - include:
-      file: classpath:db/changelog/001-alter-content-type.sql
-  - include:
-      file: classpath:db/changelog/002-add-track-to-audio.sql
-  - include:
-      file: classpath:db/changelog/003-add-download-file.sql
+      file: classpath:db/changelog/001-add-track-to-audio.sql

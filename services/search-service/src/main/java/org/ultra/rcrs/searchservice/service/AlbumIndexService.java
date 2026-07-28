@@ -13,8 +13,7 @@ import org.ultra.rcrs.searchservice.document.*;
 import org.ultra.rcrs.searchservice.repository.AlbumIndexRepository;
 import org.ultra.rcrs.searchservice.repository.ArtistIndexRepository;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 @Slf4j
@@ -29,7 +28,6 @@ public class AlbumIndexService {
         EntityStatus availability = EntityStatus.valueOf(event.getAvailabilityStatus().name());
         LifecycleStatus lifecycle = LifecycleStatus.valueOf(event.getLifecycleStatus().name());
 
-        var year = LocalDateTime.ofEpochSecond(event.getReleaseDate().getSeconds(), event.getReleaseDate().getNanos(), ZoneOffset.UTC).getYear();
         AlbumAdminDoc adminDoc = new AlbumAdminDoc();
         adminDoc.setId(event.getId());
         adminDoc.setTitle(event.getTitle());
@@ -38,7 +36,9 @@ public class AlbumIndexService {
         adminDoc.setLifecycleStatus(lifecycle);
         adminDoc.setTracks(new ArrayList<>());
         adminDoc.setArtists(new ArrayList<>());
-        adminDoc.setYear(String.valueOf(year));
+        if (!event.getReleaseDate().isEmpty()) {
+            adminDoc.setReleaseDate(LocalDate.parse(event.getReleaseDate()));
+        }
         albumIndexRepository.index(adminDoc);
 
         log.info("Album created in admin index: id={}, availability={}, lifecycle={}", event.getId(), availability, lifecycle);
@@ -208,7 +208,7 @@ public class AlbumIndexService {
         AlbumPublicDoc publicDoc = new AlbumPublicDoc();
         publicDoc.setId(adminDoc.getId());
         publicDoc.setTitle(adminDoc.getTitle());
-        publicDoc.setYear(adminDoc.getYear());
+        publicDoc.setReleaseDate(adminDoc.getReleaseDate());
         publicDoc.setCoverS3Key(adminDoc.getCoverS3Key());
         publicDoc.setAvailability(adminDoc.getAvailability());
         publicDoc.setTracks(adminDoc.getTracks());

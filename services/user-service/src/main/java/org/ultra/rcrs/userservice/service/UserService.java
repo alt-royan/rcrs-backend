@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.ultra.rcrs.enums.ImageSize;
 import org.ultra.rcrs.exceptions.NotFoundException;
 import org.ultra.rcrs.userservice.dto.IdentityEvent;
 import org.ultra.rcrs.userservice.dto.IdentityEventPayload;
@@ -12,9 +13,11 @@ import org.ultra.rcrs.userservice.model.User;
 import org.ultra.rcrs.userservice.model.UserAvatar;
 import org.ultra.rcrs.userservice.repository.UserAvatarRepository;
 import org.ultra.rcrs.userservice.repository.UserRepository;
-import org.ultra.rcrs.utils.S3Utils;
+import org.ultra.rcrs.utils.ImageUtils;
 
+import java.net.URI;
 import java.time.Instant;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -24,7 +27,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserAvatarRepository userAvatarRepository;
-    private final S3Utils s3Utils;
+    private final ImageUtils imageUtils;
 
     @Transactional
     public void handleEvent(IdentityEvent event) {
@@ -88,12 +91,12 @@ public class UserService {
         User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("User", userId));
 
-        String avatarUrl = getAvatarUrl(user.getUserId());
+        Map<ImageSize, URI> avatar = getAvatarUrls(user.getUserId());
 
         return new UserProfileResponse(
                 user.getUserId(),
                 user.getUsername(),
-                avatarUrl,
+                avatar,
                 user.getEmail(),
                 user.isEnabled(),
                 user.isEmailVerified()
@@ -102,25 +105,25 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public UserProfileResponse getCompactProfile(String userId) {
-        User user = userRepository.findByUsername(userId)
+        User user = userRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("User", userId));
 
-        String avatarUrl = getAvatarUrl(user.getUserId());
+        Map<ImageSize, URI> avatar = getAvatarUrls(user.getUserId());
 
         return new UserProfileResponse(
                 user.getUserId(),
                 user.getUsername(),
-                avatarUrl,
+                avatar,
                 null,
                 null,
                 null
         );
     }
 
-    private String getAvatarUrl(String userId) {
+    private Map<ImageSize, URI> getAvatarUrls(String userId) {
         return userAvatarRepository.findById(userId)
                 .map(UserAvatar::getAvatarKey)
-                .map(s3Utils::parseUrl)
-                .orElse(null);
+                .map(imageUtils::parseUrls)
+                .orElse(Map.of());
     }
 }

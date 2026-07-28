@@ -1,7 +1,6 @@
 package org.ultra.rcrs.metadata.service.admin;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -15,7 +14,7 @@ import org.ultra.rcrs.metadata.dto.TrackAdminStandaloneDto;
 import org.ultra.rcrs.metadata.dto.TrackAdminViewDto;
 import org.ultra.rcrs.metadata.model.TrackDocument;
 import org.ultra.rcrs.metadata.repository.TrackDocumentRepository;
-import org.ultra.rcrs.utils.S3Utils;
+import org.ultra.rcrs.utils.ImageUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -29,7 +28,7 @@ public class TrackAdminService {
 
     private final TrackDocumentRepository trackDocumentRepository;
     private final ReactiveMongoTemplate mongoTemplate;
-    private final S3Utils s3Utils;
+    private final ImageUtils imageUtils;
 
     public Mono<TrackAdminViewDto> getById(String id) {
         return trackDocumentRepository.findByIdForAdmin(id)
@@ -103,14 +102,14 @@ public class TrackAdminService {
                         ? TrackAdminViewDto.AlbumEmbed.builder()
                         .id(doc.getAlbum().getId())
                         .title(doc.getAlbum().getTitle())
-                        .coverUrl(s3Utils.parseUrl(doc.getAlbum().getCoverS3Key()))
+                        .coverUrl(imageUtils.parseUrl(doc.getAlbum().getCoverS3Key()))
                         .build()
                         : null)
                 .artists(doc.getArtists() != null
                         ? doc.getArtists().stream().map(a -> TrackAdminViewDto.ArtistEmbed.builder()
                         .id(a.getId())
                         .name(a.getName())
-                        .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
+                        .avatarUrl(imageUtils.parseUrl(a.getAvatarS3Key()))
                         .role(a.getRole())
                         .build()).collect(Collectors.toList())
                         : null)
@@ -142,13 +141,13 @@ public class TrackAdminService {
                 .album(TrackAdminStandaloneDto.AlbumEmbed.builder()
                         .id(doc.getAlbum().getId())
                         .title(doc.getAlbum().getTitle())
-                        .coverUrl(s3Utils.parseUrl(doc.getAlbum().getCoverS3Key()))
+                        .coverUrl(imageUtils.parseUrl(doc.getAlbum().getCoverS3Key()))
                         .build())
                 .artists(doc.getArtists() != null
                         ? doc.getArtists().stream().map(a -> TrackAdminStandaloneDto.ArtistEmbed.builder()
                         .id(a.getId())
                         .name(a.getName())
-                        .avatarUrl(s3Utils.parseUrl(a.getAvatarS3Key()))
+                        .avatarUrl(imageUtils.parseUrl(a.getAvatarS3Key()))
                         .role(a.getRole())
                         .build()).collect(Collectors.toList())
                         : null)

@@ -33,6 +33,15 @@ spring:
           issuer-uri: http://192.168.1.3:8180/realms/master
           jwk-set-uri: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
 
+image:
+  cdn:
+    endpoint: "http://192.168.1.3:4566/images"
+  thumbnails:
+    sizes:
+      sm: 128
+      md: 512
+      lg: 1024
+
 eureka:
   client:
     serviceUrl:

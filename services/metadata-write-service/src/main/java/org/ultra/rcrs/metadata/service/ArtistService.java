@@ -10,7 +10,7 @@ import org.ultra.rcrs.metadata.kafka.CatalogEventProducer;
 import org.ultra.rcrs.metadata.model.Artist;
 import org.ultra.rcrs.metadata.model.SocialLinks;
 import org.ultra.rcrs.metadata.repository.ArtistRepository;
-import org.ultra.rcrs.utils.S3Utils;
+import org.ultra.rcrs.utils.ImageUtils;
 import org.ultra.rcrs.utils.Url62;
 
 import java.util.UUID;
@@ -23,13 +23,13 @@ public class ArtistService {
     private final ArtistRepository artistRepository;
     private final AlbumService albumService;
     private final CatalogEventProducer catalogEventProducer;
-    private final S3Utils s3Utils;
+    private final ImageUtils imageUtils;
 
     @Transactional
     public UUID createArtist(ArtistCreateRequest request) {
         Artist artist = artistRepository.save(Artist.builder()
                 .name(request.getName())
-                .avatarS3Key(s3Utils.parseKey(request.getAvatarUri()))
+                .avatarS3Key(imageUtils.parseKey(request.getAvatarUri()))
                 .socialLinks(new SocialLinks(request.getSocialLinks()))
                 .tags(request.getTags())
                 .availabilityStatus(EntityStatus.ACTIVE)

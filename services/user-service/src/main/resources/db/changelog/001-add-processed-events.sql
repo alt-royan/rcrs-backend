@@ -1,4 +1,3 @@
-
 SET search_path TO rcrs_user;
 
 CREATE TABLE IF NOT EXISTS processed_events

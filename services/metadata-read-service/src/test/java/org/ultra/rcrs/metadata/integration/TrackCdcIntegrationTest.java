@@ -116,7 +116,7 @@ class TrackCdcIntegrationTest extends BaseIntegrationTest {
         sendTrackUpdatedDuration(trackId, 180000);
 
         webTestClient.get()
-                .uri("/admin/albums/{id}", albumId)
+                .uri("/api/catalog/admin/albums/{id}", albumId)
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()

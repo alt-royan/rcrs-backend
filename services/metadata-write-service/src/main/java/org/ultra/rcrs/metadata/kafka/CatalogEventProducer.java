@@ -21,7 +21,6 @@ import org.ultra.rcrs.metadata.model.Track;
 import org.ultra.rcrs.utils.Url62;
 
 import java.time.Instant;
-import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -115,10 +114,7 @@ public class CatalogEventProducer extends ProtobufEventProducer {
                 .setLifecycleStatus(LifecycleStatusOuterClass.LifecycleStatus.valueOf(album.getLifecycleStatus().name()));
 
         if (album.getReleaseDate() != null) {
-            Instant instant = album.getReleaseDate().toInstant(ZoneOffset.UTC);
-            eventBuilder.setReleaseDate(Timestamp.newBuilder()
-                    .setSeconds(instant.getEpochSecond())
-                    .setNanos(instant.getNano()));
+            eventBuilder.setReleaseDate(album.getReleaseDate().toString());
         }
 
         var event = eventBuilder.build();

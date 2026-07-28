@@ -33,7 +33,7 @@ import org.ultra.rcrs.metadata.repository.AlbumDocumentRepository;
 import org.ultra.rcrs.metadata.repository.ArtistDocumentRepository;
 import org.ultra.rcrs.metadata.repository.TrackDocumentRepository;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -97,8 +97,7 @@ public abstract class BaseIntegrationTest {
                 .type(AlbumType.FULL)
                 .lifecycleStatus(lifecycle)
                 .availabilityStatus(availability)
-                .releaseDate(LocalDateTime.of(2025, 1, 15, 0, 0))
-                .year(2025)
+                .releaseDate(LocalDate.of(2025, 1, 15))
                 .coverS3Key("covers/" + title.toLowerCase().replace(" ", "-") + ".jpg")
                 .explicit(false)
                 .artists(List.of())
@@ -115,8 +114,7 @@ public abstract class BaseIntegrationTest {
                 .type(AlbumType.FULL)
                 .lifecycleStatus(lifecycle)
                 .availabilityStatus(availability)
-                .releaseDate(LocalDateTime.of(2025, 1, 15, 0, 0))
-                .year(2025)
+                .releaseDate(LocalDate.of(2025, 1, 15))
                 .coverS3Key("covers/" + title.toLowerCase().replace(" ", "-") + ".jpg")
                 .explicit(false)
                 .artists(List.of(AlbumDocument.ArtistEmbed.builder()

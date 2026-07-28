@@ -3,8 +3,10 @@ package org.ultra.rcrs.mediaservice.temporal.workflow.impl;
 import io.temporal.failure.ApplicationFailure;
 import io.temporal.spring.boot.WorkflowImpl;
 import lombok.extern.slf4j.Slf4j;
+import org.ultra.rcrs.mediaservice.config.AudioConfigurationProperties;
 import org.ultra.rcrs.mediaservice.dao.model.AudioUpload;
 import org.ultra.rcrs.mediaservice.dto.TranscodingWorkflowInput;
+import org.ultra.rcrs.mediaservice.enums.Quality;
 import org.ultra.rcrs.mediaservice.temporal.activity.ActivityFactory;
 import org.ultra.rcrs.mediaservice.temporal.activity.model.AudioMetadata;
 import org.ultra.rcrs.mediaservice.temporal.workflow.AudioTranscodingWorkflow;
@@ -13,8 +15,8 @@ import java.io.File;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.ultra.rcrs.mediaservice.temporal.config.TemporalConfig.MEDIA_TASK_QUEUE;
@@ -23,12 +25,12 @@ import static org.ultra.rcrs.mediaservice.temporal.config.TemporalConfig.MEDIA_T
 @WorkflowImpl(taskQueues = MEDIA_TASK_QUEUE)
 public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
 
-    private static final String AUDIO_CONTENT_TYPE = "audio/ogg";
+    private final Map<Quality, String> qualityMap = new HashMap<>();
 
-    private final List<String> bitrates;
-
-    public AudioTranscodingWorkflowImpl(List<String> bitrates) {
-        this.bitrates = bitrates == null ? new ArrayList<>() : bitrates;
+    public AudioTranscodingWorkflowImpl(AudioConfigurationProperties.Quality quality) {
+        qualityMap.put(Quality.LOW, quality.getLow());
+        qualityMap.put(Quality.MID, quality.getMid());
+        qualityMap.put(Quality.HIGH, quality.getHigh());
     }
 
     @Override
@@ -53,21 +55,21 @@ public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
 
             activities.s3Activity().putAudio(key, tempFile, originalMeta.byteSize(), audioUpload.getContentType());
             String downloadFileName = downloadFileName(audioUpload.getOriginalFileName(), originalMeta.container());
-            activities.s3Activity().putDownload(key, tempFile, originalMeta.byteSize(), AUDIO_CONTENT_TYPE, downloadFileName);
+            activities.s3Activity().putDownload(key, tempFile, originalMeta.byteSize(), audioUpload.getContentType(), downloadFileName);
 
-            activities.dbActivity().saveAudio(trackId, guid, true, key, originalMeta);
+            activities.dbActivity().saveAudio(trackId, guid, true, key, originalMeta, Quality.ORIGINAL, audioUpload.getContentType());
 
-            for (String bitrate : bitrates) {
-                File outputFile = activities.transcodeAudioActivity().transcode(tempFile, bitrate);
+            for (Map.Entry<Quality, String> q : qualityMap.entrySet()) {
+                File outputFile = activities.transcodeAudioActivity().transcode(tempFile, q.getValue());
 
                 AudioMetadata metadata = activities.probeAudioMetadataActivity().probe(outputFile);
-                key = String.format("%s/%s/%s_%s", trackId, guid, metadata.container(), bitrate);
+                key = String.format("%s/%s/%s_%s", trackId, guid, metadata.container(), q.getValue());
 
-                activities.s3Activity().putAudio(key, outputFile, metadata.byteSize(), AUDIO_CONTENT_TYPE);
+                activities.s3Activity().putAudio(key, outputFile, metadata.byteSize());
                 downloadFileName = downloadFileName(audioUpload.getOriginalFileName(), metadata.container());
-                activities.s3Activity().putDownload(key, outputFile, metadata.byteSize(), AUDIO_CONTENT_TYPE, downloadFileName);
+                activities.s3Activity().putDownload(key, outputFile, metadata.byteSize(), downloadFileName);
 
-                activities.dbActivity().saveAudio(trackId, guid, true, key, metadata);
+                activities.dbActivity().saveAudio(trackId, guid, true, key, metadata, q.getKey());
 
                 deleteQuietly(outputFile);
             }

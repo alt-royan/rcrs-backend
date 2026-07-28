@@ -68,7 +68,7 @@ services:
       SPRING_LIQUIBASE_USER: postgres
       SPRING_LIQUIBASE_PASSWORD: postgres
       SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
-      CDN_IMAGES_ENDPOINT: http://192.168.1.3:4566/images
+      IMAGE_CDN_ENDPOINT: http://192.168.1.3:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
@@ -89,7 +89,7 @@ services:
       SPRING_PROFILES_ACTIVE: dev
       SPRING_DATA_MONGODB_URI: mongodb://192.168.1.3:27017/rcrs_catalog
       SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
-      CDN_IMAGES_ENDPOINT: http://192.168.1.3:4566/images
+      IMAGE_CDN_ENDPOINT: http://192.168.1.3:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
@@ -110,7 +110,7 @@ services:
       SPRING_PROFILES_ACTIVE: dev
       SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
       SPRING_ELASTICSEARCH_URIS: http://192.168.1.3:9200
-      CDN_IMAGES_ENDPOINT: http://192.168.1.3:4566/images
+      IMAGE_CDN_ENDPOINT: http://192.168.1.3:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
@@ -147,21 +147,26 @@ services:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
       AUDIO_BUCKET_NAME: rcrs-audio
       AUDIO_BUCKET_PUBLIC_URL: http://192.168.1.3:4566/rcrs-audio
-      AUDIO_SIGNATURE_DURATION: 6h
+      AUDIO_SIGNATURE_DURATION: 30m
       AUDIO_VALIDATION_FORMATS: mp3, wav, ogg, flac
       AUDIO_VALIDATION_DURATION_MIN: 1s
       AUDIO_VALIDATION_DURATION_MAX: 2h
-      AUDIO_BITRATES: 128k, 192k, 320k
-      AUDIO_CODEC: libvorbis
+      AUDIO_QUALITY_LOW: 96k
+      AUDIO_QUALITY_MID: 128k
+      AUDIO_QUALITY_HIGH: 192k
+      AUDIO_CODEC: aac
       AUDIO_RATE: 44100
-      AUDIO_FORMAT: ogg
+      AUDIO_FORMAT: m4a
+      AUDIO_CONTENT_TYPE: audio/mp4
       AUDIO_LOUDNORM_ENABLED: false
       AUDIO_LOUDNORM_I: -18
       AUDIO_LOUDNORM_LRA: 18
       AUDIO_LOUDNORM_TP: -1
+      IMAGE_CDN_ENDPOINT: http://192.168.1.3:4566/images
       IMAGE_BUCKET_NAME: images
-      IMAGE_BUCKET_PUBLIC_URL: http://192.168.1.3:4566/images
-      IMAGE_THUMBNAILS_SIZES: 64,300,640
+      IMAGE_THUMBNAILS_SIZES_SM: 128
+      IMAGE_THUMBNAILS_SIZES_MD: 512
+      IMAGE_THUMBNAILS_SIZES_LG: 1024
       UPLOAD_BUCKET_NAME: rcrs-upload
       UPLOAD_BUCKET_PUBLIC_URL: http://192.168.1.3:4566/rcrs-upload
       UPLOAD_SIGNATURE_DURATION: 24h
@@ -196,6 +201,7 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
+      IMAGE_CDN_ENDPOINT: http://192.168.1.3:4566/images
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -219,7 +225,7 @@ services:
       SPRING_LIQUIBASE_USER: postgres
       SPRING_LIQUIBASE_PASSWORD: postgres
       SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
-      CDN_IMAGES_ENDPOINT: http://192.168.1.3:4566/images
+      IMAGE_CDN_ENDPOINT: http://192.168.1.3:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs

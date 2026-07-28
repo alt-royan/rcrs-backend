@@ -106,21 +106,33 @@ spring:
       s3:
         path-style-access-enabled: true
 
+image:
+  cdn:
+    endpoint: "http://images.localhost:4566"
+  thumbnails:
+    sizes:
+      sm: 128
+      md: 512
+      lg: 1024
+
 media:
-  stream:
+  audio:
     bucket:
       name: rcrs-stream
-      public-url: http://audio.localhost:4566
-    signature-duration: 6h
+    signature-duration: 30m
     validation:
       formats: mp3, wav, ogg, flac
       duration:
         min: 1s
         max: 2h
-    bitrates: 128k, 192k, 320k
-    codec: libvorbis
+    quality:
+      low: 96k
+      mid: 128k
+      high: 192k
+    codec: aac
     rate: 44100
-    format: ogg
+    format: m4a
+    content-type: audio/mp4
     loudnorm:
       enabled: true
       I: -18
@@ -130,8 +142,6 @@ media:
     bucket:
       name: images
       public-url: http://images.localhost:4566
-    thumbnails:
-      sizes: 64,300,640
   upload:
     bucket:
       name: rcrs-upload

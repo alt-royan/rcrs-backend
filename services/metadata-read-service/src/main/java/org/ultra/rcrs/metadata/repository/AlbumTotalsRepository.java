@@ -37,7 +37,7 @@ public class AlbumTotalsRepository {
 
     /**
      * Totals over the tracks a storefront visitor can see — same filter as
-     * {@link TrackDocumentRepository#findAllByAlbumIdForPublic}.
+     * {@link org.ultra.rcrs.metadata.service.publ.TrackPublicService#getAllByAlbumId}.
      */
     public Mono<Map<String, AlbumTotals>> findTotalsForPublic(Collection<String> albumIds) {
         return findTotals(albumIds, Criteria.where("album.id").in(albumIds)

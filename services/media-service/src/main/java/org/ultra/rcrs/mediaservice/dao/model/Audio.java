@@ -5,8 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.ultra.rcrs.mediaservice.enums.Quality;
 
-import java.time.OffsetDateTime;
+import java.time.Instant;
 import java.util.UUID;
 
 @Data
@@ -29,10 +30,15 @@ public class Audio {
 
     private String container;
 
+    private String contentType;
+
     @Column(name = "duration_ms")
     private Integer durationMs;
 
     private String bitrate;
+
+    @Enumerated(EnumType.STRING)
+    private Quality quality;
 
     @Column(name = "sample_rate")
     private String sampleRate;
@@ -41,5 +47,5 @@ public class Audio {
     private Long byteSize;
 
     @Column(name = "creation_timestamp")
-    private OffsetDateTime creationTimestamp;
+    private Instant creationTimestamp;
 }

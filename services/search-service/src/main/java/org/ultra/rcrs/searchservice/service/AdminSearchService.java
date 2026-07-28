@@ -11,13 +11,9 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
-import org.ultra.rcrs.searchservice.document.AlbumAdminDoc;
-import org.ultra.rcrs.searchservice.document.ArtistAdminDoc;
-import org.ultra.rcrs.searchservice.document.NestedAlbum;
-import org.ultra.rcrs.searchservice.document.NestedArtist;
-import org.ultra.rcrs.searchservice.document.TrackAdminDoc;
+import org.ultra.rcrs.searchservice.document.*;
 import org.ultra.rcrs.searchservice.dto.*;
-import org.ultra.rcrs.utils.S3Utils;
+import org.ultra.rcrs.utils.ImageUtils;
 
 import java.util.Collections;
 
@@ -27,7 +23,7 @@ import java.util.Collections;
 public class AdminSearchService {
 
     private final ElasticsearchOperations elasticsearchOperations;
-    private final S3Utils s3Utils;
+    private final ImageUtils imageUtils;
 
     public SearchCollection<ArtistResultWrapper> searchArtists(String query, int page, int size) {
         var nativeQ = NativeQuery.builder()
@@ -73,33 +69,36 @@ public class AdminSearchService {
     }
 
     public SearchCollection<AlbumResultWrapper> searchAlbums(String query, int page, int size) {
+        var releaseYearRange = ReleaseDateQueries.forYearIn(query);
         var nativeQ = NativeQuery.builder()
                 .withQuery(Query.of(q -> q
-                        .bool(b -> b
-                                .should(s -> s.multiMatch(mm -> mm
-                                        .query(query)
-                                        .fields("title^3", "year^1.5")
-                                        .type(TextQueryType.BestFields)
-                                ))
-                                .should(s -> s.nested(n -> n
-                                        .path("tracks")
-                                        .query(nq -> nq.multiMatch(mm -> mm
-                                                .query(query)
-                                                .fields("tracks.title^1")
-                                                .type(TextQueryType.BestFields)
-                                        ))
-                                        .scoreMode(ChildScoreMode.Sum)
-                                ))
-                                .should(s -> s.nested(n -> n
-                                        .path("artists")
-                                        .query(nq -> nq.multiMatch(mm -> mm
-                                                .query(query)
-                                                .fields("artists.name^1")
-                                                .type(TextQueryType.BestFields)
-                                        ))
-                                        .scoreMode(ChildScoreMode.Sum)
-                                ))
-                        )
+                        .bool(b -> {
+                            releaseYearRange.ifPresent(b::should);
+                            return b
+                                    .should(s -> s.multiMatch(mm -> mm
+                                            .query(query)
+                                            .fields("title^3")
+                                            .type(TextQueryType.BestFields)
+                                    ))
+                                    .should(s -> s.nested(n -> n
+                                            .path("tracks")
+                                            .query(nq -> nq.multiMatch(mm -> mm
+                                                    .query(query)
+                                                    .fields("tracks.title^1")
+                                                    .type(TextQueryType.BestFields)
+                                            ))
+                                            .scoreMode(ChildScoreMode.Sum)
+                                    ))
+                                    .should(s -> s.nested(n -> n
+                                            .path("artists")
+                                            .query(nq -> nq.multiMatch(mm -> mm
+                                                    .query(query)
+                                                    .fields("artists.name^1")
+                                                    .type(TextQueryType.BestFields)
+                                            ))
+                                            .scoreMode(ChildScoreMode.Sum)
+                                    ));
+                        })
                 ))
                 .withPageable(PageRequest.of(page, size))
                 .build();
@@ -165,7 +164,7 @@ public class AdminSearchService {
         var tracks = doc.getTracks() != null
                 ? doc.getTracks().stream().map(t -> new NestedTrackDto(t.getId(), t.getTitle())).toList()
                 : Collections.<NestedTrackDto>emptyList();
-        return new ArtistSearchResult(doc.getId(), doc.getName(), s3Utils.parseUrl(doc.getAvatarS3Key()), doc.getTags(),
+        return new ArtistSearchResult(doc.getId(), doc.getName(), imageUtils.parseUrls(doc.getAvatarS3Key()), doc.getTags(),
                 doc.getAvailability() != null ? doc.getAvailability().name() : null, albums, tracks);
     }
 
@@ -176,8 +175,8 @@ public class AdminSearchService {
         var tracks = doc.getTracks() != null
                 ? doc.getTracks().stream().map(t -> new NestedTrackDto(t.getId(), t.getTitle())).toList()
                 : Collections.<NestedTrackDto>emptyList();
-        return new AlbumSearchResult(doc.getId(), doc.getTitle(), doc.getYear(),
-                s3Utils.parseUrl(doc.getCoverS3Key()),
+        return new AlbumSearchResult(doc.getId(), doc.getTitle(), doc.getReleaseDate(),
+                imageUtils.parseUrls(doc.getCoverS3Key()),
                 doc.getAvailability() != null ? doc.getAvailability().name() : null,
                 doc.getLifecycleStatus() != null ? doc.getLifecycleStatus().name() : null,
                 artists, tracks);
@@ -198,10 +197,10 @@ public class AdminSearchService {
     }
 
     private NestedArtistDto toNestedArtistDto(NestedArtist artist) {
-        return new NestedArtistDto(artist.getId(), artist.getName(), s3Utils.parseUrl(artist.getAvatarS3Key()));
+        return new NestedArtistDto(artist.getId(), artist.getName(), imageUtils.parseUrls(artist.getAvatarS3Key()));
     }
 
     private NestedAlbumDto toNestedAlbumDto(NestedAlbum album) {
-        return new NestedAlbumDto(album.getId(), album.getTitle(), s3Utils.parseUrl(album.getCoverS3Key()));
+        return new NestedAlbumDto(album.getId(), album.getTitle(), imageUtils.parseUrls(album.getCoverS3Key()));
     }
 }

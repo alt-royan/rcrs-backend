@@ -33,7 +33,7 @@ public class TemporalWorker implements CommandLineRunner {
 
         worker.registerWorkflowImplementationFactory(
                 AudioTranscodingWorkflow.class,
-                () -> new AudioTranscodingWorkflowImpl(properties.getBitrates())
+                () -> new AudioTranscodingWorkflowImpl(properties.getQuality())
         );
 
         worker.registerActivitiesImplementations(dbActivity);

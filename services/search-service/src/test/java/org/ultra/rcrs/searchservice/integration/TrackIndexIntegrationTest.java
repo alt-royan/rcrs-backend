@@ -245,7 +245,7 @@ class TrackIndexIntegrationTest extends BaseIntegrationTest {
         waitForProcessing();
         refreshAllIndices();
 
-        indexAlbumAdminDoc(albumId, "Test Album", "2025", "ACTIVE", "PUBLISHED", null, null);
+        indexAlbumAdminDoc(albumId, "Test Album", "2025-01-01", "ACTIVE", "PUBLISHED", null, null);
         refreshAllIndices();
 
         sendTrackAddedToAlbum(trackId, albumId);
@@ -383,7 +383,7 @@ class TrackIndexIntegrationTest extends BaseIntegrationTest {
         String albumId = UUID.randomUUID().toString();
 
         sendTrackCreated(trackId, "Sticky Track");
-        indexAlbumAdminDoc(albumId, "Sticky Album", "2025", "ACTIVE", "PUBLISHED", null, null);
+        indexAlbumAdminDoc(albumId, "Sticky Album", "2025-01-01", "ACTIVE", "PUBLISHED", null, null);
         refreshAllIndices();
 
         sendTrackAddedToAlbum(trackId, albumId);

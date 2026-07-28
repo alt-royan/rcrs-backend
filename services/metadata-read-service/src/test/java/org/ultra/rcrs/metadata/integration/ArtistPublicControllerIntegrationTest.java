@@ -17,13 +17,15 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Active Artist", EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/artists/{id}", artist.getId())
+                .uri("/api/catalog/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
                 .jsonPath("$.name").isEqualTo("Active Artist")
                 .jsonPath("$.availabilityStatus").isEqualTo("ACTIVE")
-                .jsonPath("$.avatarUrl").isNotEmpty();
+                .jsonPath("$.avatar.SM").isNotEmpty()
+                .jsonPath("$.avatar.MD").isNotEmpty()
+                .jsonPath("$.avatar.LG").isNotEmpty();
     }
 
     @Test
@@ -31,7 +33,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Hidden Artist", EntityStatus.HIDDEN);
 
         webTestClient.get()
-                .uri("/artists/{id}", artist.getId())
+                .uri("/api/catalog/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -44,7 +46,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Deleted Artist", EntityStatus.DELETED);
 
         webTestClient.get()
-                .uri("/artists/{id}", artist.getId())
+                .uri("/api/catalog/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -52,7 +54,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void getArtist_nonExistentId_404NotFound() {
         webTestClient.get()
-                .uri("/artists/{id}", "non-existent-id")
+                .uri("/api/catalog/artists/{id}", "non-existent-id")
                 .exchange()
                 .expectStatus().isNotFound();
     }
@@ -62,12 +64,13 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
         ArtistDocument artist = createArtistDoc("Avatar Test", EntityStatus.ACTIVE);
 
         webTestClient.get()
-                .uri("/artists/{id}", artist.getId())
+                .uri("/api/catalog/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
-                .jsonPath("$.avatarUrl").value(url -> {
+                .jsonPath("$.avatar.SM").value(url -> {
                     assert url.toString().startsWith("http://images.localhost:4566/");
+                    assert url.toString().endsWith("/128x128");
                 });
     }
 
@@ -87,7 +90,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .build()).block();
 
         webTestClient.get()
-                .uri("/artists/{id}", artist.getId())
+                .uri("/api/catalog/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -107,7 +110,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .build()).block();
 
         webTestClient.get()
-                .uri("/artists/{id}", artist.getId())
+                .uri("/api/catalog/artists/{id}", artist.getId())
                 .exchange()
                 .expectStatus().isOk()
                 .expectBody()
@@ -128,11 +131,15 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/artists/{id}/albums")
+                        .path("/api/catalog/artists/{id}/albums")
                         .build(artist.getId()))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Object.class).hasSize(1);
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(1)
+                .jsonPath("$.totalCount").isEqualTo(1)
+                .jsonPath("$.offset").isEqualTo(0)
+                .jsonPath("$.limit").isEqualTo(50);
     }
 
     @Test
@@ -145,8 +152,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .type(AlbumType.FULL)
                 .lifecycleStatus(LifecycleStatus.PUBLISHED)
                 .availabilityStatus(EntityStatus.ACTIVE)
-                .releaseDate(java.time.LocalDateTime.of(2025, 6, 1, 0, 0))
-                .year(2025)
+                .releaseDate(java.time.LocalDate.of(2025, 6, 1))
                 .coverS3Key("covers/full.jpg")
                 .explicit(false)
                 .artists(List.of(AlbumDocument.ArtistEmbed.builder()
@@ -163,8 +169,7 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
                 .type(AlbumType.SINGLE)
                 .lifecycleStatus(LifecycleStatus.PUBLISHED)
                 .availabilityStatus(EntityStatus.ACTIVE)
-                .releaseDate(java.time.LocalDateTime.of(2025, 7, 1, 0, 0))
-                .year(2025)
+                .releaseDate(java.time.LocalDate.of(2025, 7, 1))
                 .coverS3Key("covers/single.jpg")
                 .explicit(false)
                 .artists(List.of(AlbumDocument.ArtistEmbed.builder()
@@ -177,12 +182,14 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/artists/{id}/albums")
+                        .path("/api/catalog/artists/{id}/albums")
                         .queryParam("type", "FULL")
                         .build(artist.getId()))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Object.class).hasSize(1);
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(1)
+                .jsonPath("$.totalCount").isEqualTo(1);
     }
 
     @Test
@@ -191,10 +198,35 @@ class ArtistPublicControllerIntegrationTest extends BaseIntegrationTest {
 
         webTestClient.get()
                 .uri(uriBuilder -> uriBuilder
-                        .path("/artists/{id}/albums")
+                        .path("/api/catalog/artists/{id}/albums")
                         .build(artist.getId()))
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(Object.class).hasSize(0);
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(0)
+                .jsonPath("$.totalCount").isEqualTo(0);
+    }
+
+    @Test
+    void getAlbumsByArtist_respectsOffsetAndLimit() {
+        ArtistDocument artist = createArtistDoc("Paged Albums Artist", EntityStatus.ACTIVE);
+        for (int i = 0; i < 5; i++) {
+            createAlbumDocWithArtist("Album " + i, LifecycleStatus.PUBLISHED, EntityStatus.ACTIVE,
+                    artist.getId(), "Paged Albums Artist", ArtistRole.MAIN_ARTIST);
+        }
+
+        webTestClient.get()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/api/catalog/artists/{id}/albums")
+                        .queryParam("offset", 2)
+                        .queryParam("limit", 2)
+                        .build(artist.getId()))
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody()
+                .jsonPath("$.items.length()").isEqualTo(2)
+                .jsonPath("$.totalCount").isEqualTo(5)
+                .jsonPath("$.offset").isEqualTo(2)
+                .jsonPath("$.limit").isEqualTo(2);
     }
 }

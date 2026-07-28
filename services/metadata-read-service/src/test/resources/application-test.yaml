@@ -4,8 +4,8 @@ spring:
   security:
     enabled: false
 
-cdn:
-  images:
+image:
+  cdn:
     endpoint: "http://images.localhost:4566"
 
 eureka:

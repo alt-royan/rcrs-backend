@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Import;
 public class MediaConfigurationProperties {
 
     @NestedConfigurationProperty
-    private AudioConfigurationProperties stream;
+    private AudioConfigurationProperties audio;
 
     @NestedConfigurationProperty
     private ImageConfigurationProperties image;

@@ -17,7 +17,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
         indexArtistPublicDoc("a3", "Miles Davis", List.of("jazz"), "ACTIVE", null, null);
         refreshAllIndices();
 
-        mockMvc.perform(get("/")
+        mockMvc.perform(get("/api/search")
                         .param("q", "the")
                         .param("type", "artist"))
                 .andExpect(status().isOk())
@@ -28,13 +28,13 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void searchAlbums_returnsMatchingResults() throws Exception {
-        indexAlbumPublicDoc("al1", "Abbey Road", "1969", "ACTIVE",
+        indexAlbumPublicDoc("al1", "Abbey Road", "1969-01-01", "ACTIVE",
                 List.of(nested("a1", "The Beatles")), null);
-        indexAlbumPublicDoc("al2", "Let It Be", "1970", "ACTIVE",
+        indexAlbumPublicDoc("al2", "Let It Be", "1970-01-01", "ACTIVE",
                 List.of(nested("a1", "The Beatles")), null);
         refreshAllIndices();
 
-        mockMvc.perform(get("/")
+        mockMvc.perform(get("/api/search")
                         .param("q", "Abbey")
                         .param("type", "album"))
                 .andExpect(status().isOk())
@@ -51,7 +51,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
                 List.of(nested("a1", "The Beatles")), nestedAlbum("al2", "Let It Be"));
         refreshAllIndices();
 
-        mockMvc.perform(get("/")
+        mockMvc.perform(get("/api/search")
                         .param("q", "Come Together")
                         .param("type", "track"))
                 .andExpect(status().isOk())
@@ -63,11 +63,11 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void searchMultipleTypes_returnsAllRequestedTypes() throws Exception {
         indexArtistPublicDoc("a1", "Test Artist", List.of("rock"), "ACTIVE", null, null);
-        indexAlbumPublicDoc("al1", "Test Album", "2025", "ACTIVE", null, null);
+        indexAlbumPublicDoc("al1", "Test Album", "2025-01-01", "ACTIVE", null, null);
         indexTrackPublicDoc("t1", "Test Track", "ACTIVE", null, null);
         refreshAllIndices();
 
-        mockMvc.perform(get("/")
+        mockMvc.perform(get("/api/search")
                         .param("q", "Test")
                         .param("type", "artist,album,track"))
                 .andExpect(status().isOk())
@@ -79,10 +79,10 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
     @Test
     void searchSingleType_onlyReturnsRequestedType() throws Exception {
         indexArtistPublicDoc("a1", "Solo Artist", List.of("rock"), "ACTIVE", null, null);
-        indexAlbumPublicDoc("al1", "Solo Album", "2025", "ACTIVE", null, null);
+        indexAlbumPublicDoc("al1", "Solo Album", "2025-01-01", "ACTIVE", null, null);
         refreshAllIndices();
 
-        mockMvc.perform(get("/")
+        mockMvc.perform(get("/api/search")
                         .param("q", "Solo")
                         .param("type", "artist"))
                 .andExpect(status().isOk())
@@ -93,7 +93,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void search_noResults_returnsEmptyCollections() throws Exception {
-        mockMvc.perform(get("/")
+        mockMvc.perform(get("/api/search")
                         .param("q", "nonexistent")
                         .param("type", "artist"))
                 .andExpect(status().isOk())
@@ -107,7 +107,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
         }
         refreshAllIndices();
 
-        mockMvc.perform(get("/")
+        mockMvc.perform(get("/api/search")
                         .param("q", "Paginated")
                         .param("type", "artist")
                         .param("page", "0")
@@ -119,14 +119,14 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
 
     @Test
     void search_queryParamRequired_returns400WhenMissing() throws Exception {
-        mockMvc.perform(get("/")
+        mockMvc.perform(get("/api/search")
                         .param("type", "artist"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void search_typeParamRequired_returns400WhenMissing() throws Exception {
-        mockMvc.perform(get("/")
+        mockMvc.perform(get("/api/search")
                         .param("q", "test"))
                 .andExpect(status().isBadRequest());
     }
@@ -136,7 +136,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
         indexArtistPublicDoc("a1", "Some Artist", List.of("rock"), "ACTIVE", null, null);
         refreshAllIndices();
 
-        mockMvc.perform(get("/")
+        mockMvc.perform(get("/api/search")
                         .param("q", "")
                         .param("type", "artist"))
                 .andExpect(status().isOk());
@@ -149,7 +149,7 @@ class PublicSearchControllerIntegrationTest extends BaseIntegrationTest {
                 List.of(nested("t1", "Some Track")));
         refreshAllIndices();
 
-        mockMvc.perform(get("/")
+        mockMvc.perform(get("/api/search")
                         .param("q", "Nested")
                         .param("type", "artist"))
                 .andExpect(status().isOk())

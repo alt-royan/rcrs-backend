@@ -177,7 +177,7 @@ class ArtistIndexIntegrationTest extends BaseIntegrationTest {
         waitForProcessing();
         refreshAllIndices();
 
-        indexAlbumAdminDoc(albumId, "Test Album", "2025", "ACTIVE", "PUBLISHED", null, null);
+        indexAlbumAdminDoc(albumId, "Test Album", "2025-01-01", "ACTIVE", "PUBLISHED", null, null);
         refreshAllIndices();
 
         ArtistAddedToAlbumEventOuterClass.ArtistAddedToAlbumEvent event = ArtistAddedToAlbumEventOuterClass.ArtistAddedToAlbumEvent.newBuilder()
@@ -215,7 +215,7 @@ class ArtistIndexIntegrationTest extends BaseIntegrationTest {
         waitForProcessing();
         refreshAllIndices();
 
-        indexAlbumAdminDoc(albumId, "Test Album", "2025", "ACTIVE", "PUBLISHED", null, null);
+        indexAlbumAdminDoc(albumId, "Test Album", "2025-01-01", "ACTIVE", "PUBLISHED", null, null);
         refreshAllIndices();
 
         ArtistAddedToAlbumEventOuterClass.ArtistAddedToAlbumEvent addEvent = ArtistAddedToAlbumEventOuterClass.ArtistAddedToAlbumEvent.newBuilder()

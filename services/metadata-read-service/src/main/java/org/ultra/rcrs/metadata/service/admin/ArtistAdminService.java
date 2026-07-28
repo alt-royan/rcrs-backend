@@ -1,7 +1,6 @@
 package org.ultra.rcrs.metadata.service.admin;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -14,8 +13,7 @@ import org.ultra.rcrs.metadata.dto.ArtistAdminViewDto;
 import org.ultra.rcrs.metadata.dto.PaginationResponse;
 import org.ultra.rcrs.metadata.model.ArtistDocument;
 import org.ultra.rcrs.metadata.repository.ArtistDocumentRepository;
-import org.ultra.rcrs.utils.S3Utils;
-import reactor.core.publisher.Flux;
+import org.ultra.rcrs.utils.ImageUtils;
 import reactor.core.publisher.Mono;
 
 import java.util.List;
@@ -28,7 +26,7 @@ public class ArtistAdminService {
 
     private final ArtistDocumentRepository artistDocumentRepository;
     private final ReactiveMongoTemplate mongoTemplate;
-    private final S3Utils s3Utils;
+    private final ImageUtils imageUtils;
 
     public Mono<ArtistAdminViewDto> getById(String id) {
         return artistDocumentRepository.findByIdForAdmin(id)
@@ -68,7 +66,7 @@ public class ArtistAdminService {
         return ArtistAdminViewDto.builder()
                 .id(doc.getId())
                 .name(doc.getName())
-                .avatarUrl(s3Utils.parseUrl(doc.getAvatarS3Key()))
+                .avatarUrl(imageUtils.parseUrl(doc.getAvatarS3Key()))
                 .socialLinks(doc.getSocialLinks() != null
                         ? doc.getSocialLinks().stream().map(s -> ArtistAdminViewDto.SocialLinkEmbed.builder()
                         .resourceName(s.getResourceName())
@@ -84,7 +82,7 @@ public class ArtistAdminService {
         return ArtistAdminStandaloneDto.builder()
                 .id(doc.getId())
                 .name(doc.getName())
-                .avatarUrl(s3Utils.parseUrl(doc.getAvatarS3Key()))
+                .avatarUrl(imageUtils.parseUrl(doc.getAvatarS3Key()))
                 .availabilityStatus(doc.getAvailabilityStatus())
                 .build();
     }

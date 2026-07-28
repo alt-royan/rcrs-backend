@@ -31,7 +31,7 @@ public class S3ActivityImpl implements S3Activity {
 
     @Override
     public void putAudio(String key, File file, Long contentLength, String contentType) throws IOException {
-        String audioBucket = properties.getStream().getBucket().getName();
+        String audioBucket = properties.getAudio().getBucket().getName();
         try (InputStream is = new FileInputStream(file)) {
             s3Client.putObject(PutObjectRequest.builder()
                             .bucket(audioBucket)
@@ -42,6 +42,11 @@ public class S3ActivityImpl implements S3Activity {
         }
 
         log.info("Put audio to S3: bucket [{}], key [{}]", audioBucket, key);
+    }
+
+    @Override
+    public void putAudio(String key, File file, Long contentLength) throws IOException {
+        putAudio(key, file, contentLength, properties.getAudio().getContentType());
     }
 
     @Override
@@ -61,6 +66,11 @@ public class S3ActivityImpl implements S3Activity {
         }
 
         log.info("Put download file to S3: bucket [{}], key [{}]", downloadBucket, key);
+    }
+
+    @Override
+    public void putDownload(String key, File file, Long contentLength, String fileName) throws IOException {
+        putDownload(key, file, contentLength, properties.getAudio().getContentType(), fileName);
     }
 
     @Override

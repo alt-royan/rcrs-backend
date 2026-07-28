@@ -20,8 +20,8 @@ eureka:
   client:
     enabled: false
 
-cdn:
-  images:
+image:
+  cdn:
     endpoint: "http://test.localhost:4566"
 
 logging:

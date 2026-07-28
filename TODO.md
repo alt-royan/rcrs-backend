@@ -5,22 +5,6 @@
 - [ ] **Refine CORS configuration** — `gateway-api/src/main/java/org/ultra/rcrs/gatewayapi/SecurityConfig.java:33`
   - `//TODO:доработать` — placeholder CORS config, needs to be properly configured.
 
-- [ ] **`GET /me` всегда отдаёт 404** — `services/user-service/src/main/java/org/ultra/rcrs/userservice/service/UserService.java:105`
-  - `getCompactProfile` получает из контроллера `jwt.getSubject()` (`controller/UserController.java:23`),
-    но ищет пользователя через `findByUsername(userId)` — то есть сравнивает `sub` с `username`.
-    Соседний `getProfile` (`:88`) делает верно: `findByUserId`.
-  - Фикс: заменить `findByUsername` на `findByUserId` в `getCompactProfile`.
-  - До фикса клиентам использовать только `GET /me/profile`.
-
-- [ ] **`POST /media/stream` должен быть `GET`** — `services/media-service/src/main/java/org/ultra/rcrs/mediaservice/controller/StreamingController.java:20`
-  - Эндпоинт ничего не меняет: принимает два query-параметра (`trackId`, `quality`), тела нет,
-    возвращает presigned-ссылку. POST для чистого чтения ломает семантику HTTP, запрещает
-    кэширование и мешает клиентам (мобильные плееры и CDN ожидают GET).
-  - Фикс: `@PostMapping` → `@GetMapping`. Рядом `DownloadController` уже использует GET —
-    привести к одному виду.
-  - Поменять синхронно на клиентах; в `config/SecurityConfig.java:42` есть ещё мёртвый матчер
-    `/track/*/stream` на путь, которого не существует — заодно убрать.
-
 ## Найдено при разработке мобильного клиента
 
 Обнаружено при проектировании `rcrs-frontend/music-app-mobile` (см. его `docs/PLAN.md`).
@@ -49,64 +33,6 @@
   - Фикс: `GET /api/catalog/tracks?ids=...` в metadata-read-service (или отдавать метаданные
     сразу в ответе playlist-service).
 
-- [ ] **В публичном каталоге нет пагинации** — `services/metadata-read-service/.../controller/publ/*`
-  - `GET /artists/{id}/albums` и `GET /albums/{id}/tracks` возвращают bare JSON array: без
-    обёртки, без `total`, без `offset/limit` — вся дискография и весь трек-лист целиком.
-    Пагинация есть только в search-service.
-  - Для мобильного это трафик и память на популярных артистах.
-  - Фикс: `offset/limit` + та же обёртка `PaginationResponse`, что используется в `/admin/*`.
-
-- [ ] **Обложки недостижимы с устройства и хосты рассинхронизированы**
-  - `cdn.images.endpoint` задан по-разному: **только** metadata-read использует достижимый
-    хост `http://192.168.1.3:4566/images` (`metadata-read-service/application.yaml:21`), а
-    остальные четыре — нерезолвящийся `http://images.localhost:4566`
-    (`metadata-write-service/application.yaml:38`, `playlist-service/application.yaml:38`,
-    `search-service/application.yaml:23`, `media-service/application.yaml:132`).
-    Поэтому один и тот же альбом приходит с рабочей картинкой из каталога и с битой из
-    поиска — что ровно совпадает с уже записанным ниже пунктом «Нет картинок при поисках».
-  - `S3Utils.parseUrl` возвращает `null` при пустом ключе (`shared-lib/.../utils/S3Utils.java:27-32`),
-    так что **все** `coverUrl`/`avatarUrl` nullable — это нормально, но должно быть в контракте.
-  - Фикс: один внешне достижимый CDN-хост во всех сервисах (одна переменная окружения на все
-    пять, а не пять независимых значений в пяти `application.yaml`).
-
-- [ ] **DTO должны отдавать URL всех размеров изображения, а не один оригинал**
-  - Сейчас в DTO лежит единственный `coverUrl`/`avatarUrl` — результат
-    `S3Utils.parseUrl(imageKey)` (`shared-lib/src/main/java/org/ultra/rcrs/utils/S3Utils.java:27-32`),
-    то есть ссылка на **оригинал**. Ссылок на превью API не отдаёт вообще, поэтому клиент
-    обязан сам склеивать `{coverUrl}/64x64`, `/300x300`, `/640x640` — ключи с такими
-    суффиксами создаются при загрузке в
-    `media-service/src/main/java/org/ultra/rcrs/mediaservice/service/ImageUploadService.java:28-31`.
-  - Почему это плохо:
-    - Схема ключей превью — внутренняя деталь хранилища, а её вынуждены знать все клиенты
-      (мобильный, админка, будущий веб). Меняется схема — ломаются все сразу.
-    - Набор размеров **берётся из конфига** (`imageProperties.getThumbnails().getSizes()`,
-      сейчас `image.thumbnails.sizes: 64,300,640` в `media-service/application.yaml:133-134`,
-      в dev — из `IMAGE_THUMBNAILS_SIZES`). Клиент хардкодит три значения и тихо отдаёт 404
-      на картинках, если конфиг изменят. Про это нельзя узнать из API.
-    - Клиент не может отличить «превью ещё не сгенерировано» от «размера не существует» —
-      в обоих случаях просто битая ссылка.
-    - Отдавая только оригинал, API провоцирует тянуть полноразмерную картинку в строку списка.
-  - Фикс: заменить строковое поле на объект с готовыми ссылками, например
-    `cover: { original, sm, md, lg }` (или `{ "64": url, "300": url, "640": url }`, если хочется
-    оставить связь с размерами явной), и собирать его на сервере из того же конфига, что
-    генерирует превью. Затрагивает `AlbumPublicViewDto`, `AlbumPublicStandaloneDto`,
-    `ArtistPublicViewDto`, `TrackPublicViewDto`, `TrackPublicStandaloneDto`, search-результаты,
-    `PlaylistViewDto`, `UserProfileResponse` — то есть выносить в общий хелпер в `shared-lib`
-    рядом с `S3Utils`, а не дублировать по сервисам.
-  - Поле остаётся nullable (`parseUrl` возвращает `null` на пустом ключе) — это нормально, но
-    должно быть в контракте, чтобы клиенты обязательно рисовали плейсхолдер.
-  - До этого фикса в мобильном приложении вся логика живёт в одной точке —
-    `music-app-mobile/src/utils/images.ts` (подмена хоста, суффикс размера, плейсхолдер).
-    После фикса этот файл сводится к плейсхолдеру и удаляется почти целиком.
-
-- [ ] **Транскод по умолчанию Ogg/Vorbis — iOS его не играет** — `services/media-service/src/main/resources/application.yaml:120-123`
-  - `codec: libvorbis`, `format: ogg`. AVPlayer нативно Vorbis не декодирует, значит
-    воспроизведение на iPhone не заработает вообще, а не «заработает хуже».
-  - Фикс: профиль AAC (`.m4a`) или MP3. Сделать до заливки каталога — иначе потребуется
-    перетранскодирование всей библиотеки.
-  - Отдельно на будущее: `/media/stream` отдаёт один progressive-объект, HLS/DASH нет —
-    адаптивного битрейта и нормального переключения качества на ходу не будет.
-
 - [ ] **Анонимного чтения нет вообще** — `gateway-api/src/main/java/org/ultra/rcrs/gatewayapi/SecurityConfig.java:73`
   - `anyExchange().authenticated()`: токен требуется даже на публичные `GET /api/catalog/**`
     и `GET /api/search`. То есть «витрину» нельзя показать до логина, нельзя расшарить ссылку
@@ -130,15 +56,3 @@
     public-клиент для мобильного (PKCE S256, redirect `musicapp://redirect`) декларативно.
   - Примечание: `music-app-mobile/.env.example` ссылается на realm `music` и порты
     8081/8082/8083 — не соответствует реальности (`master`, шлюз `:8099`, Keycloak `:8180`).
-
-## Additional
-
-- [ ] Fix tests and test all functions
-- [ ] Tests in read service
-- [ ] Tests in playlist service
-- [ ] Tests in search service
-- 
-- [ ] Не устанавливается duration
-- Лагает фронт
-- Нет картинок при поисках
-- нужен даунлод ендпоит

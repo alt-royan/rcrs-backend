@@ -30,7 +30,7 @@ class AlbumWriteControllerIntegrationTest extends BaseIntegrationTest {
                 }
                 """;
 
-        String responseJson = mockMvc.perform(post("/albums")
+        String responseJson = mockMvc.perform(post("/catalog/albums")
                         .contentType("application/json")
                         .content(json))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isCreated())
@@ -74,7 +74,7 @@ class AlbumWriteControllerIntegrationTest extends BaseIntegrationTest {
                 }
                 """.formatted(Url62.encode(artist.getId()));
 
-        mockMvc.perform(post("/albums/" + Url62.encode(album.getId()) + "/artists")
+        mockMvc.perform(post("/catalog/albums/" + Url62.encode(album.getId()) + "/artists")
                         .contentType("application/json")
                         .content(json))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
@@ -112,7 +112,7 @@ class AlbumWriteControllerIntegrationTest extends BaseIntegrationTest {
                 }
                 """.formatted(Url62.encode(artist.getId()));
 
-        mockMvc.perform(delete("/albums/" + Url62.encode(album.getId()) + "/artists")
+        mockMvc.perform(delete("/catalog/albums/" + Url62.encode(album.getId()) + "/artists")
                         .contentType("application/json")
                         .content(json))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
@@ -140,7 +140,7 @@ class AlbumWriteControllerIntegrationTest extends BaseIntegrationTest {
                 }
                 """;
 
-        mockMvc.perform(put("/albums/" + Url62.encode(album.getId()) + "/status")
+        mockMvc.perform(put("/catalog/albums/" + Url62.encode(album.getId()) + "/status")
                         .contentType("application/json")
                         .content(json))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
@@ -165,7 +165,7 @@ class AlbumWriteControllerIntegrationTest extends BaseIntegrationTest {
         Album album = createAlbumInDb("Album To Hide", EntityStatus.ACTIVE);
         Track track = createTrackInDb("Track In Hidden Album", EntityStatus.ACTIVE, album.getId());
 
-        mockMvc.perform(put("/albums/" + Url62.encode(album.getId()) + "/hide"))
+        mockMvc.perform(put("/catalog/albums/" + Url62.encode(album.getId()) + "/hide"))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
 
         assertThat(albumRepository.findById(album.getId()).orElseThrow().getAvailabilityStatus()).isEqualTo(EntityStatus.HIDDEN);
@@ -186,7 +186,7 @@ class AlbumWriteControllerIntegrationTest extends BaseIntegrationTest {
         Album album = createAlbumInDb("Album To Activate", EntityStatus.HIDDEN);
         Track track = createTrackInDb("Track In Activated Album", EntityStatus.HIDDEN, album.getId());
 
-        mockMvc.perform(put("/albums/" + Url62.encode(album.getId()) + "/active"))
+        mockMvc.perform(put("/catalog/albums/" + Url62.encode(album.getId()) + "/active"))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isOk());
 
         assertThat(albumRepository.findById(album.getId()).orElseThrow().getAvailabilityStatus()).isEqualTo(EntityStatus.ACTIVE);
@@ -207,7 +207,7 @@ class AlbumWriteControllerIntegrationTest extends BaseIntegrationTest {
         Album album = createAlbumInDb("Album To Delete", EntityStatus.ACTIVE);
         Track track = createTrackInDb("Track In Deleted Album", EntityStatus.ACTIVE, album.getId());
 
-        mockMvc.perform(delete("/albums/" + Url62.encode(album.getId())))
+        mockMvc.perform(delete("/catalog/albums/" + Url62.encode(album.getId())))
                 .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.status().isNoContent());
 
         assertThat(albumRepository.findById(album.getId()).orElseThrow().getAvailabilityStatus()).isEqualTo(EntityStatus.DELETED);

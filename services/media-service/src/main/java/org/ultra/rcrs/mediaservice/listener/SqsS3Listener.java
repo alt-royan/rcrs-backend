@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.ultra.rcrs.enums.FileStatus;
 import org.ultra.rcrs.mediaservice.config.MediaConfigurationProperties;
-import org.ultra.rcrs.mediaservice.config.UploadConfigurationProperties;
 import org.ultra.rcrs.mediaservice.dao.repository.AudioUploadRepository;
 import software.amazon.awssdk.eventnotifications.s3.model.S3EventNotification;
 import software.amazon.awssdk.services.sqs.model.Message;

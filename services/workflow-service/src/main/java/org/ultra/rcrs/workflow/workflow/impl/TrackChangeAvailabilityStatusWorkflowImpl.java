@@ -19,6 +19,5 @@ public class TrackChangeAvailabilityStatusWorkflowImpl extends BaseWorkflow impl
             case HIDDEN -> activityFactory.trackActivity().hideTrack(id);
             case DELETED -> activityFactory.trackActivity().markTrackDeleted(id);
         }
-        ;
     }
 }

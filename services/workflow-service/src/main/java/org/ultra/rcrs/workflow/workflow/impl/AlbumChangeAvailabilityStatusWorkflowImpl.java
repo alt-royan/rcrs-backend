@@ -19,6 +19,5 @@ public class AlbumChangeAvailabilityStatusWorkflowImpl extends BaseWorkflow impl
             case HIDDEN -> activityFactory.albumActivity().hideAlbum(id);
             case DELETED -> activityFactory.albumActivity().markAlbumDeleted(id);
         }
-        ;
     }
 }

@@ -21,6 +21,7 @@ public class ImageStorage {
         s3Client.putObject(PutObjectRequest.builder()
                         .bucket(imageBucket)
                         .key(key)
+                        .cacheControl("public, max-age=31536000, immutable")
                         .contentType(contentType)
                         .build(),
                 RequestBody.fromBytes(body));

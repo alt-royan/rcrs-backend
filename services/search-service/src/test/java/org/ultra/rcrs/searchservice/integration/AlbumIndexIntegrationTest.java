@@ -1,6 +1,5 @@
 package org.ultra.rcrs.searchservice.integration;
 
-import com.google.protobuf.Timestamp;
 import org.junit.jupiter.api.Test;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.enums.LifecycleStatus;
@@ -8,6 +7,7 @@ import org.ultra.rcrs.events.album.*;
 import org.ultra.rcrs.events.common.*;
 import org.ultra.rcrs.events.track.TrackAddedToAlbumEventOuterClass;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -17,9 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AlbumIndexIntegrationTest extends BaseIntegrationTest {
 
     private void sendAlbumCreated(String id, String title) throws Exception {
-        Timestamp now = Timestamp.newBuilder()
-                .setSeconds(System.currentTimeMillis() / 1000)
-                .build();
         AlbumCreatedEventOuterClass.AlbumCreatedEvent payload = AlbumCreatedEventOuterClass.AlbumCreatedEvent.newBuilder()
                 .setId(id)
                 .setTitle(title)
@@ -27,7 +24,7 @@ class AlbumIndexIntegrationTest extends BaseIntegrationTest {
                 .setCoverS3Key("covers/" + id)
                 .setAvailabilityStatus(AvailabilityStatusOuterClass.AvailabilityStatus.ACTIVE)
                 .setLifecycleStatus(LifecycleStatusOuterClass.LifecycleStatus.CREATED)
-                .setReleaseDate(now)
+                .setReleaseDate(LocalDate.now().toString())
                 .build();
         sendEvent(DomainEventOuterClass.EventType.ALBUM_CREATED,
                 DomainEventOuterClass.AggregateType.ALBUM, id, payload);

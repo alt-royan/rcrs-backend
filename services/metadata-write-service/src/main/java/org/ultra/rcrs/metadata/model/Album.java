@@ -6,8 +6,8 @@ import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.EntityStatus;
 import org.ultra.rcrs.enums.LifecycleStatus;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Getter
@@ -35,10 +35,10 @@ public class Album {
     private AlbumType type;
 
     @Column(name = "release_date")
-    private LocalDateTime releaseDate;
+    private LocalDate releaseDate;
 
     @Column(name = "publish_timestamp")
-    private OffsetDateTime publishTimestamp;
+    private Instant publishTimestamp;
 
     @Column(name = "cover_s3_key")
     private String coverS3Key;

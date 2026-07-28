@@ -8,6 +8,8 @@ import org.ultra.rcrs.metadata.model.TrackDocument;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @Repository
 public interface TrackDocumentRepository extends ReactiveMongoRepository<TrackDocument, String> {
 
@@ -20,6 +22,6 @@ public interface TrackDocumentRepository extends ReactiveMongoRepository<TrackDo
     @Query("{ 'album.id': ?0 }")
     Flux<TrackDocument> findAllByAlbumIdForAdmin(String albumId, Sort sort);
 
-    @Query("{ 'album.id': ?0, 'lifecycleStatus': 'PUBLISHED', 'availabilityStatus': { '$in': [ 'ACTIVE', 'HIDDEN' ] } }")
-    Flux<TrackDocument> findAllByAlbumIdForPublic(String albumId, Sort sort);
+    @Query("{ '_id': { '$in': ?0 } }")
+    Flux<TrackDocument> findAllByIdIn(List<String> ids);
 }
