@@ -73,25 +73,59 @@ public class PlaylistService {
         return saved.getId();
     }
 
-    public PlaylistViewDto getPlaylistById(UUID id) {
-        return playlistRepository.findByIdWithTrackCount(id)
-                .map(mapper::toViewDto)
+    public PlaylistViewDto getPlaylistById(UUID id, String requesterId) {
+        var playlist = playlistRepository.findByIdWithTrackCount(id)
                 .orElseThrow(() -> new NotFoundException("Playlist", id));
+        if (isHiddenFrom(playlist.isPrivate(), playlist.ownerId(), requesterId)) {
+            throw new NotFoundException("Playlist", id);
+        }
+        return mapper.toViewDto(playlist);
     }
 
-    public List<PlaylistStandaloneDto> getPlaylistsByIds(List<UUID> ids) {
+    /**
+     * Someone else's private playlists are silently dropped from the result rather
+     * than failing the whole batch, so a stale id in the caller's list degrades to
+     * a missing entry instead of an error.
+     */
+    public List<PlaylistStandaloneDto> getPlaylistsByIds(List<UUID> ids, String requesterId) {
         return playlistRepository.findAllByIdIn(ids).stream()
+                .filter(playlist -> !isHiddenFrom(playlist.getIsPrivate(), playlist.getOwnerId(), requesterId))
                 .map(mapper::toStandaloneDto)
                 .toList();
     }
 
-    public PaginationResponse<PlaylistTrackViewDto> getTracks(UUID playlistId, int offset, int limit, String sortBy, Sort.Direction direction) {
+    /** The caller's own playlists, most recently updated first. */
+    public PaginationResponse<PlaylistStandaloneDto> getOwnPlaylists(String ownerId, int offset, int limit) {
+        Pageable pageable = new OffsetBasedPageRequest(offset, limit, Sort.unsorted());
+        List<PlaylistStandaloneDto> playlists = playlistRepository
+                .findByOwnerIdOrderByUpdatedAtDesc(ownerId, pageable).stream()
+                .map(mapper::toStandaloneDto)
+                .toList();
+        return new PaginationResponse<>(playlists, playlistRepository.countByOwnerId(ownerId), offset, limit);
+    }
+
+    public PaginationResponse<PlaylistTrackViewDto> getTracks(UUID playlistId, String requesterId, int offset, int limit, String sortBy, Sort.Direction direction) {
+        Playlist playlist = playlistRepository.findById(playlistId)
+                .orElseThrow(() -> new NotFoundException("Playlist", playlistId));
+        if (isHiddenFrom(playlist.getIsPrivate(), playlist.getOwnerId(), requesterId)) {
+            throw new NotFoundException("Playlist", playlistId);
+        }
+
         String sortField = "addedAt".equalsIgnoreCase(sortBy) ? "addedAt" : "position";
         Pageable pageable = new OffsetBasedPageRequest(offset, limit, Sort.by(direction, sortField));
         List<PlaylistTrackViewDto> tracks = playlistTrackRepository.findByPlaylistId(playlistId, pageable).stream()
                 .map(mapper::toTrackViewDto).toList();
         Integer count = playlistTrackRepository.countByPlaylistId(playlistId);
         return new PaginationResponse<>(tracks, count, offset, limit);
+    }
+
+    /**
+     * A private playlist belonging to someone else is treated as absent rather than
+     * forbidden: answering 403 would confirm that the id exists, which is exactly
+     * what a private playlist should not reveal.
+     */
+    private static boolean isHiddenFrom(Boolean isPrivate, String ownerId, String requesterId) {
+        return Boolean.TRUE.equals(isPrivate) && !Objects.equals(ownerId, requesterId);
     }
 
     @Transactional

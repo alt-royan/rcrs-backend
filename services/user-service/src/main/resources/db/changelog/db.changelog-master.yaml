@@ -7,3 +7,5 @@ databaseChangeLog:
       file: classpath:db/changelog/002-add-user-avatar.sql
   - include:
       file: classpath:db/changelog/003-add-likes.sql
+  - include:
+      file: classpath:db/changelog/004-drop-search-history.sql

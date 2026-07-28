@@ -24,4 +24,7 @@ public interface TrackDocumentRepository extends ReactiveMongoRepository<TrackDo
 
     @Query("{ '_id': { '$in': ?0 } }")
     Flux<TrackDocument> findAllByIdIn(List<String> ids);
+
+    @Query("{ '_id': { '$in': ?0 }, 'lifecycleStatus': 'PUBLISHED', 'availabilityStatus': { '$in': [ 'ACTIVE', 'HIDDEN' ] } }")
+    Flux<TrackDocument> findAllByIdInForPublic(List<String> ids);
 }

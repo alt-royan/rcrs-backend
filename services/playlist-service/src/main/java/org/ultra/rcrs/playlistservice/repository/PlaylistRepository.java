@@ -1,5 +1,6 @@
 package org.ultra.rcrs.playlistservice.repository;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -14,6 +15,10 @@ import java.util.UUID;
 public interface PlaylistRepository extends JpaRepository<Playlist, UUID> {
 
     List<Playlist> findAllByIdIn(List<UUID> ids);
+
+    List<Playlist> findByOwnerIdOrderByUpdatedAtDesc(String ownerId, Pageable pageable);
+
+    long countByOwnerId(String ownerId);
 
     @Query("SELECT new PlaylistWithCountProjection(" +
             "p.id, p.ownerId, p.title, p.description, p.tags, p.coverS3Key, p.isPrivate, p.type, " +

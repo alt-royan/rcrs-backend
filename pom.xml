@@ -46,6 +46,7 @@
         <module>services/workflow-service</module>
         <module>services/user-service</module>
         <module>services/playlist-service</module>
+        <module>services/library-service</module>
     </modules>
 
     <dependencyManagement>

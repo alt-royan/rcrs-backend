@@ -12,12 +12,16 @@ import org.springframework.web.bind.annotation.*;
 import org.ultra.rcrs.enums.AlbumType;
 import org.ultra.rcrs.enums.ArtistRole;
 import org.ultra.rcrs.metadata.dto.AlbumPublicStandaloneDto;
+import org.ultra.rcrs.metadata.dto.ArtistPublicStandaloneDto;
 import org.ultra.rcrs.metadata.dto.ArtistPublicViewDto;
 import org.ultra.rcrs.metadata.dto.ErrorResponse;
+import org.ultra.rcrs.metadata.dto.IdsRequest;
 import org.ultra.rcrs.metadata.dto.PaginationResponse;
 import org.ultra.rcrs.metadata.service.publ.AlbumPublicService;
 import org.ultra.rcrs.metadata.service.publ.ArtistPublicService;
 import reactor.core.publisher.Mono;
+
+import java.util.List;
 
 @Tag(name = "Artist", description = "Public storefront endpoints for browsing publicly available artists and their albums.")
 @RestController
@@ -38,6 +42,21 @@ public class ArtistPublicController {
     public Mono<ArtistPublicViewDto> getArtist(
             @Parameter(description = "Base62-encoded short ID of the artist.") @PathVariable("artistId") String artistId) {
         return artistPublicService.getById(artistId);
+    }
+
+    @Operation(summary = "Get several artists by ID",
+            description = "Batch lookup for callers that already hold a list of artist IDs, so a screen " +
+                    "showing many artists costs one request rather than one per artist. IDs that do not " +
+                    "resolve to a publicly available artist are omitted from the response rather than " +
+                    "causing an error, so the result may be shorter than the request.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "The publicly available artists among those requested"),
+            @ApiResponse(responseCode = "400", description = "The request body was empty or malformed",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PostMapping("/get")
+    public Mono<List<ArtistPublicStandaloneDto>> getArtists(@RequestBody IdsRequest request) {
+        return artistPublicService.getAllByIds(request.getIds());
     }
 
     @Operation(summary = "List albums of an artist", description = "Returns a paginated page of the public albums credited to the given artist, optionally filtered by album type and sorted by release date.")

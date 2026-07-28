@@ -38,10 +38,14 @@ public class TrackPublicController {
         return trackPublicService.getById(trackId);
     }
 
-    @Operation(summary = "Get a track list by IDs", description = "Returns the public detail view of list of tracks.")
+    @Operation(summary = "Get several tracks by ID",
+            description = "Batch lookup for callers that already hold a list of track IDs, so a screen " +
+                    "showing many tracks costs one request rather than one per track. IDs that do not " +
+                    "resolve to a publicly available track are omitted from the response rather than " +
+                    "causing an error, so the result may be shorter than the request.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Track found"),
-            @ApiResponse(responseCode = "404", description = "Track not found or not publicly available",
+            @ApiResponse(responseCode = "200", description = "The publicly available tracks among those requested"),
+            @ApiResponse(responseCode = "400", description = "The request body was empty or malformed",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/get")

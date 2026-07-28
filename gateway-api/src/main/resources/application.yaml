@@ -19,6 +19,14 @@ spring:
           discovery:
             locator: enabled
           routes:
+            # library-service — owns /me/library prefix itself, gateway only routes.
+            # MUST stay ahead of user-service: routes are matched in declaration
+            # order, and /me/** would otherwise swallow every library request.
+            - id: library-service
+              uri: lb://library-service
+              predicates:
+                - Path=/me/library/**
+
             # user-service — owns /me prefix itself, gateway only routes
             - id: user-service
               uri: lb://user-service
@@ -71,6 +79,8 @@ springdoc:
         url: /me/v3/api-docs
       - name: playlist
         url: /playlists/v3/api-docs
+      - name: library
+        url: /me/library/v3/api-docs
 
 eureka:
   client:
