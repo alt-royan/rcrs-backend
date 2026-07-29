@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.ultra.rcrs.security.CallerId;
 import org.ultra.rcrs.userservice.dto.ErrorResponse;
 import org.ultra.rcrs.userservice.dto.UserAvatarRequest;
-import org.ultra.rcrs.userservice.service.UserAvatarService;
+import org.ultra.rcrs.userservice.service.UserService;
 
 @RestController
 @RequestMapping("/me/avatar")
@@ -27,7 +27,7 @@ import org.ultra.rcrs.userservice.service.UserAvatarService;
 @Tag(name = "User Avatar", description = "Endpoint for uploading the avatar of the currently authenticated user")
 public class UserAvatarController {
 
-    private final UserAvatarService userAvatarService;
+    private final UserService userAvatarService;
 
     @PostMapping
     @Operation(
@@ -51,7 +51,7 @@ public class UserAvatarController {
     })
     public ResponseEntity<Void> uploadAvatar(@RequestBody @Valid UserAvatarRequest request,
                                              @AuthenticationPrincipal Jwt jwt) {
-        userAvatarService.saveAvatar(CallerId.of(jwt), request.avatar());
+        userAvatarService.saveAvatar(CallerId.require(jwt), request.avatar());
         return ResponseEntity.noContent().build();
     }
 }

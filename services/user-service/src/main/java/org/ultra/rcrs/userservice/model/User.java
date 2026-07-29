@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -18,20 +19,14 @@ import java.time.Instant;
 public class User {
 
     @Id
-    @Column(name = "user_id", nullable = false, unique = true)
-    private String userId;
+    @Column(name = "id", nullable = false, unique = true)
+    private UUID id ;
 
     @Column(name = "username", nullable = false)
     private String username;
 
-    @Column(name = "email")
-    private String email;
-
-    @Column(name = "enabled", nullable = false)
-    private boolean enabled;
-
-    @Column(name = "email_verified", nullable = false)
-    private boolean emailVerified;
+    @Column(name = "avatar_key", nullable = false)
+    private String avatarKey;
 
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;

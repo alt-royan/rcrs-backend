@@ -7,13 +7,6 @@
 Обнаружено при проектировании `rcrs-frontend/music-app-mobile` (см. его `docs/PLAN.md`).
 Порядок — от блокирующего к «знать заранее».
 
-- [ ] **Анонимного чтения нет вообще** — `gateway-api/src/main/java/org/ultra/rcrs/gatewayapi/SecurityConfig.java:73`
-  - `anyExchange().authenticated()`: токен требуется даже на публичные `GET /api/catalog/**`
-    и `GET /api/search`. То есть «витрину» нельзя показать до логина, нельзя расшарить ссылку
-    на альбом, и первый же экран с данными зависит от Keycloak.
-  - Решить продуктово: если витрина должна быть открытой — разрешить анонимно `publ`-пути
-    каталога и поиск.
-
 - [ ] **Realm и клиенты Keycloak не в version control** — `local/infra/keycloak/`
   - В папке только `Dockerfile`; Keycloak запускается `start-dev` с admin/admin и
     persistent-волюмом (`local/infra/docker-compose.yml:253-281`), realm-export отсутствует.
