@@ -53,7 +53,7 @@ public class SecurityConfig {
 
         reactiveJwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
             Flux<GrantedAuthority> authorities = Flux.fromIterable(jwtGrantedAuthoritiesConverter.convert(jwt));
-            Flux<String> roles = Mono.justOrEmpty(jwt.getClaimAsStringList("rcrs-roles"))
+            Flux<String> roles = Mono.justOrEmpty(jwt.getClaimAsStringList("resource_access.rcrs.roles"))
                     .flatMapMany(Flux::fromIterable);
 
             return Flux.concat(authorities, roles

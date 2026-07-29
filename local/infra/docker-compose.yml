@@ -251,7 +251,9 @@ services:
       - rcrs
 
   keycloak:
-    image: keycloak/keycloak:26.3.2
+    build:
+      context: ./keycloak
+      dockerfile: Dockerfile
     volumes:
       - keycloak_data:/opt/keycloak/data
     container_name: keycloak

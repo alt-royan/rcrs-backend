@@ -67,7 +67,7 @@ public class SecurityConfig {
         delegate.setJwtGrantedAuthoritiesConverter(jwt -> {
             JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
             var authorities = grantedAuthoritiesConverter.convert(jwt);
-            var roles = Optional.ofNullable(jwt.getClaimAsStringList("rcrs-roles"))
+            var roles = Optional.ofNullable(jwt.getClaimAsStringList("resource_access.rcrs.roles"))
                     .orElse(List.of());
 
             return Stream.concat(authorities.stream(),
