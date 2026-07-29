@@ -258,6 +258,9 @@ services:
       - keycloak_data:/opt/keycloak/data
     container_name: keycloak
     environment:
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KEYCLOAK_KAFKA_TOPIC_LOGIN: identity.events
+      KEYCLOAK_KAFKA_TOPIC_ADMIN: identity.events
       KEYCLOAK_ADMIN: admin
       KEYCLOAK_ADMIN_PASSWORD: admin
     ports:
