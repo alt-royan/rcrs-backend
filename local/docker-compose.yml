@@ -75,7 +75,7 @@ services:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/rcrs
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/rcrs/protocol/openid-connect/certs
       SPRING_SECURITY_WORKFLOW_CLIENT_ID: workflow-service-client
-      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs_admin-panel
+      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs-admin-panel
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -97,7 +97,7 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/rcrs
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/rcrs/protocol/openid-connect/certs
-      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs_admin-panel
+      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs-admin-panel
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -119,7 +119,7 @@ services:
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/rcrs
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/rcrs/protocol/openid-connect/certs
-      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs_admin-panel
+      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs-admin-panel
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -152,11 +152,11 @@ services:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/rcrs
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/rcrs/protocol/openid-connect/certs
       SPRING_SECURITY_WORKFLOW_CLIENT_ID: workflow-service-client
-      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs_admin-panel
+      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs-admin-panel
       AUDIO_BUCKET_NAME: rcrs-audio
       AUDIO_BUCKET_PUBLIC_URL: http://192.168.1.3:4566/rcrs-audio
       AUDIO_SIGNATURE_DURATION: 30m
-      AUDIO_VALIDATION_FORMATS: mp3, wav, ogg, flac
+      AUDIO_VALIDATION_FORMATS: mp3, wav, ogg, flac, mp4
       AUDIO_VALIDATION_DURATION_MIN: 1s
       AUDIO_VALIDATION_DURATION_MAX: 2h
       AUDIO_QUALITY_LOW: 96k
@@ -164,7 +164,7 @@ services:
       AUDIO_QUALITY_HIGH: 192k
       AUDIO_CODEC: aac
       AUDIO_RATE: 44100
-      AUDIO_FORMAT: m4a
+      AUDIO_FORMAT: mp4
       AUDIO_CONTENT_TYPE: audio/mp4
       AUDIO_LOUDNORM_ENABLED: false
       AUDIO_LOUDNORM_I: -18
@@ -210,7 +210,7 @@ services:
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/rcrs
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/rcrs/protocol/openid-connect/certs
       IMAGE_CDN_ENDPOINT: http://192.168.1.3:4566/images
-      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs_admin-panel
+      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs-admin-panel
     depends_on:
       discovery-server:
         condition: service_healthy

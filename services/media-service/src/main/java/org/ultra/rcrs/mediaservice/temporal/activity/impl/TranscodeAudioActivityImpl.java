@@ -1,5 +1,6 @@
 package org.ultra.rcrs.mediaservice.temporal.activity.impl;
 
+import io.temporal.failure.ApplicationFailure;
 import io.temporal.spring.boot.ActivityImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,7 +41,7 @@ public class TranscodeAudioActivityImpl implements TranscodeAudioActivity {
             log.info("Audio transcoding completed: (bitrate={})", bitrate);
             return outputFile;
         } catch (Exception e) {
-            throw new RuntimeException("Failed to transcode audio bitrate=" + bitrate, e);
+            throw ApplicationFailure.newNonRetryableFailure("Failed to transcode audio bitrate=" + bitrate + ": " + e.getMessage(), e.getClass().getName(), e);
         }
     }
 

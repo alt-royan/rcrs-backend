@@ -50,7 +50,7 @@ public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
             UUID guid = UUID.randomUUID();
             String originalFilename = URLEncoder.encode(audioUpload.getOriginalFileName(), StandardCharsets.UTF_8);
 
-            AudioMetadata originalMeta = activities.probeAudioMetadataActivity().probe(tempFile);
+            AudioMetadata originalMeta = activities.probeAudioMetadataActivity().probe(tempFile, true);
             String key = String.format("%s/%s/%s", trackId, guid, originalFilename);
 
             activities.s3Activity().putAudioWithContentType(key, tempFile, originalMeta.byteSize(), audioUpload.getContentType());
@@ -62,7 +62,7 @@ public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
             for (Map.Entry<Quality, String> q : qualityMap.entrySet()) {
                 File outputFile = activities.transcodeAudioActivity().transcode(tempFile, q.getValue());
 
-                AudioMetadata metadata = activities.probeAudioMetadataActivity().probe(outputFile);
+                AudioMetadata metadata = activities.probeAudioMetadataActivity().probe(outputFile, false);
                 key = String.format("%s/%s/%s_%s", trackId, guid, metadata.container(), q.getValue());
 
                 activities.s3Activity().putAudio(key, outputFile, metadata.byteSize());

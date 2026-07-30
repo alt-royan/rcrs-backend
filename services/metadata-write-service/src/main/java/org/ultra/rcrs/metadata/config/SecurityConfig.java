@@ -66,11 +66,8 @@ public class SecurityConfig {
                 return List.of();
             }
 
-            Map<String, Object> adminClientAccess = (Map<String, Object>) resourceAccess.get(adminClientId);
-            Map<String, Object> workflowClientAccess = (Map<String, Object>) resourceAccess.get(workflowClientId);
-            if (adminClientAccess == null && workflowClientAccess == null) {
-                return List.of();
-            }
+            Map<String, Object> adminClientAccess = Optional.ofNullable((Map<String, Object>) resourceAccess.get(adminClientId)).orElse(Map.of());
+            Map<String, Object> workflowClientAccess = Optional.ofNullable((Map<String, Object>) resourceAccess.get(workflowClientId)).orElse(Map.of());
 
             List<String> adminRoles = Optional.ofNullable((List<String>) adminClientAccess.get("roles")).orElse(List.of());
             List<String> workflowRoles = Optional.ofNullable((List<String>) workflowClientAccess.get("roles")).orElse(List.of());
