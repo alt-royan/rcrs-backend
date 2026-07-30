@@ -1,5 +1,6 @@
 package org.ultra.rcrs.metadata.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,10 +18,17 @@ import org.springframework.security.web.server.context.NoOpServerSecurityContext
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Configuration
 @EnableWebFluxSecurity
 @ConditionalOnProperty(prefix = "spring.security", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class SecurityConfig {
+
+    @Value("${spring.security.admin.client-id}")
+    private String clientId;
 
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
@@ -37,7 +45,7 @@ public class SecurityConfig {
                         .pathMatchers("/actuator/**").permitAll()
                         .pathMatchers(HttpMethod.GET, "/api/catalog/**").permitAll()
                         .pathMatchers(HttpMethod.POST, "/api/catalog/**").permitAll()
-                        .pathMatchers("/api/admin/**").hasRole("ADMIN")
+                        .pathMatchers("/api/admin/**").hasRole("ADMIN_READ")
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -48,18 +56,26 @@ public class SecurityConfig {
     @Bean
     public ReactiveJwtAuthenticationConverter reactiveJwtAuthenticationConverter() {
         ReactiveJwtAuthenticationConverter reactiveJwtAuthenticationConverter = new ReactiveJwtAuthenticationConverter();
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         reactiveJwtAuthenticationConverter.setPrincipalClaimName("preferred_username");
 
         reactiveJwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
-            Flux<GrantedAuthority> authorities = Flux.fromIterable(jwtGrantedAuthoritiesConverter.convert(jwt));
-            Flux<String> roles = Mono.justOrEmpty(jwt.getClaimAsStringList("resource_access.rcrs.roles"))
-                    .flatMapMany(Flux::fromIterable);
+            Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
+            if (resourceAccess == null) {
+                return Flux.empty();
+            }
 
-            return Flux.concat(authorities, roles
-                    .filter(role -> role.startsWith("ROLE_"))
-                    .map(SimpleGrantedAuthority::new)
-                    .map(GrantedAuthority.class::cast));
+            Map<String, Object> clientAccess = (Map<String, Object>) resourceAccess.get(clientId);
+            if (clientAccess == null) {
+                return Flux.empty();
+            }
+
+            List<String> roles = (List<String>) clientAccess.get("roles");
+            if (roles == null) {
+                return Flux.empty();
+            }
+
+            return Flux.fromIterable(roles)
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()));
         });
         return reactiveJwtAuthenticationConverter;
     }

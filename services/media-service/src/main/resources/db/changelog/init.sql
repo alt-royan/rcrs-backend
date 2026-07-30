@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS audio
     codec              varchar(20)              NOT NULL,
     duration_ms        int                      NOT NULL,
     container          varchar(10)              NOT NULL,
+    content_type       text                     NOT NULL,
     bitrate            varchar                  NOT NULL,
     quality            varchar                  NOT NULL,
     sample_rate        varchar                  NOT NULL,

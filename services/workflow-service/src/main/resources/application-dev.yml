@@ -21,6 +21,8 @@ spring:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
   security:
     enabled: true
+    admin:
+      client-id: ${SPRING_SECURITY_ADMIN_CLIENT_ID}
     oauth2:
       resourceserver:
         jwt:

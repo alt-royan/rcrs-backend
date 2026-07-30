@@ -12,7 +12,7 @@ import java.util.UUID;
 public interface DbActivity {
 
     @ActivityMethod
-    UUID saveAudio(String trackId, UUID guid, Boolean main, String key, AudioMetadata metadata, Quality quality, String contentType);
+    UUID saveAudioWithContentType(String trackId, UUID guid, Boolean main, String key, AudioMetadata metadata, Quality quality, String contentType);
 
     @ActivityMethod
     UUID saveAudio(String trackId, UUID guid, Boolean main, String key, AudioMetadata metadata, Quality quality);

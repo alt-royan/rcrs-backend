@@ -30,7 +30,7 @@ public class S3ActivityImpl implements S3Activity {
     private final MediaConfigurationProperties properties;
 
     @Override
-    public void putAudio(String key, File file, Long contentLength, String contentType) throws IOException {
+    public void putAudioWithContentType(String key, File file, Long contentLength, String contentType) throws IOException {
         String audioBucket = properties.getAudio().getBucket().getName();
         try (InputStream is = new FileInputStream(file)) {
             s3Client.putObject(PutObjectRequest.builder()
@@ -46,11 +46,11 @@ public class S3ActivityImpl implements S3Activity {
 
     @Override
     public void putAudio(String key, File file, Long contentLength) throws IOException {
-        putAudio(key, file, contentLength, properties.getAudio().getContentType());
+        putAudioWithContentType(key, file, contentLength, properties.getAudio().getContentType());
     }
 
     @Override
-    public void putDownload(String key, File file, Long contentLength, String contentType, String fileName) throws IOException {
+    public void putDownloadWithContentType(String key, File file, Long contentLength, String contentType, String fileName) throws IOException {
         String downloadBucket = properties.getDownload().getBucket().getName();
         String contentDisposition = ContentDisposition.attachment()
                 .filename(fileName, StandardCharsets.UTF_8)
@@ -70,7 +70,7 @@ public class S3ActivityImpl implements S3Activity {
 
     @Override
     public void putDownload(String key, File file, Long contentLength, String fileName) throws IOException {
-        putDownload(key, file, contentLength, properties.getAudio().getContentType(), fileName);
+        putDownloadWithContentType(key, file, contentLength, properties.getAudio().getContentType(), fileName);
     }
 
     @Override

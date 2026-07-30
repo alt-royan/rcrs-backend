@@ -23,10 +23,9 @@ spring:
     url: jdbc:postgresql://localhost:5432/postgres
     database-change-log-table: library_databasechangelog
     database-change-log-lock-table: library_databasechangeloglock
-  data:
-    mongodb:
-      uri: mongodb://localhost:27017/rcrs_library
-      auto-index-creation: false
+  mongodb:
+    uri: mongodb://localhost:27017/rcrs_library
+    auto-index-creation: false
   kafka:
     bootstrap-servers: localhost:9092
   security:

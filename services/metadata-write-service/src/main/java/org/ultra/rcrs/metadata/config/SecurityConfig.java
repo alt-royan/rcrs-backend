@@ -1,28 +1,37 @@
 package org.ultra.rcrs.metadata.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.oauth2.server.resource.web.BearerTokenAuthenticationEntryPoint;
 import org.springframework.security.oauth2.server.resource.web.access.BearerTokenAccessDeniedHandler;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @ConditionalOnProperty(prefix = "spring.security", name = "enabled", havingValue = "true", matchIfMissing = true)
 public class SecurityConfig {
+
+    @Value("${spring.security.admin.client-id}")
+    private String adminClientId;
+
+    @Value("${spring.security.workflow.client-id}")
+    private String workflowClientId;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) {
@@ -37,9 +46,9 @@ public class SecurityConfig {
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/catalog/swagger-ui/**").permitAll()
-                        .requestMatchers("/catalog/v3/api-docs/**").permitAll()
+                        .requestMatchers("/calalog/v3/api-docs/**").permitAll()
                         .requestMatchers("/actuator/**").permitAll()
-                        .anyRequest().hasAnyRole("SERVICE_WORKFLOW", "ADMIN")
+                        .anyRequest().hasAnyRole("ADMIN", "SERVICE_WORKFLOW")
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())));
@@ -49,21 +58,28 @@ public class SecurityConfig {
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         jwtAuthenticationConverter.setPrincipalClaimName("preferred_username");
 
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwt -> {
-            var authorities = jwtGrantedAuthoritiesConverter.convert(jwt);
-            var roles = Optional.ofNullable(jwt.getClaimAsStringList("resource_access.rcrs.roles"))
-                    .orElse(List.of());
+            Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
+            if (resourceAccess == null) {
+                return List.of();
+            }
 
-            return Stream.concat(authorities.stream(),
-                            roles.stream()
-                                    .filter(role -> role.startsWith("ROLE_"))
-                                    .map(SimpleGrantedAuthority::new)
-                                    .map(GrantedAuthority.class::cast))
-                    .toList();
+            Map<String, Object> adminClientAccess = (Map<String, Object>) resourceAccess.get(adminClientId);
+            Map<String, Object> workflowClientAccess = (Map<String, Object>) resourceAccess.get(workflowClientId);
+            if (adminClientAccess == null && workflowClientAccess == null) {
+                return List.of();
+            }
+
+            List<String> adminRoles = Optional.ofNullable((List<String>) adminClientAccess.get("roles")).orElse(List.of());
+            List<String> workflowRoles = Optional.ofNullable((List<String>) workflowClientAccess.get("roles")).orElse(List.of());
+
+            return Stream.concat(adminRoles.stream(), workflowRoles.stream())
+                    .map(role -> new SimpleGrantedAuthority("ROLE_" + role.toUpperCase()))
+                    .collect(Collectors.toList());
         });
         return jwtAuthenticationConverter;
     }
+
 }

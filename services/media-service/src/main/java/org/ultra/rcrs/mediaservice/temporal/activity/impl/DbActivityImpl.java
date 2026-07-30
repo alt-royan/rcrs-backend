@@ -33,7 +33,7 @@ public class DbActivityImpl implements DbActivity {
 
     @Override
     @Transactional
-    public UUID saveAudio(String trackId, UUID guid, Boolean main, String key, AudioMetadata metadata, Quality quality, String contentType) {
+    public UUID saveAudioWithContentType(String trackId, UUID guid, Boolean main, String key, AudioMetadata metadata, Quality quality, String contentType) {
         Audio audio = Audio.builder()
                 .guid(guid)
                 .key(key)
@@ -63,7 +63,7 @@ public class DbActivityImpl implements DbActivity {
 
     @Override
     public UUID saveAudio(String trackId, UUID guid, Boolean main, String key, AudioMetadata metadata, Quality quality) {
-        return saveAudio(trackId, guid, main, key, metadata, quality, properties.getAudio().getContentType());
+        return saveAudioWithContentType(trackId, guid, main, key, metadata, quality, properties.getAudio().getContentType());
     }
 
     @Override

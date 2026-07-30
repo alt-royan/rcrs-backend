@@ -2,6 +2,7 @@ package org.ultra.rcrs.userservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,8 @@ import org.ultra.rcrs.utils.ImageUtils;
 import org.ultra.rcrs.utils.Url62;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,6 +28,10 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final ImageUtils imageUtils;
+
+    @Value("${spring.security.admin.client-id}")
+    private String clientId;
+
 
     @Transactional
     public void handleEvent(IdentityEvent event) {
@@ -76,9 +83,19 @@ public class UserService {
         return new MeResponse(
                 Url62.encode(userId),
                 jwt.getClaimAsString("preferred_username"),
+                extractRoles(jwt),
                 imageUtils.parseUrls(userAvatar)
         );
     }
+
+    private List<String> extractRoles(Jwt jwt) {
+        Map<String, Object> resourceAccess = jwt.getClaim("resource_access");
+        if (resourceAccess == null) return List.of();
+        Map<String, Object> clientAccess = (Map<String, Object>) resourceAccess.get(clientId);
+        if (clientAccess == null) return List.of();
+        return (List<String>) clientAccess.getOrDefault("roles", List.of());
+    }
+
 
     @Transactional
     public void saveAvatar(Jwt jwt, String avatarUri) {

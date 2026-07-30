@@ -53,11 +53,11 @@ public class AudioTranscodingWorkflowImpl implements AudioTranscodingWorkflow {
             AudioMetadata originalMeta = activities.probeAudioMetadataActivity().probe(tempFile);
             String key = String.format("%s/%s/%s", trackId, guid, originalFilename);
 
-            activities.s3Activity().putAudio(key, tempFile, originalMeta.byteSize(), audioUpload.getContentType());
+            activities.s3Activity().putAudioWithContentType(key, tempFile, originalMeta.byteSize(), audioUpload.getContentType());
             String downloadFileName = downloadFileName(audioUpload.getOriginalFileName(), originalMeta.container());
-            activities.s3Activity().putDownload(key, tempFile, originalMeta.byteSize(), audioUpload.getContentType(), downloadFileName);
+            activities.s3Activity().putDownloadWithContentType(key, tempFile, originalMeta.byteSize(), audioUpload.getContentType(), downloadFileName);
 
-            activities.dbActivity().saveAudio(trackId, guid, true, key, originalMeta, Quality.ORIGINAL, audioUpload.getContentType());
+            activities.dbActivity().saveAudioWithContentType(trackId, guid, true, key, originalMeta, Quality.ORIGINAL, audioUpload.getContentType());
 
             for (Map.Entry<Quality, String> q : qualityMap.entrySet()) {
                 File outputFile = activities.transcodeAudioActivity().transcode(tempFile, q.getValue());

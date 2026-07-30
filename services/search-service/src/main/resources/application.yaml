@@ -11,6 +11,8 @@ spring:
   elasticsearch:
     uris: localhost:9200
   security:
+    admin:
+      client-id: rcrs-admin-panel
     enabled: true
     oauth2:
       resourceserver:

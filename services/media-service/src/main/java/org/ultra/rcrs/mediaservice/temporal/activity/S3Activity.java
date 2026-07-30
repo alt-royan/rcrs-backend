@@ -10,13 +10,13 @@ import java.io.IOException;
 public interface S3Activity {
 
     @ActivityMethod
-    void putAudio(String key, File file, Long contentLength, String contentType) throws IOException;
+    void putAudioWithContentType(String key, File file, Long contentLength, String contentType) throws IOException;
 
     @ActivityMethod
     void putAudio(String key, File file, Long contentLength) throws IOException;
 
     @ActivityMethod
-    void putDownload(String key, File file, Long contentLength, String contentType, String fileName) throws IOException;
+    void putDownloadWithContentType(String key, File file, Long contentLength, String contentType, String fileName) throws IOException;
 
     @ActivityMethod
     void putDownload(String key, File file, Long contentLength, String fileName) throws IOException;
