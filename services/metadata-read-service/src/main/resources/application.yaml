@@ -9,6 +9,8 @@ spring:
   kafka:
     bootstrap-servers: 192.168.1.3:9092
   security:
+    admin:
+      client-id: rcrs-admin-panel
     enabled: true
     oauth2:
       resourceserver:
@@ -24,6 +26,12 @@ image:
       sm: 128
       md: 512
       lg: 1024
+
+springdoc:
+  api-docs:
+    path: /api/catalog/v3/api-docs
+  swagger-ui:
+    path: /api/catalog/swagger-ui.html
 
 eureka:
   client:

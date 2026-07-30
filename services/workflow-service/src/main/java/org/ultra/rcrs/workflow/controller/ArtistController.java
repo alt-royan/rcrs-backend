@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.ultra.rcrs.security.CallerId;
 import org.ultra.rcrs.workflow.dto.request.ArtistUploadRequest;
 import org.ultra.rcrs.workflow.dto.request.ChangeAvailabilityStatusRequest;
 import org.ultra.rcrs.workflow.dto.response.CreateResponse;
@@ -48,7 +49,7 @@ public class ArtistController {
     })
     @PostMapping
     public ResponseEntity<CreateResponse> registerArtist(@Valid @RequestBody ArtistUploadRequest request, @AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(handler.startRegisterArtistWorkflow(request, jwt));
+        return ResponseEntity.status(HttpStatus.CREATED).body(handler.startRegisterArtistWorkflow(request, CallerId.require(jwt)));
     }
 
     @Operation(
@@ -74,7 +75,7 @@ public class ArtistController {
             @Parameter(description = "Short (Base62) identifier of the artist whose availability status is being changed", required = true)
             @PathVariable("id") String id,
             @AuthenticationPrincipal Jwt jwt) {
-        handler.startArtistChangeAvailabilityStatusWorkflow(request.status(), id, jwt);
+        handler.startArtistChangeAvailabilityStatusWorkflow(request.status(), id, CallerId.require(jwt));
         return ResponseEntity.ok().build();
     }
 

@@ -32,8 +32,13 @@ public class TrackPublicService {
                 .map(this::toDto);
     }
 
+    /**
+     * Batch lookup for callers holding a list of track ids. Filtered to publicly
+     * available tracks, like every other query behind the public controllers —
+     * tracks that are unpublished or withdrawn are simply absent from the result.
+     */
     public Mono<List<TrackPublicStandaloneDto>> getAllByIds(List<String> ids) {
-        return trackDocumentRepository.findAllByIdIn(ids)
+        return trackDocumentRepository.findAllByIdInForPublic(ids)
                 .map(this::toStandaloneDto)
                 .collectList();
     }

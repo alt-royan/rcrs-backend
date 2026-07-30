@@ -1,0 +1,73 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: library-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: rcrs_library
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  liquibase:
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    user: postgres
+    password: postgres
+    url: jdbc:postgresql://localhost:5432/postgres
+    database-change-log-table: library_databasechangelog
+    database-change-log-lock-table: library_databasechangeloglock
+  mongodb:
+    uri: mongodb://localhost:27017/rcrs_library
+    auto-index-creation: false
+  kafka:
+    bootstrap-servers: localhost:9092
+  security:
+    enabled: true
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://192.168.1.3:8180/realms/master
+          jwk-set-uri: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
+
+# The gateway performs no StripPrefix, so this service is reachable at /me/library/**
+# and its OpenAPI documents must live under that same prefix to be routable.
+springdoc:
+  api-docs:
+    path: /me/library/v3/api-docs
+  swagger-ui:
+    path: /me/library/swagger-ui.html
+
+library:
+  # Raw listen events are dropped by a MongoDB TTL index after this long.
+  # 13 months rather than 12 so year-over-year features keep a full comparison window.
+  listens:
+    retention: 400d
+    max-batch-size: 200
+  # Bounded per-user caps, trimmed on write.
+  search-history:
+    max-entries: 100
+  recently-played:
+    max-entries: 200
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    preferIpAddress: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: when_authorized

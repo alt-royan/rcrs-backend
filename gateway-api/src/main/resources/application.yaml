@@ -9,53 +9,61 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://192.168.1.3:8180/realms/master
-          jwk-set-uri: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
+          issuer-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI}
+          jwk-set-uri: ${SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI}
   cloud:
     gateway:
       server:
         webflux:
           globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: "*"
+                allowedMethods: "*"
+                allowedHeaders: "*"
           discovery:
             locator: enabled
           routes:
-            # user-service — owns /me prefix itself, gateway only routes
+            # user-service — prefix /me
             - id: user-service
               uri: lb://user-service
               predicates:
                 - Path=/me/**
 
-            # workflow-service — owns /workflow prefix itself, gateway only routes
+            # workflow-service — prefix /workflow
             - id: workflow-service
               uri: lb://workflow-service
               predicates:
                 - Path=/workflow/**
 
-            # media-service — owns /media prefix itself, gateway only routes
+            # media-service — prefix /media
             - id: media-service
               uri: lb://media-service
               predicates:
                 - Path=/media/**
 
-            # search-service — owns /api/search prefix itself, gateway only routes
+            # search-service — no prefix
             - id: search-service
               uri: lb://search-service
               predicates:
-                - Path=/api/search/**
+                - Path=/api/search/**,/api/admin/search/**
 
-            # metadata-read-service — owns /api/catalog prefix itself, gateway only routes
+            # metadata-read-service — no prefix
             - id: metadata-read-service
               uri: lb://metadata-read-service
               predicates:
-                - Path=/api/catalog/**
+                - Path=/api/catalog/**,/api/admin/catalog/**
 
-            # metadata-write — NOT available via gateway
-
-            # playlist-service — owns /playlists prefix itself, gateway only routes
             - id: playlist-service
               uri: lb://playlist-service
               predicates:
                 - Path=/playlists/**
+
+            - id: library-service
+              uri: lb://library-service
+              predicates:
+                - Path=/me/library/**
+            # metadata-write — NOT available via gateway
 springdoc:
   swagger-ui:
     urls:
@@ -69,21 +77,25 @@ springdoc:
         url: /workflow/v3/api-docs
       - name: user
         url: /me/v3/api-docs
-      - name: playlist
+      - name: playlists
         url: /playlists/v3/api-docs
+      - name: library
+        url: /me/library/v3/api-docs
 
 eureka:
   client:
     serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE}
+  instance:
+    preferIpAddress: true
+
+logging:
+  level:
+    org.springframework.security: TRACE
+    org.springframework.security.oauth2.server.resource: TRACE
 
 management:
   endpoints:
     web:
       exposure:
         include: "*"
-
-logging:
-  level:
-    org.springframework.cloud.gateway: TRACE
-    reactor.netty.http.client: DEBUG

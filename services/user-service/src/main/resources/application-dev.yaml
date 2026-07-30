@@ -26,6 +26,8 @@ spring:
   kafka:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
   security:
+    admin:
+      client-id: ${SPRING_SECURITY_ADMIN_CLIENT_ID}
     enabled: true
     oauth2:
       resourceserver:
@@ -41,6 +43,12 @@ image:
       sm: ${IMAGE_THUMBNAILS_SIZES_SM:128}
       md: ${IMAGE_THUMBNAILS_SIZES_MD:512}
       lg: ${IMAGE_THUMBNAILS_SIZES_LG:1024}
+
+springdoc:
+  api-docs:
+    path: /me/v3/api-docs
+  swagger-ui:
+    path: /me/swagger-ui.html
 
 eureka:
   client:

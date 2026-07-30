@@ -5,7 +5,10 @@ package events;
 option java_package = "org.ultra.rcrs.events.common";
 
 enum PlaylistType {
+  // LIKED = 1 and DOWNLOADS = 2 were removed: likes and downloads are owned by
+  // library-service and are not playlists. The numbers stay reserved because
+  // protobuf enum values must never be reused for a different meaning.
+  reserved 1, 2;
+
   CUSTOM = 0;
-  LIKED = 1;
-  DOWNLOADS = 2;
 }

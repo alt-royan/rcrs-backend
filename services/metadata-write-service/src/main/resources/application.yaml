@@ -26,6 +26,10 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
   security:
+    workflow:
+      client-id: workflow-service-client
+    admin:
+      client-id: rcrs-admin-panel
     enabled: true
     oauth2:
       resourceserver:
@@ -41,6 +45,12 @@ image:
       sm: 128
       md: 512
       lg: 1024
+
+springdoc:
+  api-docs:
+    path: /catalog/v3/api-docs
+  swagger-ui:
+    path: /catalog/swagger-ui.html
 
 eureka:
   client:

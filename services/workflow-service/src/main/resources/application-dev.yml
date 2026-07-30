@@ -21,6 +21,8 @@ spring:
     bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
   security:
     enabled: true
+    admin:
+      client-id: ${SPRING_SECURITY_ADMIN_CLIENT_ID}
     oauth2:
       resourceserver:
         jwt:
@@ -112,6 +114,12 @@ feign:
     url: ${FEIGN_MEDIA-SERVICE_URL}
   search-service:
     url: ${FEIGN_SEARCH-SERVICE_URL}
+
+springdoc:
+  api-docs:
+    path: /workflow/v3/api-docs
+  swagger-ui:
+    path: /workflow/swagger-ui.html
 
 eureka:
   client:

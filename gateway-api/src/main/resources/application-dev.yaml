@@ -15,6 +15,12 @@ spring:
     gateway:
       server:
         webflux:
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                allowedOrigins: "*"
+                allowedMethods: "*"
+                allowedHeaders: "*"
           discovery:
             locator: enabled
           routes:
@@ -22,41 +28,41 @@ spring:
             - id: user-service
               uri: lb://user-service
               predicates:
-                - Path=/me/**
-              filters:
-                - StripPrefix=1
+                - Path=/me
 
             # workflow-service — prefix /workflow
             - id: workflow-service
               uri: lb://workflow-service
               predicates:
                 - Path=/workflow/**
-              filters:
-                - StripPrefix=1
 
             # media-service — prefix /media
             - id: media-service
               uri: lb://media-service
               predicates:
                 - Path=/media/**
-              filters:
-                - StripPrefix=1
 
             # search-service — no prefix
             - id: search-service
               uri: lb://search-service
               predicates:
-                - Path=/api/search/**
-              filters:
-                - StripPrefix=2
+                - Path=/api/search/**,/api/admin/search/**
 
             # metadata-read-service — no prefix
             - id: metadata-read-service
               uri: lb://metadata-read-service
               predicates:
-                - Path=/api/catalog/**
-              filters:
-                - StripPrefix=2
+                - Path=/api/catalog/**,/api/admin/catalog/**
+
+            - id: playlist-service
+              uri: lb://playlist-service
+              predicates:
+                - Path=/playlists/**
+
+            - id: library-service
+              uri: lb://library-service
+              predicates:
+                - Path=/me/library/**
             # metadata-write — NOT available via gateway
 springdoc:
   swagger-ui:
@@ -71,6 +77,10 @@ springdoc:
         url: /workflow/v3/api-docs
       - name: user
         url: /me/v3/api-docs
+      - name: playlists
+        url: /playlists/v3/api-docs
+      - name: library
+        url: /me/library/v3/api-docs
 
 eureka:
   client:

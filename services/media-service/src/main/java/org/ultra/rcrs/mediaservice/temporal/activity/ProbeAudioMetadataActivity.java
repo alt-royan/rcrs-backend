@@ -10,5 +10,5 @@ import java.io.File;
 public interface ProbeAudioMetadataActivity {
 
     @ActivityMethod
-    AudioMetadata probe(File tempFile);
+    AudioMetadata probe(File tempFile, Boolean validation);
 }

@@ -29,8 +29,8 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: dev
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/rcrs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/rcrs/protocol/openid-connect/certs
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -47,6 +47,8 @@ services:
       workflow-service:
         condition: service_started
       playlist-service:
+        condition: service_started
+      library-service:
         condition: service_started
     networks:
       - rcrs
@@ -70,8 +72,10 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
       IMAGE_CDN_ENDPOINT: http://192.168.1.3:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/rcrs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/rcrs/protocol/openid-connect/certs
+      SPRING_SECURITY_WORKFLOW_CLIENT_ID: workflow-service-client
+      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs-admin-panel
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -91,8 +95,9 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
       IMAGE_CDN_ENDPOINT: http://192.168.1.3:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/rcrs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/rcrs/protocol/openid-connect/certs
+      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs-admin-panel
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -112,8 +117,9 @@ services:
       SPRING_ELASTICSEARCH_URIS: http://192.168.1.3:9200
       IMAGE_CDN_ENDPOINT: http://192.168.1.3:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/rcrs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/rcrs/protocol/openid-connect/certs
+      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs-admin-panel
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -143,12 +149,14 @@ services:
       SPRING_CLOUD_AWS_REGION_STATIC: eu-west-1
       SPRING_CLOUD_AWS_ENDPOINT: http://192.168.1.3:4566
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/rcrs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/rcrs/protocol/openid-connect/certs
+      SPRING_SECURITY_WORKFLOW_CLIENT_ID: workflow-service-client
+      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs-admin-panel
       AUDIO_BUCKET_NAME: rcrs-audio
       AUDIO_BUCKET_PUBLIC_URL: http://192.168.1.3:4566/rcrs-audio
       AUDIO_SIGNATURE_DURATION: 30m
-      AUDIO_VALIDATION_FORMATS: mp3, wav, ogg, flac
+      AUDIO_VALIDATION_FORMATS: mp3, wav, ogg, flac, mp4
       AUDIO_VALIDATION_DURATION_MIN: 1s
       AUDIO_VALIDATION_DURATION_MAX: 2h
       AUDIO_QUALITY_LOW: 96k
@@ -156,7 +164,7 @@ services:
       AUDIO_QUALITY_HIGH: 192k
       AUDIO_CODEC: aac
       AUDIO_RATE: 44100
-      AUDIO_FORMAT: m4a
+      AUDIO_FORMAT: mp4
       AUDIO_CONTENT_TYPE: audio/mp4
       AUDIO_LOUDNORM_ENABLED: false
       AUDIO_LOUDNORM_I: -18
@@ -199,9 +207,10 @@ services:
       SPRING_LIQUIBASE_PASSWORD: postgres
       SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/rcrs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/rcrs/protocol/openid-connect/certs
       IMAGE_CDN_ENDPOINT: http://192.168.1.3:4566/images
+      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs-admin-panel
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -227,8 +236,35 @@ services:
       SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
       IMAGE_CDN_ENDPOINT: http://192.168.1.3:4566/images
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/rcrs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/rcrs/protocol/openid-connect/certs
+    depends_on:
+      discovery-server:
+        condition: service_healthy
+    networks:
+      - rcrs
+
+  library-service:
+    build:
+      context: ..
+      dockerfile: services/library-service/Dockerfile
+    container_name: library-service
+    ports:
+      - "8087:8087"
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://192.168.1.3:5432/postgres
+      SPRING_HIBERNATE_DEFAUT_SCHEMA: rcrs_library
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_LIQUIBASE_URL: jdbc:postgresql://192.168.1.3:5432/postgres
+      SPRING_LIQUIBASE_USER: postgres
+      SPRING_LIQUIBASE_PASSWORD: postgres
+      SPRING_MONGODB_URI: mongodb://192.168.1.3:27017/rcrs_library
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: 192.168.1.3:29092
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/rcrs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/rcrs/protocol/openid-connect/certs
     depends_on:
       discovery-server:
         condition: service_healthy
@@ -251,12 +287,13 @@ services:
       FEIGN_MEDIA-SERVICE_URL: http://media-service:8082
       FEIGN_SEARCH-SERVICE_URL: http://search-service:8083
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://discovery-server:8761/eureka/
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/master
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/master/protocol/openid-connect/certs
-      OAUTH2_CLIENT_PROVIDER_ISSUER_URI: http://192.168.1.3:8180/realms/master
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://192.168.1.3:8180/realms/rcrs
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI: http://192.168.1.3:8180/realms/rcrs/protocol/openid-connect/certs
+      OAUTH2_CLIENT_PROVIDER_ISSUER_URI: http://192.168.1.3:8180/realms/rcrs
+      SPRING_SECURITY_ADMIN_CLIENT_ID: rcrs-admin-panel
       OAUTH2_CLIENT_PROVIDER_USERNAME_ATTRIBUTE: preferred_username
-      OAUTH2_CLIENT_REGISTRATION_CLIENT_ID: workflow-client
-      OAUTH2_CLIENT_REGISTRATION_CLIENT_SECRET: In8bQ3Yq0F8pwyJNQ3yNDKdnAoCu8vBM
+      OAUTH2_CLIENT_REGISTRATION_CLIENT_ID: workflow-service-client
+      OAUTH2_CLIENT_REGISTRATION_CLIENT_SECRET: sQnew99YcnwcsmYfCp3dZ9YUCfGZ4LeW
     depends_on:
       discovery-server:
         condition: service_healthy

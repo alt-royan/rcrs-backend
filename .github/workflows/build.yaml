@@ -103,3 +103,12 @@ jobs:
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/rcrs-playlist-service:latest
+
+      - name: Build library service
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./services/library-service/Dockerfile
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/rcrs-library-service:latest

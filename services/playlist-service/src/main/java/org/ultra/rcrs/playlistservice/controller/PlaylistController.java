@@ -20,6 +20,7 @@ import org.ultra.rcrs.playlistservice.dto.request.CreatePlaylistRequest;
 import org.ultra.rcrs.playlistservice.dto.request.IdsRequest;
 import org.ultra.rcrs.playlistservice.dto.response.*;
 import org.ultra.rcrs.playlistservice.service.PlaylistService;
+import org.ultra.rcrs.security.CallerId;
 import org.ultra.rcrs.utils.ImageUtils;
 import org.ultra.rcrs.utils.Url62;
 
@@ -29,18 +30,44 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/playlists")
-@Tag(name = "Playlist", description = "Synchronous REST API for managing user playlists and their tracks. " +
-        "This is one of two ways playlist commands can be applied — the other being an asynchronous Kafka " +
-        "command consumer that is not part of this controller.")
+@Tag(name = "Playlist", description = "User-created playlists and their tracks. Playlists are ordered, " +
+        "editable collections owned by one user; likes and downloads are not playlists and are served by " +
+        "library-service instead. A private playlist is invisible to everyone but its owner, who is always " +
+        "taken from the caller's JWT subject and never from the request.")
 public class PlaylistController {
 
     private final PlaylistService playlistService;
     private final ImageUtils imageUtils;
 
+    @GetMapping("/mine")
+    @Operation(summary = "List the caller's own playlists",
+            description = "Returns the playlists owned by the authenticated caller, most recently updated first, " +
+                    "including private ones. The owner is taken from the JWT subject, so there is no way to " +
+                    "list someone else's playlists through this endpoint.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Page of the caller's playlists (possibly empty)"),
+            @ApiResponse(responseCode = "400", description = "Invalid pagination parameter",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "Missing or invalid authentication token",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Unexpected internal error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    public PaginationResponse<PlaylistStandaloneDto> getOwnPlaylists(
+            @Parameter(description = "Zero-based offset of the first playlist to return.")
+            @RequestParam(defaultValue = "0") int offset,
+            @Parameter(description = "Maximum number of playlists to return.")
+            @RequestParam(defaultValue = "50") int limit,
+            @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
+        return playlistService.getOwnPlaylists(CallerId.of(jwt), offset, limit);
+    }
+
     @PostMapping("/get")
     @Operation(summary = "Get playlists by ID",
             description = "Fetches one or more playlists by their short (Base62) IDs and returns their public view, " +
-                    "including a resolved cover image URL.")
+                    "including a resolved cover image URL. Private playlists belonging to other users are " +
+                    "omitted from the result rather than causing an error, so the response may be shorter " +
+                    "than the request.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Playlists retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Missing or malformed 'ids' parameter, or an ID is not a valid short ID",
@@ -50,26 +77,33 @@ public class PlaylistController {
             @ApiResponse(responseCode = "500", description = "Unexpected internal error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public List<PlaylistStandaloneDto> getPlaylists(@RequestBody IdsRequest request) {
+    public List<PlaylistStandaloneDto> getPlaylists(
+            @RequestBody IdsRequest request,
+            @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
         List<UUID> uuids = request.getIds().stream().map(Url62::decode).toList();
-        return playlistService.getPlaylistsByIds(uuids);
+        return playlistService.getPlaylistsByIds(uuids, CallerId.of(jwt));
     }
 
     @GetMapping("/{playlistId}")
     @Operation(summary = "Get playlist by ID",
-            description = "Fetches one playlist by their short (Base62) IDs and returns their public view, " +
-                    "including a resolved cover image URL.")
+            description = "Fetches one playlist by its short (Base62) ID and returns its public view, " +
+                    "including a resolved cover image URL. A private playlist belonging to another user " +
+                    "reports 404 rather than 403, so that its existence is not disclosed.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Playlists retrieved successfully"),
-            @ApiResponse(responseCode = "400", description = "Missing or malformed 'ids' parameter, or an ID is not a valid short ID",
+            @ApiResponse(responseCode = "200", description = "Playlist retrieved successfully"),
+            @ApiResponse(responseCode = "400", description = "The ID is not a valid short ID",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Missing or invalid authentication token",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Playlist not found, or private and owned by another user",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Unexpected internal error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public PlaylistViewDto getPlaylists(@PathVariable("playlistId") String playlistId) {
-        return playlistService.getPlaylistById(Url62.decode(playlistId));
+    public PlaylistViewDto getPlaylist(
+            @PathVariable("playlistId") String playlistId,
+            @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
+        return playlistService.getPlaylistById(Url62.decode(playlistId), CallerId.of(jwt));
     }
 
     @PostMapping
@@ -92,21 +126,23 @@ public class PlaylistController {
             @RequestBody @Validated CreatePlaylistRequest request,
             @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
         UUID id = UUID.randomUUID();
-        var playlistId = playlistService.createPlaylist(id, jwt.getSubject(), request.getTitle(), request.getDescription(),
+        var playlistId = playlistService.createPlaylist(id, CallerId.of(jwt), request.getTitle(), request.getDescription(),
                 request.getTags(), request.getTrackIds(), imageUtils.parseKey(request.getCoverUri()), request.isPrivate(), request.getType());
         return ResponseEntity.status(HttpStatus.CREATED).body(new CreateResponse(Url62.encode(playlistId)));
     }
 
     @GetMapping("/{playlistId}/tracks")
     @Operation(summary = "List tracks in a playlist",
-            description = "Returns a paginated, sortable list of the tracks belonging to the given playlist.")
+            description = "Returns a paginated, sortable list of the tracks belonging to the given playlist. " +
+                    "A private playlist belonging to another user reports 404 rather than 403, so that its " +
+                    "existence is not disclosed.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Tracks retrieved successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid pagination or sort parameter",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "401", description = "Missing or invalid authentication token",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "404", description = "Playlist not found",
+            @ApiResponse(responseCode = "404", description = "Playlist not found, or private and owned by another user",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Unexpected internal error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -121,8 +157,9 @@ public class PlaylistController {
             @Parameter(description = "Field to sort the tracks by.")
             @RequestParam(defaultValue = "position") String sortBy,
             @Parameter(description = "Sort direction.")
-            @RequestParam(defaultValue = "DESC") Sort.Direction direction) {
-        return playlistService.getTracks(Url62.decode(playlistId), offset, limit, sortBy, direction);
+            @RequestParam(defaultValue = "DESC") Sort.Direction direction,
+            @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
+        return playlistService.getTracks(Url62.decode(playlistId), CallerId.of(jwt), offset, limit, sortBy, direction);
     }
 
     @PutMapping("/{playlistId}/tracks")
@@ -145,8 +182,9 @@ public class PlaylistController {
             @Parameter(description = "Short (Base62) ID of the playlist to add tracks to.", required = true)
             @PathVariable String playlistId,
             @Parameter(description = "Track IDs to add to the playlist.", required = true)
-            @RequestBody @Validated IdsRequest request) {
-        playlistService.addTracks(Url62.decode(playlistId), request.getIds());
+            @RequestBody @Validated IdsRequest request,
+            @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
+        playlistService.addTracks(Url62.decode(playlistId), request.getIds(), CallerId.of(jwt));
         return ResponseEntity.ok().build();
     }
 
@@ -170,8 +208,9 @@ public class PlaylistController {
             @Parameter(description = "Short (Base62) ID of the playlist to remove tracks from.", required = true)
             @PathVariable String playlistId,
             @Parameter(description = "Track IDs to remove from the playlist.", required = true)
-            @RequestBody @Validated IdsRequest request) {
-        playlistService.deleteTracks(Url62.decode(playlistId), request.getIds());
+            @RequestBody @Validated IdsRequest request,
+            @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
+        playlistService.deleteTracks(Url62.decode(playlistId), request.getIds(), CallerId.of(jwt));
         return ResponseEntity.ok().build();
     }
 
@@ -191,8 +230,9 @@ public class PlaylistController {
     })
     public ResponseEntity<Void> deletePlaylist(
             @Parameter(description = "Short (Base62) ID of the playlist to delete.", required = true)
-            @PathVariable String playlistId) {
-        playlistService.deletePlaylist(Url62.decode(playlistId));
+            @PathVariable String playlistId,
+            @Parameter(hidden = true) @AuthenticationPrincipal Jwt jwt) {
+        playlistService.deletePlaylist(Url62.decode(playlistId), CallerId.of(jwt));
         return ResponseEntity.noContent().build();
     }
 }

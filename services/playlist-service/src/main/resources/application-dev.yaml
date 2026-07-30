@@ -37,6 +37,12 @@ image:
   cdn:
     endpoint: ${IMAGE_CDN_ENDPOINT}
 
+springdoc:
+  api-docs:
+    path: /playlists/v3/api-docs
+  swagger-ui:
+    path: /playlists/swagger-ui.html
+
 eureka:
   client:
     serviceUrl:

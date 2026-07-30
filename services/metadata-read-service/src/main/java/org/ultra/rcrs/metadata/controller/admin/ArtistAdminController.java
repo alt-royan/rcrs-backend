@@ -20,7 +20,7 @@ import reactor.core.publisher.Mono;
 @Tag(name = "Artist Admin", description = "Administrative endpoints for browsing artists with unfiltered availability data.")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/catalog/admin/artists")
+@RequestMapping("/api/admin/catalog/artists")
 public class ArtistAdminController {
 
     private final ArtistAdminService artistAdminService;

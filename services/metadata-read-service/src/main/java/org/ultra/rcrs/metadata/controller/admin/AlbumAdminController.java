@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 @Tag(name = "Album Admin", description = "Administrative endpoints for browsing albums with unfiltered lifecycle and availability data.")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/catalog/admin/albums")
+@RequestMapping("/api/admin/catalog/albums")
 public class AlbumAdminController {
 
     private final AlbumAdminService albumAdminService;

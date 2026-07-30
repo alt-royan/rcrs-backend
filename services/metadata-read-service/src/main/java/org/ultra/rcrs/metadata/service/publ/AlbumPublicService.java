@@ -64,6 +64,18 @@ public class AlbumPublicService {
                 (found, total) -> new PaginationResponse<>(found, total, offset, limit));
     }
 
+    /**
+     * Batch lookup for callers that hold a list of album ids — a library screen, a
+     * set of likes — and would otherwise issue one request per album. Albums that
+     * are not publicly available are simply absent from the result.
+     */
+    public Mono<List<AlbumPublicStandaloneDto>> getAllByIds(List<String> ids) {
+        return albumDocumentRepository.findAllByIdInForPublic(ids)
+                .collectList()
+                .flatMapMany(this::toStandaloneDtos)
+                .collectList();
+    }
+
     private Flux<AlbumPublicStandaloneDto> toStandaloneDtos(List<AlbumDocument> docs) {
         List<String> ids = docs.stream().map(AlbumDocument::getId).toList();
         return albumTotalsRepository.findTotalsForPublic(ids)

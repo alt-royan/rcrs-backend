@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.ultra.rcrs.security.CallerId;
 import org.ultra.rcrs.workflow.dto.request.ChangeAvailabilityStatusRequest;
 import org.ultra.rcrs.workflow.handler.WorkflowHandler;
 
@@ -51,7 +52,7 @@ public class TrackController {
             @Parameter(description = "Short (Base62) identifier of the track whose availability status is being changed", required = true)
             @PathVariable("id") String id,
             @AuthenticationPrincipal Jwt jwt) {
-        handler.startTrackChangeAvailabilityStatusWorkflow(request.status(), id, jwt);
+        handler.startTrackChangeAvailabilityStatusWorkflow(request.status(), id, CallerId.require(jwt));
         return ResponseEntity.ok().build();
     }
 

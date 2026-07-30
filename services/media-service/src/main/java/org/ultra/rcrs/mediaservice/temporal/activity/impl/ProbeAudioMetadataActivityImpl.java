@@ -1,5 +1,6 @@
 package org.ultra.rcrs.mediaservice.temporal.activity.impl;
 
+import io.temporal.failure.ApplicationFailure;
 import io.temporal.spring.boot.ActivityImpl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ public class ProbeAudioMetadataActivityImpl implements ProbeAudioMetadataActivit
     private final AudioConfigurationProperties properties;
 
     @Override
-    public AudioMetadata probe(File tempFile) {
+    public AudioMetadata probe(File tempFile, Boolean validation) {
         try {
             ProcessBuilder pb = new ProcessBuilder(
                     "ffprobe",
@@ -65,22 +66,24 @@ public class ProbeAudioMetadataActivityImpl implements ProbeAudioMetadataActivit
 
             bitrate = Integer.parseInt(bitrate) / 1000 + "k";
 
-            if (!properties.getValidation().getFormats().contains(container)) {
-                throw new BadRequestException("Unsupported audio format: " + container);
-            }
+            if (validation) {
+                if (!properties.getValidation().getFormats().contains(container)) {
+                    throw new BadRequestException("Unsupported audio format: " + container);
+                }
 
-            if (Duration.of(durationMs, ChronoUnit.MILLIS).compareTo(properties.getValidation().getDuration().getMin()) < 0
-                    || Duration.of(durationMs, ChronoUnit.MILLIS).compareTo(properties.getValidation().getDuration().getMax()) > 0) {
-                throw new BadRequestException("Audio duration " +
-                        duration + "s is out of range [" + properties.getValidation().getDuration().getMin().toString() +
-                        ", " + properties.getValidation().getDuration().getMax().toString() + "]");
+                if (Duration.of(durationMs, ChronoUnit.MILLIS).compareTo(properties.getValidation().getDuration().getMin()) < 0
+                        || Duration.of(durationMs, ChronoUnit.MILLIS).compareTo(properties.getValidation().getDuration().getMax()) > 0) {
+                    throw new BadRequestException("Audio duration " +
+                            duration + "s is out of range [" + properties.getValidation().getDuration().getMin().toString() +
+                            ", " + properties.getValidation().getDuration().getMax().toString() + "]");
+                }
             }
 
             log.info("Probed audio: codec={}, container={}, bitrate={}, sampleRate={}, durationMs={}, size={}",
                     codec, container, bitrate, sampleRate, durationMs, sizeInBytes);
             return new AudioMetadata(codec, container, bitrate, sampleRate, durationMs, sizeInBytes);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to probe audio", e);
+            throw ApplicationFailure.newNonRetryableFailure("Failed to probe audio: " + e.getMessage(), e.getClass().getName(), e);
         }
     }
 }
