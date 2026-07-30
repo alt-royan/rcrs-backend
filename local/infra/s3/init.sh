@@ -1,5 +1,4 @@
 #!/bin/sh
-set -e
 
 ENDPOINT="http://s3:4566"
 BUCKETS="images rcrs-audio rcrs-upload rcrs-download"
